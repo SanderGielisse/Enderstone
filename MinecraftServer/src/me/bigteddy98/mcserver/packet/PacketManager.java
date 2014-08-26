@@ -5,9 +5,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import me.bigteddy98.mcserver.packet.login.PacketInLoginStart;
+import me.bigteddy98.mcserver.packet.play.PacketInAbilities;
 import me.bigteddy98.mcserver.packet.play.PacketInAnimation;
+import me.bigteddy98.mcserver.packet.play.PacketInBlockPlacement;
+import me.bigteddy98.mcserver.packet.play.PacketInClickWindow;
 import me.bigteddy98.mcserver.packet.play.PacketInClientSettings;
+import me.bigteddy98.mcserver.packet.play.PacketInClientStatus;
+import me.bigteddy98.mcserver.packet.play.PacketInCloseWindow;
+import me.bigteddy98.mcserver.packet.play.PacketInCreativeInventoryAction;
 import me.bigteddy98.mcserver.packet.play.PacketInEntityAction;
+import me.bigteddy98.mcserver.packet.play.PacketInHeldItemChange;
+import me.bigteddy98.mcserver.packet.play.PacketInPlayerDigging;
 import me.bigteddy98.mcserver.packet.play.PacketInPlayerLook;
 import me.bigteddy98.mcserver.packet.play.PacketInPlayerOnGround;
 import me.bigteddy98.mcserver.packet.play.PacketInPlayerPosition;
@@ -37,11 +45,19 @@ public class PacketManager {
 		play.put(0x04, PacketInPlayerPosition.class);
 		play.put(0x05, PacketInPlayerLook.class);
 		play.put(0x06, PacketInPlayerPositionLook.class);
+		play.put(0x07, PacketInPlayerDigging.class);
+		play.put(0x08, PacketInBlockPlacement.class);
+		play.put(0x09, PacketInHeldItemChange.class);
+		play.put(0x10, PacketInCreativeInventoryAction.class);
+		play.put(0x13, PacketInAbilities.class);
 		play.put(0x15, PacketInClientSettings.class);
+		play.put(0x16, PacketInClientStatus.class);
 		play.put(0x17, PacketInPluginMessage.class);
 
 		play.put(0x0A, PacketInAnimation.class);
 		play.put(0x0B, PacketInEntityAction.class);
+		play.put(0x0D, PacketInCloseWindow.class);
+		play.put(0x0E, PacketInClickWindow.class);
 	}
 
 	public static Class<? extends Packet> getPacket(NetworkManager manager, int id, HandshakeState handshake) {

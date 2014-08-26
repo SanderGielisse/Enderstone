@@ -1,24 +1,18 @@
-package me.bigteddy98.mcserver.packet.login;
+package me.bigteddy98.mcserver.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import me.bigteddy98.mcserver.inventory.ItemStack;
 import me.bigteddy98.mcserver.packet.Packet;
 
-public class PacketInLoginStart extends Packet {
+public class PacketInCreativeInventoryAction extends Packet {
 
-	// incoming
-	private String name;
-
-	public PacketInLoginStart() {
-	}
-
-	public PacketInLoginStart(String name) {
-		this.name = name;
-	}
+	private short slot;
+	private ItemStack clicked;
 
 	@Override
 	public void read(ByteBuf buf) throws Exception {
-		this.name = readString(buf);
-		System.out.println("Name: " + name);
+		this.slot = buf.readShort();
+		this.clicked = readItemStack(buf);
 	}
 
 	@Override
@@ -28,15 +22,19 @@ public class PacketInLoginStart extends Packet {
 
 	@Override
 	public int getSize() throws Exception {
-		return getStringSize(name) + getVarIntSize(getId());
+		return getShortSize() + getItemStackSize(clicked) + getVarIntSize(getId());
 	}
 
 	@Override
 	public byte getId() {
-		return 0x00;
+		return 0x10;
 	}
 
-	public String getPlayerName() {
-		return name;
+	public short getSlot() {
+		return slot;
+	}
+
+	public ItemStack getClicked() {
+		return clicked;
 	}
 }

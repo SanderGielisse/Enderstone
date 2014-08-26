@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 
 import java.io.UnsupportedEncodingException;
 
+import me.bigteddy98.mcserver.inventory.ItemStack;
+
 public abstract class Packet {
 
 	public abstract void read(ByteBuf buf) throws Exception;
@@ -77,6 +79,45 @@ public abstract class Packet {
 		}
 	}
 
+	public static void writeItemStack(ItemStack stack, ByteBuf buf) {
+		if (stack.getBlockId() == -1) {
+			buf.writeShort(-1);
+			return;
+		}
+		buf.writeShort(stack.getAmount());
+		buf.writeShort(stack.getDamage());
+		buf.writeShort(stack.getNbtLength());
+		if (stack.getNbtLength() == -1) {
+			return;
+		}
+		buf.writeBytes(stack.getNbtData());
+	}
+
+	public static ItemStack readItemStack(ByteBuf buf) {
+		short blockId = buf.readShort();
+		ItemStack stack = new ItemStack(blockId, (byte) -1, (short) -1, (short) -1, new byte[0]);
+
+		if (blockId == -1) {
+			return stack;
+		}
+
+		stack.setAmount(buf.readByte());
+		stack.setDamage(buf.readShort());
+
+		short nbtLength = buf.readShort();
+		stack.setNbtLength(nbtLength);
+
+		if (nbtLength == -1) {
+			return stack;
+		}
+
+		byte[] data = new byte[nbtLength];
+		buf.readBytes(data, 0, nbtLength);
+		stack.setNbtData(data);
+
+		return stack;
+	}
+
 	public static int getStringSize(String s) throws UnsupportedEncodingException {
 		int total = 0;
 		total += getVarIntSize(s.length());
@@ -95,8 +136,24 @@ public abstract class Packet {
 		}
 		return total;
 	}
-	
-	public static int getFloatSize(){
+
+	public static int getItemStackSize(ItemStack stack) {
+		int total = 0;
+
+		if (stack.getBlockId() == -1) {
+			total += getShortSize();
+			return total;
+		}
+
+		total += (getShortSize() * 3);
+		if (stack.getNbtLength() == -1) {
+			return total;
+		}
+		total += stack.getNbtData().length;
+		return total;
+	}
+
+	public static int getFloatSize() {
 		return 4;
 	}
 
@@ -111,8 +168,8 @@ public abstract class Packet {
 	public static int getLongSize() {
 		return 8;
 	}
-	
-	public static int getDoubleSize(){
+
+	public static int getDoubleSize() {
 		return 8;
 	}
 }

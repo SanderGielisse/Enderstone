@@ -6,6 +6,8 @@
 
 package me.bigteddy98.mcserver.regions;
 
+import me.bigteddy98.mcserver.inventory.ItemStack;
+
 /**
  *
  * @author Fernando

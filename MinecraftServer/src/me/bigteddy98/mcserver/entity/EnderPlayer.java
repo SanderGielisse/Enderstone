@@ -14,6 +14,10 @@ public class EnderPlayer extends Entity {
 	private boolean chatColors;
 	private byte difficulty;
 	private boolean showCapes;
+	public boolean isCreative = true;
+	public boolean godMode = true;
+	public boolean canFly = true;
+	public boolean isFlying = true;
 	public int keepAliveID = 0;
 
 	public ChunkInformer chunkInformer = new ChunkInformer() {

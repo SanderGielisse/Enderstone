@@ -1,24 +1,17 @@
-package me.bigteddy98.mcserver.packet.login;
+package me.bigteddy98.mcserver.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import me.bigteddy98.mcserver.packet.JSONStringBuilder;
 import me.bigteddy98.mcserver.packet.Packet;
 
-public class PacketInLoginStart extends Packet {
+public class PacketInChatMessage extends Packet {
 
-	// incoming
-	private String name;
-
-	public PacketInLoginStart() {
-	}
-
-	public PacketInLoginStart(String name) {
-		this.name = name;
-	}
+	private String jsonMessage;
+	private String message;
 
 	@Override
 	public void read(ByteBuf buf) throws Exception {
-		this.name = readString(buf);
-		System.out.println("Name: " + name);
+		this.message = JSONStringBuilder.read(jsonMessage = readString(buf));
 	}
 
 	@Override
@@ -28,15 +21,19 @@ public class PacketInLoginStart extends Packet {
 
 	@Override
 	public int getSize() throws Exception {
-		return getStringSize(name) + getVarIntSize(getId());
+		return getStringSize(jsonMessage) + getVarIntSize(getId());
 	}
 
 	@Override
 	public byte getId() {
-		return 0x00;
+		return 0x01;
 	}
 
-	public String getPlayerName() {
-		return name;
+	public String getJSONMessage() {
+		return jsonMessage;
+	}
+
+	public String getMessage() {
+		return message;
 	}
 }

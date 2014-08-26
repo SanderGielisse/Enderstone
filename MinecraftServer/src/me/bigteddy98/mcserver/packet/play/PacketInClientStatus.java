@@ -1,15 +1,15 @@
-package me.bigteddy98.mcserver.packet.status;
+package me.bigteddy98.mcserver.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import me.bigteddy98.mcserver.packet.Packet;
 
-public class PacketInRequest extends Packet{
+public class PacketInClientStatus extends Packet {
 
-	//no fields
-	
+	private byte actionId;
+
 	@Override
 	public void read(ByteBuf buf) throws Exception {
-		//none
+		this.actionId = buf.readByte();
 	}
 
 	@Override
@@ -19,11 +19,15 @@ public class PacketInRequest extends Packet{
 
 	@Override
 	public int getSize() throws Exception {
-		return getVarIntSize(getId());
+		return 1 + getVarIntSize(getId());
 	}
 
 	@Override
 	public byte getId() {
-		return 0x00;
+		return 0x16;
+	}
+
+	public byte getActionId() {
+		return actionId;
 	}
 }

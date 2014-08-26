@@ -9,25 +9,16 @@ import io.netty.handler.codec.ReplayingDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
-import me.bigteddy98.mcserver.Main;
 import me.bigteddy98.mcserver.entity.EnderPlayer;
 import me.bigteddy98.mcserver.packet.NetworkManager.Stage;
 import me.bigteddy98.mcserver.packet.login.PacketInLoginStart;
-import me.bigteddy98.mcserver.packet.login.PacketOutLoginSucces;
 import me.bigteddy98.mcserver.packet.play.PacketInClientSettings;
 import me.bigteddy98.mcserver.packet.play.PacketInPlayerPositionLook;
 import me.bigteddy98.mcserver.packet.play.PacketInPluginMessage;
 import me.bigteddy98.mcserver.packet.play.PacketKeepAlive;
-import me.bigteddy98.mcserver.packet.play.PacketOutJoinGame;
-import me.bigteddy98.mcserver.packet.play.PacketOutPlayerAbilities;
-import me.bigteddy98.mcserver.packet.play.PacketOutPlayerPositionLook;
-import me.bigteddy98.mcserver.packet.play.PacketOutPluginMessage;
-import me.bigteddy98.mcserver.packet.play.PacketOutSpawnPosition;
-import me.bigteddy98.mcserver.packet.status.PacketPing;
 import me.bigteddy98.mcserver.packet.status.PacketInRequest;
-import me.bigteddy98.mcserver.packet.status.PacketOutResponse;
+import me.bigteddy98.mcserver.packet.status.PacketPing;
 
 public class NetworkManager extends ReplayingDecoder<Stage> {
 
@@ -103,23 +94,15 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 		} else if (packet instanceof PacketPing) {
 			this.packetReciever.packetPing((PacketPing) packet);
 		} else if (packet instanceof PacketInLoginStart) {
-			//this.packetReciever.packet
+			this.packetReciever.packetInLoginStart((PacketInLoginStart) packet);
 		} else if (packet instanceof PacketInClientSettings) {
-			//
+			this.packetReciever.packetInClientSettings((PacketInClientSettings) packet);
 		} else if (packet instanceof PacketInPluginMessage) {
-			PacketInPluginMessage message = (PacketInPluginMessage) packet;
-
-			if (message.getChannel().equals("REGISTER")) {
-				// REGISTER.add(new String(message.getData(), "UTF-8"));
-			} else if (message.getChannel().equals("UNREGISTER")) {
-				// REGISTER.remove(new String(message.getData(), "UTF-8"));
-			} else if (message.getChannel().equals("MC|Brand")) {
-				this.sendPacket(new PacketOutPluginMessage(message.getChannel(), message.getLength(), message.getData()));
-			}
+			this.packetReciever.packetInPluginMessage((PacketInPluginMessage) packet);
 		} else if (packet instanceof PacketInPlayerPositionLook) {
-			//
+			this.packetReciever.packetInPlayerPositionLook((PacketInPlayerPositionLook) packet);
 		} else if (packet instanceof PacketKeepAlive) {
-			// this.sendPacket(packet);
+			this.packetReciever.packetKeepAlive((PacketKeepAlive) packet);
 		}
 	}
 

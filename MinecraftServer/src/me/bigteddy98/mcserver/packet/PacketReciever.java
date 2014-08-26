@@ -14,9 +14,11 @@ import me.bigteddy98.mcserver.packet.play.PacketInPlayerOnGround;
 import me.bigteddy98.mcserver.packet.play.PacketInPlayerPosition;
 import me.bigteddy98.mcserver.packet.play.PacketInPlayerPositionLook;
 import me.bigteddy98.mcserver.packet.play.PacketInPluginMessage;
+import me.bigteddy98.mcserver.packet.play.PacketKeepAlive;
 import me.bigteddy98.mcserver.packet.play.PacketOutJoinGame;
 import me.bigteddy98.mcserver.packet.play.PacketOutPlayerAbilities;
 import me.bigteddy98.mcserver.packet.play.PacketOutPlayerPositionLook;
+import me.bigteddy98.mcserver.packet.play.PacketOutPluginMessage;
 import me.bigteddy98.mcserver.packet.play.PacketOutSpawnPosition;
 import me.bigteddy98.mcserver.packet.status.PacketInRequest;
 import me.bigteddy98.mcserver.packet.status.PacketOutResponse;
@@ -71,7 +73,7 @@ public class PacketReciever {
 		this.networkManager.sendPacket(packet);
 	}
 
-	public void packetInLoginStart(PacketInLoginStart packet) {
+	public void packetInLoginStart(PacketInLoginStart packet) throws Exception {
 		if (this.networkManager.player == null) {
 			this.networkManager.player = new EnderPlayer(packet.getPlayerName(), this.networkManager);
 			Main.getInstance().sendToMainThread(new Runnable() {
@@ -85,7 +87,7 @@ public class PacketReciever {
 
 		this.networkManager.sendPacket(new PacketOutLoginSucces(UUID.randomUUID().toString(), this.networkManager.player.getPlayerName()));
 		this.networkManager.handShakeStatus = 3;
-		this.networkManager.sendPacket(new PacketOutJoinGame(10, (byte) 2, (byte) 0, (byte) 1, (byte) 60, "default"));
+		this.networkManager.sendPacket(new PacketOutJoinGame(this.networkManager.player.getEntityId(), (byte) 1, (byte) 0, (byte) 1, (byte) 60, "default"));
 
 		this.networkManager.player.getLocation().setX(0);
 		this.networkManager.player.getLocation().setY(30);
@@ -94,7 +96,39 @@ public class PacketReciever {
 		Main.getInstance().mainWorld.doChunkUpdatesForPlayer(this.networkManager.player, this.networkManager.player.chunkInformer, 3);
 
 		this.networkManager.sendPacket(new PacketOutSpawnPosition(0, 30, 0));
-		this.networkManager.sendPacket(new PacketOutPlayerAbilities((byte) 0, 0.1F, 0.1F));
+
+		int i = 0;
+
+		if (networkManager.player.isCreative)
+			i = (byte) (i | 0x1);
+		if (networkManager.player.isFlying)
+			i = (byte) (i | 0x2);
+		if (networkManager.player.canFly)
+			i = (byte) (i | 0x4);
+		if (networkManager.player.godMode)
+			i = (byte) (i | 0x8);
+
+		this.networkManager.sendPacket(new PacketOutPlayerAbilities((byte) i, 0.1F, 0.1F));
 		this.networkManager.sendPacket(new PacketOutPlayerPositionLook(0, 30, 0, 0F, 0F, false));
+	}
+
+	public void packetInPluginMessage(PacketInPluginMessage packet) {
+		if (packet.getChannel().equals("REGISTER")) {
+			// REGISTER.add(new String(message.getData(), "UTF-8"));
+		} else if (packet.getChannel().equals("UNREGISTER")) {
+			// REGISTER.remove(new String(message.getData(), "UTF-8"));
+		} else if (packet.getChannel().equals("MC|Brand")) {
+			this.networkManager.sendPacket(new PacketOutPluginMessage(packet.getChannel(), packet.getLength(), packet.getData()));
+		}
+	}
+
+	public void packetKeepAlive(PacketKeepAlive packet) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void packetInPlayerPositionLook(PacketInPlayerPositionLook packet) {
+		// TODO Auto-generated method stub
+
 	}
 }
