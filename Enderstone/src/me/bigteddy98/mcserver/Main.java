@@ -5,13 +5,17 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
-
-import org.yaml.snakeyaml.Yaml;
 
 import me.bigteddy98.mcserver.entity.EnderPlayer;
 import me.bigteddy98.mcserver.packet.play.PacketKeepAlive;
@@ -22,8 +26,10 @@ public class Main implements Runnable {
 	public static final String NAME = "Enderstone";
 	public static final String PROTOCOL_VERSION = "1.7.6";
 	public static final int PROTOCOL = 5;
-	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig" };
+	public static final String[] AUTHORS = new String[] { "bigteddy98",
+			"ferrybig" };
 
+	public static Properties properties = new Properties();
 	public static final Random random = new Random();
 	private final int port;
 	public final EnderWorld mainWorld = new EnderWorld();
@@ -32,7 +38,8 @@ public class Main implements Runnable {
 	private static Main instance;
 
 	public final List<EnderPlayer> onlinePlayers = new ArrayList<>();
-	private final List<Runnable> sendToMainThread = Collections.synchronizedList(new ArrayList<Runnable>());
+	private final List<Runnable> sendToMainThread = Collections
+			.synchronizedList(new ArrayList<Runnable>());
 
 	public Main(int port) {
 		this.port = port;
@@ -55,13 +62,15 @@ public class Main implements Runnable {
 
 	@Override
 	public void run() {
-		EnderLogger.info("Starting " + NAME + " server version " + PROTOCOL_VERSION + " at port " + this.port);
+		EnderLogger.info("Starting " + NAME + " server version "
+				+ PROTOCOL_VERSION + " at port " + this.port);
 		EnderLogger.info("Authors: " + Arrays.asList(AUTHORS).toString());
 
+		EnderLogger.info("Loading Config....");
+		this.loadProperties();
+
 		EnderLogger.info("Starting Netty Server...");
-		
-		
-		
+
 		new Thread(new Runnable() {
 
 			@Override
@@ -111,7 +120,49 @@ public class Main implements Runnable {
 			}
 		}).start();
 		EnderLogger.info("Main Server Thread initialized and started!");
-		EnderLogger.info(NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + this.port + "!");
+		EnderLogger.info(NAME + " Server started, " + PROTOCOL_VERSION
+				+ " clients can now connect to port " + this.port + "!");
+	}
+
+	public void loadProperties() {
+		InputStream input = null;
+
+		try {
+			input = new FileInputStream("config.ender");
+			properties.load(input);
+		} catch (Exception e) {
+			this.saveProperties(true);
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void saveProperties(boolean defaultt) {
+		OutputStream output = null;
+		try {
+			output = new FileOutputStream("config.ender");
+			if (defaultt) {
+				properties.setProperty("join-format",
+						"&player& poeped the server!");
+			}
+			properties.store(output, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (output != null) {
+				try {
+					output.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	private int latestKeepAlive = 0;
@@ -120,7 +171,9 @@ public class Main implements Runnable {
 
 		if (latestKeepAlive++ % (20 * 10) == 0) {
 			for (EnderPlayer p : onlinePlayers) {
-				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));
+				p.getNetworkManager().sendPacket(
+						new PacketKeepAlive(p.keepAliveID = random
+								.nextInt(Integer.MAX_VALUE)));
 			}
 		}
 	}
