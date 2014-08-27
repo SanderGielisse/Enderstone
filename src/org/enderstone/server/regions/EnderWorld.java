@@ -93,7 +93,6 @@ public class EnderWorld {
 			int[][] chunkLoad = new int[(radius * 2) * (radius * 2) * 2][];
 			int index = 0;
 			Set<EnderChunk> copy = new HashSet<>(playerChunks);
-			System.out.println("COPY SIZE: " + copy.size());
 
 			for (; x < maxX; x++) {
 				for (z = minZ; z < maxZ; z++) {
