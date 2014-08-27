@@ -224,12 +224,12 @@ public class EnderChunk {
 					boolean hd = false;
 
 					for (byte block : nibblearray) {
+						byte blockLigth = 0;
 						if (hd) {
-							halfData = (byte) (halfData << 4);
-
-							abyte[j++] = (byte) (halfData | 0);
+							halfData = (byte) ((blockLigth << 4) | halfData);
+							abyte[j++] = halfData;
 						} else {
-							halfData = 0;
+							halfData = blockLigth;
 						}
 						hd = !hd;
 					}
@@ -249,12 +249,12 @@ public class EnderChunk {
 					boolean hd = false;
 
 					for (short block : nibblearray) {
+						byte skyLigth = (byte) (block == 0 ? 15 : 0);
 						if (hd) {
-							halfData = (byte) (halfData << 4);
-
-							abyte[j++] = (byte) (halfData | (block == 0 ? 15 : 0));
+							halfData = (byte) ((skyLigth << 4) | halfData);
+							abyte[j++] = halfData;
 						} else {
-							halfData = (byte) (block == 0 ? 15 : 0);
+							halfData = skyLigth;
 						}
 						hd = !hd;
 					}
