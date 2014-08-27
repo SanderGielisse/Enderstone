@@ -13,51 +13,6 @@ import org.enderstone.server.regions.generators.util.SimplexOctaveGenerator;
  */
 public class FlyingIslandsGenerator extends ChunkGenerator {
 
-	/**
-	 *
-	 * @param x
-	 *            X co-ordinate of the block to be set in the array
-	 * @param y
-	 *            Y co-ordinate of the block to be set in the array
-	 * @param z
-	 *            Z co-ordinate of the block to be set in the array
-	 * @param chunk
-	 *            An array containing the Block id's of all the blocks in the
-	 *            chunk. The first offset is the block section number. There are
-	 *            16 block sections, stacked vertically, each of which 16 by 16
-	 *            by 16 blocks.
-	 * @param material
-	 *            The material to set the block to.
-	 */
-	private void setBlock(int x, int y, int z, BlockId[][] chunk, BlockId material) {
-		// if the Block section the block is in hasn't been used yet, allocate
-		// it
-		if (chunk[y >> 4] == null) {
-			chunk[y >> 4] = new BlockId[16 * 16 * 16];
-		}
-		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {
-			return;
-		}
-		try {
-			chunk[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = material;
-		} catch (Exception e) {
-			// do nothing
-		}
-	}
-
-	private BlockId getBlock(int x, int y, int z, BlockId[][] chunk) {
-		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {
-			return BlockId.AIR;
-		}
-		// if the Block section the block is in hasn't been used yet, allocate
-		// it
-		if (chunk[y >> 4] == null) {
-			return BlockId.AIR; // block is air as it hasnt been allocated
-		}
-		return chunk[y >> 4][((y & 0xF) << 8) | (z << 4) | x];
-
-	}
-
 	@Override
 	public BlockId[][] generateExtBlockSections(EnderWorld world, Random random, int ChunkX, int ChunkZ, ChunkGenerator.BiomeGrid biomes) {
 		BlockId[][] chunk = new BlockId[16][];
