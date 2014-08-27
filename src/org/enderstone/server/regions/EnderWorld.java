@@ -54,6 +54,16 @@ public class EnderWorld {
 		}
 		return r;
 	}
+	
+	public BlockId getBlockIdAt(int x, int y, int z)
+	{
+	return getOrCreateChunk(x >> 4, z >> 4).getBlock(x & 0xF, y & 0xFF, z & 0xF);
+	}
+	
+	public byte getBlockDataAt(int x, int y, int z)
+	{
+		return getOrCreateChunk(x >> 4, z >> 4).getData(x & 0xF, y & 0xFF, z & 0xF);
+	}
 
 	public synchronized void doChunkUpdatesForPlayer(EnderPlayer player, ChunkInformer informer, int radius) throws Exception {
 
@@ -83,7 +93,6 @@ public class EnderWorld {
 			int[][] chunkLoad = new int[(radius * 2) * (radius * 2) * 2][];
 			int index = 0;
 			Set<EnderChunk> copy = new HashSet<>(playerChunks);
-			System.out.println("COPY SIZE: " + copy.size());
 
 			for (; x < maxX; x++) {
 				for (z = minZ; z < maxZ; z++) {

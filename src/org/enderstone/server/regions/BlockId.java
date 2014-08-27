@@ -365,13 +365,22 @@ public enum BlockId {
 	public short getId() {
 		return (short) id;
 	}
+	/**
+	 * All Minecraft item and block id's stored inside a array for performance reasons
+	 */
+	private static final BlockId[] byid = new BlockId[2 ^ 12 - 1];
+
+	static {
+		for (BlockId block : values()) {
+			byid[block.id] = block;
+		}
+	}
 
 	public static BlockId byId(short s) {
-		for (BlockId id : values()) {
-			if (id.getId() == s) {
-				return id;
-			}
+		BlockId block = byid[s];
+		if (block == null) {
+			throw new RuntimeException("Unsupported block id " + s);
 		}
-		throw new RuntimeException("Unsupported block id " + s);
+		return block;
 	}
 }
