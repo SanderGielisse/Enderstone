@@ -160,6 +160,7 @@ public class EnderPlayer extends Entity {
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(this.getPlayerName(), this.isOnline, (short) 1);
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			player.getNetworkManager().sendPacket(packet);
+			this.getNetworkManager().sendPacket(new PacketOutPlayerListItem(player.getPlayerName(), true, (short) 1));
 		}
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " joined the game!");
 	}
@@ -201,7 +202,14 @@ public class EnderPlayer extends Entity {
 
 	public void onDisconnect() throws Exception {
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " left the game!");
+<<<<<<< HEAD
 		Main.getInstance().mainWorld.players.remove(this);
+=======
+
+		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
+			p.getNetworkManager().sendPacket(new PacketOutPlayerListItem(this.getPlayerName(), false, (short) 1));
+		}
+>>>>>>> sander
 	}
 
 	public void updatePlayers(List<EnderPlayer> onlinePlayers) throws Exception {
@@ -259,11 +267,10 @@ public class EnderPlayer extends Entity {
 		Packet pack2 = new PacketOutEntityHeadLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F));
 
 		while (players.hasNext()) {
-			String name;
-			EnderPlayer ep = Main.getInstance().getPlayer(name = players.next());
+			EnderPlayer ep = Main.getInstance().getPlayer(players.next());
 
 			if (ep == null) {
-				this.visiblePlayers.remove(name);
+				players.remove();
 				continue;
 			}
 			ep.networkManager.sendPacket(pack1);
