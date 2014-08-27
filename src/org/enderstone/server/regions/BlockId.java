@@ -368,7 +368,7 @@ public enum BlockId {
 	/**
 	 * All Minecraft item and block id's stored inside a array for performance reasons
 	 */
-	private static final BlockId[] byid = new BlockId[2 ^ 12 - 1];
+	private static final BlockId[] byid = new BlockId[4096];
 
 	static {
 		for (BlockId block : values()) {
