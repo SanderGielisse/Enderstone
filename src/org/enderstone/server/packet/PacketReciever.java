@@ -50,8 +50,21 @@ public class PacketReciever {
 
 	}
 
-	public void packetInPlayerLook(PacketInPlayerLook packet) {
+	public void packetInPlayerLook(final PacketInPlayerLook packet) {
+		Main.getInstance().sendToMainThread(new Runnable() {
 
+			@Override
+			public void run() {
+				Location loc = networkManager.player.getLocation();
+				try {
+					networkManager.player.broadcastRotation(packet.getPitch(), packet.getYaw());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				loc.setPitch(packet.getPitch());
+				loc.setYaw(packet.getYaw());
+			}
+		});
 	}
 
 	public void PacketInPlayerOnGround(PacketInPlayerOnGround packet) {
@@ -84,6 +97,7 @@ public class PacketReciever {
 				Location loc = networkManager.player.getLocation();
 				try {
 					networkManager.player.broadcastLocation(new Location("", packet.getX(), packet.getFeetY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
+					networkManager.player.broadcastRotation(packet.getPitch(), packet.getYaw());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

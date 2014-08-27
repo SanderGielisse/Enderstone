@@ -13,6 +13,7 @@ import org.enderstone.server.Utill;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
+import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
@@ -248,7 +249,25 @@ public class EnderPlayer extends Entity {
 				continue;
 			}
 			ep.networkManager.sendPacket(packet);
-			ep.networkManager.sendPacket(new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(newLocation.getYaw() * 256.0F / 360.0F), (byte) Utill.calcYaw(newLocation.getPitch() * 256.0F / 360.0F)));
+		}
+	}
+
+	public void broadcastRotation(float pitch, float yaw) throws Exception {
+		Iterator<String> players = this.visiblePlayers.iterator();
+
+		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F), (byte) Utill.calcYaw(pitch * 256.0F / 360.0F));
+		Packet pack2 = new PacketOutEntityHeadLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F));
+
+		while (players.hasNext()) {
+			String name;
+			EnderPlayer ep = Main.getInstance().getPlayer(name = players.next());
+
+			if (ep == null) {
+				this.visiblePlayers.remove(name);
+				continue;
+			}
+			ep.networkManager.sendPacket(pack1);
+			ep.networkManager.sendPacket(pack2);
 		}
 	}
 }
