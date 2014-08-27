@@ -202,14 +202,11 @@ public class EnderPlayer extends Entity {
 
 	public void onDisconnect() throws Exception {
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " left the game!");
-<<<<<<< HEAD
 		Main.getInstance().mainWorld.players.remove(this);
-=======
 
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
 			p.getNetworkManager().sendPacket(new PacketOutPlayerListItem(this.getPlayerName(), false, (short) 1));
 		}
->>>>>>> sander
 	}
 
 	public void updatePlayers(List<EnderPlayer> onlinePlayers) throws Exception {
