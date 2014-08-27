@@ -69,6 +69,7 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 				PacketHandshake packet = (PacketHandshake) PacketManager.handshake.newInstance();
 				packet.read(buf);
 				this.handShakeStatus = packet.getNextState();
+				lastHandshake = packet;
 			} else if (handShakeStatus == 1) {
 				Packet packet = PacketManager.getPacket(this, id, HandshakeState.STATUS).newInstance();
 				packet.read(buf);
