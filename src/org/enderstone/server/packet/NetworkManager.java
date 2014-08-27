@@ -6,8 +6,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.enderstone.server.Main;
@@ -17,6 +15,7 @@ import org.enderstone.server.packet.login.PacketInLoginStart;
 import org.enderstone.server.packet.play.PacketInChatMessage;
 import org.enderstone.server.packet.play.PacketInClientSettings;
 import org.enderstone.server.packet.play.PacketInPlayerDigging;
+import org.enderstone.server.packet.play.PacketInPlayerLook;
 import org.enderstone.server.packet.play.PacketInPlayerPosition;
 import org.enderstone.server.packet.play.PacketInPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketInPluginMessage;
@@ -112,6 +111,8 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 			this.packetReciever.packetInChatMessage((PacketInChatMessage) packet);
 		} else if (packet instanceof PacketInPlayerDigging) {
 			this.packetReciever.packetInPlayerDigging((PacketInPlayerDigging) packet);
+		}else if(packet instanceof PacketInPlayerLook){
+			this.packetReciever.packetInPlayerLook((PacketInPlayerLook)packet);
 		}
 	}
 

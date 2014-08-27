@@ -9,7 +9,6 @@ public class PacketOutEntityDestroy extends Packet {
 	private Integer[] ids;
 
 	public PacketOutEntityDestroy(Integer[] ids) {
-
 		if (ids.length > 127) {
 			throw new IllegalArgumentException("You can't despawn more than 127 entities with only one packet.");
 		}

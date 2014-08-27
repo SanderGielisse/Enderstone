@@ -9,16 +9,6 @@ public class PacketInPlayerLook extends Packet {
 	private float pitch;
 	private boolean onGround;
 
-	public PacketInPlayerLook() {
-	}
-
-	public PacketInPlayerLook(float yaw, float pitch, boolean onGround) {
-		super();
-		this.yaw = yaw;
-		this.pitch = pitch;
-		this.onGround = onGround;
-	}
-
 	@Override
 	public void read(ByteBuf buf) throws Exception {
 		this.yaw = buf.readFloat();
