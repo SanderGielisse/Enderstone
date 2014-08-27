@@ -57,12 +57,17 @@ public class EnderWorld {
 	
 	public BlockId getBlockIdAt(int x, int y, int z)
 	{
-	return getOrCreateChunk(x >> 4, z >> 4).getBlock(x & 0xF, y & 0xFF, z & 0xF);
+		return getOrCreateChunk(x >> 4, z >> 4).getBlock(x & 0xF, y & 0xFF, z & 0xF);
 	}
 	
 	public byte getBlockDataAt(int x, int y, int z)
 	{
 		return getOrCreateChunk(x >> 4, z >> 4).getData(x & 0xF, y & 0xFF, z & 0xF);
+	}
+	
+	public void setBlockAt(int x, int y, int z, BlockId id, byte data)
+	{
+		getOrCreateChunk(x >> 4, z >> 4).setBlock(x & 0xF, y & 0xFF, z & 0xF, id, data);
 	}
 
 	public synchronized void doChunkUpdatesForPlayer(EnderPlayer player, ChunkInformer informer, int radius) throws Exception {
