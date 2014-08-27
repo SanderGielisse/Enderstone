@@ -383,4 +383,9 @@ public enum BlockId {
 		}
 		return block;
 	}
+
+	@Override
+	public String toString() {
+		return "BlockId{" + "id=" + id + ", validBlock=" + validBlock + '}';
+	}
 }
