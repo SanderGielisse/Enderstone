@@ -15,10 +15,10 @@ import java.util.Set;
 
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.regions.generators.FlyingIslandsGenerator;
+import org.enderstone.server.regions.generators.TimTest;
 
 /**
- *
+ * 
  * @author Fernando
  */
 public class EnderWorld {
@@ -26,12 +26,13 @@ public class EnderWorld {
 	private Long seed = null;
 	private final RegionSet loadedChunks = new RegionSet();
 	public final Map<EnderPlayer, RegionSet> players = new LinkedHashMap<>();
-	private final ChunkGenerator generator = new FlyingIslandsGenerator();
+	private final ChunkGenerator generator = new TimTest();
 
 	public EnderChunk getOrCreateChunk(int x, int z) {
 		EnderChunk r = loadedChunks.get(x, z);
 		if (r == null) {
-			BlockId[][] blocks = generator.generateExtBlockSections(this, new Random(), x, z, null);
+			BlockId[][] blocks = generator.generateExtBlockSections(this,
+					new Random(), x, z, null);
 
 			short[][] id = new short[16][];
 			byte[][] data = new byte[16][];
@@ -50,27 +51,30 @@ public class EnderWorld {
 					}
 				}
 			}
-			loadedChunks.add(r = new EnderChunk(x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>()));
+			loadedChunks.add(r = new EnderChunk(x, z, id, data,
+					new byte[16 * 16], new ArrayList<BlockData>()));
 		}
 		return r;
 	}
-	
-	public BlockId getBlockIdAt(int x, int y, int z)
-	{
-		return getOrCreateChunk(x >> 4, z >> 4).getBlock(x & 0xF, y & 0xFF, z & 0xF);
-	}
-	
-	public byte getBlockDataAt(int x, int y, int z)
-	{
-		return getOrCreateChunk(x >> 4, z >> 4).getData(x & 0xF, y & 0xFF, z & 0xF);
-	}
-	
-	public void setBlockAt(int x, int y, int z, BlockId id, byte data) throws Exception
-	{
-		getOrCreateChunk(x >> 4, z >> 4).setBlock(x & 0xF, y & 0xFF, z & 0xF, id, data);
+
+	public BlockId getBlockIdAt(int x, int y, int z) {
+		return getOrCreateChunk(x >> 4, z >> 4).getBlock(x & 0xF, y & 0xFF,
+				z & 0xF);
 	}
 
-	public synchronized void doChunkUpdatesForPlayer(EnderPlayer player, ChunkInformer informer, int radius) throws Exception {
+	public byte getBlockDataAt(int x, int y, int z) {
+		return getOrCreateChunk(x >> 4, z >> 4).getData(x & 0xF, y & 0xFF,
+				z & 0xF);
+	}
+
+	public void setBlockAt(int x, int y, int z, BlockId id, byte data)
+			throws Exception {
+		getOrCreateChunk(x >> 4, z >> 4).setBlock(x & 0xF, y & 0xFF, z & 0xF,
+				id, data);
+	}
+
+	public synchronized void doChunkUpdatesForPlayer(EnderPlayer player,
+			ChunkInformer informer, int radius) throws Exception {
 
 		if (players.get(player) == null) {
 			players.put(player, new RegionSet());
