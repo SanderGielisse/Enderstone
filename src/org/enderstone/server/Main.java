@@ -5,11 +5,22 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketKeepAlive;
@@ -22,8 +33,10 @@ public class Main implements Runnable {
 	public static final int PROTOCOL = 5;
 	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig" };
 
+	public BufferedImage favicon = null;
+	public Properties prop = null;
 	public static final Random random = new Random();
-	public final int port;
+	public int port;
 	public final EnderWorld mainWorld = new EnderWorld();
 	public volatile boolean isRunning = true;
 
@@ -32,8 +45,7 @@ public class Main implements Runnable {
 	public final List<EnderPlayer> onlinePlayers = new ArrayList<>();
 	private final List<Runnable> sendToMainThread = Collections.synchronizedList(new ArrayList<Runnable>());
 
-	public Main(int port) {
-		this.port = port;
+	public Main() {
 		instance = this;
 	}
 
@@ -48,13 +60,30 @@ public class Main implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		new Thread(new Main(25565)).start();
+		new Thread(new Main()).start();
 	}
 
 	@Override
 	public void run() {
 		EnderLogger.info("Starting " + NAME + " server version " + PROTOCOL_VERSION + " at port " + this.port);
 		EnderLogger.info("Authors: " + Arrays.asList(AUTHORS).toString());
+
+		EnderLogger.info("Loading config.ender");
+		this.loadConfigFromDisk();
+
+		EnderLogger.info("Loading favicon.");
+		try {
+			BufferedImage image = ImageIO.read(new File("server-icon.png"));
+			if (image.getWidth() == 64 && image.getHeight() == 64) {
+				favicon = image;
+			} else {
+				EnderLogger.exception(new IllegalArgumentException(
+						"Your server-icon.ping needs to be 64*64!"));
+			}
+		} catch (IOException e) {
+			EnderLogger.exception(new FileNotFoundException(
+					"server-icon.png not found!"));
+		}
 
 		EnderLogger.info("Starting Netty Server...");
 
@@ -116,6 +145,36 @@ public class Main implements Runnable {
 		}).start();
 		EnderLogger.info("Main Server Thread initialized and started!");
 		EnderLogger.info(NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + this.port + "!");
+	}
+
+	public void saveConfigToDisk(boolean defaultt) {
+		try {
+			OutputStream output = new FileOutputStream("config.ender");
+			if (defaultt) {
+				prop.setProperty("motd", "Another Enderstone server!");
+				prop.setProperty("port", "25565");
+				prop.setProperty("max-players", "20");
+				prop.setProperty("view-distance", "7");
+			}
+			prop.store(output, "Enderstone Server Config!");
+		} catch (IOException e1) {
+			EnderLogger.exception(e1);
+		}
+	}
+
+	public Properties loadConfigFromDisk() {
+		InputStream input;
+		prop = new Properties();
+		try {
+			input = new FileInputStream("config.ender");
+			prop.load(input);
+			port = Integer.parseInt(prop.getProperty("port"));
+		} catch (FileNotFoundException e) {
+			this.saveConfigToDisk(true);
+		} catch (IOException e) {
+			EnderLogger.exception(e);
+		}
+		return prop;
 	}
 
 	public EnderPlayer getPlayer(String name) {
