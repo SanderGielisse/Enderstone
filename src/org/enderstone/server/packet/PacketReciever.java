@@ -64,7 +64,11 @@ public class PacketReciever {
 			@Override
 			public void run() {
 				Location loc = networkManager.player.getLocation();
-				networkManager.player.broadcastLocation(new Location("", packet.getX(), packet.getFeetY(), packet.getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
+				try {
+					networkManager.player.broadcastLocation(new Location("", packet.getX(), packet.getFeetY(), packet.getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				loc.setX(packet.getX());
 				loc.setY(packet.getFeetY());
 				loc.setZ(packet.getZ());
@@ -78,7 +82,11 @@ public class PacketReciever {
 			@Override
 			public void run() {
 				Location loc = networkManager.player.getLocation();
-				networkManager.player.broadcastLocation(new Location("", packet.getX(), packet.getFeetY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
+				try {
+					networkManager.player.broadcastLocation(new Location("", packet.getX(), packet.getFeetY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				loc.setX(packet.getX());
 				loc.setY(packet.getFeetY());
 				loc.setZ(packet.getZ());
@@ -92,7 +100,7 @@ public class PacketReciever {
 
 	}
 
-	public void packetInRequest(PacketInRequest packet) {
+	public void packetInRequest(PacketInRequest packet) throws Exception {
 		JSONObject json = new JSONObject();
 		json.put("version", new JSONObject().put("name", Main.PROTOCOL_VERSION).put("protocol", Main.PROTOCOL));
 		json.put("players", new JSONObject().put("max", 10).put("online", 3));
@@ -101,7 +109,7 @@ public class PacketReciever {
 		networkManager.sendPacket(new PacketOutResponse(json.toString()));
 	}
 
-	public void packetPing(PacketPing packet) {
+	public void packetPing(PacketPing packet) throws Exception {
 		this.networkManager.sendPacket(packet);
 	}
 
@@ -114,7 +122,11 @@ public class PacketReciever {
 				@Override
 				public void run() {
 					Main.getInstance().onlinePlayers.add(networkManager.player);
-					networkManager.player.onJoin();
+					try {
+						networkManager.player.onJoin();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			});
 		}
@@ -146,7 +158,7 @@ public class PacketReciever {
 		this.networkManager.sendPacket(new PacketOutPlayerPositionLook(0, 100, 0, 0F, 0F, false));
 	}
 
-	public void packetInPluginMessage(PacketInPluginMessage packet) {
+	public void packetInPluginMessage(PacketInPluginMessage packet) throws Exception {
 		if (packet.getChannel().equals("REGISTER")) {
 			// REGISTER.add(new String(message.getData(), "UTF-8"));
 		} else if (packet.getChannel().equals("UNREGISTER")) {
@@ -161,11 +173,11 @@ public class PacketReciever {
 
 	}
 
-	public void packetInChatMessage(PacketInChatMessage packet) {
+	public void packetInChatMessage(PacketInChatMessage packet) throws Exception {
 		this.networkManager.player.sendChatMessage(packet.getMessage());
 	}
 
-	public void packetInPlayerDigging(PacketInPlayerDigging packet) {
+	public void packetInPlayerDigging(PacketInPlayerDigging packet) throws Exception {
 		EnderChunk chunk = Main.getInstance().mainWorld.getOrCreateChunk(packet.getX() >> 4, packet.getZ() >> 4);
 		chunk.setBlock(packet.getX() & 0xF, packet.getY() & 0xFF, packet.getZ() & 0xF, BlockId.AIR, (byte) 0);
 	}
