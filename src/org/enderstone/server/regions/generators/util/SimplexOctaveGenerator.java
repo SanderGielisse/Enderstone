@@ -24,6 +24,7 @@ public class SimplexOctaveGenerator extends OctaveGenerator {
 	public SimplexOctaveGenerator(EnderWorld world, int octaves) {
 		this(new Random(world.getSeed()), octaves);
 	}
+	//comment meer
 
 	/**
 	 * Creates a simplex octave generator for the given world
