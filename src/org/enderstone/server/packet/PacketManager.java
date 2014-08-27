@@ -1,32 +1,32 @@
-package me.bigteddy98.mcserver.packet;
+package org.enderstone.server.packet;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import me.bigteddy98.mcserver.packet.login.PacketInLoginStart;
-import me.bigteddy98.mcserver.packet.play.PacketInAbilities;
-import me.bigteddy98.mcserver.packet.play.PacketInAnimation;
-import me.bigteddy98.mcserver.packet.play.PacketInBlockPlacement;
-import me.bigteddy98.mcserver.packet.play.PacketInChatMessage;
-import me.bigteddy98.mcserver.packet.play.PacketInClickWindow;
-import me.bigteddy98.mcserver.packet.play.PacketInClientSettings;
-import me.bigteddy98.mcserver.packet.play.PacketInClientStatus;
-import me.bigteddy98.mcserver.packet.play.PacketInCloseWindow;
-import me.bigteddy98.mcserver.packet.play.PacketInCreativeInventoryAction;
-import me.bigteddy98.mcserver.packet.play.PacketInEntityAction;
-import me.bigteddy98.mcserver.packet.play.PacketInHeldItemChange;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerDigging;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerLook;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerOnGround;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerPosition;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerPositionLook;
-import me.bigteddy98.mcserver.packet.play.PacketInPluginMessage;
-import me.bigteddy98.mcserver.packet.play.PacketInUseEntity;
-import me.bigteddy98.mcserver.packet.play.PacketKeepAlive;
-import me.bigteddy98.mcserver.packet.play.PacketOutPlayerDisconnect;
-import me.bigteddy98.mcserver.packet.status.PacketPing;
-import me.bigteddy98.mcserver.packet.status.PacketInRequest;
+import org.enderstone.server.packet.login.PacketInLoginStart;
+import org.enderstone.server.packet.play.PacketInAbilities;
+import org.enderstone.server.packet.play.PacketInAnimation;
+import org.enderstone.server.packet.play.PacketInBlockPlacement;
+import org.enderstone.server.packet.play.PacketInChatMessage;
+import org.enderstone.server.packet.play.PacketInClickWindow;
+import org.enderstone.server.packet.play.PacketInClientSettings;
+import org.enderstone.server.packet.play.PacketInClientStatus;
+import org.enderstone.server.packet.play.PacketInCloseWindow;
+import org.enderstone.server.packet.play.PacketInCreativeInventoryAction;
+import org.enderstone.server.packet.play.PacketInEntityAction;
+import org.enderstone.server.packet.play.PacketInHeldItemChange;
+import org.enderstone.server.packet.play.PacketInPlayerDigging;
+import org.enderstone.server.packet.play.PacketInPlayerLook;
+import org.enderstone.server.packet.play.PacketInPlayerOnGround;
+import org.enderstone.server.packet.play.PacketInPlayerPosition;
+import org.enderstone.server.packet.play.PacketInPlayerPositionLook;
+import org.enderstone.server.packet.play.PacketInPluginMessage;
+import org.enderstone.server.packet.play.PacketInUseEntity;
+import org.enderstone.server.packet.play.PacketKeepAlive;
+import org.enderstone.server.packet.play.PacketOutPlayerDisconnect;
+import org.enderstone.server.packet.status.PacketPing;
+import org.enderstone.server.packet.status.PacketInRequest;
 
 public class PacketManager {
 

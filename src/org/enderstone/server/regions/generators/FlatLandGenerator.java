@@ -1,10 +1,10 @@
-package me.bigteddy98.mcserver.regions.generators;
+package org.enderstone.server.regions.generators;
 
 import java.util.Random;
 
-import me.bigteddy98.mcserver.regions.BlockId;
-import me.bigteddy98.mcserver.regions.ChunkGenerator;
-import me.bigteddy98.mcserver.regions.EnderWorld;
+import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.ChunkGenerator;
+import org.enderstone.server.regions.EnderWorld;
 
 public class FlatLandGenerator extends ChunkGenerator {
 	@Override

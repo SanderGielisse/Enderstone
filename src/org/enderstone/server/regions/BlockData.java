@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package me.bigteddy98.mcserver.regions;
+package org.enderstone.server.regions;
 
-import me.bigteddy98.mcserver.inventory.ItemStack;
+import org.enderstone.server.inventory.ItemStack;
 
 /**
  *

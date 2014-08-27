@@ -1,21 +1,21 @@
-package me.bigteddy98.mcserver.entity;
+package org.enderstone.server.entity;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import me.bigteddy98.mcserver.EnderLogger;
-import me.bigteddy98.mcserver.Location;
-import me.bigteddy98.mcserver.Main;
-import me.bigteddy98.mcserver.Utill;
-import me.bigteddy98.mcserver.packet.NetworkManager;
-import me.bigteddy98.mcserver.packet.Packet;
-import me.bigteddy98.mcserver.packet.play.PacketOutEntityDestroy;
-import me.bigteddy98.mcserver.packet.play.PacketOutPlayerListItem;
-import me.bigteddy98.mcserver.packet.play.PacketOutSpawnPlayer;
-import me.bigteddy98.mcserver.regions.EnderChunk;
-import me.bigteddy98.mcserver.regions.EnderWorld.ChunkInformer;
+import org.enderstone.server.EnderLogger;
+import org.enderstone.server.Location;
+import org.enderstone.server.Main;
+import org.enderstone.server.Utill;
+import org.enderstone.server.packet.NetworkManager;
+import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.play.PacketOutEntityDestroy;
+import org.enderstone.server.packet.play.PacketOutPlayerListItem;
+import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
+import org.enderstone.server.regions.EnderChunk;
+import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 
 public class EnderPlayer extends Entity {
 

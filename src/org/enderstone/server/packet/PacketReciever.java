@@ -1,30 +1,30 @@
-package me.bigteddy98.mcserver.packet;
+package org.enderstone.server.packet;
 
 import java.util.UUID;
 
-import me.bigteddy98.mcserver.Location;
-import me.bigteddy98.mcserver.Main;
-import me.bigteddy98.mcserver.entity.EnderPlayer;
-import me.bigteddy98.mcserver.packet.login.PacketInLoginStart;
-import me.bigteddy98.mcserver.packet.login.PacketOutLoginSucces;
-import me.bigteddy98.mcserver.packet.play.PacketInAnimation;
-import me.bigteddy98.mcserver.packet.play.PacketInChatMessage;
-import me.bigteddy98.mcserver.packet.play.PacketInClientSettings;
-import me.bigteddy98.mcserver.packet.play.PacketInEntityAction;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerLook;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerOnGround;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerPosition;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerPositionLook;
-import me.bigteddy98.mcserver.packet.play.PacketInPluginMessage;
-import me.bigteddy98.mcserver.packet.play.PacketKeepAlive;
-import me.bigteddy98.mcserver.packet.play.PacketOutJoinGame;
-import me.bigteddy98.mcserver.packet.play.PacketOutPlayerAbilities;
-import me.bigteddy98.mcserver.packet.play.PacketOutPlayerPositionLook;
-import me.bigteddy98.mcserver.packet.play.PacketOutPluginMessage;
-import me.bigteddy98.mcserver.packet.play.PacketOutSpawnPosition;
-import me.bigteddy98.mcserver.packet.status.PacketInRequest;
-import me.bigteddy98.mcserver.packet.status.PacketOutResponse;
-import me.bigteddy98.mcserver.packet.status.PacketPing;
+import org.enderstone.server.Location;
+import org.enderstone.server.Main;
+import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.packet.login.PacketInLoginStart;
+import org.enderstone.server.packet.login.PacketOutLoginSucces;
+import org.enderstone.server.packet.play.PacketInAnimation;
+import org.enderstone.server.packet.play.PacketInChatMessage;
+import org.enderstone.server.packet.play.PacketInClientSettings;
+import org.enderstone.server.packet.play.PacketInEntityAction;
+import org.enderstone.server.packet.play.PacketInPlayerLook;
+import org.enderstone.server.packet.play.PacketInPlayerOnGround;
+import org.enderstone.server.packet.play.PacketInPlayerPosition;
+import org.enderstone.server.packet.play.PacketInPlayerPositionLook;
+import org.enderstone.server.packet.play.PacketInPluginMessage;
+import org.enderstone.server.packet.play.PacketKeepAlive;
+import org.enderstone.server.packet.play.PacketOutJoinGame;
+import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
+import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
+import org.enderstone.server.packet.play.PacketOutPluginMessage;
+import org.enderstone.server.packet.play.PacketOutSpawnPosition;
+import org.enderstone.server.packet.status.PacketInRequest;
+import org.enderstone.server.packet.status.PacketOutResponse;
+import org.enderstone.server.packet.status.PacketPing;
 
 import org.json.JSONObject;
 

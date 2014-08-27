@@ -1,7 +1,7 @@
-package me.bigteddy98.mcserver;
+package org.enderstone.server;
 
-import me.bigteddy98.mcserver.entity.EnderPlayer;
-import me.bigteddy98.mcserver.packet.play.PacketOutChatMessage;
+import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.packet.play.PacketOutChatMessage;
 
 public class Utill {
 

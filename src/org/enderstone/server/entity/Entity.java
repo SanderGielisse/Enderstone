@@ -1,7 +1,7 @@
-package me.bigteddy98.mcserver.entity;
+package org.enderstone.server.entity;
 
-import me.bigteddy98.mcserver.Location;
-import me.bigteddy98.mcserver.packet.Packet;
+import org.enderstone.server.Location;
+import org.enderstone.server.packet.Packet;
 
 public class Entity {
 

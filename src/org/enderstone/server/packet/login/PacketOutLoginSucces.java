@@ -1,7 +1,7 @@
-package me.bigteddy98.mcserver.packet.login;
+package org.enderstone.server.packet.login;
 
 import io.netty.buffer.ByteBuf;
-import me.bigteddy98.mcserver.packet.Packet;
+import org.enderstone.server.packet.Packet;
 
 public class PacketOutLoginSucces extends Packet {
 

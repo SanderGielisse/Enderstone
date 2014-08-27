@@ -1,8 +1,8 @@
-package me.bigteddy98.mcserver.regions.generators.util;
+package org.enderstone.server.regions.generators.util;
 
 import java.util.Random;
 
-import me.bigteddy98.mcserver.regions.EnderWorld;
+import org.enderstone.server.regions.EnderWorld;
 
 /**
  * 

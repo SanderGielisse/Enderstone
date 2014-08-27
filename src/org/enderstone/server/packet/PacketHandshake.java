@@ -1,4 +1,4 @@
-package me.bigteddy98.mcserver.packet;
+package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
 

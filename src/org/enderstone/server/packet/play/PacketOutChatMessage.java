@@ -1,8 +1,8 @@
-package me.bigteddy98.mcserver.packet.play;
+package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
-import me.bigteddy98.mcserver.packet.JSONStringBuilder;
-import me.bigteddy98.mcserver.packet.Packet;
+import org.enderstone.server.packet.JSONStringBuilder;
+import org.enderstone.server.packet.Packet;
 
 public class PacketOutChatMessage extends Packet {
 

@@ -1,8 +1,8 @@
-package me.bigteddy98.mcserver.packet.play;
+package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
-import me.bigteddy98.mcserver.inventory.ItemStack;
-import me.bigteddy98.mcserver.packet.Packet;
+import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.packet.Packet;
 
 public class PacketInCreativeInventoryAction extends Packet {
 

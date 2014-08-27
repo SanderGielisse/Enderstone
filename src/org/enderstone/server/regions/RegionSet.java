@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package me.bigteddy98.mcserver.regions;
+package org.enderstone.server.regions;
 
 import java.util.AbstractSet;
 import java.util.Iterator;

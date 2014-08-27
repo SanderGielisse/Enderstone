@@ -1,4 +1,4 @@
-package me.bigteddy98.mcserver.packet;
+package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -10,18 +10,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import me.bigteddy98.mcserver.Main;
-import me.bigteddy98.mcserver.entity.EnderPlayer;
-import me.bigteddy98.mcserver.packet.NetworkManager.Stage;
-import me.bigteddy98.mcserver.packet.login.PacketInLoginStart;
-import me.bigteddy98.mcserver.packet.play.PacketInChatMessage;
-import me.bigteddy98.mcserver.packet.play.PacketInClientSettings;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerPosition;
-import me.bigteddy98.mcserver.packet.play.PacketInPlayerPositionLook;
-import me.bigteddy98.mcserver.packet.play.PacketInPluginMessage;
-import me.bigteddy98.mcserver.packet.play.PacketKeepAlive;
-import me.bigteddy98.mcserver.packet.status.PacketInRequest;
-import me.bigteddy98.mcserver.packet.status.PacketPing;
+import org.enderstone.server.Main;
+import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.packet.NetworkManager.Stage;
+import org.enderstone.server.packet.login.PacketInLoginStart;
+import org.enderstone.server.packet.play.PacketInChatMessage;
+import org.enderstone.server.packet.play.PacketInClientSettings;
+import org.enderstone.server.packet.play.PacketInPlayerPosition;
+import org.enderstone.server.packet.play.PacketInPlayerPositionLook;
+import org.enderstone.server.packet.play.PacketInPluginMessage;
+import org.enderstone.server.packet.play.PacketKeepAlive;
+import org.enderstone.server.packet.status.PacketInRequest;
+import org.enderstone.server.packet.status.PacketPing;
 
 public class NetworkManager extends ReplayingDecoder<Stage> {
 

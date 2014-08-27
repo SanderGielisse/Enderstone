@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package me.bigteddy98.mcserver.regions;
+package org.enderstone.server.regions;
 
 /**
  *

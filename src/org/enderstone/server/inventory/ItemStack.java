@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package me.bigteddy98.mcserver.inventory;
+package org.enderstone.server.inventory;
 
 /**
  *

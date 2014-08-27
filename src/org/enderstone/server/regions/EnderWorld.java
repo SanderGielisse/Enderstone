@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package me.bigteddy98.mcserver.regions;
+package org.enderstone.server.regions;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import me.bigteddy98.mcserver.Main;
-import me.bigteddy98.mcserver.entity.EnderPlayer;
-import me.bigteddy98.mcserver.regions.generators.FlyingIslandsGenerator;
+import org.enderstone.server.Main;
+import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.regions.generators.FlyingIslandsGenerator;
 
 /**
  *

@@ -1,4 +1,4 @@
-package me.bigteddy98.mcserver.entity;
+package org.enderstone.server.entity;
 
 public class ProfileProperty {
 

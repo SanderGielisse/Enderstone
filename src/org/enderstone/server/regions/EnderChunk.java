@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package me.bigteddy98.mcserver.regions;
+package org.enderstone.server.regions;
 
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 
-import me.bigteddy98.mcserver.Main;
-import me.bigteddy98.mcserver.entity.EnderPlayer;
-import me.bigteddy98.mcserver.packet.play.PacketOutBlockChange;
+import org.enderstone.server.Main;
+import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.packet.play.PacketOutBlockChange;
 
 /**
  *

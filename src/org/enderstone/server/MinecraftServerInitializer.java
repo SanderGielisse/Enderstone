@@ -1,6 +1,6 @@
-package me.bigteddy98.mcserver;
+package org.enderstone.server;
 
-import me.bigteddy98.mcserver.packet.NetworkManager;
+import org.enderstone.server.packet.NetworkManager;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;

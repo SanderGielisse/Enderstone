@@ -1,4 +1,4 @@
-package me.bigteddy98.mcserver;
+package org.enderstone.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
@@ -11,9 +11,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import me.bigteddy98.mcserver.entity.EnderPlayer;
-import me.bigteddy98.mcserver.packet.play.PacketKeepAlive;
-import me.bigteddy98.mcserver.regions.EnderWorld;
+import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.packet.play.PacketKeepAlive;
+import org.enderstone.server.regions.EnderWorld;
 
 public class Main implements Runnable {
 

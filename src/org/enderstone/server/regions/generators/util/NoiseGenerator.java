@@ -1,4 +1,4 @@
-package me.bigteddy98.mcserver.regions.generators.util;
+package org.enderstone.server.regions.generators.util;
 
 /**
  * 

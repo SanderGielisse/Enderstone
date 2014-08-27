@@ -1,7 +1,7 @@
-package me.bigteddy98.mcserver.regions;
+package org.enderstone.server.regions;
 
 import java.util.zip.Deflater;
-import me.bigteddy98.mcserver.packet.play.PacketOutChunkData;
+import org.enderstone.server.packet.play.PacketOutChunkData;
 
 /*
  * To change this license header, choose License Headers in Project Properties.

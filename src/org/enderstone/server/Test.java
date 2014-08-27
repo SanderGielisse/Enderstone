@@ -1,4 +1,4 @@
-package me.bigteddy98.mcserver;
+package org.enderstone.server;
 
 import java.io.UnsupportedEncodingException;
 

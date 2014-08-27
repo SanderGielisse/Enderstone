@@ -1,13 +1,13 @@
-package me.bigteddy98.mcserver.packet;
+package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map.Entry;
 
-import me.bigteddy98.mcserver.Vector;
-import me.bigteddy98.mcserver.entity.DataWatcher;
-import me.bigteddy98.mcserver.inventory.ItemStack;
+import org.enderstone.server.Vector;
+import org.enderstone.server.entity.DataWatcher;
+import org.enderstone.server.inventory.ItemStack;
 
 public abstract class Packet {
 

@@ -1,12 +1,12 @@
-package me.bigteddy98.mcserver.packet.play;
+package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 
 import java.util.List;
 
-import me.bigteddy98.mcserver.entity.DataWatcher;
-import me.bigteddy98.mcserver.entity.ProfileProperty;
-import me.bigteddy98.mcserver.packet.Packet;
+import org.enderstone.server.entity.DataWatcher;
+import org.enderstone.server.entity.ProfileProperty;
+import org.enderstone.server.packet.Packet;
 
 public class PacketOutSpawnPlayer extends Packet {
 
