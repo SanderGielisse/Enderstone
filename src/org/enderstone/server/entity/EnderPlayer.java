@@ -13,6 +13,7 @@ import org.enderstone.server.Utill;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
+import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
@@ -247,6 +248,7 @@ public class EnderPlayer extends Entity {
 				continue;
 			}
 			ep.networkManager.sendPacket(packet);
+			ep.networkManager.sendPacket(new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(newLocation.getYaw() * 256.0F / 360.0F), (byte) Utill.calcYaw(newLocation.getPitch() * 256.0F / 360.0F)));
 		}
 	}
 }
