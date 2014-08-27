@@ -17,16 +17,13 @@ public class PacketOutPlayerListItem extends Packet {
 
 	@Override
 	public void read(ByteBuf buf) throws Exception {
-		throw new RuntimeException("Packet " + this.getClass().getSimpleName()
-				+ " with ID 0x" + Integer.toHexString(getId())
-				+ " cannot be read.");
+		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
 	public void write(ByteBuf buf) throws Exception {
 		if (name.length() > 16) {
-			throw new IllegalArgumentException(
-					"Playername in TAB-List can't be longer than 16 characters!");
+			throw new IllegalArgumentException("Playername in TAB-List can't be longer than 16 characters!");
 		}
 		writeString(this.name, buf);
 		buf.writeBoolean(this.online);
@@ -35,8 +32,7 @@ public class PacketOutPlayerListItem extends Packet {
 
 	@Override
 	public int getSize() throws Exception {
-		return getStringSize(name) + 1 + getShortSize()
-				+ getVarIntSize(getId());
+		return getStringSize(name) + 1 + getShortSize() + getVarIntSize(getId());
 	}
 
 	@Override

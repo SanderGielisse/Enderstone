@@ -64,7 +64,7 @@ public class PacketReciever {
 			@Override
 			public void run() {
 				Location loc = networkManager.player.getLocation();
-				networkManager.player.broadcastLocation(new Location("", packet.getX(), packet.getFeetY(), packet.getZ(), 0F, 0F));
+				networkManager.player.broadcastLocation(new Location("", packet.getX(), packet.getFeetY(), packet.getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
 				loc.setX(packet.getX());
 				loc.setY(packet.getFeetY());
 				loc.setZ(packet.getZ());
@@ -72,13 +72,20 @@ public class PacketReciever {
 		});
 	}
 
-	public void packetInPlayerPositionLook(PacketInPlayerPositionLook packet) {
-		Location loc = this.networkManager.player.getLocation();
-		loc.setX(packet.getX());
-		loc.setY(packet.getFeetY());
-		loc.setZ(packet.getZ());
-		loc.setPitch(packet.getPitch());
-		loc.setYaw(packet.getYaw());
+	public void packetInPlayerPositionLook(final PacketInPlayerPositionLook packet) {
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Location loc = networkManager.player.getLocation();
+				networkManager.player.broadcastLocation(new Location("", packet.getX(), packet.getFeetY(), packet.getZ(), packet.getYaw(), packet.getPitch()));
+				loc.setX(packet.getX());
+				loc.setY(packet.getFeetY());
+				loc.setZ(packet.getZ());
+				loc.setPitch(packet.getPitch());
+				loc.setYaw(packet.getYaw());
+			}
+		});
 	}
 
 	public void packetInAnimation(PacketInPluginMessage packet) {
