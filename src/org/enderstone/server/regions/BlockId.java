@@ -365,7 +365,16 @@ public enum BlockId {
 	public short getId() {
 		return (short) id;
 	}
-
+	/**
+	 * All Minecraft item and block id's stored inside a array for performance reasons
+	 */
+	private final BlockId[] byid = new BlockId[2 ^ 12 - 1];
+	{
+		for(BlockId block : values()) {
+			byid[block.id] = block;
+		}
+	}
+	
 	public static BlockId byId(short s) {
 		for (BlockId id : values()) {
 			if (id.getId() == s) {
