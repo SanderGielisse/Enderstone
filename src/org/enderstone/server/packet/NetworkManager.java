@@ -16,6 +16,7 @@ import org.enderstone.server.packet.NetworkManager.Stage;
 import org.enderstone.server.packet.login.PacketInLoginStart;
 import org.enderstone.server.packet.play.PacketInChatMessage;
 import org.enderstone.server.packet.play.PacketInClientSettings;
+import org.enderstone.server.packet.play.PacketInPlayerDigging;
 import org.enderstone.server.packet.play.PacketInPlayerPosition;
 import org.enderstone.server.packet.play.PacketInPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketInPluginMessage;
@@ -118,6 +119,8 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 			this.packetReciever.packetKeepAlive((PacketKeepAlive) packet);
 		} else if (packet instanceof PacketInChatMessage) {
 			this.packetReciever.packetInChatMessage((PacketInChatMessage) packet);
+		}else if(packet instanceof PacketInPlayerDigging){
+			this.packetReciever.packetInPlayerDigging((PacketInPlayerDigging) packet);
 		}
 	}
 

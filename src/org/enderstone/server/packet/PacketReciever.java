@@ -11,6 +11,7 @@ import org.enderstone.server.packet.play.PacketInAnimation;
 import org.enderstone.server.packet.play.PacketInChatMessage;
 import org.enderstone.server.packet.play.PacketInClientSettings;
 import org.enderstone.server.packet.play.PacketInEntityAction;
+import org.enderstone.server.packet.play.PacketInPlayerDigging;
 import org.enderstone.server.packet.play.PacketInPlayerLook;
 import org.enderstone.server.packet.play.PacketInPlayerOnGround;
 import org.enderstone.server.packet.play.PacketInPlayerPosition;
@@ -25,7 +26,8 @@ import org.enderstone.server.packet.play.PacketOutSpawnPosition;
 import org.enderstone.server.packet.status.PacketInRequest;
 import org.enderstone.server.packet.status.PacketOutResponse;
 import org.enderstone.server.packet.status.PacketPing;
-
+import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.EnderChunk;
 import org.json.JSONObject;
 
 public class PacketReciever {
@@ -153,5 +155,11 @@ public class PacketReciever {
 
 	public void packetInChatMessage(PacketInChatMessage packet) {
 		this.networkManager.player.sendChatMessage(packet.getMessage());
+	}
+
+	public void packetInPlayerDigging(PacketInPlayerDigging packet) {
+		int chunkX, chunkZ;
+		EnderChunk chunk = Main.getInstance().mainWorld.getOrCreateChunk(chunkX = (int) (packet.getX() / 16), chunkZ = (int) (packet.getZ() / 16));
+		chunk.setBlock(packet.getX() - (chunkX * 16), packet.getY(), packet.getZ() - (chunkZ * 16), BlockId.AIR, (byte) 0);
 	}
 }
