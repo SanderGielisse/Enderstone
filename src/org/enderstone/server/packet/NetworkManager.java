@@ -8,6 +8,7 @@ import io.netty.handler.codec.ReplayingDecoder;
 
 import java.util.List;
 
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.NetworkManager.Stage;
@@ -117,17 +118,6 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 		}
 	}
 
-	private void writeAndFlushPackets(Packet... packets) throws Exception {
-
-		ByteBuf buf = Unpooled.buffer();
-		for (Packet packet : packets) {
-			Packet.writeVarInt(packet.getSize(), buf);
-			Packet.writeVarInt(packet.getId(), buf);
-			packet.write(buf);
-		}
-		this.channel.writeAndFlush(buf);
-	}
-
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		this.channelInactive(ctx);
@@ -174,6 +164,7 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 	public synchronized void sendPacket(Packet... packets) throws Exception {
 		ByteBuf buf = Unpooled.buffer();
 		for (Packet packet : packets) {
+			EnderLogger.debug(packet.toString());
 			Packet.writeVarInt(packet.getSize(), buf);
 			Packet.writeVarInt(packet.getId(), buf);
 			packet.write(buf);

@@ -253,7 +253,10 @@ public class EnderPlayer extends Entity {
 				players.remove();
 				continue;
 			}
-			ep.networkManager.sendPacket(packet);
+
+			if (ep.getLocation().isInRange(50, this.getLocation())) {
+				ep.networkManager.sendPacket(packet);
+			}
 		}
 	}
 
@@ -270,8 +273,10 @@ public class EnderPlayer extends Entity {
 				players.remove();
 				continue;
 			}
-			ep.networkManager.sendPacket(pack1);
-			ep.networkManager.sendPacket(pack2);
+			if (ep.getLocation().isInRange(50, this.getLocation())) {
+				ep.networkManager.sendPacket(pack1);
+				ep.networkManager.sendPacket(pack2);
+			}
 		}
 	}
 }
