@@ -91,6 +91,7 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 		// " with id 0x" + Integer.toHexString(packet.getId()));
 
 		if (packet instanceof PacketInRequest) {
+			this.packetReciever.packetInRequest((PacketInRequest) packet, lastHandshake);
 			lastHandshake = null;
 		} else if (packet instanceof PacketPing) {
 			this.packetReciever.packetPing((PacketPing) packet);
