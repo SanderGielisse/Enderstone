@@ -38,6 +38,8 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 	// private List<Packet> waitingPackets = Collections.synchronizedList(new
 	// ArrayList<Packet>());
 
+	PacketHandshake lastHandshake = null;
+
 	public NetworkManager() {
 		super(Stage.LENGTH);
 		this.packetReciever = new PacketReciever(this);
@@ -90,7 +92,8 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 		// " with id 0x" + Integer.toHexString(packet.getId()));
 
 		if (packet instanceof PacketInRequest) {
-			this.packetReciever.packetInRequest((PacketInRequest) packet);
+			this.packetReciever.packetInRequest((PacketInRequest) packet, lastHandshake);
+			lastHandshake = null;
 		} else if (packet instanceof PacketPing) {
 			this.packetReciever.packetPing((PacketPing) packet);
 		} else if (packet instanceof PacketInLoginStart) {

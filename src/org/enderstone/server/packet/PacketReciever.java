@@ -1,7 +1,12 @@
 package org.enderstone.server.packet;
 
+import java.io.ByteArrayOutputStream;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
+
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
@@ -114,11 +119,26 @@ public class PacketReciever {
 
 	}
 
-	public void packetInRequest(PacketInRequest packet) throws Exception {
+	public void packetInRequest(PacketInRequest packet,
+			PacketHandshake handshake) throws Exception {
+		EnderLogger.info("Pinged... By: " + handshake.getHostname() + ":"
+				+ handshake.getPort());
 		JSONObject json = new JSONObject();
-		json.put("version", new JSONObject().put("name", Main.PROTOCOL_VERSION).put("protocol", Main.PROTOCOL));
-		json.put("players", new JSONObject().put("max", 10).put("online", 3));
-		json.put("description", "It seems like you are using the Enderstone Server");
+		json.put("version", new JSONObject().put("name", Main.PROTOCOL_VERSION)
+				.put("protocol", handshake.getProtocol()));
+		json.put(
+				"players",
+				new JSONObject().put("max", 20).put("online",
+						Main.getInstance().onlinePlayers.size()));
+		json.put("description", Main.getInstance().prop.get("motd") + ""
+				+ handshake.getNextState());
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(Main.getInstance().favicon, "png", baos);
+		baos.flush();
+		String favicon = "data:image/png;base64,"
+				+ DatatypeConverter.printBase64Binary(baos.toByteArray());
+		json.put("favicon", favicon);
 
 		networkManager.sendPacket(new PacketOutResponse(json.toString()));
 	}
