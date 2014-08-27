@@ -20,6 +20,7 @@ import org.enderstone.server.packet.play.PacketInPlayerPosition;
 import org.enderstone.server.packet.play.PacketInPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketInPluginMessage;
 import org.enderstone.server.packet.play.PacketKeepAlive;
+import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.status.PacketInRequest;
 import org.enderstone.server.packet.status.PacketPing;
 
@@ -111,8 +112,8 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 			this.packetReciever.packetInChatMessage((PacketInChatMessage) packet);
 		} else if (packet instanceof PacketInPlayerDigging) {
 			this.packetReciever.packetInPlayerDigging((PacketInPlayerDigging) packet);
-		}else if(packet instanceof PacketInPlayerLook){
-			this.packetReciever.packetInPlayerLook((PacketInPlayerLook)packet);
+		} else if (packet instanceof PacketInPlayerLook) {
+			this.packetReciever.packetInPlayerLook((PacketInPlayerLook) packet);
 		}
 	}
 
@@ -147,6 +148,18 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 					}
 					if (Main.getInstance().onlinePlayers.contains(player)) {
 						Main.getInstance().onlinePlayers.remove(player);
+
+						for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
+							for (String name : ep.visiblePlayers) {
+								if (name.equals(player.getPlayerName()) && !player.getPlayerName().equals(ep.getPlayerName())) {
+									try {
+										ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { player.getEntityId() }));
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+							}
+						}
 					}
 				}
 			});

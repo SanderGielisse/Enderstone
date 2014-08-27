@@ -241,11 +241,10 @@ public class EnderPlayer extends Entity {
 		Iterator<String> players = this.visiblePlayers.iterator();
 
 		while (players.hasNext()) {
-			String name;
-			EnderPlayer ep = Main.getInstance().getPlayer(name = players.next());
+			EnderPlayer ep = Main.getInstance().getPlayer(players.next());
 
 			if (ep == null) {
-				this.visiblePlayers.remove(name);
+				players.remove();
 				continue;
 			}
 			ep.networkManager.sendPacket(packet);
