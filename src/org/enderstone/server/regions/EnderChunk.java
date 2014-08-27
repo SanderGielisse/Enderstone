@@ -74,8 +74,9 @@ public class EnderChunk {
 	 * @param z
 	 * @param material
 	 * @param data
+	 * @throws Exception 
 	 */
-	public void setBlock(int x, int y, int z, BlockId material, byte data) {
+	public void setBlock(int x, int y, int z, BlockId material, byte data) throws Exception {
 		// if the Block section the block is in hasn't been used yet, allocate
 		// it
 		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {

@@ -33,17 +33,13 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 
 	int handShakeStatus = -1;
 	private int length;
-	private List<Packet> waitingPackets = Collections.synchronizedList(new ArrayList<Packet>());
+
+	// private List<Packet> waitingPackets = Collections.synchronizedList(new
+	// ArrayList<Packet>());
 
 	public NetworkManager() {
 		super(Stage.LENGTH);
 		this.packetReciever = new PacketReciever(this);
-	}
-
-	public void sendPacket(Packet packet) {
-		synchronized (waitingPackets) {
-			this.waitingPackets.add(packet);
-		}
 	}
 
 	@Override
@@ -84,11 +80,6 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 				this.onPacketRecieve(packet);
 			}
 			this.state(Stage.LENGTH);
-
-			synchronized (waitingPackets) {
-				this.writeAndFlushPackets(waitingPackets.toArray(new Packet[0]));
-				this.waitingPackets.clear();
-			}
 		}
 	}
 
@@ -119,7 +110,7 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 			this.packetReciever.packetKeepAlive((PacketKeepAlive) packet);
 		} else if (packet instanceof PacketInChatMessage) {
 			this.packetReciever.packetInChatMessage((PacketInChatMessage) packet);
-		}else if(packet instanceof PacketInPlayerDigging){
+		} else if (packet instanceof PacketInPlayerDigging) {
 			this.packetReciever.packetInPlayerDigging((PacketInPlayerDigging) packet);
 		}
 	}
@@ -148,7 +139,11 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 
 				@Override
 				public void run() {
-					player.onDisconnect();
+					try {
+						player.onDisconnect();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					if (Main.getInstance().onlinePlayers.contains(player)) {
 						Main.getInstance().onlinePlayers.remove(player);
 					}
@@ -160,5 +155,15 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 
 	enum Stage {
 		LENGTH, DATA
+	}
+
+	public synchronized void sendPacket(Packet... packets) throws Exception {
+		ByteBuf buf = Unpooled.buffer();
+		for (Packet packet : packets) {
+			Packet.writeVarInt(packet.getSize(), buf);
+			Packet.writeVarInt(packet.getId(), buf);
+			packet.write(buf);
+		}
+		this.channel.writeAndFlush(buf);
 	}
 }

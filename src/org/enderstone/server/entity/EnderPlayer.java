@@ -153,7 +153,7 @@ public class EnderPlayer extends Entity {
 		return playerName;
 	}
 
-	public void onJoin() {
+	public void onJoin() throws Exception {
 		this.updateDataWatcher();
 
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(this.getPlayerName(), this.isOnline, (short) 1);
@@ -194,15 +194,15 @@ public class EnderPlayer extends Entity {
 		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.dataWatcher);
 	}
 
-	public void sendChatMessage(String message) {
+	public void sendChatMessage(String message) throws Exception {
 		Utill.broadcastMessage("<" + this.getPlayerName() + "> " + message);
 	}
 
-	public void onDisconnect() {
+	public void onDisconnect() throws Exception {
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " left the game!");
 	}
 
-	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
+	public void updatePlayers(List<EnderPlayer> onlinePlayers) throws Exception {
 		Set<Integer> toDespawn = new HashSet<>();
 		for (EnderPlayer pl : onlinePlayers) {
 			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation())) {
@@ -221,7 +221,7 @@ public class EnderPlayer extends Entity {
 
 	private int moveUpdates = 0;
 
-	public void broadcastLocation(Location newLocation) {
+	public void broadcastLocation(Location newLocation) throws Exception {
 
 		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
 		double dy = (newLocation.getY() - this.getLocation().getY()) * 32;

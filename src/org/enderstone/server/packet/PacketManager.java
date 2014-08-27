@@ -64,7 +64,7 @@ public class PacketManager {
 		play.put(0x0E, PacketInClickWindow.class);
 	}
 
-	public static Class<? extends Packet> getPacket(NetworkManager manager, int id, HandshakeState handshake) {
+	public static Class<? extends Packet> getPacket(NetworkManager manager, int id, HandshakeState handshake) throws Exception {
 
 		Map<Integer, Class<? extends Packet>> map = null;
 
