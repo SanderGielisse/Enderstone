@@ -28,6 +28,7 @@ public class EnderChunk {
 	private final List<BlockData> blockData;
 	private final List<BlockData> activeBlockData = new LinkedList<>();
 	private final int x;
+	public boolean hasPopulated = false;
 
 	public EnderChunk(int x, int z, short[][] blockID, byte[][] data, byte[] biome, List<BlockData> blockData) {
 		this.z = z;

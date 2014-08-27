@@ -20,7 +20,7 @@ public class Main implements Runnable {
 	public static final String NAME = "Enderstone";
 	public static final String PROTOCOL_VERSION = "1.7.6";
 	public static final int PROTOCOL = 5;
-	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig" };
+	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig", "timbayens" };
 
 	public static final Random random = new Random();
 	public final int port;
