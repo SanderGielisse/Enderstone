@@ -1,22 +1,25 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+
 import org.enderstone.server.packet.Packet;
 
-public class PacketOutBlockChange extends Packet {
+public class PacketOutEntityTeleport extends Packet {
 
+	private int entityId;
 	private int x;
 	private int y;
 	private int z;
-	private int blockId;
-	private byte metadata;
+	private byte yaw;
+	private byte pitch;
 
-	public PacketOutBlockChange(int x, int y, int z, int blockId, byte metadata) {
+	public PacketOutEntityTeleport(int entityId, int x, int y, int z, byte yaw, byte pitch) {
+		this.entityId = entityId;
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		this.blockId = blockId;
-		this.metadata = metadata;
+		this.yaw = yaw;
+		this.pitch = pitch;
 	}
 
 	@Override
@@ -26,20 +29,21 @@ public class PacketOutBlockChange extends Packet {
 
 	@Override
 	public void write(ByteBuf buf) throws Exception {
+		buf.writeInt(entityId);
 		buf.writeInt(x);
-		buf.writeByte(y);
+		buf.writeInt(y);
 		buf.writeInt(z);
-		writeVarInt(blockId, buf);
-		buf.writeByte(metadata);
+		buf.writeByte(yaw);
+		buf.writeByte(pitch);
 	}
 
 	@Override
 	public int getSize() throws Exception {
-		return (getIntSize() * 2) + 2 + getVarIntSize(blockId) + getVarIntSize(getId());
+		return (getIntSize() * 4) + 2 + getVarIntSize(getId());
 	}
 
 	@Override
 	public byte getId() {
-		return 0x23;
+		return 0x18;
 	}
 }

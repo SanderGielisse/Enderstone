@@ -91,7 +91,11 @@ public class Main implements Runnable {
 				while (isRunning) {
 					synchronized (sendToMainThread) {
 						for (Runnable run : sendToMainThread) {
-							run.run();
+							try {
+								run.run();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 						sendToMainThread.clear();
 					}
@@ -112,6 +116,15 @@ public class Main implements Runnable {
 		}).start();
 		EnderLogger.info("Main Server Thread initialized and started!");
 		EnderLogger.info(NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + this.port + "!");
+	}
+
+	public EnderPlayer getPlayer(String name) {
+		for (EnderPlayer ep : this.onlinePlayers) {
+			if (ep.getPlayerName().equals(name)) {
+				return ep;
+			}
+		}
+		return null;
 	}
 
 	private int latestKeepAlive = 0;

@@ -68,6 +68,7 @@ public class EnderChunk {
 
 	/**
 	 * MUST BE CALLED FROM MAIN THREAD
+	 * 
 	 * @param x
 	 * @param y
 	 * @param z

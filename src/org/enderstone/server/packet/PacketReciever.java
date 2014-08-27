@@ -58,11 +58,18 @@ public class PacketReciever {
 
 	}
 
-	public void packetInPlayerPosition(PacketInPlayerPosition packet) {
-		Location loc = this.networkManager.player.getLocation();
-		loc.setX(packet.getX());
-		loc.setY(packet.getFeetY());
-		loc.setZ(packet.getZ());
+	public void packetInPlayerPosition(final PacketInPlayerPosition packet) {
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Location loc = networkManager.player.getLocation();
+				networkManager.player.broadcastLocation(new Location("", packet.getX(), packet.getFeetY(), packet.getZ(), 0F, 0F));
+				loc.setX(packet.getX());
+				loc.setY(packet.getFeetY());
+				loc.setZ(packet.getZ());
+			}
+		});
 	}
 
 	public void packetInPlayerPositionLook(PacketInPlayerPositionLook packet) {
@@ -79,18 +86,12 @@ public class PacketReciever {
 	}
 
 	public void packetInRequest(PacketInRequest packet) {
-		// String jsonResponse = "{\"version\": {\"name\": \"" +
-		// Main.PROTOCOL_VERSION + "\",\"protocol\": " + Main.PROTOCOL +
-		// "},\"players\": {\"max\": 100,\"online\": 5,\"sample\":[{\"name\":\"sander2798\", \"id\": "
-		// + UUID.randomUUID().toString() +
-		// "\"\"}]},	\"description\": {\"text\":\"Hello world\"}}";
-
 		JSONObject json = new JSONObject();
 		json.put("version", new JSONObject().put("name", Main.PROTOCOL_VERSION).put("protocol", Main.PROTOCOL));
-		json.put("players", new JSONObject().put("max", 10).put("online", Main.getInstance().onlinePlayers.size() + 3));
+		json.put("players", new JSONObject().put("max", 10).put("online", 3));
 		json.put("description", "It seems like you are using the Enderstone Server");
 
-		this.networkManager.sendPacket(new PacketOutResponse(json.toString()));
+		networkManager.sendPacket(new PacketOutResponse(json.toString()));
 	}
 
 	public void packetPing(PacketPing packet) {
@@ -158,8 +159,7 @@ public class PacketReciever {
 	}
 
 	public void packetInPlayerDigging(PacketInPlayerDigging packet) {
-		int chunkX, chunkZ;
-		EnderChunk chunk = Main.getInstance().mainWorld.getOrCreateChunk(chunkX = (int) (packet.getX() / 16), chunkZ = (int) (packet.getZ() / 16));
-		chunk.setBlock(packet.getX() - (chunkX * 16), packet.getY(), packet.getZ() - (chunkZ * 16), BlockId.AIR, (byte) 0);
+		EnderChunk chunk = Main.getInstance().mainWorld.getOrCreateChunk(packet.getX() >> 4, packet.getZ() >> 4);
+		chunk.setBlock(packet.getX() & 0xF, packet.getY() & 0xFF, packet.getZ() & 0xF, BlockId.AIR, (byte) 0);
 	}
 }

@@ -2,6 +2,7 @@ package org.enderstone.server.entity;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +13,8 @@ import org.enderstone.server.Utill;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
+import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
+import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
 import org.enderstone.server.regions.EnderChunk;
@@ -66,6 +69,31 @@ public class EnderPlayer extends Entity {
 		this.uuid = uuid;
 
 		EnderLogger.info(name + " logged in.");
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EnderPlayer other = (EnderPlayer) obj;
+		if (uuid == null) {
+			if (other.uuid != null)
+				return false;
+		} else if (!uuid.equals(other.uuid))
+			return false;
+		return true;
 	}
 
 	public String getLocale() {
@@ -171,7 +199,6 @@ public class EnderPlayer extends Entity {
 
 	public void onDisconnect() {
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " left the game!");
-		// TODO send despawn packet
 	}
 
 	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
@@ -188,6 +215,38 @@ public class EnderPlayer extends Entity {
 		}
 		if (!toDespawn.isEmpty()) {
 			this.networkManager.sendPacket(new PacketOutEntityDestroy(toDespawn.toArray(new Integer[0])));
+		}
+	}
+
+	private int moveUpdates = 0;
+
+	public void broadcastLocation(Location newLocation) {
+
+		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
+		double dy = (newLocation.getY() - this.getLocation().getY()) * 32;
+		double dz = (newLocation.getZ() - this.getLocation().getZ()) * 32;
+
+		Packet packet;
+
+		if (moveUpdates++ % 40 == 0 || dx > 127 || dx < -127 || dy > 127 || dy < -127 || dz > 127 || dz < -127) {
+			// teleport
+			packet = new PacketOutEntityTeleport(this.getEntityId(), (int) (this.getLocation().getX() * 32.0D), (int) (this.getLocation().getY() * 32.0D), (int) (this.getLocation().getZ() * 32.0D), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch());
+		} else {
+			// movement
+			packet = new PacketOutEntityRelativeMove(this.getEntityId(), (byte) dx, (byte) dy, (byte) dz);
+		}
+
+		Iterator<String> players = this.visiblePlayers.iterator();
+
+		while (players.hasNext()) {
+			String name;
+			EnderPlayer ep = Main.getInstance().getPlayer(name = players.next());
+
+			if (ep == null) {
+				this.visiblePlayers.remove(name);
+				continue;
+			}
+			ep.networkManager.sendPacket(packet);
 		}
 	}
 }

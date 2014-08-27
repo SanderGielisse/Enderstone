@@ -49,8 +49,8 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> args) throws Exception {
 
-		if (channel == null) {
-			channel = ctx.channel();
+		if (this.channel == null) {
+			this.channel = ctx.channel();
 		}
 		if (this.ctx == null) {
 			this.ctx = ctx;
