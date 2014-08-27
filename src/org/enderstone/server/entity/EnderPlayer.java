@@ -201,6 +201,7 @@ public class EnderPlayer extends Entity {
 
 	public void onDisconnect() throws Exception {
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " left the game!");
+		Main.getInstance().mainWorld.players.remove(this);
 	}
 
 	public void updatePlayers(List<EnderPlayer> onlinePlayers) throws Exception {
