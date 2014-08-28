@@ -84,6 +84,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 				EnderChunk c = cache.get(i);
 				packets[i] = c.getCompressedChunk().toPacket(c.getX(), c.getZ());
 			}
+			cache.clear();
 			networkManager.sendPacket(packets);
 		}
 	};
