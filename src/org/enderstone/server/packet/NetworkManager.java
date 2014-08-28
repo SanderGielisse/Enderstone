@@ -27,7 +27,7 @@ import org.enderstone.server.packet.status.PacketPing;
 
 public class NetworkManager extends ReplayingDecoder<Stage> {
 
-	private ChannelHandlerContext ctx;
+	public ChannelHandlerContext ctx;
 	private Channel channel;
 	public EnderPlayer player;
 
