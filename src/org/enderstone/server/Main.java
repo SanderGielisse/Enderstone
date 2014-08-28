@@ -29,6 +29,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.regions.EnderWorld;
+import org.enderstone.server.uuid.UUIDFactory;
 
 public class Main implements Runnable {
 
@@ -38,14 +39,15 @@ public class Main implements Runnable {
 		private static final long serialVersionUID = 1L;
 
 		{
-			this.add(5); //1.7.9
+			this.add(5); // 1.7.9
 		}
 	});
 	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig", "timbayens" };
+	public static final Random random = new Random();
 
 	public Properties prop = null;
-	public static final Random random = new Random();
-	public static String FAVICON = null;
+	public UUIDFactory uuidFactory = new UUIDFactory();
+	public String FAVICON = null;
 	public int port;
 	public final EnderWorld mainWorld = new EnderWorld();
 	public volatile boolean isRunning = true;
