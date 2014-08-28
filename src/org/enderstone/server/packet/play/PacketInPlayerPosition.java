@@ -1,8 +1,11 @@
 package org.enderstone.server.packet.play;
 
+import org.enderstone.server.EnderLogger;
+
 import io.netty.buffer.ByteBuf;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
@@ -57,11 +60,21 @@ public class PacketInPlayerPosition extends Packet {
 			public void run() {
 				if (networkManager.player != null) {
 					Location loc = networkManager.player.getLocation();
-					try {
-						networkManager.player.broadcastLocation(new Location("", getX(), getFeetY(), getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
-					} catch (Exception e) {
-						e.printStackTrace();
+					if (networkManager.player.waitingForValidMoveAfterTeleport > 0) {
+						if (Math.max(Math.max(
+								getX() < loc.getX() ? loc.getX() - getX() : getX() - loc.getX(),
+								getHeadY() < loc.getY() ? loc.getY() - getHeadY() : getHeadY() - loc.getY()),
+								getZ() < loc.getZ() ? loc.getZ() - getZ() : getZ() - loc.getZ()
+						) > 0.1) {
+							if (networkManager.player.waitingForValidMoveAfterTeleport++ > 100) {
+								networkManager.player.teleport(loc);
+							}
+							return;
+						}
+						networkManager.player.sendMessage(new SimpleMessage("Position corrected!"));
+						networkManager.player.waitingForValidMoveAfterTeleport = 0;
 					}
+					networkManager.player.broadcastLocation(new Location("", getX(), getFeetY(), getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
 					loc.setX(getX());
 					loc.setY(getFeetY());
 					loc.setZ(getZ());

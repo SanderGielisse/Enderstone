@@ -4,9 +4,8 @@
  * and open the template in the editor.
  */
 
-package org.enderstone.server.commands.enderstone;
+package org.enderstone.server.commands.vanila;
 
-import java.util.Arrays;
 import org.enderstone.server.Main;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.commands.Command;
@@ -19,16 +18,17 @@ import org.enderstone.server.commands.SimpleCommand;
  *
  * @author Fernando
  */
-public class VersionCommand extends SimpleCommand{
-	public VersionCommand() {
-		super("command.enderstone.version","version",CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY, "ver");
+public class StopCommand extends SimpleCommand {
+
+	public StopCommand() {
+		super("command.enderstone.stop","stop",CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY, "halt");
 	}
 
 	@Override
 	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
-		sender.sendMessage(new SimpleMessage(Main.NAME + " " + Main.VERSION + " Created by: "+ Arrays.asList(Main.AUTHORS)));
-		sender.sendMessage(new SimpleMessage("Implementing Minecraft api: "+Main.PROTOCOL_VERSION));
+		sender.sendMessage(new SimpleMessage("Stopping server..."));
+		Main.getInstance().scheduleShutdown();
 		return COMMAND_SUCCES;
 	}
-	
 }
+

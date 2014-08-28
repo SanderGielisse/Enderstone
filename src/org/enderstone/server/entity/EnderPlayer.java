@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
@@ -15,6 +16,7 @@ import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
+import org.enderstone.server.packet.play.PacketOutChunkData;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
@@ -33,7 +35,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public final String playerName;
 	public DataWatcher dataWatcher;
 	public HashSet<String> visiblePlayers = new HashSet<>();
-
+	/**
+	 * If this is above 0, then the server is waiting for a correction on the last teleport the server sended
+	 */
+	public int waitingForValidMoveAfterTeleport = 0;
 	public final String uuid;
 	public String locale;
 	public byte renderDistance;
@@ -46,7 +51,6 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public boolean godMode = true;
 	public boolean canFly = true;
 	public boolean isFlying = true;
-
 	public boolean isOnFire = false;
 	public boolean isSneaking = false;
 	public boolean isSprinting = false;
@@ -70,6 +74,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 		@Override
 		public boolean removeChunk(EnderChunk chunk) {
+			networkManager.sendPacket(PacketOutChunkData.clearChunk(chunk.getX(), chunk.getZ()));
 			return true;
 		}
 
@@ -82,6 +87,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 				EnderChunk c = cache.get(i);
 				packets[i] = c.getCompressedChunk().toPacket(c.getX(), c.getZ());
 			}
+			cache.clear();
 			networkManager.sendPacket(packets);
 		}
 	};
@@ -378,6 +384,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	}
 
 	public void teleport(Location newLocation) {
+		this.waitingForValidMoveAfterTeleport = 1;
 		Location oldLocation = this.getLocation();
 		oldLocation.setX(newLocation.getX());
 		oldLocation.setY(newLocation.getY());

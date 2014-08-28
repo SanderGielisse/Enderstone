@@ -1,5 +1,6 @@
 package org.enderstone.server.packet.play;
 
+import java.util.zip.Deflater;
 import io.netty.buffer.ByteBuf;
 import org.enderstone.server.packet.Packet;
 
@@ -50,5 +51,21 @@ public class PacketOutChunkData extends Packet {
 	@Override
 	public byte getId() {
 		return 0x21;
+	}
+
+	private final static byte[] emptyChunk;
+
+	static {
+		byte[] buildBuffer = new byte[256];
+		Deflater deflator = new Deflater(9);
+		deflator.setInput(buildBuffer);
+		deflator.finish();
+		int size = deflator.deflate(buildBuffer);
+		emptyChunk = new byte[size];
+		System.arraycopy(buildBuffer, 0, emptyChunk, 0, size);
+	}
+
+	public static PacketOutChunkData clearChunk(int x, int z) {
+		return new PacketOutChunkData(x, z, true, (short) 0, (short) 0, emptyChunk.length, emptyChunk);
 	}
 }
