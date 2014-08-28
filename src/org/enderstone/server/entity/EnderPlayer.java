@@ -199,7 +199,27 @@ public class EnderPlayer extends Entity implements CommandSender {
 	}
 
 	public void onPlayerChat(String message) throws Exception {
-		Utill.broadcastMessage("<" + this.getPlayerName() + "> " + message);
+		if (message.startsWith("/")) {
+			final String fullCommand = message.substring(1);
+			final String[] split = fullCommand.split(" ");
+			final String[] args;
+			if (split.length != 1) {
+				args = new String[split.length - 1];
+				System.arraycopy(split, 1, args, 0, args.length);
+			} else
+				args = new String[0];
+
+			Main.getInstance().sendToMainThread(new Runnable() {
+
+				@Override
+				public void run() {
+
+					Main.getInstance().commands.executeCommand(null, split[0], EnderPlayer.this, args);
+				}
+			});
+		}
+		else
+			Utill.broadcastMessage("<" + this.getPlayerName() + "> " + message);
 	}
 
 	public void onDisconnect() throws Exception {
