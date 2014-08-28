@@ -1,7 +1,6 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
-
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.NetworkManager;
