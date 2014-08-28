@@ -18,6 +18,7 @@ import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
+import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
@@ -288,5 +289,9 @@ public class EnderPlayer extends Entity {
 				ep.networkManager.sendPacket(pack2);
 			}
 		}
+	}
+
+	public void playSound(String soundName, float volume, byte pitch) {
+		networkManager.sendPacket(new PacketOutSoundEffect(soundName, getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), volume, pitch));
 	}
 }

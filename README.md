@@ -12,4 +12,4 @@ http://www.gnu.org/copyleft/gpl.html
 The 5 classes in the org/enderstone/server/regions/generators/util package are made by Bukkit, so the credits for that go to them.
 
 We use the JNBT library to read and write our NBT data. When you use and/or redistribute source located in the org.jnbt package, you accept to the license of JNBT, which can be found in the JNBT_LICENSE.TXT file.
-All credits of the JNBT library (located in the org.jnbt package) goes to them.
+All credits of the JNBT library (located in the org.jnbt package) go to them.
