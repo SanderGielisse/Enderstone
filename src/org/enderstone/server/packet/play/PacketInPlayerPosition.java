@@ -71,7 +71,6 @@ public class PacketInPlayerPosition extends Packet {
 							}
 							return;
 						}
-						networkManager.player.sendMessage(new SimpleMessage("Position corrected!"));
 						networkManager.player.waitingForValidMoveAfterTeleport = 0;
 					}
 					networkManager.player.broadcastLocation(new Location("", getX(), getFeetY(), getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
