@@ -105,11 +105,7 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 						for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 							for (String name : ep.visiblePlayers) {
 								if (name.equals(player.getPlayerName()) && !player.getPlayerName().equals(ep.getPlayerName())) {
-									try {
 										ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { player.getEntityId() }));
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
 								}
 							}
 						}
@@ -124,14 +120,18 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 		LENGTH, DATA
 	}
 
-	public synchronized void sendPacket(Packet... packets) throws Exception {
-		ByteBuf buf = Unpooled.buffer();
-		for (Packet packet : packets) {
-			EnderLogger.debug(packet.toString());
-			Packet.writeVarInt(packet.getSize(), buf);
-			Packet.writeVarInt(packet.getId(), buf);
-			packet.write(buf);
+	public synchronized void sendPacket(Packet... packets) {
+		try {
+			ByteBuf buf = Unpooled.buffer();
+			for (Packet packet : packets) {
+				EnderLogger.debug(packet.toString());
+				Packet.writeVarInt(packet.getSize(), buf);
+				Packet.writeVarInt(packet.getId(), buf);
+				packet.write(buf);
+			}
+			this.channel.writeAndFlush(buf);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		this.channel.writeAndFlush(buf);
 	}
 }

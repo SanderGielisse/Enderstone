@@ -186,7 +186,7 @@ public class Main implements Runnable {
 	private int latestKeepAlive = 0;
 	private int latestChunkUpdate = 0;
 
-	private void serverTick() throws Exception {
+	private void serverTick() {
 		if ((latestKeepAlive++ & 0b1111111) == 0) { // faster than % .. == 0
 			for (EnderPlayer p : onlinePlayers) {
 				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));

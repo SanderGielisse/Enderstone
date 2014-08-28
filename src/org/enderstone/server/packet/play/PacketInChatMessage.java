@@ -29,18 +29,14 @@ public class PacketInChatMessage extends Packet {
 	public byte getId() {
 		return 0x01;
 	}
-	
+
 	@Override
-	public void onRecieve(final NetworkManager networkManager) throws Exception {
+	public void onRecieve(final NetworkManager networkManager) {
 		Main.getInstance().sendToMainThread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				try {
-					networkManager.player.onPlayerChat(getMessage());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				networkManager.player.onPlayerChat(getMessage());
 			}
 		});
 	}

@@ -53,7 +53,7 @@ public class EnderPlayer extends Entity {
 	public ChunkInformer chunkInformer = new ChunkInformer() {
 
 		@Override
-		public boolean sendChunk(EnderChunk chunk) throws Exception {
+		public boolean sendChunk(EnderChunk chunk) {
 			networkManager.sendPacket(chunk.getCompressedChunk().toPacket(chunk.getX(), chunk.getZ()));
 			return true;
 		}
@@ -154,7 +154,7 @@ public class EnderPlayer extends Entity {
 		return playerName;
 	}
 
-	public void onJoin() throws Exception {
+	public void onJoin() {
 		this.updateDataWatcher();
 
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(this.getPlayerName(), this.isOnline, (short) 1);
@@ -196,7 +196,7 @@ public class EnderPlayer extends Entity {
 		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.dataWatcher);
 	}
 
-	public void onPlayerChat(String message) throws Exception {
+	public void onPlayerChat(String message) {
 		Utill.broadcastMessage("<" + this.getPlayerName() + "> " + message);
 	}
 
@@ -209,7 +209,7 @@ public class EnderPlayer extends Entity {
 		}
 	}
 
-	public void updatePlayers(List<EnderPlayer> onlinePlayers) throws Exception {
+	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
 		Set<Integer> toDespawn = new HashSet<>();
 		for (EnderPlayer pl : onlinePlayers) {
 			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation())) {
@@ -228,7 +228,7 @@ public class EnderPlayer extends Entity {
 
 	private int moveUpdates = 0;
 
-	public void broadcastLocation(Location newLocation) throws Exception {
+	public void broadcastLocation(Location newLocation) {
 
 		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
 		double dy = (newLocation.getY() - this.getLocation().getY()) * 32;
@@ -260,7 +260,7 @@ public class EnderPlayer extends Entity {
 		}
 	}
 
-	public void broadcastRotation(float pitch, float yaw) throws Exception {
+	public void broadcastRotation(float pitch, float yaw) {
 		Iterator<String> players = this.visiblePlayers.iterator();
 
 		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F), (byte) Utill.calcYaw(pitch * 256.0F / 360.0F));

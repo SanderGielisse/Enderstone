@@ -41,7 +41,7 @@ public class PacketInLoginStart extends Packet {
 	}
 	
 	@Override
-	public void onRecieve(final NetworkManager networkManager) throws Exception {
+	public void onRecieve(final NetworkManager networkManager) {
 		if (networkManager.player == null) {
 
 			networkManager.player = new EnderPlayer(getPlayerName(), networkManager, UUID.randomUUID().toString());

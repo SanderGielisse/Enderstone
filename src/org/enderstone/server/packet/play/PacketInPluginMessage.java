@@ -44,7 +44,7 @@ public class PacketInPluginMessage extends Packet {
 	}
 
 	@Override
-	public void onRecieve(NetworkManager networkManager) throws Exception {
+	public void onRecieve(NetworkManager networkManager) {
 		if (getChannel().equals("REGISTER")) {
 			// REGISTER.add(new String(message.getData(), "UTF-8"));
 		} else if (getChannel().equals("UNREGISTER")) {

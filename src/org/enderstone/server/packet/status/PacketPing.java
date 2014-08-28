@@ -32,7 +32,7 @@ public class PacketPing extends Packet {
 	}
 
 	@Override
-	public void onRecieve(NetworkManager networkManager) throws Exception {
+	public void onRecieve(NetworkManager networkManager) {
 		networkManager.sendPacket(this);
 	}
 

@@ -127,7 +127,7 @@ public class EnderWorld {
 		getOrCreateChunk(x >> 4, z >> 4).setBlock(x & 0xF, y & 0xFF, z & 0xF, id, data);
 	}
 
-	public void doChunkUpdatesForPlayer(final EnderPlayer player, final ChunkInformer informer, final int radius) throws Exception {
+	public void doChunkUpdatesForPlayer(final EnderPlayer player, final ChunkInformer informer, final int radius) {
 		Main.getInstance().sendToMainThread(new Runnable() {
 
 			@Override

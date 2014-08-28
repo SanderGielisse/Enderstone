@@ -28,7 +28,7 @@ public class PacketInClientSettings extends Packet {
 
 	@Override
 	public void read(ByteBuf buf) throws Exception {
-		this.locale = readString(buf);		
+		this.locale = readString(buf);
 		this.renderDistance = buf.readByte();
 		this.chatFlags = buf.readByte();
 		this.chatColors = buf.readBoolean();
@@ -50,9 +50,9 @@ public class PacketInClientSettings extends Packet {
 	public byte getId() {
 		return 0x15;
 	}
-	
+
 	@Override
-	public void onRecieve(NetworkManager networkManager) throws Exception {
+	public void onRecieve(NetworkManager networkManager) {
 		// TODO Auto-generated method stub
 	}
 

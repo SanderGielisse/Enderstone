@@ -57,18 +57,14 @@ public class PacketInPlayerPositionLook extends Packet {
 	}
 
 	@Override
-	public void onRecieve(final NetworkManager networkManager) throws Exception {
+	public void onRecieve(final NetworkManager networkManager) {
 		Main.getInstance().sendToMainThread(new Runnable() {
 
 			@Override
 			public void run() {
 				Location loc = networkManager.player.getLocation();
-				try {
-					networkManager.player.broadcastLocation(new Location("", getX(), getFeetY(), getZ(), getYaw(), getPitch()));
-					networkManager.player.broadcastRotation(getPitch(), getYaw());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				networkManager.player.broadcastLocation(new Location("", getX(), getFeetY(), getZ(), getYaw(), getPitch()));
+				networkManager.player.broadcastRotation(getPitch(), getYaw());
 				loc.setX(getX());
 				loc.setY(getFeetY());
 				loc.setZ(getZ());
