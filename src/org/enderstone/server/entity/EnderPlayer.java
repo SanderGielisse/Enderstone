@@ -243,16 +243,12 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 	}
 
-<<<<<<< HEAD
-	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
-=======
 	@Override
 	public boolean isOnline() {
 		return this.isOnline;
 	}
 
-	public void updatePlayers(List<EnderPlayer> onlinePlayers) throws Exception {
->>>>>>> ferrybig
+	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
 		Set<Integer> toDespawn = new HashSet<>();
 		for (EnderPlayer pl : onlinePlayers) {
 			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation())) {
