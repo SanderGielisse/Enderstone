@@ -36,7 +36,7 @@ public class Main implements Runnable {
 	public BufferedImage favicon = null;
 	public Properties prop = null;
 	public static final Random random = new Random();
-	public int port = 25565;
+	public int port;
 	public final EnderWorld mainWorld = new EnderWorld();
 	public volatile boolean isRunning = true;
 
@@ -65,10 +65,10 @@ public class Main implements Runnable {
 
 	@Override
 	public void run() {
-		EnderLogger.info("Starting " + NAME + " server version " + PROTOCOL_VERSION + " at port " + this.port);
+		EnderLogger.info("Starting " + NAME + " server version " + PROTOCOL_VERSION + ".");
 		EnderLogger.info("Authors: " + Arrays.asList(AUTHORS).toString());
 
-		EnderLogger.info("Loading config.ender");
+		EnderLogger.info("Loading config.ender file...");
 		this.loadConfigFromDisk();
 
 		EnderLogger.info("Loading favicon.");
@@ -77,15 +77,13 @@ public class Main implements Runnable {
 			if (image.getWidth() == 64 && image.getHeight() == 64) {
 				favicon = image;
 			} else {
-				EnderLogger.exception(new IllegalArgumentException(
-						"Your server-icon.ping needs to be 64*64!"));
+				EnderLogger.exception(new IllegalArgumentException("Your server-icon.png needs to be 64*64!"));
 			}
 		} catch (IOException e) {
-			EnderLogger.exception(new FileNotFoundException(
-					"server-icon.png not found!"));
+			EnderLogger.exception(new FileNotFoundException("server-icon.png not found!"));
 		}
 
-		EnderLogger.info("Starting Netty Server...");
+		EnderLogger.info("Starting Netty Server at port " + this.port + "...");
 
 		new Thread(new Runnable() {
 
@@ -169,7 +167,9 @@ public class Main implements Runnable {
 			prop.load(input);
 			port = Integer.parseInt(prop.getProperty("port"));
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 			this.saveConfigToDisk(true);
+			this.loadConfigFromDisk();
 		} catch (IOException e) {
 			EnderLogger.exception(e);
 		}
