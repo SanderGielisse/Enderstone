@@ -6,6 +6,14 @@
 
 package org.enderstone.server.inventory;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.zip.GZIPInputStream;
+
+import org.jnbt.CompoundTag;
+import org.jnbt.NBTInputStream;
+
 /**
  *
  * @author Fernando
@@ -25,6 +33,16 @@ public class ItemStack {
 		this.damage = damage;
 		this.nbtLength = nbtLength;
 		this.nbtData = nbtData;
+
+		if (nbtLength <= 0) {
+			return;
+		}
+
+		try (NBTInputStream in = new NBTInputStream(new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(nbtData))))) {
+			CompoundTag itemstack = (CompoundTag) in.readTag();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public short getBlockId() {
