@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.regions.generators.TimTest;
@@ -137,12 +138,10 @@ public class EnderWorld {
 		int minZ = z;
 		int maxZ = z + tmp1;
 		if (playerChunks.isEmpty()) {
-			int i = 0;
 			while (x++ < maxX) {
 				for (z = minZ; z < maxZ; z++) {
 					EnderChunk c = getOrCreateChunk(x, z);
 					playerChunks.add(c);
-					i++;
 					try {
 						if (!informer.sendChunk(c)) {
 							return;
@@ -176,7 +175,6 @@ public class EnderWorld {
 			}
 
 			index = 0;
-			int a = 0;
 			for (int[] i : chunkLoad) {
 				if (i == null) {
 					break;
@@ -186,7 +184,6 @@ public class EnderWorld {
 				EnderChunk c = getOrCreateChunk(x, z);
 				playerChunks.add(c);
 				try {
-					a++;
 					if (!informer.sendChunk(c)) {
 						return;
 					}
