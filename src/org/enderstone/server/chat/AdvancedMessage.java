@@ -591,5 +591,8 @@ public final class AdvancedMessage implements Message, AdvancedMessagePart {
 		public MessagePart next() {
 			throw new UnsupportedOperationException("I am sorry, but this iterator is empty...");
 		}
+
+		@Override
+		public void remove() {}
 	};
 }
