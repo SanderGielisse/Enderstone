@@ -52,14 +52,30 @@ public final class AdvancedMessage implements Message, AdvancedMessagePart {
 
 	@Override
 	public String toMessageJson() {
-		MessagePart head = getLatest();
+		MessagePart head;
+		if(index == -1)
+		{
+			head = (MessagePart) addPart("", Type.PLAIN);
+		}
+		else
+		{
+			head = messageParts.get(0);
+		}
 		Iterator<MessagePart> parts = messageParts.listIterator(1);
 		return head.buildMessage(parts).toString();
 	}
 
 	@Override
 	public String toAsciiText() {
-		MessagePart head = getLatest();
+		MessagePart head;
+		if(index == -1)
+		{
+			head = (MessagePart) addPart("", Type.PLAIN);
+		}
+		else
+		{
+			head = messageParts.get(0);
+		}
 		Iterator<MessagePart> parts = messageParts.listIterator(1);
 		StringBuilder b = new StringBuilder();
 		head.buildAscii(parts, b);
@@ -548,7 +564,7 @@ public final class AdvancedMessage implements Message, AdvancedMessagePart {
 				do {
 					tmp.put(with.next().buildMessage(NULL_ITERATOR));
 				} while (with.hasNext());
-				cache.put("with", tmp);
+				cache.put("extra", tmp);
 			}
 			return cache;
 		}
