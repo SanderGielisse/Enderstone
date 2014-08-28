@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import org.enderstone.server.entity.ChatColor;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 

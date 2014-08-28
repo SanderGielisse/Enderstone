@@ -7,6 +7,7 @@ package org.enderstone.server.commands.vanila;
 
 import org.enderstone.server.Main;
 import org.enderstone.server.chat.AdvancedMessage;
+import org.enderstone.server.chat.ChatColor;
 import org.enderstone.server.chat.AdvancedMessagePart.ClickEventType;
 import org.enderstone.server.chat.AdvancedMessagePart.HoverEventType;
 import org.enderstone.server.chat.SimpleMessage;
@@ -14,7 +15,6 @@ import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;
-import org.enderstone.server.entity.ChatColor;
 import org.enderstone.server.entity.EnderPlayer;
 
 /**

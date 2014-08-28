@@ -1,6 +1,5 @@
 package org.enderstone.server.chat;
 
-import org.enderstone.server.entity.ChatColor;
 
 /**
  *

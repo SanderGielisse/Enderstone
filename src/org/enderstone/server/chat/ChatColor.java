@@ -1,4 +1,4 @@
-package org.enderstone.server.entity;
+package org.enderstone.server.chat;
 
 public enum ChatColor {
 
