@@ -5,9 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
-
 import java.util.List;
-
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
@@ -78,7 +76,7 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		if (player.isOnline()) {
+		if (player != null && player.isOnline()) {
 			final EnderPlayer subPlayer = player;
 			Main.getInstance().sendToMainThread(new Runnable() {
 

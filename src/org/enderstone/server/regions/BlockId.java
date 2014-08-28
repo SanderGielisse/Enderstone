@@ -80,6 +80,8 @@ public enum BlockId {
 	IRON_DOOR_BLOCK(71, true),
 	WOOD_PLATE(72, true),
 	REDSTONE_ORE(73, true),
+	REDSTONE_TORCH(76, true),
+	BUTTON(77, true),
 	CACTUS(81, true),
 	CLAY(82, true),
 	SUGAR_CANE_BLOCK(83, true),
