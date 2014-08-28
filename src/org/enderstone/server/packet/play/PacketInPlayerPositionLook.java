@@ -1,6 +1,10 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+
+import org.enderstone.server.Location;
+import org.enderstone.server.Main;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketInPlayerPositionLook extends Packet {
@@ -50,6 +54,28 @@ public class PacketInPlayerPositionLook extends Packet {
 	@Override
 	public byte getId() {
 		return 0x06;
+	}
+
+	@Override
+	public void onRecieve(final NetworkManager networkManager) throws Exception {
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Location loc = networkManager.player.getLocation();
+				try {
+					networkManager.player.broadcastLocation(new Location("", getX(), getFeetY(), getZ(), getYaw(), getPitch()));
+					networkManager.player.broadcastRotation(getPitch(), getYaw());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				loc.setX(getX());
+				loc.setY(getFeetY());
+				loc.setZ(getZ());
+				loc.setPitch(getPitch());
+				loc.setYaw(getYaw());
+			}
+		});
 	}
 
 	public double getX() {

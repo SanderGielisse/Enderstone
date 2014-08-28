@@ -196,7 +196,7 @@ public class EnderPlayer extends Entity {
 		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.dataWatcher);
 	}
 
-	public void sendChatMessage(String message) throws Exception {
+	public void onPlayerChat(String message) throws Exception {
 		Utill.broadcastMessage("<" + this.getPlayerName() + "> " + message);
 	}
 

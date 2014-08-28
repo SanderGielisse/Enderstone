@@ -36,7 +36,7 @@ public class Main implements Runnable {
 	public BufferedImage favicon = null;
 	public Properties prop = null;
 	public static final Random random = new Random();
-	public int port;
+	public int port = 25565;
 	public final EnderWorld mainWorld = new EnderWorld();
 	public volatile boolean isRunning = true;
 
@@ -163,10 +163,9 @@ public class Main implements Runnable {
 	}
 
 	public Properties loadConfigFromDisk() {
-		InputStream input;
 		prop = new Properties();
 		try {
-			input = new FileInputStream("config.ender");
+			InputStream input = new FileInputStream("config.ender");
 			prop.load(input);
 			port = Integer.parseInt(prop.getProperty("port"));
 		} catch (FileNotFoundException e) {

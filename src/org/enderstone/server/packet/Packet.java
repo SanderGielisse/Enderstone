@@ -19,6 +19,8 @@ public abstract class Packet {
 
 	public abstract byte getId();
 
+	public void onRecieve(NetworkManager networkManager) throws Exception{};
+
 	public static String readString(ByteBuf buf) {
 		int len = readVarInt(buf);
 

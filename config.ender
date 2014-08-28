@@ -1,0 +1,6 @@
+#Enderstone Server Config!
+#Thu Aug 28 12:30:03 CEST 2014
+view-distance=7
+port=25565
+max-players=20
+motd=Another Enderstone server\!

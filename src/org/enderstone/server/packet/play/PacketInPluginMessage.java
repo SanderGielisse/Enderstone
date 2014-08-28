@@ -1,6 +1,8 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketInPluginMessage extends Packet {
@@ -39,6 +41,17 @@ public class PacketInPluginMessage extends Packet {
 	@Override
 	public byte getId() {
 		return 0x17;
+	}
+
+	@Override
+	public void onRecieve(NetworkManager networkManager) throws Exception {
+		if (getChannel().equals("REGISTER")) {
+			// REGISTER.add(new String(message.getData(), "UTF-8"));
+		} else if (getChannel().equals("UNREGISTER")) {
+			// REGISTER.remove(new String(message.getData(), "UTF-8"));
+		} else if (getChannel().equals("MC|Brand")) {
+			networkManager.sendPacket(new PacketOutPluginMessage(getChannel(), getLength(), getData()));
+		}
 	}
 
 	public String getChannel() {

@@ -1,6 +1,8 @@
 package org.enderstone.server.packet.status;
 
 import io.netty.buffer.ByteBuf;
+
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketPing extends Packet {
@@ -27,6 +29,11 @@ public class PacketPing extends Packet {
 	@Override
 	public int getSize() throws Exception {
 		return getLongSize() + getVarIntSize(getId());
+	}
+
+	@Override
+	public void onRecieve(NetworkManager networkManager) throws Exception {
+		networkManager.sendPacket(this);
 	}
 
 	@Override

@@ -29,20 +29,14 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 
 	private ChannelHandlerContext ctx;
 	private Channel channel;
-	EnderPlayer player;
-	private PacketReciever packetReciever;
+	public EnderPlayer player;
 
-	int handShakeStatus = -1;
+	public PacketHandshake latestHandshakePacket;
+	public int handShakeStatus = -1;
 	private int length;
-
-	// private List<Packet> waitingPackets = Collections.synchronizedList(new
-	// ArrayList<Packet>());
-
-	PacketHandshake lastHandshake = null;
 
 	public NetworkManager() {
 		super(Stage.LENGTH);
-		this.packetReciever = new PacketReciever(this);
 	}
 
 	@Override
@@ -69,56 +63,21 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 				PacketHandshake packet = (PacketHandshake) PacketManager.handshake.newInstance();
 				packet.read(buf);
 				this.handShakeStatus = packet.getNextState();
-				lastHandshake = packet;
+				latestHandshakePacket = packet;
 			} else if (handShakeStatus == 1) {
 				Packet packet = PacketManager.getPacket(this, id, HandshakeState.STATUS).newInstance();
 				packet.read(buf);
-				this.onPacketRecieve(packet);
+				packet.onRecieve(this);
 			} else if (handShakeStatus == 2) {
 				Packet packet = PacketManager.getPacket(this, id, HandshakeState.LOGIN).newInstance();
 				packet.read(buf);
-				this.onPacketRecieve(packet);
+				packet.onRecieve(this);
 			} else if (handShakeStatus == 3) {
 				Packet packet = PacketManager.getPacket(this, id, HandshakeState.PLAY).newInstance();
 				packet.read(buf);
-				this.onPacketRecieve(packet);
+				packet.onRecieve(this);
 			}
 			this.state(Stage.LENGTH);
-		}
-	}
-
-	private void onPacketRecieve(Packet packet) throws Exception {
-
-		// System.out.println("Recieved " + packet.getClass().getSimpleName() +
-		// " with id 0x" + Integer.toHexString(packet.getId()));
-
-		if (packet instanceof PacketInRequest) {
-			this.packetReciever.packetInRequest((PacketInRequest) packet, lastHandshake);
-			lastHandshake = null;
-		} else if (packet instanceof PacketPing) {
-			this.packetReciever.packetPing((PacketPing) packet);
-		} else if (packet instanceof PacketInLoginStart) {
-			this.packetReciever.packetInLoginStart((PacketInLoginStart) packet);
-		} else if (packet instanceof PacketInClientSettings) {
-			this.packetReciever.packetInClientSettings((PacketInClientSettings) packet);
-		} else if (packet instanceof PacketInPluginMessage) {
-			this.packetReciever.packetInPluginMessage((PacketInPluginMessage) packet);
-		}
-
-		else if (packet instanceof PacketInPlayerPositionLook) {
-			this.packetReciever.packetInPlayerPositionLook((PacketInPlayerPositionLook) packet);
-		} else if (packet instanceof PacketInPlayerPosition) {
-			this.packetReciever.packetInPlayerPosition((PacketInPlayerPosition) packet);
-		}
-
-		else if (packet instanceof PacketKeepAlive) {
-			this.packetReciever.packetKeepAlive((PacketKeepAlive) packet);
-		} else if (packet instanceof PacketInChatMessage) {
-			this.packetReciever.packetInChatMessage((PacketInChatMessage) packet);
-		} else if (packet instanceof PacketInPlayerDigging) {
-			this.packetReciever.packetInPlayerDigging((PacketInPlayerDigging) packet);
-		} else if (packet instanceof PacketInPlayerLook) {
-			this.packetReciever.packetInPlayerLook((PacketInPlayerLook) packet);
 		}
 	}
 

@@ -1,6 +1,8 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketInChatMessage extends Packet {
@@ -25,6 +27,11 @@ public class PacketInChatMessage extends Packet {
 	@Override
 	public byte getId() {
 		return 0x01;
+	}
+	
+	@Override
+	public void onRecieve(NetworkManager networkManager) throws Exception {
+		networkManager.player.onPlayerChat(getMessage());
 	}
 
 	public String getMessage() {

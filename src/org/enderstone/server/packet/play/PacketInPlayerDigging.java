@@ -1,7 +1,11 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+
+import org.enderstone.server.Main;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.EnderChunk;
 
 public class PacketInPlayerDigging extends Packet {
 
@@ -33,6 +37,11 @@ public class PacketInPlayerDigging extends Packet {
 	@Override
 	public byte getId() {
 		return 0x07;
+	}
+
+	public void onRecieve(org.enderstone.server.packet.NetworkManager networkManager) throws Exception {
+		EnderChunk chunk = Main.getInstance().mainWorld.getOrCreateChunk(getX() >> 4, getZ() >> 4);
+		chunk.setBlock(getX() & 0xF, getY() & 0xFF, getZ() & 0xF, BlockId.AIR, (byte) 0);
 	}
 
 	public byte getStatus() {
