@@ -3,6 +3,7 @@ package org.enderstone.server.packet.play;
 import io.netty.buffer.ByteBuf;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
@@ -62,6 +63,20 @@ public class PacketInPlayerPositionLook extends Packet {
 			@Override
 			public void run() {
 				Location loc = networkManager.player.getLocation();
+				if (networkManager.player.waitingForValidMoveAfterTeleport > 0) {
+					if (Math.max(Math.max(
+							getX() < loc.getX() ? loc.getX() - getX() : getX() - loc.getX(),
+							getHeadY() < loc.getY() ? loc.getY() - getHeadY() : getHeadY() - loc.getY()),
+							getZ() < loc.getZ() ? loc.getZ() - getZ() : getZ() - loc.getZ()
+					) > 0.1) {
+						if (networkManager.player.waitingForValidMoveAfterTeleport++ > 100) {
+							networkManager.player.teleport(loc);
+						}
+						return;
+					}
+					networkManager.player.sendMessage(new SimpleMessage("Position corrected!"));
+					networkManager.player.waitingForValidMoveAfterTeleport = 0;
+				}
 				networkManager.player.broadcastLocation(new Location("", getX(), getFeetY(), getZ(), getYaw(), getPitch()));
 				networkManager.player.broadcastRotation(getPitch(), getYaw());
 				loc.setX(getX());

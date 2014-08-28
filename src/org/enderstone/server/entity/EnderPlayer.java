@@ -33,7 +33,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public final String playerName;
 	public DataWatcher dataWatcher;
 	public HashSet<String> visiblePlayers = new HashSet<>();
-
+	/**
+	 * If this is above 0, then the server is waiting for a correction on the last teleport the server sended
+	 */
+	public int waitingForValidMoveAfterTeleport = 0;
 	public final String uuid;
 	public String locale;
 	public byte renderDistance;
@@ -46,7 +49,6 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public boolean godMode = true;
 	public boolean canFly = true;
 	public boolean isFlying = true;
-
 	public boolean isOnFire = false;
 	public boolean isSneaking = false;
 	public boolean isSprinting = false;
@@ -378,6 +380,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	}
 
 	public void teleport(Location newLocation) {
+		this.waitingForValidMoveAfterTeleport = 1;
 		Location oldLocation = this.getLocation();
 		oldLocation.setX(newLocation.getX());
 		oldLocation.setY(newLocation.getY());
