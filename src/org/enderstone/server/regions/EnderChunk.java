@@ -204,14 +204,12 @@ public class EnderChunk {
 
 					for (byte block : nibblearray) {
 						if (hd) {
-							halfData = (byte) (halfData << 4);
-
-							abyte[j++] = (byte) (halfData | block);
+							halfData = (byte) ((block << 4) | halfData);
+							abyte[j++] = halfData;
 						} else {
 							halfData = block;
 						}
 						hd = !hd;
-
 					}
 					// j += nibblearray.length / 2 ;
 				}

@@ -5,13 +5,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
+import org.enderstone.server.chat.Message;
+import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.play.PacketOutChatMessage;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
@@ -23,7 +25,7 @@ import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 
-public class EnderPlayer extends Entity {
+public class EnderPlayer extends Entity implements CommandSender {
 
 	public final NetworkManager networkManager;
 	public final String playerName;
@@ -208,10 +210,31 @@ public class EnderPlayer extends Entity {
 	}
 
 	public void onPlayerChat(String message) {
-		Utill.broadcastMessage("<" + this.getPlayerName() + "> " + message);
+		if (message.startsWith("/")) {
+			final String fullCommand = message.substring(1);
+			final String[] split = fullCommand.split(" ");
+			final String[] args;
+			if (split.length != 1) {
+				args = new String[split.length - 1];
+				System.arraycopy(split, 1, args, 0, args.length);
+			} else
+				args = new String[0];
+
+			Main.getInstance().sendToMainThread(new Runnable() {
+
+				@Override
+				public void run() {
+
+					Main.getInstance().commands.executeCommand(null, split[0], EnderPlayer.this, args);
+				}
+			});
+		}
+		else
+			Utill.broadcastMessage("<" + this.getPlayerName() + "> " + message);
 	}
 
 	public void onDisconnect() throws Exception {
+		this.isOnline = false;
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " left the game!");
 		Main.getInstance().mainWorld.players.remove(this);
 
@@ -220,7 +243,16 @@ public class EnderPlayer extends Entity {
 		}
 	}
 
+<<<<<<< HEAD
 	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
+=======
+	@Override
+	public boolean isOnline() {
+		return this.isOnline;
+	}
+
+	public void updatePlayers(List<EnderPlayer> onlinePlayers) throws Exception {
+>>>>>>> ferrybig
 		Set<Integer> toDespawn = new HashSet<>();
 		for (EnderPlayer pl : onlinePlayers) {
 			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation())) {
@@ -291,7 +323,36 @@ public class EnderPlayer extends Entity {
 		}
 	}
 
+<<<<<<< HEAD
 	public void playSound(String soundName, float volume, byte pitch) {
 		networkManager.sendPacket(new PacketOutSoundEffect(soundName, getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), volume, pitch));
+=======
+	@Override
+	public boolean sendMessage(Message message) {
+		return this.sendRawMessage(message);
+	}
+
+	@Override
+	public boolean sendRawMessage(Message message) {
+		if (!this.isOnline) return false;
+		try {
+			this.networkManager.sendPacket(new PacketOutChatMessage(message.toMessageJson(), true));
+			return true;
+		} catch (Exception ex) {
+			try {
+				this.networkManager.channelInactive(networkManager.ctx);
+				EnderLogger.logger.throwing(null, null, ex);
+			} catch (Exception ex1) {
+				ex.addSuppressed(ex1);
+				EnderLogger.logger.throwing(null, null, ex);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public String getName() {
+		return this.getPlayerName();
+>>>>>>> ferrybig
 	}
 }

@@ -16,7 +16,7 @@ import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 
 public class NetworkManager extends ReplayingDecoder<Stage> {
 
-	private ChannelHandlerContext ctx;
+	public ChannelHandlerContext ctx;
 	private Channel channel;
 	public EnderPlayer player;
 

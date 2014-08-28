@@ -4,7 +4,6 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -22,10 +21,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
-
-import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
-
+import javax.imageio.ImageIO;
+import org.enderstone.server.commands.CommandMap;
+import org.enderstone.server.commands.enderstone.PingCommand;
+import org.enderstone.server.commands.enderstone.VersionCommand;
+import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.regions.EnderWorld;
@@ -51,7 +52,14 @@ public class Main implements Runnable {
 	public int port;
 	public final EnderWorld mainWorld = new EnderWorld();
 	public volatile boolean isRunning = true;
-
+	public final CommandMap commands;
+	{
+		commands = new CommandMap();
+		commands.registerCommand(new TellCommand());
+		commands.registerCommand(new PingCommand());
+		commands.registerCommand(new VersionCommand());
+	}
+			
 	private static Main instance;
 
 	public final List<EnderPlayer> onlinePlayers = new ArrayList<>();
