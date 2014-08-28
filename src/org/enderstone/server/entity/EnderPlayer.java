@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
@@ -22,6 +21,7 @@ import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
+import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
 import org.enderstone.server.regions.EnderChunk;
@@ -41,7 +41,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public boolean chatColors;
 	public byte difficulty;
 	public boolean showCapes;
-	public boolean isOnline = true;
+	public volatile boolean isOnline = true;
 	public boolean isCreative = true;
 	public boolean godMode = true;
 	public boolean canFly = true;
@@ -232,7 +232,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 			});
 		} else {
 			Main.getInstance().sendToMainThread(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					Utill.broadcastMessage("<" + getPlayerName() + "> " + message);
@@ -358,5 +358,27 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	public String getName() {
 		return this.getPlayerName();
+	}
+
+	public void teleport(Entity entity) {
+		this.teleport(entity.getLocation());
+	}
+
+	public void teleport(Location newLocation) {
+		Location oldLocation = this.getLocation();
+		oldLocation.setX(newLocation.getX());
+		oldLocation.setY(newLocation.getY());
+		oldLocation.setZ(newLocation.getZ());
+		oldLocation.setPitch(newLocation.getPitch());
+		oldLocation.setYaw(newLocation.getYaw());
+
+		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(newLocation.getX(), newLocation.getY(), newLocation.getZ(), newLocation.getYaw(), newLocation.getPitch(), false));
+
+		PacketOutEntityTeleport packet = new PacketOutEntityTeleport(this.getEntityId(), (int) (newLocation.getX() * 32.0D), (int) (newLocation.getY() * 32.0D), (int) (newLocation.getZ() * 32.0D), (byte) newLocation.getYaw(), (byte) newLocation.getPitch());
+		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
+			if (!ep.equals(this)) {
+				ep.getNetworkManager().sendPacket(packet);
+			}
+		}
 	}
 }

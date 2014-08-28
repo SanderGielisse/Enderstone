@@ -1,9 +1,7 @@
 package org.enderstone.server.packet.login;
 
 import io.netty.buffer.ByteBuf;
-
 import java.util.UUID;
-
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.NetworkManager;
@@ -44,7 +42,7 @@ public class PacketInLoginStart extends Packet {
 
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
-		new Thread(new Runnable() {
+		Thread thread = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -92,7 +90,8 @@ public class PacketInLoginStart extends Packet {
 				networkManager.sendPacket(new PacketOutPlayerAbilities((byte) i, 0.1F, 0.1F));
 				networkManager.sendPacket(new PacketOutPlayerPositionLook(0, 100, 0, 0F, 0F, false));
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	@Override

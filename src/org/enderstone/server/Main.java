@@ -25,6 +25,7 @@ import javax.xml.bind.DatatypeConverter;
 import javax.imageio.ImageIO;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.enderstone.PingCommand;
+import org.enderstone.server.commands.enderstone.TeleportCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderPlayer;
@@ -58,8 +59,9 @@ public class Main implements Runnable {
 		commands.registerCommand(new TellCommand());
 		commands.registerCommand(new PingCommand());
 		commands.registerCommand(new VersionCommand());
+		commands.registerCommand(new TeleportCommand());
 	}
-			
+
 	private static Main instance;
 
 	public final List<EnderPlayer> onlinePlayers = new ArrayList<>();

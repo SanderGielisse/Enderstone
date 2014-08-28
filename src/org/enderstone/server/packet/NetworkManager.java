@@ -78,7 +78,7 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		if (player != null) {
+		if (player.isOnline()) {
 			final EnderPlayer subPlayer = player;
 			Main.getInstance().sendToMainThread(new Runnable() {
 
@@ -102,7 +102,7 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 					}
 				}
 			});
-			player = null;
+			player.isOnline = false;
 		}
 		super.channelInactive(ctx);
 	}
