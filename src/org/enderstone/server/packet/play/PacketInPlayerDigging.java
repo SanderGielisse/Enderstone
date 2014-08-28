@@ -42,16 +42,15 @@ public class PacketInPlayerDigging extends Packet {
 	}
 
 	public void onRecieve(final NetworkManager networkManager) {
-		// TODO not working properly
-
 		Main.getInstance().sendToMainThread(new Runnable() {
 
 			@Override
 			public void run() {
-
-				if (networkManager.player.getLocation().isInRange(6, new Location("", getX(), getY(), getZ(), 0F, 0F))) {
-						Main.getInstance().mainWorld.setBlockAt(getX(), getY(), getZ(), BlockId.AIR, (byte) 0);
+				Location loc;
+				if (networkManager.player.getLocation().isInRange(6, loc = new Location("", getX(), getY(), getZ(), 0F, 0F))) {
+					Main.getInstance().mainWorld.setBlockAt(getX(), getY(), getZ(), BlockId.AIR, (byte) 0);
 				}
+				Main.getInstance().mainWorld.broadcastSound("dig.grass", x, y, z, 1F, (byte) 63, loc, networkManager.player);
 			}
 		});
 	}

@@ -27,7 +27,8 @@ public class PacketInBlockPlacement extends Packet {
 		this.z = buf.readInt();
 		this.direction = buf.readByte();
 		this.heldItem = readItemStack(buf);
-		this.cursorX = buf.readByte(); // The position of the crosshair on the block
+		this.cursorX = buf.readByte(); // The position of the crosshair on the
+										// block
 		this.cursorY = buf.readByte();
 		this.cursorZ = buf.readByte();
 	}
@@ -76,9 +77,11 @@ public class PacketInBlockPlacement extends Packet {
 					x++;
 				}
 
-				if (networkManager.player.getLocation().isInRange(6, new Location("", getX(), getY(), getZ(), 0F, 0F))) {
+				Location loc;
+				if (networkManager.player.getLocation().isInRange(6, loc = new Location("", getX(), getY(), getZ(), 0F, 0F))) {
 					Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
 				}
+				Main.getInstance().mainWorld.broadcastSound("dig.grass", x, y, z, 1F, (byte) 63, loc, null);
 			}
 		});
 	}
