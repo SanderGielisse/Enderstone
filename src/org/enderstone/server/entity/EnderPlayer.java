@@ -61,15 +61,28 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	public ChunkInformer chunkInformer = new ChunkInformer() {
 
+		List<EnderChunk> cache = new ArrayList<>();
 		@Override
 		public boolean sendChunk(EnderChunk chunk) {
-			networkManager.sendPacket(chunk.getCompressedChunk().toPacket(chunk.getX(), chunk.getZ()));
+			cache.add(chunk);
 			return true;
 		}
 
 		@Override
 		public boolean removeChunk(EnderChunk chunk) {
 			return true;
+		}
+
+		@Override
+		public void done() {
+			int size;
+			Packet[] packets = new Packet[size = cache.size()];
+			for(int i = 0; i < size; i++)
+			{
+				EnderChunk c = cache.get(i);
+				packets[i] = c.getCompressedChunk().toPacket(c.getX(), c.getZ());
+			}
+			networkManager.sendPacket(packets);
 		}
 	};
 

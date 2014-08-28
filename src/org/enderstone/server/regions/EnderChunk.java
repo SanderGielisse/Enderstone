@@ -149,7 +149,7 @@ public class EnderChunk {
 		return map;
 	}
 
-	private static EnderChunkMap build(EnderChunk chunk, boolean flag, int i) {
+	public static EnderChunkMap build(EnderChunk chunk, boolean flag, int i) {
 		int j = 0;
 
 		int k = 0;
