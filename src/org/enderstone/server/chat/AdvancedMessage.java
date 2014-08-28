@@ -35,7 +35,15 @@ public final class AdvancedMessage implements Message, AdvancedMessagePart {
 
 	@Override
 	public String toPlainText() {
-		MessagePart head = getLatest();
+		MessagePart head;
+		if(index == -1)
+		{
+			head = (MessagePart) addPart("", Type.PLAIN);
+		}
+		else
+		{
+			head = messageParts.get(0);
+		}
 		Iterator<MessagePart> parts = messageParts.listIterator(1);
 		StringBuilder b = new StringBuilder();
 		head.buildPlain(parts, b);
@@ -66,6 +74,7 @@ public final class AdvancedMessage implements Message, AdvancedMessagePart {
 	@Override
 	public AdvancedMessagePart addPart(String text, Type type) {
 		messageParts.add(working = new MessagePart(text, type));
+		index++;
 		return working;
 	}
 
