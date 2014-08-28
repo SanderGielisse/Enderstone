@@ -43,7 +43,7 @@ public class Main implements Runnable {
 	public static final String VERSION = "1.0.0";
 	public static final String PROTOCOL_VERSION = "1.7.6";
 	private static final int EXCEPTED_SLEEP_TIME = 1000 / 20;
-	private static final int CANT_KEEP_UP_TIMEOUT = -5000;
+	private static final int CANT_KEEP_UP_TIMEOUT = -10000;
 	private static final int MAX_SLEEP = 100;
 	public static final Set<Integer> PROTOCOL = Collections.unmodifiableSet(new HashSet<Integer>() {
 		private static final long serialVersionUID = 1L;
@@ -180,18 +180,17 @@ public class Main implements Runnable {
 							EnderLogger.error("Problem while running ServerTick()");
 							EnderLogger.exception(e);
 						}
-
-						long sleepTime = (lastTick + Main.EXCEPTED_SLEEP_TIME) - System.currentTimeMillis();
+						this.lastTick += Main.EXCEPTED_SLEEP_TIME;
+						long sleepTime = (lastTick) - System.currentTimeMillis();
 						if (sleepTime < Main.CANT_KEEP_UP_TIMEOUT) {
 							this.warn("Can't keep up! " + (sleepTime / Main.EXCEPTED_SLEEP_TIME) + " ticks behind!");
 							this.lastTick = System.currentTimeMillis();
-						} else if (sleepTime > 0) {
-							Thread.sleep(sleepTime);
-							this.lastTick += Main.EXCEPTED_SLEEP_TIME;
 						} else if (sleepTime > Main.MAX_SLEEP) {
 							this.warn("Did the system time change?");
 							this.lastTick = System.currentTimeMillis();
-						}
+						} else if (sleepTime > 0) {
+							Thread.sleep(sleepTime);
+						} 
 					} catch (InterruptedException e) {
 						Main.this.isRunning = false;
 						Thread.currentThread().interrupt();
@@ -228,7 +227,7 @@ public class Main implements Runnable {
 				if (interrupted)
 					Thread.currentThread().interrupt();
 			}
-		},"Server stopping"));
+		}, "Server stopping"));
 	}
 
 	private boolean readFavicon() throws IOException {
@@ -294,7 +293,7 @@ public class Main implements Runnable {
 			}
 		}
 
-		if ((latestChunkUpdate++ & 0b0011_1111) == 0) { // faster than % 63 == 0
+		if ((latestChunkUpdate++ & 0b0001_1111) == 0) { // faster than % 31 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				mainWorld.doChunkUpdatesForPlayer(p, p.chunkInformer, 10);
 				p.updatePlayers(onlinePlayers);

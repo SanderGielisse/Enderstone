@@ -69,7 +69,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		@Override
 		public boolean sendChunk(EnderChunk chunk) {
 			cache.add(chunk);
-			return true;
+			return cache.size() < 64;
 		}
 
 		@Override
