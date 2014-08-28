@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.enderstone.server.regions;
 
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
-
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketOutBlockChange;
@@ -21,6 +17,7 @@ public class EnderChunk {
 
 	protected final static int CHUNK_SECTION_SIZE = 16;
 	protected final static int MAX_CHUNK_SECTIONS = 16;
+	private static final Reference<EnderChunkMap> NULL_REFERENCE = new WeakReference(null);
 	private final int z;
 	private final short[][] blockID;
 	private final byte[][] data;
@@ -69,13 +66,12 @@ public class EnderChunk {
 
 	/**
 	 * MUST BE CALLED FROM MAIN THREAD
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param z
 	 * @param material
 	 * @param data
-	 * @throws Exception
 	 */
 	public void setBlock(int x, int y, int z, BlockId material, byte data) {
 		// if the Block section the block is in hasn't been used yet, allocate
@@ -101,11 +97,12 @@ public class EnderChunk {
 					try {
 						player.getNetworkManager().sendPacket(new PacketOutBlockChange((this.getX() * 16) + x, y, (this.getZ() * 16) + z, material.getId(), data));
 					} catch (Exception e) {
-						e.printStackTrace();
+						EnderLogger.exception(e);
 					}
 				}
 			}
 		}
+		compressed = NULL_REFERENCE;
 	}
 
 	public BlockId getBlock(int x, int y, int z) {
@@ -134,7 +131,7 @@ public class EnderChunk {
 
 	}
 
-	public WeakReference<EnderChunkMap> compressed = new WeakReference<>(null);
+	public Reference<EnderChunkMap> compressed = NULL_REFERENCE;
 
 	/**
 	 * Gets the format used by the chunk packet
@@ -148,11 +145,10 @@ public class EnderChunk {
 			return map;
 		}
 		map = build(this, false, 65535);
-		compressed = new WeakReference<EnderChunkMap>(map);
+		compressed = new WeakReference<>(map);
 		return map;
 	}
 
-	@SuppressWarnings("unused")
 	private static EnderChunkMap build(EnderChunk chunk, boolean flag, int i) {
 		int j = 0;
 
@@ -216,8 +212,7 @@ public class EnderChunk {
 			}
 		}
 		/**
-		 * Block Ligth - uses data because its the same size as the ligthing
-		 * array we don't have
+		 * Block Ligth - uses data because its the same size as the ligthing array we don't have
 		 */
 		{
 			for (l = 0; l < chunk.data.length; ++l) {
@@ -241,8 +236,7 @@ public class EnderChunk {
 			}
 		}
 		/**
-		 * Sky light - uses blockid because its the same size as the sky array
-		 * we don't have
+		 * Sky light - uses blockid because its the same size as the sky array we don't have
 		 */
 		{
 			for (l = 0; l < chunk.blockID.length; ++l) {
