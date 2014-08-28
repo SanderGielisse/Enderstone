@@ -32,13 +32,7 @@ public class PacketInChatMessage extends Packet {
 
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
-		Main.getInstance().sendToMainThread(new Runnable() {
-
-			@Override
-			public void run() {
 				networkManager.player.onPlayerChat(getMessage());
-			}
-		});
 	}
 
 	public String getMessage() {

@@ -209,7 +209,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.dataWatcher);
 	}
 
-	public void onPlayerChat(String message) {
+	public void onPlayerChat(final String message) {
 		if (message.startsWith("/")) {
 			final String fullCommand = message.substring(1);
 			final String[] split = fullCommand.split(" ");
@@ -228,9 +228,15 @@ public class EnderPlayer extends Entity implements CommandSender {
 					Main.getInstance().commands.executeCommand(null, split[0], EnderPlayer.this, args);
 				}
 			});
+		} else {
+			Main.getInstance().sendToMainThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					Utill.broadcastMessage("<" + getPlayerName() + "> " + message);
+				}
+			});
 		}
-		else
-			Utill.broadcastMessage("<" + this.getPlayerName() + "> " + message);
 	}
 
 	public void onDisconnect() throws Exception {
@@ -322,7 +328,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public void playSound(String soundName, float volume, byte pitch) {
 		networkManager.sendPacket(new PacketOutSoundEffect(soundName, getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), volume, pitch));
 	}
-	
+
 	@Override
 	public boolean sendMessage(Message message) {
 		return this.sendRawMessage(message);
@@ -330,7 +336,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	public boolean sendRawMessage(Message message) {
-		if (!this.isOnline) return false;
+		if (!this.isOnline)
+			return false;
 		try {
 			this.networkManager.sendPacket(new PacketOutChatMessage(message.toMessageJson(), true));
 			return true;
