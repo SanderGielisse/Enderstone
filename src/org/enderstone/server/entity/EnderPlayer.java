@@ -319,10 +319,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 	}
 
-<<<<<<< HEAD
 	public void playSound(String soundName, float volume, byte pitch) {
 		networkManager.sendPacket(new PacketOutSoundEffect(soundName, getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), volume, pitch));
-=======
+	}
+	
 	@Override
 	public boolean sendMessage(Message message) {
 		return this.sendRawMessage(message);
@@ -349,6 +349,5 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	public String getName() {
 		return this.getPlayerName();
->>>>>>> ferrybig
 	}
 }
