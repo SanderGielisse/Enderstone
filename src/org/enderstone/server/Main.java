@@ -38,7 +38,6 @@ public class Main implements Runnable {
 		private static final long serialVersionUID = 1L;
 
 		{
-			this.add(4); //1.7.2
 			this.add(5); //1.7.9
 		}
 	});

@@ -1,18 +1,11 @@
 package org.enderstone.server.packet.status;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.xml.bind.DatatypeConverter;
-
 import io.netty.buffer.ByteBuf;
 
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class PacketInRequest extends Packet {

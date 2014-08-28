@@ -183,6 +183,7 @@ public class EnderPlayer extends Entity {
 
 		this.dataWatcher.watch(0, (byte) meaning);
 		this.dataWatcher.watch(1, (short) 0);
+		this.dataWatcher.watch(6, 20F);
 		this.dataWatcher.watch(8, (byte) 0);
 	}
 

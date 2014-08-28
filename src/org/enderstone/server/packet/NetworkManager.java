@@ -90,28 +90,30 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		if (player != null) {
+			final EnderPlayer subPlayer = player;
 			Main.getInstance().sendToMainThread(new Runnable() {
 
 				@Override
 				public void run() {
 					try {
-						player.onDisconnect();
+						subPlayer.onDisconnect();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					if (Main.getInstance().onlinePlayers.contains(player)) {
-						Main.getInstance().onlinePlayers.remove(player);
+					if (Main.getInstance().onlinePlayers.contains(subPlayer)) {
+						Main.getInstance().onlinePlayers.remove(subPlayer);
 
 						for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 							for (String name : ep.visiblePlayers) {
-								if (name.equals(player.getPlayerName()) && !player.getPlayerName().equals(ep.getPlayerName())) {
-										ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { player.getEntityId() }));
+								if (name.equals(subPlayer.getPlayerName()) && !subPlayer.getPlayerName().equals(ep.getPlayerName())) {
+									ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { subPlayer.getEntityId() }));
 								}
 							}
 						}
 					}
 				}
 			});
+			player = null;
 		}
 		super.channelInactive(ctx);
 	}
