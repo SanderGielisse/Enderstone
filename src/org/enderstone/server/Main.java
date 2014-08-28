@@ -1,9 +1,5 @@
 package org.enderstone.server;
 
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -21,22 +17,34 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
-import javax.xml.bind.DatatypeConverter;
-import javax.imageio.ImageIO;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.enderstone.PingCommand;
 import org.enderstone.server.commands.enderstone.TeleportCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
+import org.enderstone.server.commands.vanila.StopCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.uuid.UUIDFactory;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
+
 public class Main implements Runnable {
 
 	public static final String NAME = "Enderstone";
+	public static final String VERSION = "1.0.0";
 	public static final String PROTOCOL_VERSION = "1.7.6";
+	private static final int EXCEPTED_SLEEP_TIME = 1000 / 20;
+	private static final int CANT_KEEP_UP_TIMEOUT = -5000;
+	private static final int MAX_SLEEP = 100;
 	public static final Set<Integer> PROTOCOL = Collections.unmodifiableSet(new HashSet<Integer>() {
 		private static final long serialVersionUID = 1L;
 
@@ -44,8 +52,10 @@ public class Main implements Runnable {
 			this.add(5); // 1.7.9
 		}
 	});
-	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig", "timbayens" };
+	public static final String[] AUTHORS = new String[]{"bigteddy98", "ferrybig", "timbayens"};
 	public static final Random random = new Random();
+	public volatile Thread mainThread;
+	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();
 
 	public Properties prop = null;
 	public UUIDFactory uuidFactory = new UUIDFactory();
@@ -54,22 +64,20 @@ public class Main implements Runnable {
 	public final EnderWorld mainWorld = new EnderWorld();
 	public volatile boolean isRunning = true;
 	public final CommandMap commands;
+
 	{
 		commands = new CommandMap();
 		commands.registerCommand(new TellCommand());
 		commands.registerCommand(new PingCommand());
 		commands.registerCommand(new VersionCommand());
 		commands.registerCommand(new TeleportCommand());
+		commands.registerCommand(new StopCommand());
 	}
 
 	private static Main instance;
 
 	public final List<EnderPlayer> onlinePlayers = new ArrayList<>();
 	private final List<Runnable> sendToMainThread = Collections.synchronizedList(new ArrayList<Runnable>());
-
-	public Main() {
-		instance = this;
-	}
 
 	public static Main getInstance() {
 		return instance;
@@ -82,93 +90,160 @@ public class Main implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		new Thread(new Main()).start();
+		new Main().run();
 	}
 
 	@Override
 	public void run() {
-		EnderLogger.info("Starting " + NAME + " server version " + PROTOCOL_VERSION + ".");
+		Main.instance = this;
+		EnderLogger.info("Starting " + NAME + " " + VERSION + " server version " + PROTOCOL_VERSION + ".");
 		EnderLogger.info("Authors: " + Arrays.asList(AUTHORS).toString());
-
 		EnderLogger.info("Loading config.ender file...");
 		this.loadConfigFromDisk();
+		EnderLogger.info("Loaded config.ender file!");
 
 		EnderLogger.info("Loading favicon...");
+		try {
+			if (readFavicon())
+				EnderLogger.info("Loaded server-icon.png!");
+		} catch (FileNotFoundException e) {
+			EnderLogger.info("server-icon.png not found!");
+		} catch (IOException e) {
+			EnderLogger.warn("Error while reading server-icon.png!");
+			EnderLogger.exception(e);
+		}
+
+		ThreadGroup nettyListeners = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Netty Listeners");
+		EnderLogger.info("Starting Netty listeners... [" + this.port + "]");
+		for (final int nettyPort : new int[]{this.port}) {
+
+			Thread t;
+			(t = new Thread(nettyListeners, new Runnable() {
+
+				@Override
+				public void run() {
+					EnderLogger.info("[Netty] Started Netty Server at port " + nettyPort + "...");
+					EventLoopGroup bossGroup = new NioEventLoopGroup();
+					EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+					try {
+						ServerBootstrap bootstrap = new ServerBootstrap();
+						bootstrap.group(bossGroup, workerGroup);
+						bootstrap.channel(NioServerSocketChannel.class);
+						bootstrap.childHandler(new MinecraftServerInitializer());
+
+						bootstrap.bind(nettyPort).sync().channel().closeFuture().sync();
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					} finally {
+						scheduleShutdown();
+						bossGroup.shutdownGracefully();
+						workerGroup.shutdownGracefully();
+					}
+					EnderLogger.info("[Netty] Stopped Netty Server at port " + nettyPort + "...");
+				}
+			}, "Netty listener-" + nettyPort)).start();
+			this.listenThreads.add(t);
+		}
+
+		EnderLogger.info("Initializing main Server Thread...");
+		(mainThread = new Thread(new Runnable() {
+			long lastTick = System.currentTimeMillis();
+			long tick = 0;
+
+			@Override
+			@SuppressWarnings("SleepWhileInLoop")
+			public void run() {
+				EnderLogger.info("[ServerThread] Main Server Thread initialized and started!");
+				EnderLogger.info("[ServerThread] " + NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + port + "!");
+
+				while (Main.this.isRunning) {
+					try {
+						if (Thread.interrupted()) {
+							throw new InterruptedException();
+						}
+						synchronized (sendToMainThread) {
+							for (Runnable run : sendToMainThread) {
+								try {
+									run.run();
+								} catch (Exception e) {
+									EnderLogger.warn("Problem while executing task " + run.toString());
+									EnderLogger.exception(e);
+								}
+							}
+							sendToMainThread.clear();
+						}
+
+						try {
+							serverTick();
+						} catch (Exception e) {
+							EnderLogger.error("Problem while running ServerTick()");
+							EnderLogger.exception(e);
+						}
+
+						long sleepTime = (lastTick + Main.EXCEPTED_SLEEP_TIME) - System.currentTimeMillis();
+						if (sleepTime < Main.CANT_KEEP_UP_TIMEOUT) {
+							this.warn("Can't keep up! " + (sleepTime / Main.EXCEPTED_SLEEP_TIME) + " ticks behind!");
+							this.lastTick = System.currentTimeMillis();
+						} else if (sleepTime > 0) {
+							Thread.sleep(sleepTime);
+							this.lastTick += Main.EXCEPTED_SLEEP_TIME;
+						} else if (sleepTime > Main.MAX_SLEEP) {
+							this.warn("Did the system time change?");
+							this.lastTick = System.currentTimeMillis();
+						}
+					} catch (InterruptedException e) {
+						Main.this.isRunning = false;
+						Thread.currentThread().interrupt();
+					}
+					tick++;
+				}
+				Main.this.isRunning = false;
+				Main.getInstance().directShutdown();
+				EnderLogger.info("[ServerThread] Main Server Thread stopped!");
+			}
+
+			public void warn(String warn) {
+				EnderLogger.warn("[ServerThread] [tick-" + tick + "] " + warn);
+
+			}
+		}, "Enderstone server thread.")).start();
+
+		ThreadGroup shutdownHooks = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Shutdown hooks");
+		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHooks, new Runnable() {
+
+			@Override
+			public void run() {
+				Main.this.scheduleShutdown();
+				boolean interrupted = false;
+				boolean joined = false;
+				do {
+					try {
+						mainThread.join();
+						joined = true;
+					} catch (InterruptedException ex) {
+						interrupted = true;
+					}
+				} while (!joined);
+				if (interrupted)
+					Thread.currentThread().interrupt();
+			}
+		},"Server stopping"));
+	}
+
+	private boolean readFavicon() throws IOException {
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			BufferedImage image = ImageIO.read(new File("server-icon.png"));
 			if (image.getWidth() == 64 && image.getHeight() == 64) {
 				ImageIO.write(image, "png", baos);
 				baos.flush();
 				FAVICON = "data:image/png;base64," + DatatypeConverter.printBase64Binary(baos.toByteArray());
+				return true;
 			} else {
-				EnderLogger.exception(new IllegalArgumentException("Your server-icon.png needs to be 64*64!"));
+				EnderLogger.warn("Your server-icon.png needs to be 64*64!");
+				return false;
 			}
-		} catch (IOException e) {
-			EnderLogger.exception(new FileNotFoundException("server-icon.png not found!"));
 		}
-
-		EnderLogger.info("Favicon server-icon.png loaded!");
-
-		EnderLogger.info("Starting Netty Server at port " + this.port + "...");
-
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				EnderLogger.info("Netty Server Started!");
-
-				EventLoopGroup bossGroup = new NioEventLoopGroup();
-				EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-				try {
-					ServerBootstrap bootstrap = new ServerBootstrap();
-					bootstrap.group(bossGroup, workerGroup);
-					bootstrap.channel(NioServerSocketChannel.class);
-					bootstrap.childHandler(new MinecraftServerInitializer());
-
-					bootstrap.bind(port).sync().channel().closeFuture().sync();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} finally {
-					bossGroup.shutdownGracefully();
-					workerGroup.shutdownGracefully();
-				}
-			}
-		}).start();
-
-		EnderLogger.info("Initializing main Server Thread...");
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				while (isRunning) {
-					synchronized (sendToMainThread) {
-						for (Runnable run : sendToMainThread) {
-							try {
-								run.run();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-						sendToMainThread.clear();
-					}
-
-					try {
-						serverTick();
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-
-					try {
-						Thread.sleep(50L);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}).start();
-		EnderLogger.info("Main Server Thread initialized and started!");
-		EnderLogger.info(NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + this.port + "!");
 	}
 
 	public void saveConfigToDisk(boolean defaultt) {
@@ -213,17 +288,51 @@ public class Main implements Runnable {
 	private int latestChunkUpdate = 0;
 
 	private void serverTick() {
-		if ((latestKeepAlive++ & 0b1111111) == 0) { // faster than % .. == 0
+		if ((latestKeepAlive++ & 0b0111_1111) == 0) { // faster than % 127 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));
 			}
 		}
 
-		if ((latestChunkUpdate++ & 0b111111) == 0) { // faster than % .. == 0
+		if ((latestChunkUpdate++ & 0b0011_1111) == 0) { // faster than % 63 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				mainWorld.doChunkUpdatesForPlayer(p, p.chunkInformer, 10);
 				p.updatePlayers(onlinePlayers);
 			}
 		}
+	}
+
+	/**
+	 * Schedule a server shutdown, calling this methodes says to the main thread that the server need to shutdown
+	 */
+	public void scheduleShutdown() {
+		this.mainThread.interrupt();
+		isRunning = false;
+	}
+
+	/**
+	 * Any mainthread-shutdown logic belongs to this method
+	 */
+	private void directShutdown() {
+		if (this.mainThread != null) {
+			this.mainThread.interrupt();
+		}
+		for (Thread t : this.listenThreads) {
+			t.interrupt();
+		}
+		boolean interrupted = false;
+		for (Thread t : this.listenThreads) {
+			boolean joined = false;
+			do {
+				try {
+					t.join();
+					joined = true;
+				} catch (InterruptedException ex) {
+					interrupted = true;
+				}
+			} while (!joined);
+		}
+		if (interrupted)
+			Thread.currentThread().interrupt();
 	}
 }
