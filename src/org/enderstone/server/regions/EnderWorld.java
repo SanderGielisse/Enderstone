@@ -134,9 +134,51 @@ public class EnderWorld {
 		int z = (player.getLocation().getBlockZ() >> 4) - radius;
 		int minZ = z;
 		int maxZ = z + tmp1;
-		if (playerChunks.isEmpty()) {
-			while (x++ < maxX) {
-				for (z = minZ; z < maxZ; z++) {
+		try {
+			if (playerChunks.isEmpty()) {
+				while (x++ < maxX) {
+					for (z = minZ; z < maxZ; z++) {
+						EnderChunk c = getOrCreateChunk(x, z);
+						playerChunks.add(c);
+						try {
+							if (!informer.sendChunk(c)) {
+								return;
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			} else {
+				int[][] chunkLoad = new int[(radius * 2) * (radius * 2) * 2][];
+				int index = 0;
+				Set<EnderChunk> copy = new HashSet<>(playerChunks);
+
+				for (; x < maxX; x++) {
+					for (z = minZ; z < maxZ; z++) {
+						EnderChunk tmp = getOrCreateChunk(x, z);
+						if (!copy.contains(tmp)) {
+							chunkLoad[index++] = new int[]{x, z};
+						} else {
+							copy.remove(tmp);
+						}
+					}
+
+				}
+				Iterator<EnderChunk> loop = copy.iterator();
+				while (loop.hasNext()) {
+					EnderChunk i = loop.next();
+					playerChunks.remove(i);
+					informer.removeChunk(i);
+				}
+
+				index = 0;
+				for (int[] i : chunkLoad) {
+					if (i == null) {
+						break;
+					}
+					x = i[0];
+					z = i[1];
 					EnderChunk c = getOrCreateChunk(x, z);
 					playerChunks.add(c);
 					try {
@@ -146,49 +188,11 @@ public class EnderWorld {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+					index++;
 				}
 			}
-		} else {
-			int[][] chunkLoad = new int[(radius * 2) * (radius * 2) * 2][];
-			int index = 0;
-			Set<EnderChunk> copy = new HashSet<>(playerChunks);
-
-			for (; x < maxX; x++) {
-				for (z = minZ; z < maxZ; z++) {
-					EnderChunk tmp = getOrCreateChunk(x, z);
-					if (!copy.contains(tmp)) {
-						chunkLoad[index++] = new int[] { x, z };
-					} else {
-						copy.remove(tmp);
-					}
-				}
-
-			}
-			Iterator<EnderChunk> loop = copy.iterator();
-			while (loop.hasNext()) {
-				EnderChunk i = loop.next();
-				playerChunks.remove(i);
-				informer.removeChunk(i);
-			}
-
-			index = 0;
-			for (int[] i : chunkLoad) {
-				if (i == null) {
-					break;
-				}
-				x = i[0];
-				z = i[1];
-				EnderChunk c = getOrCreateChunk(x, z);
-				playerChunks.add(c);
-				try {
-					if (!informer.sendChunk(c)) {
-						return;
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				index++;
-			}
+		} finally {
+			informer.done();
 		}
 	}
 
@@ -204,12 +208,14 @@ public class EnderWorld {
 		public boolean sendChunk(EnderChunk chunk) throws Exception;
 
 		public boolean removeChunk(EnderChunk chunk);
+
+		public void done();
 	}
 
 	public void broadcastSound(String soundName, int x, int y, int z, float volume, byte pitch, Location loc, EnderPlayer exceptOne) {
 		PacketOutSoundEffect packet = new PacketOutSoundEffect(soundName, x, y, z, volume, pitch);
-		for(EnderPlayer ep : Main.getInstance().onlinePlayers){
-			if((!ep.equals(exceptOne)) && loc.isInRange(15, ep.getLocation())){
+		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
+			if ((!ep.equals(exceptOne)) && loc.isInRange(15, ep.getLocation())) {
 				ep.getNetworkManager().sendPacket(packet);
 			}
 		}
