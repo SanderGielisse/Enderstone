@@ -14,8 +14,10 @@ import java.util.Random;
 import java.util.Set;
 
 import org.enderstone.server.EnderLogger;
+import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.regions.generators.TimTest;
 
 /**
@@ -207,5 +209,14 @@ public class EnderWorld {
 		public boolean sendChunk(EnderChunk chunk) throws Exception;
 
 		public boolean removeChunk(EnderChunk chunk);
+	}
+
+	public void broadcastSound(String soundName, int x, int y, int z, float volume, byte pitch, Location loc, EnderPlayer exceptOne) {
+		PacketOutSoundEffect packet = new PacketOutSoundEffect(soundName, x, y, z, volume, pitch);
+		for(EnderPlayer ep : Main.getInstance().onlinePlayers){
+			if((!ep.equals(exceptOne)) && loc.isInRange(15, ep.getLocation())){
+				ep.getNetworkManager().sendPacket(packet);
+			}
+		}
 	}
 }

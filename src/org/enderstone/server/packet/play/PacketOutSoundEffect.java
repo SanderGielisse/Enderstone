@@ -15,9 +15,9 @@ public class PacketOutSoundEffect extends Packet {
 
 	public PacketOutSoundEffect(String soundName, int x, int y, int z, float volume, byte pitch) {
 		this.soundName = soundName;
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.x = x * 8;
+		this.y = y * 8;
+		this.z = z * 8;
 		this.volume = volume;
 		this.pitch = pitch;
 	}
