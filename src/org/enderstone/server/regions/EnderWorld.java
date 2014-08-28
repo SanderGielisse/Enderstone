@@ -123,7 +123,7 @@ public class EnderWorld {
 		return getOrCreateChunk(x >> 4, z >> 4).getData(x & 0xF, y & 0xFF, z & 0xF);
 	}
 
-	public void setBlockAt(int x, int y, int z, BlockId id, byte data) throws Exception {
+	public void setBlockAt(int x, int y, int z, BlockId id, byte data) {
 		getOrCreateChunk(x >> 4, z >> 4).setBlock(x & 0xF, y & 0xFF, z & 0xF, id, data);
 	}
 

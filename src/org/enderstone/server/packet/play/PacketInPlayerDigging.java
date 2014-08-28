@@ -2,6 +2,7 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 
+import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.regions.BlockId;
@@ -39,18 +40,20 @@ public class PacketInPlayerDigging extends Packet {
 		return 0x07;
 	}
 
-	public void onRecieve(org.enderstone.server.packet.NetworkManager networkManager) throws Exception {
-		//TODO not working properly
-		
+	public void onRecieve(final org.enderstone.server.packet.NetworkManager networkManager) throws Exception {
+		// TODO not working properly
+
 		Main.getInstance().sendToMainThread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				EnderChunk chunk = Main.getInstance().mainWorld.getOrCreateChunk(getX() >> 4, getZ() >> 4);
-				try {
-					chunk.setBlock(getX() & 0xF, getY() & 0xFF, getZ() & 0xF, BlockId.AIR, (byte) 0);
-				} catch (Exception e) {
-					e.printStackTrace();
+
+				if (networkManager.player.getLocation().isInRange(6, new Location("", getX(), getY(), getZ(), 0F, 0F))) {
+					try {
+						Main.getInstance().mainWorld.setBlockAt(getX(), getY(), getZ(), BlockId.AIR, (byte) 0);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});

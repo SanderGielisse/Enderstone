@@ -77,7 +77,7 @@ public class EnderChunk {
 	 * @param data
 	 * @throws Exception
 	 */
-	public void setBlock(int x, int y, int z, BlockId material, byte data) throws Exception {
+	public void setBlock(int x, int y, int z, BlockId material, byte data) {
 		// if the Block section the block is in hasn't been used yet, allocate
 		// it
 		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {
@@ -98,7 +98,11 @@ public class EnderChunk {
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			if (Main.getInstance().mainWorld.players.containsKey(player)) {
 				if (Main.getInstance().mainWorld.players.get(player).contains(this)) {
-					player.getNetworkManager().sendPacket(new PacketOutBlockChange((this.getX() * 16) + x, y, (this.getZ() * 16) + z, material.getId(), data));
+					try {
+						player.getNetworkManager().sendPacket(new PacketOutBlockChange((this.getX() * 16) + x, y, (this.getZ() * 16) + z, material.getId(), data));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
