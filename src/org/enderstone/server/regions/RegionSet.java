@@ -4,12 +4,14 @@ import java.util.AbstractSet;
 import java.util.Iterator;
 
 /**
+ * This Set is used to store the chunks in a hashset manner from a world, it generaly has better performace over a
+ * HashSet for chunks since its focussed on storing chunks from a region together in the same subnode
  *
- * @author Fernando
+ * @author ferrybig
  */
 public class RegionSet extends AbstractSet<EnderChunk> {
 
-	Node[][] chunkBuckets = new Node[16][16];
+	private Node[][] chunkBuckets = new Node[16][16];
 
 	private static class Node {
 
@@ -18,9 +20,9 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 			this.regionZ = regionZ;
 		}
 
-		private int regionX, regionZ;
+		private final int regionX, regionZ;
 		private Node next;
-		private EnderChunk[] regionChunks = new EnderChunk[32 * 32];
+		private final EnderChunk[] regionChunks = new EnderChunk[32 * 32];
 
 	}
 
@@ -45,7 +47,7 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 
 		prev.next = new Node(rX, rZ);
 		prev.regionChunks[calculateChunkPos(x) + calculateChunkPos(z) * 32] = c;
-		return false;
+		return true;
 	}
 
 	@Override
