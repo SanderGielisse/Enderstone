@@ -2,6 +2,7 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 
+import org.enderstone.server.Main;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
@@ -30,8 +31,18 @@ public class PacketInChatMessage extends Packet {
 	}
 	
 	@Override
-	public void onRecieve(NetworkManager networkManager) throws Exception {
-		networkManager.player.onPlayerChat(getMessage());
+	public void onRecieve(final NetworkManager networkManager) throws Exception {
+		Main.getInstance().sendToMainThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					networkManager.player.onPlayerChat(getMessage());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	public String getMessage() {

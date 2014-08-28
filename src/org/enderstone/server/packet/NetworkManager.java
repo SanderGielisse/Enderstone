@@ -32,7 +32,7 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 	public EnderPlayer player;
 
 	public PacketHandshake latestHandshakePacket;
-	public int handShakeStatus = -1;
+	public volatile int handShakeStatus = -1;
 	private int length;
 
 	public NetworkManager() {

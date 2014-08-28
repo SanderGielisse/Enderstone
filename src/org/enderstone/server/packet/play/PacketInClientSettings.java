@@ -1,6 +1,8 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketInClientSettings extends Packet {
@@ -47,6 +49,11 @@ public class PacketInClientSettings extends Packet {
 	@Override
 	public byte getId() {
 		return 0x15;
+	}
+	
+	@Override
+	public void onRecieve(NetworkManager networkManager) throws Exception {
+		// TODO Auto-generated method stub
 	}
 
 	public String getLocale() {

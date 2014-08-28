@@ -146,8 +146,7 @@ public class Main implements Runnable {
 	}
 
 	public void saveConfigToDisk(boolean defaultt) {
-		try {
-			OutputStream output = new FileOutputStream("config.ender");
+		try (OutputStream output = new FileOutputStream("config.ender")) {
 			if (defaultt) {
 				prop.setProperty("motd", "Another Enderstone server!");
 				prop.setProperty("port", "25565");
@@ -162,8 +161,7 @@ public class Main implements Runnable {
 
 	public Properties loadConfigFromDisk() {
 		prop = new Properties();
-		try {
-			InputStream input = new FileInputStream("config.ender");
+		try (InputStream input = new FileInputStream("config.ender")) {
 			prop.load(input);
 			port = Integer.parseInt(prop.getProperty("port"));
 		} catch (FileNotFoundException e) {

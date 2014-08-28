@@ -40,8 +40,20 @@ public class PacketInPlayerDigging extends Packet {
 	}
 
 	public void onRecieve(org.enderstone.server.packet.NetworkManager networkManager) throws Exception {
-		EnderChunk chunk = Main.getInstance().mainWorld.getOrCreateChunk(getX() >> 4, getZ() >> 4);
-		chunk.setBlock(getX() & 0xF, getY() & 0xFF, getZ() & 0xF, BlockId.AIR, (byte) 0);
+		//TODO not working properly
+		
+		Main.getInstance().sendToMainThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				EnderChunk chunk = Main.getInstance().mainWorld.getOrCreateChunk(getX() >> 4, getZ() >> 4);
+				try {
+					chunk.setBlock(getX() & 0xF, getY() & 0xFF, getZ() & 0xF, BlockId.AIR, (byte) 0);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	public byte getStatus() {
