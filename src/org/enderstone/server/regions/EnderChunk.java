@@ -75,7 +75,7 @@ public class EnderChunk {
 	 * @param z
 	 * @param material
 	 * @param data
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void setBlock(int x, int y, int z, BlockId material, byte data) throws Exception {
 		// if the Block section the block is in hasn't been used yet, allocate
@@ -98,7 +98,7 @@ public class EnderChunk {
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			if (Main.getInstance().mainWorld.players.containsKey(player)) {
 				if (Main.getInstance().mainWorld.players.get(player).contains(this)) {
-					player.getNetworkManager().sendPacket(new PacketOutBlockChange(x, y, z, material.getId(), data));
+					player.getNetworkManager().sendPacket(new PacketOutBlockChange((this.getX() * 16) + x, y, (this.getZ() * 16) + z, material.getId(), data));
 				}
 			}
 		}
@@ -149,7 +149,7 @@ public class EnderChunk {
 	}
 
 	@SuppressWarnings("unused")
-	public static EnderChunkMap build(EnderChunk chunk, boolean flag, int i) {
+	private static EnderChunkMap build(EnderChunk chunk, boolean flag, int i) {
 		int j = 0;
 
 		int k = 0;
@@ -287,5 +287,15 @@ public class EnderChunk {
 		System.arraycopy(abyte, 0, chunkmap.chunkData, 0, j);
 
 		return chunkmap;
+	}
+
+	public int getHighestBlock(int x, int z) {
+		for (int i = 255; i > 0; i--) {
+			BlockId bl = this.getBlock(x, i, z);
+			if (!bl.equals(BlockId.AIR)) {
+				return i;
+			}
+		}
+		return (short) 0;
 	}
 }
