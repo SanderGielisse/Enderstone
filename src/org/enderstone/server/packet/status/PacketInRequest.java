@@ -43,8 +43,13 @@ public class PacketInRequest extends Packet {
 	public void onRecieve(NetworkManager networkManager) {
 		EnderLogger.info("Pinged... by: " + networkManager.latestHandshakePacket.getHostname() + ":" + networkManager.latestHandshakePacket.getPort());
 
+		int protocol = networkManager.latestHandshakePacket.getProtocol();
+		if(!Main.PROTOCOL.contains(protocol)){
+			protocol = 5;
+		}
+		
 		JSONObject json = new JSONObject();
-		json.put("version", new JSONObject().put("name", Main.PROTOCOL_VERSION).put("protocol", networkManager.latestHandshakePacket.getProtocol()));
+		json.put("version", new JSONObject().put("name", Main.PROTOCOL_VERSION).put("protocol", protocol));
 		json.put("players", new JSONObject().put("max", 20).put("online", Main.getInstance().onlinePlayers.size()));
 		json.put("description", Main.getInstance().prop.get("motd"));
 		

@@ -17,9 +17,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
@@ -27,13 +29,19 @@ import javax.xml.bind.DatatypeConverter;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.regions.EnderWorld;
-import org.json.JSONException;
 
 public class Main implements Runnable {
 
 	public static final String NAME = "Enderstone";
 	public static final String PROTOCOL_VERSION = "1.7.6";
-	public static final int PROTOCOL = 5;
+	public static final Set<Integer> PROTOCOL = Collections.unmodifiableSet(new HashSet<Integer>() {
+		private static final long serialVersionUID = 1L;
+
+		{
+			this.add(4); //1.7.2
+			this.add(5); //1.7.9
+		}
+	});
 	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig", "timbayens" };
 
 	public Properties prop = null;
@@ -87,7 +95,7 @@ public class Main implements Runnable {
 		} catch (IOException e) {
 			EnderLogger.exception(new FileNotFoundException("server-icon.png not found!"));
 		}
-		
+
 		EnderLogger.info("Favicon server-icon.png loaded!");
 
 		EnderLogger.info("Starting Netty Server at port " + this.port + "...");
