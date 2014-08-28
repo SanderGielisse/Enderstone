@@ -6,6 +6,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,10 +22,12 @@ import java.util.Properties;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
 
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.regions.EnderWorld;
+import org.json.JSONException;
 
 public class Main implements Runnable {
 
@@ -33,9 +36,9 @@ public class Main implements Runnable {
 	public static final int PROTOCOL = 5;
 	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig", "timbayens" };
 
-	public BufferedImage favicon = null;
 	public Properties prop = null;
 	public static final Random random = new Random();
+	public static String FAVICON = null;
 	public int port;
 	public final EnderWorld mainWorld = new EnderWorld();
 	public volatile boolean isRunning = true;
@@ -71,17 +74,21 @@ public class Main implements Runnable {
 		EnderLogger.info("Loading config.ender file...");
 		this.loadConfigFromDisk();
 
-		EnderLogger.info("Loading favicon.");
-		try {
+		EnderLogger.info("Loading favicon...");
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			BufferedImage image = ImageIO.read(new File("server-icon.png"));
 			if (image.getWidth() == 64 && image.getHeight() == 64) {
-				favicon = image;
+				ImageIO.write(image, "png", baos);
+				baos.flush();
+				FAVICON = "data:image/png;base64," + DatatypeConverter.printBase64Binary(baos.toByteArray());
 			} else {
 				EnderLogger.exception(new IllegalArgumentException("Your server-icon.png needs to be 64*64!"));
 			}
 		} catch (IOException e) {
 			EnderLogger.exception(new FileNotFoundException("server-icon.png not found!"));
 		}
+		
+		EnderLogger.info("Favicon server-icon.png loaded!");
 
 		EnderLogger.info("Starting Netty Server at port " + this.port + "...");
 

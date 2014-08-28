@@ -47,14 +47,9 @@ public class PacketInRequest extends Packet {
 		json.put("version", new JSONObject().put("name", Main.PROTOCOL_VERSION).put("protocol", networkManager.latestHandshakePacket.getProtocol()));
 		json.put("players", new JSONObject().put("max", 20).put("online", Main.getInstance().onlinePlayers.size()));
 		json.put("description", Main.getInstance().prop.get("motd"));
-
-		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-			ImageIO.write(Main.getInstance().favicon, "png", baos);
-			baos.flush();
-			String favicon = "data:image/png;base64," + DatatypeConverter.printBase64Binary(baos.toByteArray());
-			json.put("favicon", favicon);
-		} catch (JSONException | IOException e) {
-			e.printStackTrace();
+		
+		if(Main.FAVICON != null){
+			json.put("favicon", Main.FAVICON);
 		}
 
 		networkManager.sendPacket(new PacketOutResponse(json.toString()));
