@@ -68,7 +68,6 @@ public class TimTest extends ChunkGenerator {
 				int x = random.nextInt(15), z = random.nextInt(15);
 				try {
 					source.setBlock(x, source.getHighestBlock(x, z), z, BlockId.LOG, (byte) 1);
-					System.out.println("ADDED: " + ((source.getX() * 16) + x) + ":" + ((source.getZ() * 16) + z));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

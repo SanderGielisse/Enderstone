@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.regions.generators.TimTest;
@@ -38,11 +37,9 @@ public class EnderWorld {
 		}
 		BlockId[][] blocks = generator.generateExtBlockSections(this, new Random(), x, z, null);
 		if (blocks == null) {
-			EnderLogger.warn("Generator " + generator.toString() + " returned null for chunk " + x + ", " + z);
 			blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
 		}
 		if (blocks.length != AMOUNT_OF_CHUNKSECTIONS) {
-			EnderLogger.warn("Generator " + generator.toString() + " returned invalid size for chunk " + x + ", " + z);
 			blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
 		}
 
@@ -128,81 +125,77 @@ public class EnderWorld {
 	}
 
 	public void doChunkUpdatesForPlayer(final EnderPlayer player, final ChunkInformer informer, final int radius) {
-		Main.getInstance().sendToMainThread(new Runnable() {
+		if (players.get(player) == null) {
+			players.put(player, new RegionSet());
+		}
 
-			@Override
-			public void run() {
-
-				if (players.get(player) == null) {
-					players.put(player, new RegionSet());
-				}
-
-				Set<EnderChunk> playerChunks = players.get(player);
-				int tmp1 = radius * 2 + 1;
-				int x = (player.getLocation().getBlockX() >> 4) - radius;
-				int maxX = x + tmp1;
-				int z = (player.getLocation().getBlockZ() >> 4) - radius;
-				int minZ = z;
-				int maxZ = z + tmp1;
-				if (playerChunks.isEmpty()) {
-
-					while (x++ < maxX) {
-						for (z = minZ; z < maxZ; z++) {
-							EnderChunk c = getOrCreateChunk(x, z);
-							playerChunks.add(c);
-							try {
-								if (!informer.sendChunk(c)) {
-									return;
-								}
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
+		Set<EnderChunk> playerChunks = players.get(player);
+		int tmp1 = radius * 2 + 1;
+		int x = (player.getLocation().getBlockX() >> 4) - radius;
+		int maxX = x + tmp1;
+		int z = (player.getLocation().getBlockZ() >> 4) - radius;
+		int minZ = z;
+		int maxZ = z + tmp1;
+		if (playerChunks.isEmpty()) {
+			int i = 0;
+			while (x++ < maxX) {
+				for (z = minZ; z < maxZ; z++) {
+					EnderChunk c = getOrCreateChunk(x, z);
+					playerChunks.add(c);
+					i++;
+					try {
+						if (!informer.sendChunk(c)) {
+							return;
 						}
-					}
-				} else {
-					int[][] chunkLoad = new int[(radius * 2) * (radius * 2) * 2][];
-					int index = 0;
-					Set<EnderChunk> copy = new HashSet<>(playerChunks);
-
-					for (; x < maxX; x++) {
-						for (z = minZ; z < maxZ; z++) {
-							EnderChunk tmp = getOrCreateChunk(x, z);
-							if (!copy.contains(tmp)) {
-								chunkLoad[index++] = new int[] { x, z };
-							} else {
-								copy.remove(tmp);
-							}
-						}
-
-					}
-					Iterator<EnderChunk> loop = copy.iterator();
-					while (loop.hasNext()) {
-						EnderChunk i = loop.next();
-						playerChunks.remove(i);
-						informer.removeChunk(i);
-					}
-
-					index = 0;
-					for (int[] i : chunkLoad) {
-						if (i == null) {
-							break;
-						}
-						x = i[0];
-						z = i[1];
-						EnderChunk c = getOrCreateChunk(x, z);
-						playerChunks.add(c);
-						try {
-							if (!informer.sendChunk(c)) {
-								return;
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						index++;
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 				}
 			}
-		});
+		} else {
+			int[][] chunkLoad = new int[(radius * 2) * (radius * 2) * 2][];
+			int index = 0;
+			Set<EnderChunk> copy = new HashSet<>(playerChunks);
+
+			for (; x < maxX; x++) {
+				for (z = minZ; z < maxZ; z++) {
+					EnderChunk tmp = getOrCreateChunk(x, z);
+					if (!copy.contains(tmp)) {
+						chunkLoad[index++] = new int[] { x, z };
+					} else {
+						copy.remove(tmp);
+					}
+				}
+
+			}
+			Iterator<EnderChunk> loop = copy.iterator();
+			while (loop.hasNext()) {
+				EnderChunk i = loop.next();
+				playerChunks.remove(i);
+				informer.removeChunk(i);
+			}
+
+			index = 0;
+			int a = 0;
+			for (int[] i : chunkLoad) {
+				if (i == null) {
+					break;
+				}
+				x = i[0];
+				z = i[1];
+				EnderChunk c = getOrCreateChunk(x, z);
+				playerChunks.add(c);
+				try {
+					a++;
+					if (!informer.sendChunk(c)) {
+						return;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				index++;
+			}
+		}
 	}
 
 	public long getSeed() {

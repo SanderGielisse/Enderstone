@@ -12,18 +12,7 @@ import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.NetworkManager.Stage;
-import org.enderstone.server.packet.login.PacketInLoginStart;
-import org.enderstone.server.packet.play.PacketInChatMessage;
-import org.enderstone.server.packet.play.PacketInClientSettings;
-import org.enderstone.server.packet.play.PacketInPlayerDigging;
-import org.enderstone.server.packet.play.PacketInPlayerLook;
-import org.enderstone.server.packet.play.PacketInPlayerPosition;
-import org.enderstone.server.packet.play.PacketInPlayerPositionLook;
-import org.enderstone.server.packet.play.PacketInPluginMessage;
-import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
-import org.enderstone.server.packet.status.PacketInRequest;
-import org.enderstone.server.packet.status.PacketPing;
 
 public class NetworkManager extends ReplayingDecoder<Stage> {
 
@@ -126,7 +115,6 @@ public class NetworkManager extends ReplayingDecoder<Stage> {
 		try {
 			ByteBuf buf = Unpooled.buffer();
 			for (Packet packet : packets) {
-				EnderLogger.debug(packet.toString());
 				Packet.writeVarInt(packet.getSize(), buf);
 				Packet.writeVarInt(packet.getId(), buf);
 				packet.write(buf);

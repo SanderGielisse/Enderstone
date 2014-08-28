@@ -68,7 +68,7 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 					return false;
 				}
 				mainLoop: while (next == null) {
-					if (i3 >= 32 * 32 - 1) {
+					if (i3 >= 32 * 32) {
 						i3 = 0;
 
 						if (n2 != null) {

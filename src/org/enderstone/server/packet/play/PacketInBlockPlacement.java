@@ -1,8 +1,13 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+
+import org.enderstone.server.Location;
+import org.enderstone.server.Main;
 import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.regions.BlockId;
 
 public class PacketInBlockPlacement extends Packet {
 
@@ -22,7 +27,7 @@ public class PacketInBlockPlacement extends Packet {
 		this.z = buf.readInt();
 		this.direction = buf.readByte();
 		this.heldItem = readItemStack(buf);
-		this.cursorX = buf.readByte();
+		this.cursorX = buf.readByte(); // The position of the crosshair on the block
 		this.cursorY = buf.readByte();
 		this.cursorZ = buf.readByte();
 	}
@@ -40,6 +45,42 @@ public class PacketInBlockPlacement extends Packet {
 	@Override
 	public byte getId() {
 		return 0x08;
+	}
+
+	@Override
+	public void onRecieve(final NetworkManager networkManager) {
+		if (getHeldItem().getBlockId() == -1) {
+			return;
+		}
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				int x = getX();
+				int y = getY();
+				int z = getZ();
+
+				byte direct = getDirection();
+
+				if (direct == 0) {
+					y--;
+				} else if (direct == 1) {
+					y++;
+				} else if (direct == 2) {
+					z--;
+				} else if (direct == 3) {
+					z++;
+				} else if (direct == 4) {
+					x--;
+				} else if (direct == 5) {
+					x++;
+				}
+
+				if (networkManager.player.getLocation().isInRange(6, new Location("", getX(), getY(), getZ(), 0F, 0F))) {
+					Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
+				}
+			}
+		});
 	}
 
 	public int getX() {
