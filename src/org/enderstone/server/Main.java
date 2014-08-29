@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -21,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.enderstone.PingCommand;
-import org.enderstone.server.commands.enderstone.TeleportCommand;
+import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
 import org.enderstone.server.commands.vanila.StopCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
@@ -157,54 +158,64 @@ public class Main implements Runnable {
 				EnderLogger.info("[ServerThread] Main Server Thread initialized and started!");
 				EnderLogger.info("[ServerThread] " + NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + port + "!");
 
-				while (Main.this.isRunning) {
-					try {
-						if (Thread.interrupted()) {
-							throw new InterruptedException();
-						}
-						synchronized (sendToMainThread) {
-							for (Runnable run : sendToMainThread) {
-								try {
-									run.run();
-								} catch (Exception e) {
-									EnderLogger.warn("Problem while executing task " + run.toString());
-									EnderLogger.exception(e);
-								}
-							}
-							sendToMainThread.clear();
-						}
+				try {
+					while (Main.this.isRunning) {
+						mainServerTick();
+					}
+				} catch (InterruptedException e) {
+					Main.this.isRunning = false;
+					Thread.currentThread().interrupt();
+				} catch (RuntimeException ex) {
+					EnderLogger.error("[ServerThread] CRASH REPORT! (this should not happen!)");
+					EnderLogger.error("[ServerThread] Main thread has shutdown, this shouldn't happen!");
+					EnderLogger.exception(ex);
+					EnderLogger.error("[ServerThread] Server is inside tick " + tick);
+					EnderLogger.error("[ServerThread] Last tick was in " + new Date(lastTick).toString());
+				} finally {
+					Main.this.isRunning = false;
+					Main.getInstance().directShutdown();
+					EnderLogger.info("[ServerThread] Main Server Thread stopped!");
+				}
+			}
 
+			private void mainServerTick() throws InterruptedException {
+				if (Thread.interrupted()) {
+					throw new InterruptedException();
+				}
+				synchronized (sendToMainThread) {
+					for (Runnable run : sendToMainThread) {
 						try {
-							serverTick();
+							run.run();
 						} catch (Exception e) {
-							EnderLogger.error("Problem while running ServerTick()");
+							EnderLogger.warn("Problem while executing task " + run.toString());
 							EnderLogger.exception(e);
 						}
-						this.lastTick += Main.EXCEPTED_SLEEP_TIME;
-						long sleepTime = (lastTick) - System.currentTimeMillis();
-						if (sleepTime < Main.CANT_KEEP_UP_TIMEOUT) {
-							this.warn("Can't keep up! " + (sleepTime / Main.EXCEPTED_SLEEP_TIME) + " ticks behind!");
-							this.lastTick = System.currentTimeMillis();
-						} else if (sleepTime > Main.MAX_SLEEP) {
-							this.warn("Did the system time change?");
-							this.lastTick = System.currentTimeMillis();
-						} else if (sleepTime > 0) {
-							Thread.sleep(sleepTime);
-						} 
-					} catch (InterruptedException e) {
-						Main.this.isRunning = false;
-						Thread.currentThread().interrupt();
 					}
-					tick++;
+					sendToMainThread.clear();
 				}
-				Main.this.isRunning = false;
-				Main.getInstance().directShutdown();
-				EnderLogger.info("[ServerThread] Main Server Thread stopped!");
+
+				try {
+					serverTick();
+				} catch (Exception e) {
+					EnderLogger.error("Problem while running ServerTick()");
+					EnderLogger.exception(e);
+				}
+				this.lastTick += Main.EXCEPTED_SLEEP_TIME;
+				long sleepTime = (lastTick) - System.currentTimeMillis();
+				if (sleepTime < Main.CANT_KEEP_UP_TIMEOUT) {
+					this.warn("Can't keep up! " + (sleepTime / Main.EXCEPTED_SLEEP_TIME) + " ticks behind!");
+					this.lastTick = System.currentTimeMillis();
+				} else if (sleepTime > Main.MAX_SLEEP) {
+					this.warn("Did the system time change?");
+					this.lastTick = System.currentTimeMillis();
+				} else if (sleepTime > 0) {
+					Thread.sleep(sleepTime);
+				}
+				tick++;
 			}
 
 			public void warn(String warn) {
 				EnderLogger.warn("[ServerThread] [tick-" + tick + "] " + warn);
-
 			}
 		}, "Enderstone server thread.")).start();
 

@@ -1,5 +1,6 @@
-package org.enderstone.server.commands.enderstone;
+package org.enderstone.server.commands.vanila;
 
+import java.util.List;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.chat.SimpleMessage;
@@ -51,7 +52,7 @@ public class TeleportCommand extends SimpleCommand {
 				for (int i = 0; i < args.length; i++) {
 					try {
 						Integer.parseInt(args[i]);
-					} catch (Exception e) {
+					} catch (NumberFormatException e) {
 						sender.sendMessage(new SimpleMessage(args[i] + " is not a valid number."));
 						return Command.COMMAND_FAILED;
 					}
@@ -70,4 +71,12 @@ public class TeleportCommand extends SimpleCommand {
 		}
 		return Command.COMMAND_SUCCES;
 	}
+
+	@Override
+	public List<String> executeTabList(Command cmd, String alias, CommandSender sender, String[] args) {
+		if (args.length == 0)
+			return calculateMissingArgumentsPlayer("", sender);
+		return calculateMissingArgumentsPlayer(args[args.length - 1], sender);
+	}
+
 }

@@ -22,11 +22,12 @@ import org.enderstone.server.packet.play.PacketInPlayerOnGround;
 import org.enderstone.server.packet.play.PacketInPlayerPosition;
 import org.enderstone.server.packet.play.PacketInPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketInPluginMessage;
+import org.enderstone.server.packet.play.PacketInTabComplete;
 import org.enderstone.server.packet.play.PacketInUseEntity;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutPlayerDisconnect;
-import org.enderstone.server.packet.status.PacketPing;
 import org.enderstone.server.packet.status.PacketInRequest;
+import org.enderstone.server.packet.status.PacketPing;
 
 public class PacketManager {
 
@@ -57,6 +58,7 @@ public class PacketManager {
 		play.put(0x15, PacketInClientSettings.class);
 		play.put(0x16, PacketInClientStatus.class);
 		play.put(0x17, PacketInPluginMessage.class);
+		play.put(0x14, PacketInTabComplete.class);
 
 		play.put(0x0A, PacketInAnimation.class);
 		play.put(0x0B, PacketInEntityAction.class);

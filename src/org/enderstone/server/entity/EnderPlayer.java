@@ -12,9 +12,11 @@ import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
 import org.enderstone.server.chat.ChatColor;
 import org.enderstone.server.chat.Message;
+import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.play.PacketInTabComplete;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
 import org.enderstone.server.packet.play.PacketOutChunkData;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
@@ -26,6 +28,7 @@ import org.enderstone.server.packet.play.PacketOutPlayerListItem;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
+import org.enderstone.server.packet.play.PacketOutTabComplete;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 
@@ -66,6 +69,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public ChunkInformer chunkInformer = new ChunkInformer() {
 
 		List<EnderChunk> cache = new ArrayList<>();
+
 		@Override
 		public boolean sendChunk(EnderChunk chunk) {
 			cache.add(chunk);
@@ -82,8 +86,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		public void done() {
 			int size;
 			Packet[] packets = new Packet[size = cache.size()];
-			for(int i = 0; i < size; i++)
-			{
+			for (int i = 0; i < size; i++) {
 				EnderChunk c = cache.get(i);
 				packets[i] = c.getCompressedChunk().toPacket(c.getX(), c.getZ());
 			}
@@ -401,4 +404,39 @@ public class EnderPlayer extends Entity implements CommandSender {
 			}
 		}
 	}
+
+	public void onPlayerChatComplete(final PacketInTabComplete packet) {
+		assert Thread.currentThread() != Main.getInstance().mainThread;
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				String message = packet.getHalfCommand();
+				List<String> out;
+				if (message.startsWith("/")) {
+					final String fullCommand = message.substring(1);
+					final String[] split = fullCommand.split(" ",-1);
+					final String[] args;
+					if (split.length != 1) {
+						args = new String[split.length - 1];
+						System.arraycopy(split, 1, args, 0, args.length);
+					} else
+						args = new String[0];
+					String commandBeforeSplit = message.substring(0, message.length() - split[0].length());
+					out = Main.getInstance().commands.executeTabList(null, split[0], EnderPlayer.this, args);
+				} else {
+					final String[] split = message.split(" ",-1);
+					String lastPart = split[split.length-1];
+					String commandBeforeSplit = message.substring(0, message.length() - lastPart.length());
+					out = Command.calculateMissingArgumentsPlayer(lastPart,EnderPlayer.this);
+				}
+				EnderPlayer.this.networkManager.sendPacket(new PacketOutTabComplete(out));
+			}
+		});
+	}
+
+	public boolean canSee(EnderPlayer player) {
+		return true;
+	}
+
 }

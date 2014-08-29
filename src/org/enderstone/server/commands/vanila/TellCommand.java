@@ -1,5 +1,6 @@
 package org.enderstone.server.commands.vanila;
 
+import java.util.List;
 import org.enderstone.server.Main;
 import org.enderstone.server.chat.AdvancedMessage;
 import org.enderstone.server.chat.ChatColor;
@@ -61,6 +62,13 @@ public class TellCommand extends SimpleCommand {
 		}
 		sender.sendMessage(new SimpleMessage("Usage: /tell <person> <command>"));
 		return COMMAND_FAILED;
+	}
+
+	@Override
+	public List<String> executeTabList(Command cmd, String alias, CommandSender sender, String[] args) {
+		if (args.length == 0)
+			return calculateMissingArgumentsPlayer("", sender);
+		return calculateMissingArgumentsPlayer(args[args.length - 1], sender);
 	}
 
 }
