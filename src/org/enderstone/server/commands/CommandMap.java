@@ -1,9 +1,12 @@
 package org.enderstone.server.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.enderstone.server.chat.SimpleMessage;
 
 /**
@@ -13,6 +16,7 @@ import org.enderstone.server.chat.SimpleMessage;
 public class CommandMap extends Command {
 
 	private final Map<String, Command> commands = new HashMap<>();
+	private String[] allCommands = null;
 	private final Map<String, Integer> conflictedCommands = new HashMap<>();
 	private final static Command COMMAND_CONFLICT = null;
 	public final static Integer DEFAULT_ENDERSTONE_COMMAND_PRIORITY = -100;
@@ -20,7 +24,8 @@ public class CommandMap extends Command {
 	public CommandMap registerCommand(Command... cmd) {
 		for (Command c : cmd) {
 			int priority = c.getPriority();
-			registerCommand(c, c.getName(), priority);
+			if (registerCommand(c, c.getName(), priority))
+				allCommands = null;
 			for (String alias : c.getAliasses()) registerCommand(c, alias, priority - 1);
 		}
 		return this;
@@ -69,6 +74,17 @@ public class CommandMap extends Command {
 
 	@Override
 	public List<String> executeTabList(Command cmd, String alias, CommandSender sender, String[] args) {
+		if (args.length == 0) {
+			if (allCommands == null) {
+				allCommands = this.commands.keySet().toArray(new String[this.commands.size()]);
+				Arrays.sort(allCommands);
+			}
+			List<String> out = new ArrayList<>();
+			for (String commandName : allCommands)
+				if (commandName.startsWith(alias))
+					out.add("/"+commandName);
+			return out;
+		}
 		cmd = this.commands.get(alias);
 		if (cmd == null)
 			return Collections.emptyList();
