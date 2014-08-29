@@ -52,7 +52,7 @@ public class TeleportCommand extends SimpleCommand {
 				for (int i = 0; i < args.length; i++) {
 					try {
 						Integer.parseInt(args[i]);
-					} catch (Exception e) {
+					} catch (NumberFormatException e) {
 						sender.sendMessage(new SimpleMessage(args[i] + " is not a valid number."));
 						return Command.COMMAND_FAILED;
 					}
