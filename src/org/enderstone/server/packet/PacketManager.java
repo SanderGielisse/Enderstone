@@ -68,7 +68,7 @@ public class PacketManager {
 
 	public static Class<? extends Packet> getPacket(NetworkManager manager, int id, HandshakeState handshake) {
 
-		Map<Integer, Class<? extends Packet>> map = null;
+		Map<Integer, Class<? extends Packet>> map;
 
 		if (handshake == HandshakeState.STATUS) {
 			map = status;
@@ -76,13 +76,13 @@ public class PacketManager {
 			map = login;
 		} else if (handshake == HandshakeState.PLAY) {
 			map = play;
+		} else {
+			throw new IllegalArgumentException("I don't know the packet table for the specified handshakestate! "+ handshake);
 		}
 
-		for (Entry<Integer, Class<? extends Packet>> s : map.entrySet()) {
-			if (s.getKey() == id) {
-				return s.getValue();
-			}
-		}
+		Class<? extends Packet> packet = map.get(id);
+		if(packet != null)
+			return packet;
 		manager.sendPacket(new PacketOutPlayerDisconnect(JSONStringBuilder.build("Packet ID 0x" + Integer.toHexString(id) + " " + handshake.toString() + " does not have a valid packet.")));
 		throw new RuntimeException("Packet ID 0x" + Integer.toHexString(id) + " " + handshake.toString() + " does not have a valid packet.");
 	}
