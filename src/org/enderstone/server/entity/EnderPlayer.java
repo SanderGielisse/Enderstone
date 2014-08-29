@@ -16,6 +16,7 @@ import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
+import org.enderstone.server.packet.play.PacketOutAnimation;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
 import org.enderstone.server.packet.play.PacketOutChunkData;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
@@ -454,6 +455,17 @@ public class EnderPlayer extends Entity implements CommandSender {
 			if (change > 0) {
 				this.health -= change;
 				networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
+
+				for (EnderPlayer p : Main.getInstance().onlinePlayers) {
+					if (p.getLocation().isInRange(25, getLocation())) {
+						p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
+					}
+				}
+				if(change > 5){
+					Main.getInstance().mainWorld.broadcastSound("damage.fallbig", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
+				}else{
+					Main.getInstance().mainWorld.broadcastSound("damage.fallsmall", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
+				}
 			}
 			if (health < 0) {
 				isDeath = true;
