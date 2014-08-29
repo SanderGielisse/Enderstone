@@ -45,12 +45,6 @@ public class EnderPlayer extends Entity implements CommandSender {
 	 */
 	public int waitingForValidMoveAfterTeleport = 0;
 	public final String uuid;
-	public String locale;
-	public byte renderDistance;
-	public byte chatFlags;
-	public boolean chatColors;
-	public byte difficulty;
-	public boolean showCapes;
 	public volatile boolean isOnline = true;
 	public boolean isCreative = false;
 	public boolean godMode = false;
@@ -105,7 +99,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	};
 
 	public EnderPlayer(String name, NetworkManager networkManager, String uuid, String textureValue, String textureSignature) {
-		super(-1, new Location());
+		super(new Location());
 		this.networkManager = networkManager;
 		this.playerName = name;
 		this.uuid = uuid;
@@ -141,54 +135,6 @@ public class EnderPlayer extends Entity implements CommandSender {
 		} else if (!uuid.equals(other.uuid))
 			return false;
 		return true;
-	}
-
-	public String getLocale() {
-		return locale;
-	}
-
-	public void setLocale(String locale) {
-		this.locale = locale;
-	}
-
-	public byte getRenderDistance() {
-		return renderDistance;
-	}
-
-	public void setRenderDistance(byte renderDistance) {
-		this.renderDistance = renderDistance;
-	}
-
-	public byte getChatFlags() {
-		return chatFlags;
-	}
-
-	public void setChatFlags(byte chatFlags) {
-		this.chatFlags = chatFlags;
-	}
-
-	public boolean hasChatColors() {
-		return chatColors;
-	}
-
-	public void setChatColors(boolean chatColors) {
-		this.chatColors = chatColors;
-	}
-
-	public byte getDifficulty() {
-		return difficulty;
-	}
-
-	public void setDifficulty(byte difficulty) {
-		this.difficulty = difficulty;
-	}
-
-	public boolean getShowCapes() {
-		return showCapes;
-	}
-
-	public void setShowCapes(boolean showCapes) {
-		this.showCapes = showCapes;
 	}
 
 	public NetworkManager getNetworkManager() {
@@ -234,11 +180,9 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	public Packet getSpawnPacket() {
-
 		List<ProfileProperty> list = new ArrayList<>();
 		ProfileProperty prop = new ProfileProperty("textures", this.textureValue, this.textureSignature);
 		list.add(prop);
-
 		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.dataWatcher);
 	}
 
@@ -287,6 +231,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return this.isOnline;
 	}
 
+	@Override
 	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
 		Set<Integer> toDespawn = new HashSet<>();
 		for (EnderPlayer pl : onlinePlayers) {
@@ -306,6 +251,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	private int moveUpdates = 0;
 
+	@Override
 	public void broadcastLocation(Location newLocation) {
 
 		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
@@ -338,6 +284,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 	}
 
+	@Override
 	public void broadcastRotation(float pitch, float yaw) {
 		Iterator<String> players = this.visiblePlayers.iterator();
 
@@ -391,10 +338,12 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return this.getPlayerName();
 	}
 
+	@Override
 	public void teleport(Entity entity) {
 		this.teleport(entity.getLocation());
 	}
 
+	@Override
 	public void teleport(Location newLocation) {
 		this.waitingForValidMoveAfterTeleport = 1;
 		Location oldLocation = this.getLocation();
@@ -448,6 +397,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return true;
 	}
 
+	@Override
 	public void damage(float damage) {
 		if (damage <= 0) {
 			throw new IllegalArgumentException("Damage cannot be smaller or equal to zero.");
@@ -459,15 +409,16 @@ public class EnderPlayer extends Entity implements CommandSender {
 				p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
 			}
 		}
-		Main.getInstance().mainWorld.broadcastSound("damage.hit", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
+		// can't find correct sound name
 		if (this.health <= 0) {
 			isDeath = true;
-			onDie();
+			onDeath();
 		}
 	}
 
-	public void onDie() {
-		Packet packet = new PacketOutEntityDestroy(new Integer[]{ this.getEntityId() });
+	@Override
+	public void onDeath() {
+		Packet packet = new PacketOutEntityDestroy(new Integer[] { this.getEntityId() });
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (ep.visiblePlayers.contains(this.getPlayerName())) {
 				ep.visiblePlayers.remove(this.getPlayerName());
@@ -490,19 +441,34 @@ public class EnderPlayer extends Entity implements CommandSender {
 					}
 				}
 				if (change > 5) {
-					Main.getInstance().mainWorld.broadcastSound("damage.fallbig", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
+					// can't find correct sound name
 				} else {
 					Main.getInstance().mainWorld.broadcastSound("damage.fallsmall", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
 				}
 			}
 			if (health <= 0) {
 				isDeath = true;
-				onDie();
+				onDeath();
 			}
 		} else if (this.isOnGround == true && onGround == false) {
 			// save Y location
 			this.yLocation = this.getLocation().getY();
 		}
 		this.isOnGround = onGround;
+	}
+
+	@Override
+	public void onRightClick() {
+		// TODO
+	}
+
+	@Override
+	public void onLeftClick() {
+		this.damage(1F);
+	}
+
+	@Override
+	public boolean isValid() {
+		return this.isDeath && this.isOnline;
 	}
 }

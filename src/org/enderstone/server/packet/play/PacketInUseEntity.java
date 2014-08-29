@@ -47,7 +47,17 @@ public class PacketInUseEntity extends Packet {
 					if (player.isDeath) {
 						return;
 					}
-					player.damage(1F);
+					player.onLeftClick();
+				} else if (getMouseClick() == 0) { // right click
+					EnderPlayer player = Main.getInstance().getPlayer(getTargetId());
+					if (player == null) {
+						networkManager.sendPacket(new PacketOutPlayerDisconnect("Invalid target id, probably a server bug, please report!"));
+						return;
+					}
+					if (player.isDeath) {
+						return;
+					}
+					player.onRightClick();
 				}
 			}
 		});
