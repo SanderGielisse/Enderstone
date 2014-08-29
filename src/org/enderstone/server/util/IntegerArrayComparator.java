@@ -29,8 +29,6 @@ public class IntegerArrayComparator implements Comparator<int[]> {
 		int zD2 = o2[1] > fz ? o2[1] - fz : fz - o2[1]; // 0
 		int d1 = xD1 > zD1 ? xD1 : zD1; // 0
 		int d2 = xD2 > zD2 ? xD2 : zD2; // 0
-		System.out.println("TEST: " + xD1 + " " + zD1 + " " + xD2 + " " + zD2 + " " + d1 + " " + d2);
-		System.out.println("TEST1: " + fx + " " + fz + " | " + o1[0] + " " + o1[1] + " | " + o2[0] + " " + o2[1]);
 		if (d1 > d2) return 1;
 		else if (d1 < d2) return -1;
 		else if (xD1 < xD2) return -1;
