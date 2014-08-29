@@ -23,7 +23,7 @@ public class PacketOutTabComplete extends Packet {
 
 	@Override
 	public void read(ByteBuf buf) throws Exception {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
 import org.enderstone.server.packet.play.PacketOutTabComplete;
+import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 
@@ -62,6 +63,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	public volatile boolean isOnGround = true;
 	public double yLocation;
+	public float health = 20;
+	public short food = 20;
+	public float foodSaturation = 0;
+	public volatile boolean isDeath = false;
 
 	// our alternative for the stupid Steve skins :D
 	private volatile String textureValue = "eyJ0aW1lc3RhbXAiOjE0MDkwODUzMTUyOTUsInByb2ZpbGVJZCI6IjY3NDNhODE0OWQ0MTRkMzNhZjllZTE0M2JjMmQ0NjJjIiwicHJvZmlsZU5hbWUiOiJzYW5kZXIyNzk4IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9jYTgwYTQyMzVkMzc1N2Q0YWI0Nzg2ZGY0NzQxYzE1MmExMWM5ZGVjMGU1YWM5ZmJlOGVmMmM0MjA4YWM2In19fQ==";
@@ -222,7 +227,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 		this.dataWatcher.watch(0, (byte) meaning);
 		this.dataWatcher.watch(1, (short) 0);
-		this.dataWatcher.watch(6, 20F);
+		this.dataWatcher.watch(6, 1F);
 		this.dataWatcher.watch(8, (byte) 0);
 	}
 
@@ -418,7 +423,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 				List<String> out;
 				if (message.startsWith("/")) {
 					final String fullCommand = message.substring(1);
-					final String[] split = fullCommand.split(" ",-1);
+					final String[] split = fullCommand.split(" ", -1);
 					final String[] args;
 					if (split.length != 1) {
 						args = new String[split.length - 1];
@@ -428,10 +433,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 					String commandBeforeSplit = message.substring(0, message.length() - split[0].length());
 					out = Main.getInstance().commands.executeTabList(null, split[0], EnderPlayer.this, args);
 				} else {
-					final String[] split = message.split(" ",-1);
-					String lastPart = split[split.length-1];
+					final String[] split = message.split(" ", -1);
+					String lastPart = split[split.length - 1];
 					String commandBeforeSplit = message.substring(0, message.length() - lastPart.length());
-					out = Command.calculateMissingArgumentsPlayer(lastPart,EnderPlayer.this);
+					out = Command.calculateMissingArgumentsPlayer(lastPart, EnderPlayer.this);
 				}
 				EnderPlayer.this.networkManager.sendPacket(new PacketOutTabComplete(out));
 			}
@@ -446,6 +451,13 @@ public class EnderPlayer extends Entity implements CommandSender {
 		if (this.isOnGround == false && onGround == true) {
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
+			if (change > 0) {
+				this.health -= change;
+				networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
+			}
+			if (health < 0) {
+				isDeath = true;
+			}
 		} else if (this.isOnGround == true && onGround == false) {
 			// save Y location
 			this.yLocation = this.getLocation().getY();
