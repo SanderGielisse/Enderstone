@@ -409,6 +409,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		if (damage <= 0) {
 			throw new IllegalArgumentException("Damage cannot be smaller or equal to zero.");
 		}
+		if(this.godMode) return;
 		this.health -= damage;
 		networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
