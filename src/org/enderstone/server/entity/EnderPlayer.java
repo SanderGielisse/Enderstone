@@ -36,14 +36,14 @@ import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 public class EnderPlayer extends Entity implements CommandSender {
 
 	private static final int MAX_CHUNKS_EVERY_UPDATE = 16;
-	
+
+	public final ClientSettings clientSettings = new ClientSettings();
 	public final NetworkManager networkManager;
 	public final String playerName;
 	public DataWatcher dataWatcher;
 	public HashSet<String> visiblePlayers = new HashSet<>();
 	/**
-	 * If this is above 0, then the server is waiting for a correction on the
-	 * last teleport the server sended
+	 * If this is above 0, then the server is waiting for a correction on the last teleport the server sended
 	 */
 	public int waitingForValidMoveAfterTeleport = 0;
 	public final String uuid;
@@ -98,7 +98,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 			cache.clear();
 			networkManager.sendPacket(packets);
 		}
-		
+
 		@Override
 		public int maxChunks() {
 			return MAX_CHUNKS_EVERY_UPDATE;
@@ -477,5 +477,68 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	public boolean isValid() {
 		return this.isDeath && this.isOnline;
+	}
+	/**
+	 * Class used to store the client side settings from the user, the reason I included setters and getters
+	 *  is that we can add a event or simulair to the code later on
+	 * @author ferrybig
+	 */
+	public final class ClientSettings {
+
+		private String locale = "en_US";
+		private byte renderDistance = 3;
+		private byte chatFlags = 0;
+		private boolean chatColors = true;
+		private byte difficulty = 2;
+		private boolean showCapes = true;
+
+		public String getLocale() {
+			return locale;
+		}
+
+		public void setLocale(String locale) {
+			this.locale = locale;
+		}
+
+		public byte getRenderDistance() {
+			return renderDistance;
+		}
+
+		public void setRenderDistance(byte renderDistance) {
+			this.renderDistance = renderDistance;
+		}
+
+		public byte getChatFlags() {
+			return chatFlags;
+		}
+
+		public void setChatFlags(byte chatFlags) {
+			this.chatFlags = chatFlags;
+		}
+
+		public boolean isChatColors() {
+			return chatColors;
+		}
+
+		public void setChatColors(boolean chatColors) {
+			this.chatColors = chatColors;
+		}
+
+		public byte getDifficulty() {
+			return difficulty;
+		}
+
+		public void setDifficulty(byte difficulty) {
+			this.difficulty = difficulty;
+		}
+
+		public boolean isShowCapes() {
+			return showCapes;
+		}
+
+		public void setShowCapes(boolean showCapes) {
+			this.showCapes = showCapes;
+		}
+
 	}
 }

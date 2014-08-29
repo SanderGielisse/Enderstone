@@ -1,7 +1,8 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
-
+import org.enderstone.server.Main;
+import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
@@ -52,8 +53,21 @@ public class PacketInClientSettings extends Packet {
 	}
 
 	@Override
-	public void onRecieve(NetworkManager networkManager) {
-		// TODO Auto-generated method stub
+	public void onRecieve(final NetworkManager networkManager) {
+		Main.getInstance().sendToMainThread(new Runnable(){
+
+			@Override
+			public void run() {
+				EnderPlayer player;
+				if((player=networkManager.player) == null) return;
+				player.clientSettings.setChatColors(chatColors);
+				player.clientSettings.setChatFlags(chatFlags);
+				player.clientSettings.setDifficulty(difficulty);
+				player.clientSettings.setLocale(locale);
+				player.clientSettings.setRenderDistance(renderDistance);
+				player.clientSettings.setShowCapes(showCapes);
+			}
+		});
 	}
 
 	public String getLocale() {
