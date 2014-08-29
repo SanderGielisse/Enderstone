@@ -57,6 +57,7 @@ public class Main implements Runnable {
 	public static final Random random = new Random();
 	public volatile Thread mainThread;
 	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();
+	public boolean onlineMode = false;
 
 	public Properties prop = null;
 	public UUIDFactory uuidFactory = new UUIDFactory();

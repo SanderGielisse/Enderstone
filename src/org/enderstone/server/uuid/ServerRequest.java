@@ -3,8 +3,8 @@ package org.enderstone.server.uuid;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
-
 import org.json.JSONObject;
 
 public class ServerRequest {
@@ -25,6 +25,10 @@ public class ServerRequest {
 		try (Scanner scanner = new Scanner(uc.getInputStream())) {
 			scanner.useDelimiter("\\A");
 			return new JSONObject(scanner.next());
+		}
+		catch(NoSuchElementException noskin)
+		{
+			return new JSONObject();
 		}
 	}
 }

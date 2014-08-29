@@ -50,7 +50,13 @@ public class PacketInLoginStart extends Packet {
 				if (networkManager.player == null) {
 					UUIDFactory factory = Main.getInstance().uuidFactory;
 					UUID uuid = factory.getPlayerUUIDAsync(getPlayerName());
-					JSONObject property = factory.getTextureDataAsync(uuid);
+					JSONObject property;
+					if (uuid == null) {
+						uuid = UUID.randomUUID(); // TODO: Kick player here?
+						property = null;
+					}
+					else 
+						property = factory.getTextureDataAsync(uuid);
 					networkManager.player = new EnderPlayer(getPlayerName(), networkManager, uuid.toString(), (property == null) ? null : property.getString("value"), (property == null) ? null : property.getString("signature"));
 					Main.getInstance().sendToMainThread(new Runnable() {
 

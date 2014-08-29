@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+import org.enderstone.server.Main;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +23,12 @@ public class UUIDFactory {
 		}
 		try {
 			String URL = "https://api.mojang.com/users/profiles/minecraft/" + name;
-			UUID uuid = parseUUID(new ServerRequest(URL).get().getString("id"));
+			JSONObject json = new ServerRequest(URL).get();
+			UUID uuid;
+			if(json == null)
+				uuid = Main.getInstance().onlineMode ? null : UUID.randomUUID();
+			else
+				uuid = parseUUID(json.getString("id"));
 			synchronized (uuidCache) {
 				this.uuidCache.put(name, uuid);
 			}
