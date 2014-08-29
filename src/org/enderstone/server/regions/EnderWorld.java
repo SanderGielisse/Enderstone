@@ -1,6 +1,9 @@
 package org.enderstone.server.regions;
 
+import org.enderstone.server.util.IntegerArrayComparator;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -122,43 +125,44 @@ public class EnderWorld {
 		getOrCreateChunk(x >> 4, z >> 4).setBlock(x & 0xF, y & 0xFF, z & 0xF, id, data);
 	}
 
-	public void doChunkUpdatesForPlayer(final EnderPlayer player, final ChunkInformer informer, final int radius) {
-		if (players.get(player) == null) {
-			players.put(player, new RegionSet());
+	public void doChunkUpdatesForPlayer(EnderPlayer player, ChunkInformer informer, int radius) {
+		doChunkUpdatesForPlayer(player,informer,radius,false);
+	}
+	
+	public void doChunkUpdatesForPlayer(EnderPlayer player, ChunkInformer informer, int radius, boolean force) {
+		RegionSet playerChunks = players.get(player);
+		if (playerChunks == null) {
+			players.put(player, playerChunks = new RegionSet());
 		}
 
-		Set<EnderChunk> playerChunks = players.get(player);
-		int tmp1 = radius * 2 + 1;
-		int x = (player.getLocation().getBlockX() >> 4) - radius;
-		int maxX = x + tmp1;
-		int z = (player.getLocation().getBlockZ() >> 4) - radius;
-		int minZ = z;
-		int maxZ = z + tmp1;
+		int r2 = radius * 2 + 1;
+		int px = player.getLocation().getBlockX() >> 4;
+		int cx = (px) - radius;
+		int mx = cx + r2;
+		int pz = player.getLocation().getBlockZ() >> 4;
+		int minz = (pz) - radius;
+		int cz = minz;
+		int mz = cz + r2;
 		try {
 			if (playerChunks.isEmpty()) {
-				while (x++ < maxX) {
-					for (z = minZ; z < maxZ; z++) {
-						EnderChunk c = getOrCreateChunk(x, z);
+				while (cx++ < mx) {
+					for (cz = minz; cz < mz; cz++) {
+						EnderChunk c = getOrCreateChunk(cx, cz);
 						playerChunks.add(c);
-						try {
-							if (!informer.sendChunk(c)) {
-								return;
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+						informer.sendChunk(c);
 					}
 				}
 			} else {
+				int maxSize = force ? Integer.MAX_VALUE : informer.maxChunks();
 				int[][] chunkLoad = new int[(radius * 2) * (radius * 2) * 2][];
 				int index = 0;
-				Set<EnderChunk> copy = new HashSet<>(playerChunks);
+				Set<EnderChunk> copy = new RegionSet(playerChunks);
 
-				for (; x < maxX; x++) {
-					for (z = minZ; z < maxZ; z++) {
-						EnderChunk tmp = getOrCreateChunk(x, z);
+				for (; cx < mx; cx++) {
+					for (cz = minz; cz < mz; cz++) {
+						EnderChunk tmp = getOrCreateChunk(cx, cz);
 						if (!copy.contains(tmp)) {
-							chunkLoad[index++] = new int[]{x, z};
+							chunkLoad[index++] = new int[]{cx, cz};
 						} else {
 							copy.remove(tmp);
 						}
@@ -171,25 +175,21 @@ public class EnderWorld {
 					playerChunks.remove(i);
 					informer.removeChunk(i);
 				}
-
+				Arrays.sort(chunkLoad, 0, index, new IntegerArrayComparator(px, pz));
+				if(maxSize < chunkLoad.length) chunkLoad[maxSize] = null;
 				index = 0;
-				for (int[] i : chunkLoad) {
-					if (i == null) {
+				for (int[] l : chunkLoad) {
+					if (l == null) {
 						break;
 					}
-					x = i[0];
-					z = i[1];
-					EnderChunk c = getOrCreateChunk(x, z);
+					cx = l[0];
+					cz = l[1];
+					EnderChunk c = getOrCreateChunk(cx, cz);
 					playerChunks.add(c);
-					try {
-						if (!informer.sendChunk(c)) {
-							return;
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					informer.sendChunk(c);
 					index++;
 				}
+				if(index > 0) EnderLogger.debug("Send "+index+" chunks to player: "+player.getName());
 			}
 		} finally {
 			informer.done();
@@ -205,11 +205,13 @@ public class EnderWorld {
 
 	public static interface ChunkInformer {
 
-		public boolean sendChunk(EnderChunk chunk) throws Exception;
+		public void sendChunk(EnderChunk chunk);
 
-		public boolean removeChunk(EnderChunk chunk);
+		public void removeChunk(EnderChunk chunk);
 
 		public void done();
+
+		public int maxChunks();
 	}
 
 	public void broadcastSound(String soundName, int x, int y, int z, float volume, byte pitch, Location loc, EnderPlayer exceptOne) {
@@ -220,4 +222,5 @@ public class EnderWorld {
 			}
 		}
 	}
+
 }

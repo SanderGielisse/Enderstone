@@ -35,6 +35,8 @@ import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 
 public class EnderPlayer extends Entity implements CommandSender {
 
+	private static final int MAX_CHUNKS_EVERY_UPDATE = 16;
+	
 	public final NetworkManager networkManager;
 	public final String playerName;
 	public DataWatcher dataWatcher;
@@ -80,27 +82,32 @@ public class EnderPlayer extends Entity implements CommandSender {
 		List<EnderChunk> cache = new ArrayList<>();
 
 		@Override
-		public boolean sendChunk(EnderChunk chunk) {
+		public void sendChunk(EnderChunk chunk) {
 			cache.add(chunk);
-			return cache.size() < 64;
 		}
 
 		@Override
-		public boolean removeChunk(EnderChunk chunk) {
+		public void removeChunk(EnderChunk chunk) {
 			networkManager.sendPacket(PacketOutChunkData.clearChunk(chunk.getX(), chunk.getZ()));
-			return true;
 		}
 
 		@Override
 		public void done() {
-			int size;
-			Packet[] packets = new Packet[size = cache.size()];
+			int size = cache.size();
+			if(size == 0)
+				return;
+			Packet[] packets = new Packet[size];
 			for (int i = 0; i < size; i++) {
 				EnderChunk c = cache.get(i);
 				packets[i] = c.getCompressedChunk().toPacket(c.getX(), c.getZ());
 			}
 			cache.clear();
 			networkManager.sendPacket(packets);
+		}
+		
+		@Override
+		public int maxChunks() {
+			return MAX_CHUNKS_EVERY_UPDATE;
 		}
 	};
 
