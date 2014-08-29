@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
@@ -39,7 +38,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public DataWatcher dataWatcher;
 	public HashSet<String> visiblePlayers = new HashSet<>();
 	/**
-	 * If this is above 0, then the server is waiting for a correction on the last teleport the server sended
+	 * If this is above 0, then the server is waiting for a correction on the
+	 * last teleport the server sended
 	 */
 	public int waitingForValidMoveAfterTeleport = 0;
 	public final String uuid;
@@ -50,15 +50,18 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public byte difficulty;
 	public boolean showCapes;
 	public volatile boolean isOnline = true;
-	public boolean isCreative = true;
-	public boolean godMode = true;
-	public boolean canFly = true;
-	public boolean isFlying = true;
+	public boolean isCreative = false;
+	public boolean godMode = false;
+	public boolean canFly = false;
+	public boolean isFlying = false;
 	public boolean isOnFire = false;
 	public boolean isSneaking = false;
 	public boolean isSprinting = false;
 	public boolean isEating = false;
 	private boolean isInvisible = false;
+
+	public volatile boolean isOnGround = true;
+	public double yLocation;
 
 	// our alternative for the stupid Steve skins :D
 	private volatile String textureValue = "eyJ0aW1lc3RhbXAiOjE0MDkwODUzMTUyOTUsInByb2ZpbGVJZCI6IjY3NDNhODE0OWQ0MTRkMzNhZjllZTE0M2JjMmQ0NjJjIiwicHJvZmlsZU5hbWUiOiJzYW5kZXIyNzk4IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9jYTgwYTQyMzVkMzc1N2Q0YWI0Nzg2ZGY0NzQxYzE1MmExMWM5ZGVjMGU1YWM5ZmJlOGVmMmM0MjA4YWM2In19fQ==";
@@ -439,4 +442,14 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return true;
 	}
 
+	public void setOnGround(boolean onGround) {
+		if (this.isOnGround == false && onGround == true) {
+			// fall damage
+			double change = this.yLocation - this.getLocation().getY() - 3;
+		} else if (this.isOnGround == true && onGround == false) {
+			// save Y location
+			this.yLocation = this.getLocation().getY();
+		}
+		this.isOnGround = onGround;
+	}
 }

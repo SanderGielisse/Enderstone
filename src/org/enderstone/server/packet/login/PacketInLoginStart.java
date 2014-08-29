@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.GameMode;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutJoinGame;
@@ -67,7 +68,7 @@ public class PacketInLoginStart extends Packet {
 
 				networkManager.sendPacket(new PacketOutLoginSucces(networkManager.player.uuid, networkManager.player.getPlayerName()));
 				networkManager.handShakeStatus = 3;
-				networkManager.sendPacket(new PacketOutJoinGame(networkManager.player.getEntityId(), (byte) 1, (byte) 0, (byte) 1, (byte) 60, "default"));
+				networkManager.sendPacket(new PacketOutJoinGame(networkManager.player.getEntityId(), (byte) GameMode.SURVIVAL.getId(), (byte) 0, (byte) 1, (byte) 60, "default"));
 
 				networkManager.player.getLocation().setX(0);
 				networkManager.player.getLocation().setY(100);

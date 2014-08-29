@@ -1,7 +1,6 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
-
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.NetworkManager;
@@ -42,6 +41,11 @@ public class PacketInPlayerLook extends Packet {
 			@Override
 			public void run() {
 				Location loc = networkManager.player.getLocation();
+
+				if (networkManager.player.waitingForValidMoveAfterTeleport > 0) {
+					return;
+				}
+
 				try {
 					networkManager.player.broadcastRotation(getPitch(), getYaw());
 				} catch (Exception e) {
@@ -49,6 +53,7 @@ public class PacketInPlayerLook extends Packet {
 				}
 				loc.setPitch(getPitch());
 				loc.setYaw(getYaw());
+				networkManager.player.setOnGround(isOnGround());
 			}
 		});
 	}

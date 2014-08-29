@@ -1,6 +1,8 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import org.enderstone.server.Main;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketInPlayerOnGround extends Packet {
@@ -32,6 +34,20 @@ public class PacketInPlayerOnGround extends Packet {
 	@Override
 	public byte getId() {
 		return 0x03;
+	}
+
+	@Override
+	public void onRecieve(final NetworkManager networkManager) {
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				if (networkManager.player.waitingForValidMoveAfterTeleport > 0) {
+					return;
+				}
+				networkManager.player.setOnGround(isOnGround());
+			}
+		});
 	}
 
 	public boolean isOnGround() {

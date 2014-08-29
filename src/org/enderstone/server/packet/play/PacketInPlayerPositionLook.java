@@ -64,11 +64,7 @@ public class PacketInPlayerPositionLook extends Packet {
 			public void run() {
 				Location loc = networkManager.player.getLocation();
 				if (networkManager.player.waitingForValidMoveAfterTeleport > 0) {
-					if (Math.max(Math.max(
-							getX() < loc.getX() ? loc.getX() - getX() : getX() - loc.getX(),
-							getHeadY() < loc.getY() ? loc.getY() - getHeadY() : getHeadY() - loc.getY()),
-							getZ() < loc.getZ() ? loc.getZ() - getZ() : getZ() - loc.getZ()
-					) > 0.1) {
+					if (Math.max(Math.max(getX() < loc.getX() ? loc.getX() - getX() : getX() - loc.getX(), getHeadY() < loc.getY() ? loc.getY() - getHeadY() : getHeadY() - loc.getY()), getZ() < loc.getZ() ? loc.getZ() - getZ() : getZ() - loc.getZ()) > 0.1) {
 						if (networkManager.player.waitingForValidMoveAfterTeleport++ > 100) {
 							networkManager.player.teleport(loc);
 						}
@@ -84,6 +80,7 @@ public class PacketInPlayerPositionLook extends Packet {
 				loc.setZ(getZ());
 				loc.setPitch(getPitch());
 				loc.setYaw(getYaw());
+				networkManager.player.setOnGround(isOnGround());
 			}
 		});
 	}
