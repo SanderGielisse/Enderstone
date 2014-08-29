@@ -1,4 +1,4 @@
-package org.enderstone.server.commands.enderstone;
+package org.enderstone.server.commands.vanila;
 
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;

@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.enderstone.PingCommand;
-import org.enderstone.server.commands.enderstone.TeleportCommand;
+import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
 import org.enderstone.server.commands.vanila.StopCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
