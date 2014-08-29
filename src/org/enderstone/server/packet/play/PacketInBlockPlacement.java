@@ -1,7 +1,6 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.inventory.ItemStack;
@@ -61,11 +60,6 @@ public class PacketInBlockPlacement extends Packet {
 				int y = getY();
 				int z = getZ();
 
-				short idAt = Main.getInstance().mainWorld.getBlockIdAt(x, y, z).getId();
-				if (idAt == BlockId.LEVER.getId() || idAt == BlockId.BUTTON.getId()) {
-
-				}
-
 				byte direct = getDirection();
 				if (direct == 0) {
 					y--;
@@ -83,31 +77,15 @@ public class PacketInBlockPlacement extends Packet {
 
 				Location loc;
 				if (networkManager.player.getLocation().isInRange(6, loc = new Location("", getX(), getY(), getZ(), 0F, 0F))) {
-					short id = getHeldItem().getBlockId();
-					if (id == 50 || id == 76 || id == 69) {
-
-						/*byte datavalue = 0;
-
-						if (direct == 0) {
-							datavalue = 0;
-						} else if (direct == 1) {
-							datavalue = 5;
-						} else if (direct == 2) {
-							datavalue = 4;
-						} else if (direct == 3) {
-							datavalue = 3;
-						} else if (direct == 4) {
-							datavalue = 2;
-						} else if (direct == 5) {
-							datavalue = 1;
-						}*/
-
-						//datavalue = (byte) (Main.random.nextInt(10) + 6);
-
-						Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) 0);
-					} else {
-						Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
+					ItemStack stack = getHeldItem();
+					if (stack.getBlockId() == BlockId.LAVA_BUCKET.getId()) {
+						stack.setBlockId(BlockId.LAVA.getId());
+					} else if (stack.getBlockId() == BlockId.WATER_BUCKET.getId()) {
+						stack.setBlockId(BlockId.WATER.getId());
+					} else if (stack.getBlockId() == BlockId.FLINT_AND_STEEL.getId()) {
+						stack.setBlockId(BlockId.FIRE.getId());
 					}
+					Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
 				}
 				Main.getInstance().mainWorld.broadcastSound("dig.grass", x, y, z, 1F, (byte) 63, loc, null);
 			}
