@@ -1,6 +1,7 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import org.enderstone.server.chat.Message;
 import org.enderstone.server.packet.JSONStringBuilder;
 import org.enderstone.server.packet.Packet;
 
@@ -14,6 +15,11 @@ public class PacketOutChatMessage extends Packet {
 		} else {
 			this.jsonChat = JSONStringBuilder.build(chatMessage);
 		}
+	}
+	
+	public PacketOutChatMessage(Message message)
+	{
+		this(message.toMessageJson(), true);
 	}
 
 	@Override

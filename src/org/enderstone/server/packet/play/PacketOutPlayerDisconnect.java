@@ -1,6 +1,7 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import org.enderstone.server.chat.Message;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutPlayerDisconnect extends Packet {
@@ -11,6 +12,10 @@ public class PacketOutPlayerDisconnect extends Packet {
 
 	public PacketOutPlayerDisconnect(String reason) {
 		this.reason = reason;
+	}
+	
+	public PacketOutPlayerDisconnect(Message reason) {
+		this.reason = reason.toMessageJson();
 	}
 
 	@Override

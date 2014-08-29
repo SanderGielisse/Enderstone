@@ -1,6 +1,7 @@
 package org.enderstone.server.regions;
 
 import java.util.AbstractSet;
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -11,7 +12,10 @@ import java.util.Iterator;
  */
 public class RegionSet extends AbstractSet<EnderChunk> {
 
-	private Node[][] chunkBuckets = new Node[16][16];
+	private static final int REGION_BUCKET_SIZE = 32 * 32;
+	
+	private static final int CHUNK_BUCKET_SIZE = 16;
+	private Node[][] chunkBuckets = new Node[CHUNK_BUCKET_SIZE][CHUNK_BUCKET_SIZE];
 
 	private static class Node {
 
@@ -22,8 +26,36 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 
 		private final int regionX, regionZ;
 		private Node next;
-		private final EnderChunk[] regionChunks = new EnderChunk[32 * 32];
+		private final EnderChunk[] regionChunks = new EnderChunk[REGION_BUCKET_SIZE];
 
+	}
+
+	public RegionSet() {
+	}
+
+	public RegionSet(Collection<EnderChunk> other) {
+		this();
+		this.addAll(other);
+	}
+
+	public RegionSet(RegionSet other) {
+		this();
+		for (int x = 0; x < CHUNK_BUCKET_SIZE; x++) {
+			Node[] tmp = other.chunkBuckets[x];
+			for (int z = 0; z < CHUNK_BUCKET_SIZE; z++) {
+				Node otherNode = tmp[z];
+				Node thisNode = null;
+				for (; otherNode != null; otherNode = otherNode.next) {
+					if (thisNode == null)
+						thisNode = chunkBuckets[x][z] = new Node(otherNode.regionX, otherNode.regionZ);
+					else {
+						thisNode.next = new Node(otherNode.regionX, otherNode.regionZ);
+						thisNode = thisNode.next;
+					}
+					System.arraycopy(otherNode.regionChunks, 0, thisNode.regionChunks, 0, REGION_BUCKET_SIZE);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -64,7 +96,8 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 				if (hasNext == false) {
 					return false;
 				}
-				mainLoop: while (next == null) {
+				mainLoop:
+				while (next == null) {
 					if (i3 >= 32 * 32) {
 						i3 = 0;
 
@@ -139,6 +172,30 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 			}
 		}
 		return size;
+	}
+
+	private Node getNode(int rX, int rZ) {
+		Node n = this.chunkBuckets[maskCordinate(rX)][maskCordinate(rZ)];
+		if (n != null) {
+			do {
+				if (n.regionX == rX && n.regionZ == rZ)
+					return n;
+			} while ((n = n.next) != null);
+		}
+		return n;
+	}
+
+	private Node getOrCreateNode(int rX, int rZ) {
+		Node n = this.chunkBuckets[maskCordinate(rX)][maskCordinate(rZ)];
+		if (n == null)
+			return this.chunkBuckets[maskCordinate(rX)][maskCordinate(rZ)] = new Node(rX, rZ);
+		Node prev;
+		do {
+			prev = n;
+			if (n.regionX == rX && n.regionZ == rZ)
+				return n;
+		} while ((n = n.next) != null);
+		return prev.next = new Node(rX, rZ);
 	}
 
 	@Override
