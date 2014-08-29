@@ -44,6 +44,7 @@ public class Main implements Runnable {
 	public static final String PROTOCOL_VERSION = "1.7.6";
 	private static final int EXCEPTED_SLEEP_TIME = 1000 / 20;
 	private static final int CANT_KEEP_UP_TIMEOUT = -10000;
+	private static final int MAX_VIEW_DISTANCE = 10;
 	private static final int MAX_SLEEP = 100;
 	public static final Set<Integer> PROTOCOL = Collections.unmodifiableSet(new HashSet<Integer>() {
 		private static final long serialVersionUID = 1L;
@@ -305,7 +306,7 @@ public class Main implements Runnable {
 
 		if ((latestChunkUpdate++ & 0b0001_1111) == 0) { // faster than % 31 == 0
 			for (EnderPlayer p : onlinePlayers) {
-				mainWorld.doChunkUpdatesForPlayer(p, p.chunkInformer, 10);
+				mainWorld.doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.getRenderDistance() - 1, MAX_VIEW_DISTANCE));
 				p.updatePlayers(onlinePlayers);
 			}
 		}
