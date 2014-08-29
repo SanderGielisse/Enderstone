@@ -345,4 +345,13 @@ public class Main implements Runnable {
 		if (interrupted)
 			Thread.currentThread().interrupt();
 	}
+
+	public EnderPlayer getPlayer(int entityId) {
+		for (EnderPlayer ep : this.onlinePlayers) {
+			if (ep.getEntityId() == entityId) {
+				return ep;
+			}
+		}
+		return null;
+	}
 }

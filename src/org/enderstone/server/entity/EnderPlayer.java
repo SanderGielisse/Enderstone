@@ -290,7 +290,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
 		Set<Integer> toDespawn = new HashSet<>();
 		for (EnderPlayer pl : onlinePlayers) {
-			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation())) {
+			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation()) && (!pl.isDeath)) {
 				this.visiblePlayers.add(pl.getPlayerName());
 				this.networkManager.sendPacket(pl.getSpawnPacket());
 			}
@@ -448,6 +448,34 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return true;
 	}
 
+	public void damage(float damage) {
+		if (damage <= 0) {
+			throw new IllegalArgumentException("Damage cannot be smaller or equal to zero.");
+		}
+		this.health -= damage;
+		networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
+		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
+			if (p.getLocation().isInRange(25, getLocation())) {
+				p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
+			}
+		}
+		Main.getInstance().mainWorld.broadcastSound("damage.hit", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
+		if (this.health <= 0) {
+			isDeath = true;
+			onDie();
+		}
+	}
+
+	public void onDie() {
+		Packet packet = new PacketOutEntityDestroy(new Integer[]{ this.getEntityId() });
+		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
+			if (ep.visiblePlayers.contains(this.getPlayerName())) {
+				ep.visiblePlayers.remove(this.getPlayerName());
+				ep.getNetworkManager().sendPacket(packet);
+			}
+		}
+	}
+
 	public void setOnGround(boolean onGround) {
 		if (this.isOnGround == false && onGround == true) {
 			// fall damage
@@ -461,14 +489,15 @@ public class EnderPlayer extends Entity implements CommandSender {
 						p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
 					}
 				}
-				if(change > 5){
+				if (change > 5) {
 					Main.getInstance().mainWorld.broadcastSound("damage.fallbig", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
-				}else{
+				} else {
 					Main.getInstance().mainWorld.broadcastSound("damage.fallsmall", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
 				}
 			}
-			if (health < 0) {
+			if (health <= 0) {
 				isDeath = true;
+				onDie();
 			}
 		} else if (this.isOnGround == true && onGround == false) {
 			// save Y location

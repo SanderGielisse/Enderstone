@@ -1,6 +1,9 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import org.enderstone.server.Main;
+import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketInUseEntity extends Packet {
@@ -27,6 +30,27 @@ public class PacketInUseEntity extends Packet {
 	@Override
 	public byte getId() {
 		return 0x02;
+	}
+
+	@Override
+	public void onRecieve(final NetworkManager networkManager) {
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				if (getMouseClick() == 1) { // left click
+					EnderPlayer player = Main.getInstance().getPlayer(getTargetId());
+					if (player == null) {
+						networkManager.sendPacket(new PacketOutPlayerDisconnect("Invalid target id, probably a server bug, please report!"));
+						return;
+					}
+					if (player.isDeath) {
+						return;
+					}
+					player.damage(1F);
+				}
+			}
+		});
 	}
 
 	public int getTargetId() {
