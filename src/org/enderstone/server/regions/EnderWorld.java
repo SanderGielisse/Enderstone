@@ -222,5 +222,10 @@ public class EnderWorld {
 			}
 		}
 	}
+	
+	public Block getBlock(int x, int y, int z)
+	{
+		return new EnderBlock(x, y, z, this);
+	}
 
 }
