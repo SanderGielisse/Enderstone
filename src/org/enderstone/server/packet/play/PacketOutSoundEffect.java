@@ -1,7 +1,7 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
-
+import org.enderstone.server.Location;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutSoundEffect extends Packet {
@@ -13,6 +13,11 @@ public class PacketOutSoundEffect extends Packet {
 	private float volume;
 	private byte pitch;
 
+	public PacketOutSoundEffect(String soundName, Location loc)
+	{
+		this(soundName,loc.getBlockX(),loc.getBlockY(),loc.getBlockZ(),1f,(byte)63);
+	}
+	
 	public PacketOutSoundEffect(String soundName, int x, int y, int z, float volume, byte pitch) {
 		this.soundName = soundName;
 		this.x = x * 8;

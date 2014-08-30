@@ -60,10 +60,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	public volatile boolean isOnGround = true;
 	public double yLocation;
-	public float health = 20;
 	public short food = 20;
 	public float foodSaturation = 0;
-	public volatile boolean isDeath = false;
 
 	// our alternative for the stupid Steve skins :D
 	private volatile String textureValue = "eyJ0aW1lc3RhbXAiOjE0MDkwODUzMTUyOTUsInByb2ZpbGVJZCI6IjY3NDNhODE0OWQ0MTRkMzNhZjllZTE0M2JjMmQ0NjJjIiwicHJvZmlsZU5hbWUiOiJzYW5kZXIyNzk4IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9jYTgwYTQyMzVkMzc1N2Q0YWI0Nzg2ZGY0NzQxYzE1MmExMWM5ZGVjMGU1YWM5ZmJlOGVmMmM0MjA4YWM2In19fQ==";
@@ -242,7 +240,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
 		Set<Integer> toDespawn = new HashSet<>();
 		for (EnderPlayer pl : onlinePlayers) {
-			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation()) && (!pl.isDeath)) {
+			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation()) && (!pl.isDead())) {
 				this.visiblePlayers.add(pl.getPlayerName());
 				this.networkManager.sendPacket(pl.getSpawnPacket());
 			}
@@ -410,22 +408,13 @@ public class EnderPlayer extends Entity implements CommandSender {
 			throw new IllegalArgumentException("Damage cannot be smaller or equal to zero.");
 		}
 		if(this.godMode) return;
-		this.health -= damage;
-		networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
-		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
-			if (p.getLocation().isInRange(25, getLocation())) {
-				p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
-			}
-		}
-		// can't find correct sound name
-		if (this.health <= 0) {
-			isDeath = true;
-			onDeath();
-		}
+		super.damage(damage);
 	}
 
 	@Override
-	public void onDeath() {
+	protected void onHealthUpdate(float health,float oldHealth) {
+		networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
+		if(health > 0) return;
 		Packet packet = new PacketOutEntityDestroy(new Integer[] { this.getEntityId() });
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (ep.visiblePlayers.contains(this.getPlayerName())) {
@@ -435,28 +424,39 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 	}
 
+	@Override
+	protected String getDamageSound() {
+		return "game.player.hurt";
+	}
+
+	@Override
+	protected String getDeadSound() {
+		return "game.player.dead";
+	}	
+
+	@Override
+	protected float getBaseHealth() {
+		return 4;
+	}
+
+	@Override
+	protected float getBaseMaxHealth() {
+		return 20;
+	}
+	
+
 	public void setOnGround(boolean onGround) {
 		if (this.isOnGround == false && onGround == true) {
+			if(this.canFly) return; // Flying players don't get damage in vanilla
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
 			if (change > 0) {
-				this.health -= change;
-				networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
-
-				for (EnderPlayer p : Main.getInstance().onlinePlayers) {
-					if (p.getLocation().isInRange(25, getLocation())) {
-						p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
-					}
-				}
+				damage((float) change);
 				if (change > 5) {
 					// can't find correct sound name
 				} else {
 					Main.getInstance().mainWorld.broadcastSound("damage.fallsmall", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
 				}
-			}
-			if (health <= 0) {
-				isDeath = true;
-				onDeath();
 			}
 		} else if (this.isOnGround == true && onGround == false) {
 			// save Y location
@@ -466,18 +466,18 @@ public class EnderPlayer extends Entity implements CommandSender {
 	}
 
 	@Override
-	public void onRightClick() {
+	public void onRightClick(EnderPlayer attacker) {
 		// TODO
 	}
 
 	@Override
-	public void onLeftClick() {
+	public void onLeftClick(EnderPlayer attacker) {
 		this.damage(1F);
 	}
 
 	@Override
 	public boolean isValid() {
-		return this.isDeath && this.isOnline;
+		return this.isOnline;
 	}
 	/**
 	 * Class used to store the client side settings from the user, the reason I included setters and getters

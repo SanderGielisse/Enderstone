@@ -44,20 +44,20 @@ public class PacketInUseEntity extends Packet {
 						networkManager.sendPacket(new PacketOutPlayerDisconnect("Invalid target id, probably a server bug, please report!"));
 						return;
 					}
-					if (player.isDeath) {
+					if (player.isDead()) {
 						return;
 					}
-					player.onLeftClick();
+					player.onLeftClick(networkManager.player);
 				} else if (getMouseClick() == 0) { // right click
 					EnderPlayer player = Main.getInstance().getPlayer(getTargetId());
 					if (player == null) {
 						networkManager.sendPacket(new PacketOutPlayerDisconnect("Invalid target id, probably a server bug, please report!"));
 						return;
 					}
-					if (player.isDeath) {
+					if (player.isDead()) {
 						return;
 					}
-					player.onRightClick();
+					player.onRightClick(networkManager.player);
 				}
 			}
 		});

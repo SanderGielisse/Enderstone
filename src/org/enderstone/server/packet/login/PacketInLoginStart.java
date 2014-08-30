@@ -11,6 +11,7 @@ import org.enderstone.server.packet.play.PacketOutJoinGame;
 import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSpawnPosition;
+import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.uuid.UUIDFactory;
 import org.json.JSONObject;
 
@@ -96,6 +97,7 @@ public class PacketInLoginStart extends Packet {
 
 				networkManager.sendPacket(new PacketOutPlayerAbilities((byte) i, 0.1F, 0.1F));
 				networkManager.sendPacket(new PacketOutPlayerPositionLook(0, 100, 0, 0F, 0F, false));
+				networkManager.sendPacket(new PacketOutUpdateHealth(networkManager.player.getHealth(), networkManager.player.food, networkManager.player.foodSaturation));
 			}
 		});
 		thread.start();
