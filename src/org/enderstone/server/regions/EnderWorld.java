@@ -1,22 +1,26 @@
 package org.enderstone.server.regions;
 
-import org.enderstone.server.util.IntegerArrayComparator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.Entity;
+import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.play.PacketOutEntityDestroy;
+import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
+import org.enderstone.server.packet.play.PacketOutSpawnObject;
 import org.enderstone.server.regions.generators.TimTest;
+import org.enderstone.server.util.IntegerArrayComparator;
 
 /**
  *
@@ -30,6 +34,7 @@ public class EnderWorld {
 	private final ChunkGenerator generator = new TimTest();
 	private final Random random = new Random();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
+	public final Set<Entity> entities = new HashSet<>();
 
 	public EnderChunk getOrCreateChunk(int x, int z) {
 		EnderChunk r = getChunk(x, z);
@@ -126,9 +131,9 @@ public class EnderWorld {
 	}
 
 	public void doChunkUpdatesForPlayer(EnderPlayer player, ChunkInformer informer, int radius) {
-		doChunkUpdatesForPlayer(player,informer,radius,false);
+		doChunkUpdatesForPlayer(player, informer, radius, false);
 	}
-	
+
 	public void doChunkUpdatesForPlayer(EnderPlayer player, ChunkInformer informer, int radius, boolean force) {
 		RegionSet playerChunks = players.get(player);
 		if (playerChunks == null) {
@@ -162,7 +167,7 @@ public class EnderWorld {
 					for (cz = minz; cz < mz; cz++) {
 						EnderChunk tmp = getOrCreateChunk(cx, cz);
 						if (!copy.contains(tmp)) {
-							chunkLoad[index++] = new int[]{cx, cz};
+							chunkLoad[index++] = new int[] { cx, cz };
 						} else {
 							copy.remove(tmp);
 						}
@@ -176,7 +181,8 @@ public class EnderWorld {
 					informer.removeChunk(i);
 				}
 				Arrays.sort(chunkLoad, 0, index, new IntegerArrayComparator(px, pz));
-				if(maxSize < chunkLoad.length) chunkLoad[maxSize] = null;
+				if (maxSize < chunkLoad.length)
+					chunkLoad[maxSize] = null;
 				index = 0;
 				for (int[] l : chunkLoad) {
 					if (l == null) {
@@ -189,7 +195,8 @@ public class EnderWorld {
 					informer.sendChunk(c);
 					index++;
 				}
-				if(index > 0) EnderLogger.debug("Send "+index+" chunks to player: "+player.getName());
+				if (index > 0)
+					EnderLogger.debug("Send " + index + " chunks to player: " + player.getName());
 			}
 		} finally {
 			informer.done();
@@ -223,4 +230,13 @@ public class EnderWorld {
 		}
 	}
 
+	public void addEntity(Entity e) {
+		this.entities.add(e);
+	}
+
+	public void updateEntities(List<EnderPlayer> onlinePlayers){
+		for(Entity e : this.entities){
+			e.updatePlayers(onlinePlayers);
+		}
+	}
 }

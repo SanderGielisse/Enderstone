@@ -3,6 +3,8 @@ package org.enderstone.server.packet.play;
 import io.netty.buffer.ByteBuf;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.entity.EntityItem;
+import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.regions.BlockId;
@@ -45,12 +47,14 @@ public class PacketInPlayerDigging extends Packet {
 
 			@Override
 			public void run() {
+				Location loc = new Location("", getX(), getY(), getZ(), 0F, 0F);
+				short blockId = Main.getInstance().mainWorld.getBlockIdAt(x, y, z).getId();
 				if (getStatus() == 2) {
-					Location loc;
-					if (networkManager.player.getLocation().isInRange(6, loc = new Location("", getX(), getY(), getZ(), 0F, 0F))) {
+					if (networkManager.player.getLocation().isInRange(6, loc)) {
 						Main.getInstance().mainWorld.setBlockAt(getX(), getY(), getZ(), BlockId.AIR, (byte) 0);
 					}
 					Main.getInstance().mainWorld.broadcastSound("dig.grass", x, y, z, 1F, (byte) 63, loc, networkManager.player);
+					Main.getInstance().mainWorld.addEntity(new EntityItem(loc, new ItemStack((short)2, (byte) 4, (short) 0)));
 				}
 			}
 		});

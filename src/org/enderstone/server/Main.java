@@ -310,6 +310,7 @@ public class Main implements Runnable {
 				mainWorld.doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.getRenderDistance() - 1, MAX_VIEW_DISTANCE));
 				p.updatePlayers(onlinePlayers);
 			}
+			this.mainWorld.updateEntities(onlinePlayers);
 		}
 	}
 

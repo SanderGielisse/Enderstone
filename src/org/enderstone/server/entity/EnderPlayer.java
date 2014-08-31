@@ -40,8 +40,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public final ClientSettings clientSettings = new ClientSettings();
 	public final NetworkManager networkManager;
 	public final String playerName;
-	public DataWatcher dataWatcher;
 	public HashSet<String> visiblePlayers = new HashSet<>();
+	public HashSet<Entity> canSeeEntity = new HashSet<>();
 	/**
 	 * If this is above 0, then the server is waiting for a correction on the last teleport the server sended
 	 */
@@ -150,7 +150,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return playerName;
 	}
 
-	public void onJoin() {
+	@Override
+	public void onSpawn() {
 		this.updateDataWatcher();
 
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(this.getPlayerName(), this.isOnline, (short) 1);
@@ -161,9 +162,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " joined the game!");
 	}
 
-	private void updateDataWatcher() {
-		this.dataWatcher = new DataWatcher();
-
+	@Override
+	public void updateDataWatcher() {
 		int meaning = 0;
 
 		if (isOnFire)
@@ -177,10 +177,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 		if (isInvisible)
 			meaning = (byte) (meaning | 0x20);
 
-		this.dataWatcher.watch(0, (byte) meaning);
-		this.dataWatcher.watch(1, (short) 0);
-		this.dataWatcher.watch(6, 1F);
-		this.dataWatcher.watch(8, (byte) 0);
+		this.getDataWatcher().watch(0, (byte) meaning);
+		this.getDataWatcher().watch(1, (short) 0);
+		this.getDataWatcher().watch(6, 1F);
+		this.getDataWatcher().watch(8, (byte) 0);
 	}
 
 	@Override
@@ -188,7 +188,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		List<ProfileProperty> list = new ArrayList<>();
 		ProfileProperty prop = new ProfileProperty("textures", this.textureValue, this.textureSignature);
 		list.add(prop);
-		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.dataWatcher);
+		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.getDataWatcher());
 	}
 
 	public void onPlayerChat(final String message) {
@@ -436,7 +436,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	protected float getBaseHealth() {
-		return 4;
+		return 20;
 	}
 
 	@Override

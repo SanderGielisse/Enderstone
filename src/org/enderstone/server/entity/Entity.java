@@ -16,6 +16,7 @@ public abstract class Entity {
 	private final Location location;
 	private float health = Float.NaN;
 	private float maxHealth = Float.NaN;
+	private DataWatcher dataWatcher = new DataWatcher();
 
 	public Entity(Location location) {
 		this.entityId = entityCount++;
@@ -41,8 +42,10 @@ public abstract class Entity {
 	public abstract void onLeftClick(EnderPlayer attacker);
 
 	public void damage(float damage) {
-		if(Float.isNaN(this.health)) initHealth();
-		if (health == 0) return;
+		if (Float.isNaN(this.health))
+			initHealth();
+		if (health == 0)
+			return;
 		this.setHealth(Math.max(health - damage, 0));
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
 			if (p.getLocation().isInRange(25, getLocation())) {
@@ -54,17 +57,16 @@ public abstract class Entity {
 	}
 
 	public final boolean isDead() {
-		if(Float.isNaN(this.health)) initHealth();
+		if (Float.isNaN(this.health))
+			initHealth();
 		return this.health <= 0;
 	}
-	
-	public final void kill()
-	{
+
+	public final void kill() {
 		damage(1000);
 	}
-	
-	public final void heal()
-	{
+
+	public final void heal() {
 		setHealth(this.getMaxHealth());
 	}
 
@@ -72,36 +74,42 @@ public abstract class Entity {
 	}
 
 	public float getHealth() {
-		if(Float.isNaN(this.health)) initHealth();
+		if (Float.isNaN(this.health))
+			initHealth();
 		return health;
 	}
 
 	public final float getMaxHealth() {
-		if(Float.isNaN(this.health)) initHealth();
+		if (Float.isNaN(this.health))
+			initHealth();
 		return maxHealth;
 	}
 
 	public final void setMaxHealth(float health) {
-		if(Float.isNaN(this.health)) initHealth();
+		if (Float.isNaN(this.health))
+			initHealth();
 		setHealth(Math.min(health, this.health));
 		this.maxHealth = health;
 	}
 
 	public final void setHealth(float health) {
-		if(Float.isNaN(this.health)) initHealth();
-		if (health == this.health) return;
-		if (health > this.maxHealth) throw new IllegalArgumentException("Health value too large");
+		if (Float.isNaN(this.health))
+			initHealth();
+		if (health == this.health)
+			return;
+		if (health > this.maxHealth)
+			throw new IllegalArgumentException("Health value too large");
 		float lastHealth = this.health;
 		this.health = health;
-		onHealthUpdate(this.health,lastHealth);
+		onHealthUpdate(this.health, lastHealth);
 	}
-	
+
 	protected abstract String getDamageSound();
-	
+
 	protected abstract String getDeadSound();
-	
+
 	protected abstract float getBaseHealth();
-	
+
 	protected abstract float getBaseMaxHealth();
 
 	public abstract void updatePlayers(List<EnderPlayer> onlinePlayers);
@@ -112,8 +120,38 @@ public abstract class Entity {
 
 	public abstract boolean isValid();
 
+	public abstract void updateDataWatcher();
+
+	public abstract void onSpawn();
+
 	private void initHealth() {
 		this.health = getBaseHealth();
 		this.maxHealth = getBaseMaxHealth();
+	}
+
+	public DataWatcher getDataWatcher() {
+		return this.dataWatcher;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + entityId;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Entity other = (Entity) obj;
+		if (entityId != other.entityId)
+			return false;
+		return true;
 	}
 }

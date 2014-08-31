@@ -65,7 +65,7 @@ public class PacketInLoginStart extends Packet {
 						public void run() {
 							Main.getInstance().onlinePlayers.add(networkManager.player);
 							try {
-								networkManager.player.onJoin();
+								networkManager.player.onSpawn();
 							} catch (Exception e) {
 								e.printStackTrace();
 							}

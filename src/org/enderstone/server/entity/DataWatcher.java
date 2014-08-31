@@ -1,15 +1,16 @@
 package org.enderstone.server.entity;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DataWatcher {
 
-	private final Map<Integer, Object> watched = Collections.synchronizedMap(new HashMap<Integer, Object>());
+	private final Map<Integer, Object> watched = new HashMap<Integer, Object>();
 
-	public synchronized void watch(int index, Object value) {
-		this.watched.put(index, value);
+	public void watch(int index, Object value) {
+		synchronized (watched) {
+			this.watched.put(index, value);
+		}
 	}
 
 	public Map<Integer, Object> getWatchedCopy() {
