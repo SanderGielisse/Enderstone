@@ -39,7 +39,6 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws DecodeException {
-		//System.out.println("Minecratservercodex.decode");
 		while (buf.readableBytes() > 0) {
 			buf.markReaderIndex();
 			int readBytes = buf.readableBytes();
@@ -49,7 +48,6 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 				byte in;
 				while (true) {
 					if (readBytes < 1) {
-						//System.out.println("cannot read fully length marker");
 						buf.resetReaderIndex();
 						return;
 					}
@@ -67,7 +65,6 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 				}
 			}
 			if (buf.readableBytes() < length) {
-				//System.out.println("cannot read full packet");
 				buf.resetReaderIndex();
 				return;
 			}

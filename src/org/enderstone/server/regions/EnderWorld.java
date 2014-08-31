@@ -193,7 +193,6 @@ public class EnderWorld {
 						informer.sendChunk(c);
 						index++;
 					}
-					if (index > 0) EnderLogger.debug("Send " + index + " chunks to player: " + player.getName());
 				}
 			} finally {
 				informer.done();
