@@ -70,13 +70,9 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		encryptionSettings.verifyToken = new byte[16];
 		Main.random.nextBytes(encryptionSettings.verifyToken);
 	}
-
-	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object msg) {
-		if (this.ctx == null) this.ctx = ctx;
-		((Packet) msg).onRecieve(this);
-		//EnderLogger.debug("in: " + msg);
-		
+	
+	public void forcePacketFlush()
+	{
 		synchronized (packets) {
 			Packet p;
 			while ((p = packets.poll()) != null) {
@@ -86,6 +82,14 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			}
 			ctx.flush();
 		}
+	}
+
+	@Override
+	public void channelRead(ChannelHandlerContext ctx, Object msg) {
+		if (this.ctx == null) this.ctx = ctx;
+		((Packet) msg).onRecieve(this);
+		//EnderLogger.debug("in: " + msg);
+		forcePacketFlush();
 	}
 
 	@Override
@@ -145,7 +149,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	public void setupEncryption(final SecretKey key) throws IOException {
 		final Cipher decrypter = generateKey(2, key);
 		final Cipher encrypter = generateKey(1, key);
-		ctx.pipeline().addFirst("decrypt", new MessageToMessageDecoder<ByteBuf>() {
+		ctx.pipeline().addBefore("decrypt", "packet_rw_converter", new MessageToMessageDecoder<ByteBuf>() {
 
 			NetworkEncrypter chipper = new NetworkEncrypter(decrypter);
 
@@ -156,7 +160,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			}
 
 		});
-		ctx.pipeline().addFirst("encrypt", new MessageToByteEncoder<ByteBuf>() {
+		ctx.pipeline().addBefore("encrypt", "packet_rw_converter", new MessageToByteEncoder<ByteBuf>() {
 
 			NetworkEncrypter chipper = new NetworkEncrypter(encrypter);
 

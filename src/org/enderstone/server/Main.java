@@ -299,7 +299,7 @@ public class Main implements Runnable {
 	private int latestChunkUpdate = 0;
 
 	private void serverTick() {
-		if ((latestKeepAlive++ & 0b0111_1111) == 0) { // faster than % 127 == 0
+		if ((latestKeepAlive++ & 0b0011_1111) == 0) { // faster than % 64 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));
 			}
@@ -307,6 +307,11 @@ public class Main implements Runnable {
 
 		if ((latestChunkUpdate++ & 0b0001_1111) == 0) { // faster than % 31 == 0
 			for (EnderPlayer p : onlinePlayers) {
+				if(p.isDead()) 
+				{
+					p.networkManager.forcePacketFlush();
+					continue;
+				}
 				mainWorld.doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.getRenderDistance() - 1, MAX_VIEW_DISTANCE));
 				p.updatePlayers(onlinePlayers);
 			}

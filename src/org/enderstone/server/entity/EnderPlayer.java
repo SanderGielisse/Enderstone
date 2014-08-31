@@ -184,7 +184,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		List<ProfileProperty> list = new ArrayList<>();
 		ProfileProperty prop = new ProfileProperty("textures", this.textureValue, this.textureSignature);
 		list.add(prop);
-		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.getDataWatcher());
+		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid.toString(), this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.getDataWatcher());
 	}
 
 	public void onPlayerChat(final String message) {
