@@ -14,6 +14,9 @@ import org.enderstone.server.chat.ChatColor;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
+import org.enderstone.server.inventory.Inventory;
+import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.inventory.Inventory.InventoryType;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
@@ -63,6 +66,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public double yLocation;
 	public short food = 20;
 	public float foodSaturation = 0;
+	public Inventory inventory;
 
 	// our alternative for the stupid Steve skins :D
 	private final String textureValue;
@@ -156,6 +160,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 			this.getNetworkManager().sendPacket(new PacketOutPlayerListItem(player.getPlayerName(), true, (short) 1));
 		}
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " joined the game!");
+		this.inventory = new Inventory(this);
 	}
 
 	@Override
