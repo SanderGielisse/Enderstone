@@ -30,13 +30,13 @@ public class Inventory {
 	public void setItem(InventoryType type, int slotNumber, ItemStack stack) {
 		int slot = 0;
 		if (type == InventoryType.EQUIPMENT) {
-			slot = this.EQUIPMENT.get(slot);
+			slot = this.EQUIPMENT.get(slotNumber);
 		} else if (type == InventoryType.CRAFTING) {
-			slot = this.CRAFTING.get(slot);
+			slot = this.CRAFTING.get(slotNumber);
 		} else if (type == InventoryType.INVENTORY) {
-			slot = this.INVENTORY.get(slot);
+			slot = this.INVENTORY.get(slotNumber);
 		} else if (type == InventoryType.HOTBAR) {
-			slot = this.HOTBAR.get(slot);
+			slot = this.HOTBAR.get(slotNumber);
 		}
 		this.ITEMS.put(slot, stack);
 
