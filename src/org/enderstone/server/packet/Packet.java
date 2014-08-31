@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import org.enderstone.server.Vector;
 import org.enderstone.server.entity.DataWatcher;
 import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.inventory.Inventory.InventoryType;
 import org.enderstone.server.packet.codec.DecodeException;
 
 public abstract class Packet {

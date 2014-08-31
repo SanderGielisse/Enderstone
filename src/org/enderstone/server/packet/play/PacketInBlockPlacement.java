@@ -50,7 +50,7 @@ public class PacketInBlockPlacement extends Packet {
 
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
-		if (getHeldItem().getBlockId() == -1) {
+		if (getHeldItem() == null || getHeldItem().getBlockId() == -1) {
 			return;
 		}
 		Main.getInstance().sendToMainThread(new Runnable() {

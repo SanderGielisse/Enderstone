@@ -2,6 +2,9 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.inventory.Inventory.InventoryType;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutRespawn extends Packet {
@@ -39,5 +42,10 @@ public class PacketOutRespawn extends Packet {
 	@Override
 	public byte getId() {
 		return 0x07;
+	}
+	
+	@Override
+	public void onSend(NetworkManager networkManager) {
+		networkManager.player.inventory.setItem(InventoryType.HOTBAR, 1, new ItemStack((short) 2, (byte) 3, (short) 0));
 	}
 }
