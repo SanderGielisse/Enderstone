@@ -320,7 +320,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		if (!this.isOnline)
 			return false;
 		try {
-			this.networkManager.sendPacket(new PacketOutChatMessage(message.toMessageJson(), true));
+			this.networkManager.sendPacket(new PacketOutChatMessage(message));
 			return true;
 		} catch (Exception ex) {
 			try {

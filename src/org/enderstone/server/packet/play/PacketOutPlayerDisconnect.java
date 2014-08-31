@@ -7,6 +7,7 @@ import org.enderstone.server.packet.Packet;
 
 public class PacketOutPlayerDisconnect extends Packet {
 	private String reason;
+	private Message message;
 
 	public PacketOutPlayerDisconnect() {
 	}
@@ -16,7 +17,7 @@ public class PacketOutPlayerDisconnect extends Packet {
 	}
 	
 	public PacketOutPlayerDisconnect(Message reason) {
-		this.reason = reason.toMessageJson();
+		this.message = reason;
 	}
 
 	@Override
@@ -26,11 +27,13 @@ public class PacketOutPlayerDisconnect extends Packet {
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
+		if(this.reason == null) this.reason = message.toMessageJson();
 		writeString(reason, buf);
 	}
 
 	@Override
 	public int getSize() throws IOException {
+		if(this.reason == null) this.reason = message.toMessageJson();
 		return getStringSize(reason) + getVarIntSize(getId());
 	}
 
