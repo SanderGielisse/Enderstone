@@ -99,8 +99,6 @@ public abstract class Packet {
 		buf.writeShort(stack.getDamage());
 		buf.writeShort(stack.getNbtLength());
 		
-		EnderLogger.warn("ItemStack ID: " + stack.getBlockId() + " AMOUNT: " + stack.getAmount() + " DAMAGE: " + stack.getDamage() + " NBT LENGTH: " + stack.getNbtLength());
-		
 		if (stack.getNbtLength() == -1) {
 			return;
 		}
