@@ -1,6 +1,7 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import org.enderstone.server.packet.Packet;
 
 public class PacketInEntityAction extends Packet {
@@ -10,19 +11,19 @@ public class PacketInEntityAction extends Packet {
 	private int jumpBoost;
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		this.entityId = buf.readInt();
 		this.actionId = buf.readByte();
 		this.jumpBoost = buf.readInt();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return (getIntSize() * 2) + 1 + getVarIntSize(getId());
 	}
 

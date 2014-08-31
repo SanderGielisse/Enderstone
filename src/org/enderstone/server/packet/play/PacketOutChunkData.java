@@ -1,7 +1,8 @@
 package org.enderstone.server.packet.play;
 
-import java.util.zip.Deflater;
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+import java.util.zip.Deflater;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutChunkData extends Packet {
@@ -28,12 +29,12 @@ public class PacketOutChunkData extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		buf.writeInt(x);
 		buf.writeInt(z);
 		buf.writeBoolean(groundUpContinuous);
@@ -44,7 +45,7 @@ public class PacketOutChunkData extends Packet {
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return (3 * getIntSize()) + 1 + (2 * getShortSize()) + data.length + getVarIntSize(getId());
 	}
 
@@ -67,5 +68,10 @@ public class PacketOutChunkData extends Packet {
 
 	public static PacketOutChunkData clearChunk(int x, int z) {
 		return new PacketOutChunkData(x, z, true, (short) 0, (short) 0, emptyChunk.length, emptyChunk);
+	}
+
+	@Override
+	public String toString() {
+		return "PacketOutChunkData{" + "x=" + x + ", z=" + z + ", size=" + size + '}';
 	}
 }

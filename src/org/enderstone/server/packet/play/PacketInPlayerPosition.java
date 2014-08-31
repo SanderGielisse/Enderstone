@@ -1,11 +1,10 @@
 package org.enderstone.server.packet.play;
 
-import org.enderstone.server.EnderLogger;
 
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
-import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
@@ -29,7 +28,7 @@ public class PacketInPlayerPosition extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		this.x = buf.readDouble();
 		this.feetY = buf.readDouble();
 		this.headY = buf.readDouble();
@@ -38,12 +37,12 @@ public class PacketInPlayerPosition extends Packet {
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return (getDoubleSize() * 4) + 1 + getVarIntSize(getId());
 	}
 

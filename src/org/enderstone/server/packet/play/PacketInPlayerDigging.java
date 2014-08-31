@@ -1,12 +1,12 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.regions.BlockId;
-import org.enderstone.server.regions.EnderChunk;
 
 public class PacketInPlayerDigging extends Packet {
 
@@ -17,7 +17,7 @@ public class PacketInPlayerDigging extends Packet {
 	private byte face;
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		this.status = buf.readByte();
 		this.x = buf.readInt();
 		this.y = buf.readByte();
@@ -26,12 +26,12 @@ public class PacketInPlayerDigging extends Packet {
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return 3 + (2 * getIntSize()) + getVarIntSize(getId());
 	}
 

@@ -1,6 +1,7 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.inventory.ItemStack;
@@ -20,7 +21,7 @@ public class PacketInBlockPlacement extends Packet {
 	private byte cursorZ;
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		this.x = buf.readInt();
 		this.y = buf.readByte();
 		this.z = buf.readInt();
@@ -33,12 +34,12 @@ public class PacketInBlockPlacement extends Packet {
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return (getIntSize() * 2) + 5 + getItemStackSize(this.heldItem) + getVarIntSize(getId());
 	}
 
