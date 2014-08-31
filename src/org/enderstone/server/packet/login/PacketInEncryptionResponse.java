@@ -1,27 +1,17 @@
 package org.enderstone.server.packet.login;
 
+import static org.enderstone.server.uuid.UUIDFactory.parseUUID;
 import io.netty.buffer.ByteBuf;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.enderstone.server.EnderLogger;
-import org.enderstone.server.Main;
 import org.enderstone.server.entity.PlayerTextureStore;
 import org.enderstone.server.packet.NetworkEncrypter;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.uuid.ServerRequest;
-import static org.enderstone.server.uuid.UUIDFactory.parseUUID;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**

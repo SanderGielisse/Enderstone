@@ -77,7 +77,6 @@ public class EntityItem extends Entity {
 				pl.canSeeEntity.add(this);
 				pl.getNetworkManager().sendPacket(spawnPacket);
 				pl.getNetworkManager().sendPacket(packet);
-				EnderLogger.warn("Sent to " + pl.getPlayerName());
 			} else if (!pl.getLocation().isInRange(40, this.getLocation()) && pl.canSeeEntity.contains(this)) {
 				pl.canSeeEntity.remove(this);
 				pl.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));

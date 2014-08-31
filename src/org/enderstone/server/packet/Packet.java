@@ -92,16 +92,12 @@ public abstract class Packet {
 	public static void writeItemStack(ItemStack stack, ByteBuf buf) {
 		if (stack == null) {
 			buf.writeShort(-1);
-			
-			EnderLogger.warn("ItemStack: NULL");
 			return;
 		}
 		buf.writeShort(stack.getBlockId());
 		buf.writeByte(stack.getAmount());
 		buf.writeShort(stack.getDamage());
 		buf.writeShort(stack.getNbtLength());
-		
-		EnderLogger.warn("ItemStack ID: " + stack.getBlockId() + " AMOUNT: " + stack.getAmount() + " DAMAGE: " + stack.getDamage() + " NBT LENGTH: " + stack.getNbtLength());
 		
 		if (stack.getNbtLength() == -1) {
 			return;
