@@ -1,6 +1,7 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import org.enderstone.server.packet.Packet;
 
 public class PacketKeepAlive extends Packet {
@@ -15,17 +16,17 @@ public class PacketKeepAlive extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		this.keepAliveId = buf.readInt();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		buf.writeInt(keepAliveId);
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return getIntSize() + getVarIntSize(getId());
 	}
 

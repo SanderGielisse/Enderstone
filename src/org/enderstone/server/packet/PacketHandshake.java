@@ -1,6 +1,7 @@
 package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 
 public class PacketHandshake extends Packet {
 
@@ -20,7 +21,7 @@ public class PacketHandshake extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		this.protocol = readVarInt(buf);
 		this.hostname = readString(buf);
 		this.port = buf.readShort();
@@ -28,7 +29,7 @@ public class PacketHandshake extends Packet {
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		writeVarInt(protocol, buf);
 		writeString(hostname, buf);
 		buf.writeShort(port);
@@ -36,7 +37,7 @@ public class PacketHandshake extends Packet {
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return getVarIntSize(protocol) + getStringSize(hostname) + getShortSize() + getVarIntSize(nextState) + getVarIntSize(getId());
 	}
 
@@ -60,4 +61,11 @@ public class PacketHandshake extends Packet {
 	public int getNextState() {
 		return nextState;
 	}
+
+	@Override
+	public void onRecieve(NetworkManager networkManager) {
+		networkManager.latestHandshakePacket = this;
+	}
+	
+	
 }

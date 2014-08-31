@@ -1,6 +1,7 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.packet.JSONStringBuilder;
 import org.enderstone.server.packet.Packet;
@@ -23,7 +24,7 @@ public class PacketOutChatMessage extends Packet {
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		if (getStringSize(jsonChat) > 32767) {
 			throw new IllegalArgumentException("The chat messages can't be any longer than 32767 bytes!");
 		}
@@ -31,7 +32,7 @@ public class PacketOutChatMessage extends Packet {
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return getStringSize(this.jsonChat) + getVarIntSize(getId());
 	}
 
@@ -41,7 +42,7 @@ public class PacketOutChatMessage extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 }

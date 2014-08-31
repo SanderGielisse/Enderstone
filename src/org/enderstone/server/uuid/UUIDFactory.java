@@ -5,15 +5,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
+import org.enderstone.server.entity.PlayerTextureStore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class UUIDFactory {
 
-	private final Map<String, UUID> uuidCache = Collections.synchronizedMap(new HashMap<String, UUID>());
-	private final Map<UUID, JSONObject> textureCache = Collections.synchronizedMap(new HashMap<UUID, JSONObject>());
+	private final Map<String, UUID> uuidCache = new HashMap<>();
+	private final Map<UUID, PlayerTextureStore> textureCache = new HashMap<>();
 
 	public UUID getPlayerUUIDAsync(String name) {
 		synchronized (uuidCache) {
@@ -25,8 +27,8 @@ public class UUIDFactory {
 			String URL = "https://api.mojang.com/users/profiles/minecraft/" + name;
 			JSONObject json = new ServerRequest(URL).get();
 			UUID uuid;
-			if(json == null)
-				uuid = Main.getInstance().onlineMode ? null : UUID.randomUUID();
+			if (json == null)
+				return null;
 			else
 				uuid = parseUUID(json.getString("id"));
 			synchronized (uuidCache) {
@@ -34,12 +36,13 @@ public class UUIDFactory {
 			}
 			return uuid;
 		} catch (JSONException | IOException e) {
-			// something went wrong
+			EnderLogger.warn("Unable to find a uuid for OfflinePlayerUUID: "+name);
+			EnderLogger.warn(e.getMessage());
 			return null;
 		}
 	}
 
-	public JSONObject getTextureDataAsync(UUID uuid) {
+	public PlayerTextureStore getTextureDataAsync(UUID uuid) {
 		synchronized (textureCache) {
 			if (textureCache.containsKey(uuid)) {
 				return textureCache.get(uuid);
@@ -48,25 +51,21 @@ public class UUIDFactory {
 
 		try {
 			String URL = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false";
-			JSONArray properties = new ServerRequest(URL).get().getJSONArray("properties");
-			for (int i = 0; i < properties.length(); i++) {
-				JSONObject property = properties.getJSONObject(i);
-				if (property.getString("name").equals("textures")) {
-					synchronized (textureCache) {
-						textureCache.put(uuid, property);
-					}
-					return property;
-				}
+			PlayerTextureStore store = new PlayerTextureStore(new ServerRequest(URL).get().getJSONArray("properties"));
+
+			synchronized (textureCache) {
+				textureCache.put(uuid, store);
 			}
-			return null;
+			return store;
 		} catch (JSONException | IOException e) {
-			// something went wrong
-			return null;
+			EnderLogger.warn("Unable to find a skin for OfflinePlayerUUID: "+uuid);
+			EnderLogger.warn(e.getMessage());
+			return PlayerTextureStore.DEFAULT_STORE;
 		}
 	}
 
-	private static UUID parseUUID(String uuidStr) {
-		String[] uuidComponents = new String[] { uuidStr.substring(0, 8), uuidStr.substring(8, 12), uuidStr.substring(12, 16), uuidStr.substring(16, 20), uuidStr.substring(20, uuidStr.length()) };
+	public static UUID parseUUID(String uuidStr) {
+		String[] uuidComponents = new String[]{uuidStr.substring(0, 8), uuidStr.substring(8, 12), uuidStr.substring(12, 16), uuidStr.substring(16, 20), uuidStr.substring(20, uuidStr.length())};
 		StringBuilder builder = new StringBuilder();
 		for (String component : uuidComponents) {
 			builder.append(component).append('-');

@@ -1,6 +1,7 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 
@@ -14,7 +15,7 @@ public class PacketInClickWindow extends Packet {
 	private ItemStack itemStack;
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		this.windowId = buf.readByte();
 		this.slot = buf.readShort();
 		this.button = buf.readByte();
@@ -24,12 +25,12 @@ public class PacketInClickWindow extends Packet {
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return 3 + (getShortSize() * 2) + getItemStackSize(itemStack) + getVarIntSize(getId());
 	}
 

@@ -1,15 +1,20 @@
 package org.enderstone.server;
 
-import org.enderstone.server.packet.NetworkManager;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import java.util.concurrent.TimeUnit;
+import org.enderstone.server.packet.NetworkManager;
 
 public class MinecraftServerInitializer extends ChannelInitializer<SocketChannel> {
 
 	@Override
 	protected void initChannel(SocketChannel channel) throws Exception {
 		ChannelPipeline line = channel.pipeline();
-		line.addLast("packet_handler", new NetworkManager());
+		NetworkManager manager = new NetworkManager();
+		line.addLast(new ReadTimeoutHandler(30,TimeUnit.SECONDS));
+		line.addLast("packet_converter", manager.createCodex());
+		line.addLast("packet_reader", manager);
 	}
 }

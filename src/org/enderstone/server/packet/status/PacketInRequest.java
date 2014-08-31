@@ -1,7 +1,7 @@
 package org.enderstone.server.packet.status;
 
 import io.netty.buffer.ByteBuf;
-
+import java.io.IOException;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.NetworkManager;
@@ -13,17 +13,17 @@ public class PacketInRequest extends Packet {
 	// no fields
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		// none
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return getVarIntSize(getId());
 	}
 

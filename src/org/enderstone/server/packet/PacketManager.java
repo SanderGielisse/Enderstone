@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.enderstone.server.packet.login.PacketInEncryptionResponse;
 import org.enderstone.server.packet.login.PacketInLoginStart;
 import org.enderstone.server.packet.play.PacketInAbilities;
 import org.enderstone.server.packet.play.PacketInAnimation;
@@ -42,6 +43,7 @@ public class PacketManager {
 		status.put(0x01, PacketPing.class);
 
 		login.put(0x00, PacketInLoginStart.class);
+		login.put(0x01, PacketInEncryptionResponse.class);
 
 		play.put(0x00, PacketKeepAlive.class);
 		play.put(0x01, PacketInChatMessage.class);
@@ -66,7 +68,7 @@ public class PacketManager {
 		play.put(0x0E, PacketInClickWindow.class);
 	}
 
-	public static Class<? extends Packet> getPacket(NetworkManager manager, int id, HandshakeState handshake) {
+	public static Class<? extends Packet> getPacket(int id, HandshakeState handshake) {
 
 		Map<Integer, Class<? extends Packet>> map;
 
@@ -81,9 +83,12 @@ public class PacketManager {
 		}
 
 		Class<? extends Packet> packet = map.get(id);
-		if(packet != null)
-			return packet;
-		manager.sendPacket(new PacketOutPlayerDisconnect(JSONStringBuilder.build("Packet ID 0x" + Integer.toHexString(id) + " " + handshake.toString() + " does not have a valid packet.")));
-		throw new RuntimeException("Packet ID 0x" + Integer.toHexString(id) + " " + handshake.toString() + " does not have a valid packet.");
+		return packet;
+	}
+	public static Packet getPacketInstance(int id, HandshakeState handshake) throws InstantiationException, IllegalAccessException {
+		Class<? extends Packet> pclass = getPacket(id, handshake);
+		if(pclass != null)
+			return pclass.newInstance();
+		return null;
 	}
 }

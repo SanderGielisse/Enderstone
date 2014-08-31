@@ -1,6 +1,9 @@
 package org.enderstone.server.packet.login;
 
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+import org.enderstone.server.packet.HandshakeState;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutLoginSucces extends Packet {
@@ -17,19 +20,19 @@ public class PacketOutLoginSucces extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		this.UUID = readString(buf);
 		this.username = readString(buf);
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		writeString(UUID, buf);
 		writeString(username, buf);
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 		return getStringSize(username) + getStringSize(UUID) + getVarIntSize(getId());
 	}
 
@@ -44,5 +47,11 @@ public class PacketOutLoginSucces extends Packet {
 
 	public String getUsername() {
 		return username;
+	}
+	
+	@Override
+	public void onSend(NetworkManager manager)
+	{
+		manager.getCodex().setState(HandshakeState.PLAY);
 	}
 }

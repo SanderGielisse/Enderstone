@@ -22,7 +22,12 @@ public class ServerRequest {
 	public static JSONObject parseDataFromURL(String connect) throws IOException {
 		URL url = new URL(connect);
 		URLConnection uc = url.openConnection();
-		try (Scanner scanner = new Scanner(uc.getInputStream())) {
+		uc.setConnectTimeout(5000);
+		uc.setReadTimeout(5000);
+		uc.connect();
+		String encoding = uc.getContentEncoding();
+		encoding = encoding == null ? "UTF-8" : encoding;
+		try (Scanner scanner = new Scanner(uc.getInputStream(),encoding)) {
 			scanner.useDelimiter("\\A");
 			return new JSONObject(scanner.next());
 		}

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
@@ -46,7 +47,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	 * If this is above 0, then the server is waiting for a correction on the last teleport the server sended
 	 */
 	public int waitingForValidMoveAfterTeleport = 0;
-	public final String uuid;
+	public final UUID uuid;
 	public volatile boolean isOnline = true;
 	public boolean isCreative = false;
 	public boolean godMode = false;
@@ -64,9 +65,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public float foodSaturation = 0;
 
 	// our alternative for the stupid Steve skins :D
-	private volatile String textureValue = "eyJ0aW1lc3RhbXAiOjE0MDkwODUzMTUyOTUsInByb2ZpbGVJZCI6IjY3NDNhODE0OWQ0MTRkMzNhZjllZTE0M2JjMmQ0NjJjIiwicHJvZmlsZU5hbWUiOiJzYW5kZXIyNzk4IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9jYTgwYTQyMzVkMzc1N2Q0YWI0Nzg2ZGY0NzQxYzE1MmExMWM5ZGVjMGU1YWM5ZmJlOGVmMmM0MjA4YWM2In19fQ==";
-	private volatile String textureSignature = "T/S5/8yNblHMtt5KCnFwymwHOF9RCPh223CwCc3wAUoBRDmYJR2jtlkoLltKp24YZa/s/NTtuaji9g4Dq6hkDC+WvAHJ3UxWHSixumG78EJQxUIHW0QD7wmkeAb2RfipuXG84gnzJ6gFz3aYz7vNM7eZ1dO0KCDKVawsvMkHUvM2BoRUh/rSj0ji6BlQ611FU1peMXep9oAPOcKZFK0snH4Su0qZt8n3dw5087RuhaBGmkT4nYrD7eH43uGDdXs5SLWzLd1d3oQzj0cGL7GiM1Jrg8DcaQoXXqMMuMThviHVi1YVM/sZ7eWVj5Ui4BVOTu2nGSH5Avegq4UOdBILfHadlFroKPEX5uRA3Od+/3hF7ZGBYv+W9/oA8P6gUsnEvAYC4TnM5KWViCg/aJ/7hDYeW6Nv0CjHHz7o3iNy2OxeL3X4jhLSlYRg4gEkejohN5NUeFi1ZRxvhPgJLr2aVKYsMNtKcLfRI567NxuRpLt4KAd62zxB5AzfWJd3qIK8q8a9fIfqiDJ8UHdW801Dhg2HSqmf9xzw3RPqOTkAX3gCpxBsfHedPzScW7RBEoyqIk9LEx5dZuVUBHOlPS2kk/8zTvKWGhFfJKmyrL159ZElPR9DjZoNN1LBmIJEAZ3jRfwZBDZVux8xUYpsrh1vT3DTP+lUMoD0oql3M3i/Lgg=";
-
+	private final String textureValue;
+	private final String textureSignature;
 	public int keepAliveID = 0;
 
 	public ChunkInformer chunkInformer = new ChunkInformer() {
@@ -86,7 +86,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		@Override
 		public void done() {
 			int size = cache.size();
-			if(size == 0)
+			if (size == 0)
 				return;
 			Packet[] packets = new Packet[size];
 			for (int i = 0; i < size; i++) {
@@ -103,18 +103,14 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 	};
 
-	public EnderPlayer(String name, NetworkManager networkManager, String uuid, String textureValue, String textureSignature) {
+	public EnderPlayer(String userName, NetworkManager networkManager, UUID uuid, PlayerTextureStore textures) {
 		super(new Location());
 		this.networkManager = networkManager;
-		this.playerName = name;
+		this.playerName = userName;
 		this.uuid = uuid;
-
-		if (textureValue != null && textureSignature != null) {
-			this.textureValue = textureValue;
-			this.textureSignature = textureSignature;
-		}
-
-		EnderLogger.info(name + " logged in.");
+		this.textureValue = textures.getSkin().value;
+		this.textureSignature = textures.getSkin().signature;
+		EnderLogger.info(userName + " logged in with uuid "+uuid);
 	}
 
 	@Override
@@ -407,15 +403,15 @@ public class EnderPlayer extends Entity implements CommandSender {
 		if (damage <= 0) {
 			throw new IllegalArgumentException("Damage cannot be smaller or equal to zero.");
 		}
-		if(this.godMode) return;
+		if (this.godMode) return;
 		super.damage(damage);
 	}
 
 	@Override
-	protected void onHealthUpdate(float health,float oldHealth) {
+	protected void onHealthUpdate(float health, float oldHealth) {
 		networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
-		if(health > 0) return;
-		Packet packet = new PacketOutEntityDestroy(new Integer[] { this.getEntityId() });
+		if (health > 0) return;
+		Packet packet = new PacketOutEntityDestroy(new Integer[]{this.getEntityId()});
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (ep.visiblePlayers.contains(this.getPlayerName())) {
 				ep.visiblePlayers.remove(this.getPlayerName());
@@ -432,7 +428,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	protected String getDeadSound() {
 		return "game.player.dead";
-	}	
+	}
 
 	@Override
 	protected float getBaseHealth() {
@@ -443,11 +439,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 	protected float getBaseMaxHealth() {
 		return 20;
 	}
-	
 
 	public void setOnGround(boolean onGround) {
 		if (this.isOnGround == false && onGround == true) {
-			if(this.canFly) return; // Flying players don't get damage in vanilla
+			if (this.canFly) return; // Flying players don't get damage in vanilla
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
 			if (change > 0) {
@@ -479,9 +474,11 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public boolean isValid() {
 		return this.isOnline;
 	}
+
 	/**
-	 * Class used to store the client side settings from the user, the reason I included setters and getters
-	 *  is that we can add a event or simulair to the code later on
+	 * Class used to store the client side settings from the user, the reason I included setters and getters is that we
+	 * can add a event or simulair to the code later on
+	 *
 	 * @author ferrybig
 	 */
 	public final class ClientSettings {

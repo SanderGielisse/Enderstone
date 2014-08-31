@@ -1,9 +1,8 @@
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
-
+import java.io.IOException;
 import java.util.List;
-
 import org.enderstone.server.entity.DataWatcher;
 import org.enderstone.server.entity.ProfileProperty;
 import org.enderstone.server.packet.Packet;
@@ -42,12 +41,12 @@ public class PacketOutSpawnPlayer extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws Exception {
+	public void read(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws Exception {
+	public void write(ByteBuf buf) throws IOException {
 		writeVarInt(entityId, buf);
 		writeString(uuid, buf);
 		writeString(name, buf);
@@ -71,7 +70,7 @@ public class PacketOutSpawnPlayer extends Packet {
 	}
 
 	@Override
-	public int getSize() throws Exception {
+	public int getSize() throws IOException {
 
 		int sizee = 0;
 

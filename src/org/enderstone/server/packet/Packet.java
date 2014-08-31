@@ -1,26 +1,30 @@
 package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
+import org.enderstone.server.EnderLogger;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map.Entry;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Vector;
 import org.enderstone.server.entity.DataWatcher;
 import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.packet.codec.DecodeException;
 
 public abstract class Packet {
 
-	public abstract void read(ByteBuf buf) throws Exception;
+	public abstract void read(ByteBuf buf) throws IOException;
 
-	public abstract void write(ByteBuf buf) throws Exception;
+	public abstract void write(ByteBuf buf) throws IOException;
 
-	public abstract int getSize() throws Exception;
+	public abstract int getSize() throws IOException;
 
 	public abstract byte getId();
 
 	public void onRecieve(NetworkManager networkManager) {
-	};
+	}
+
+	public void onSend(NetworkManager networkManager) {
+	}
 
 	public static String readString(ByteBuf buf) {
 		int len = readVarInt(buf);
@@ -61,7 +65,7 @@ public abstract class Packet {
 		try {
 			b = s.getBytes("UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			throw new Error("No UTF-8 support? This server platform is not supported!", e);
 		}
 		writeVarInt(b.length, buf);
 		buf.writeBytes(b);
@@ -90,7 +94,7 @@ public abstract class Packet {
 			buf.writeShort(-1);
 			
 			EnderLogger.warn("ItemStack: NULL");
-			
+			return;
 		}
 		buf.writeShort(stack.getBlockId());
 		buf.writeByte(stack.getAmount());
@@ -283,5 +287,26 @@ public abstract class Packet {
 
 	public static int getDoubleSize() {
 		return 8;
+	}
+
+	public void writeFully(ByteBuf buf) throws IOException, DecodeException {
+		int writerIndex = buf.writerIndex();
+		int packetContentSize  = getSize();
+		int id = getId();
+		int exceptedSize = getVarIntSize(packetContentSize);
+		int totalSize = exceptedSize+packetContentSize;
+		buf.ensureWritable(totalSize);
+		
+		writeVarInt(packetContentSize, buf);
+		writeVarInt(id, buf);
+		write(buf);
+		
+		int newIndex = buf.writerIndex();
+		if (writerIndex + totalSize != newIndex) {
+			throw new DecodeException("!!! Invalid send packet !!! "
+					+ "\nExcepted size: " + totalSize + " "
+					+ "\nReal size:" + (buf.writerIndex() - writerIndex) + " "
+					+ "\nPacket: " + this.toString());
+		}
 	}
 }
