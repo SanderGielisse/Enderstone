@@ -35,6 +35,7 @@ public class EnderWorld {
 	private final Random random = new Random();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
 	public final Set<Entity> entities = new HashSet<>();
+	private Location spawnLocation = new Location(null, 0, 100, 0, 0f, 0f);
 
 	public EnderChunk getOrCreateChunk(int x, int z) {
 		EnderChunk r = getChunk(x, z);
@@ -240,4 +241,13 @@ public class EnderWorld {
 	public Block getBlock(int x, int y, int z) {
 		return new EnderBlock(x, y, z, this);
 	}
+
+	public Location getSpawn() {
+		return this.spawnLocation;
+	}
+
+	public void setSpawn(Location spawnLocation) {
+		this.spawnLocation = spawnLocation;
+	}
+
 }
