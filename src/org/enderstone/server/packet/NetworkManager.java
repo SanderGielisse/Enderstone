@@ -22,6 +22,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import org.enderstone.server.EnderLogger;
+import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.GameMode;
@@ -34,6 +35,7 @@ import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSpawnPosition;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
+import org.enderstone.server.regions.EnderWorld;
 
 public class NetworkManager extends ChannelHandlerAdapter {
 
@@ -205,14 +207,19 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						sendPacket(new PacketOutLoginSucces(player.uuid.toString(), player.getPlayerName()));
 
 						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) GameMode.SURVIVAL.getId(), (byte) 0, (byte) 1, (byte) 60, "default"));
-
-						player.getLocation().setX(0);
-						player.getLocation().setY(100);
-						player.getLocation().setZ(0);
-
-						Main.getInstance().mainWorld.doChunkUpdatesForPlayer(player, player.chunkInformer, 1);
+						
+						EnderWorld mainWorld = Main.getInstance().mainWorld;
+						Location spawn = mainWorld.getSpawn();
+						Location loc = player.getLocation();
+						loc.setX(spawn.getX());
+						loc.setY(spawn.getY());
+						loc.setZ(spawn.getZ());
+						loc.setYaw(spawn.getYaw());
+						loc.setPitch(spawn.getPitch());
+						
+						mainWorld.doChunkUpdatesForPlayer(player, player.chunkInformer, 1);
 						player.onSpawn();
-						sendPacket(new PacketOutSpawnPosition(0, 100, 0));
+						sendPacket(new PacketOutSpawnPosition(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()));
 
 						int i = 0;
 						if (player.isCreative)
@@ -225,7 +232,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 							i = (byte) (i | 0x8);
 
 						sendPacket(new PacketOutPlayerAbilities((byte) i, 0.1F, 0.1F));
-						sendPacket(new PacketOutPlayerPositionLook(0, 100, 0, 0F, 0F, false));
+						sendPacket(new PacketOutPlayerPositionLook(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), false));
 						sendPacket(new PacketOutUpdateHealth(player.getHealth(), player.food, player.foodSaturation));
 
 					} catch (Exception e) {
