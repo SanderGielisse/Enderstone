@@ -231,8 +231,8 @@ public class EnderWorld {
 		this.entities.add(e);
 	}
 
-	public void updateEntities(List<EnderPlayer> onlinePlayers){
-		for(Entity e : this.entities){
+	public void updateEntities(List<EnderPlayer> onlinePlayers) {
+		for (Entity e : this.entities) {
 			e.updatePlayers(onlinePlayers);
 		}
 	}
@@ -240,5 +240,4 @@ public class EnderWorld {
 	public Block getBlock(int x, int y, int z) {
 		return new EnderBlock(x, y, z, this);
 	}
-
 }
