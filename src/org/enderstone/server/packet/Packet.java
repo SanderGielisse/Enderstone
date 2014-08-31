@@ -102,8 +102,6 @@ public abstract class Packet {
 		if (stack.getNbtLength() == -1) {
 			return;
 		}
-
-		EnderLogger.warn("NBT DATA: " + stack.getNbtData());
 		buf.writeBytes(stack.getNbtData());
 	}
 
