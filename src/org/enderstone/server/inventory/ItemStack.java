@@ -58,7 +58,6 @@ public class ItemStack {
 
 		this.nbtData = outStream.toByteArray();
 		this.nbtLength = (short) nbtData.length;
-		EnderLogger.warn("Updated nbtData to length " + nbtLength);
 	}
 
 	public short getBlockId() {

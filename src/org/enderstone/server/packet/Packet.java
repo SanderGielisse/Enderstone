@@ -92,8 +92,6 @@ public abstract class Packet {
 	public static void writeItemStack(ItemStack stack, ByteBuf buf) {
 		if (stack == null) {
 			buf.writeShort(-1);
-			
-			EnderLogger.warn("ItemStack: NULL");
 			return;
 		}
 		buf.writeShort(stack.getBlockId());
