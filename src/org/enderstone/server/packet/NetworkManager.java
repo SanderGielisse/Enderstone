@@ -97,7 +97,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		EnderLogger.exception(cause);
-		this.channelInactive(ctx);
+		ctx.close();
 		super.exceptionCaught(ctx, cause);
 	}
 
