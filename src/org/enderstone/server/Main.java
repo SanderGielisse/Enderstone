@@ -1,5 +1,9 @@
 package org.enderstone.server;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,23 +23,20 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.enderstone.PingCommand;
-import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
+import org.enderstone.server.commands.vanila.KillCommand;
 import org.enderstone.server.commands.vanila.StopCommand;
+import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.uuid.UUIDFactory;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import javax.imageio.ImageIO;
-import javax.xml.bind.DatatypeConverter;
 
 public class Main implements Runnable {
 
@@ -74,6 +75,7 @@ public class Main implements Runnable {
 		commands.registerCommand(new VersionCommand());
 		commands.registerCommand(new TeleportCommand());
 		commands.registerCommand(new StopCommand());
+		commands.registerCommand(new KillCommand());
 	}
 
 	private static Main instance;
