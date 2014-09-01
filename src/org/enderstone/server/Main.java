@@ -25,15 +25,19 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
+import org.enderstone.server.chat.Message;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.enderstone.PingCommand;
+import org.enderstone.server.commands.enderstone.QuitCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
 import org.enderstone.server.commands.vanila.KillCommand;
 import org.enderstone.server.commands.vanila.StopCommand;
 import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
+import org.enderstone.server.packet.play.PacketOutChatMessage;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.uuid.UUIDFactory;
@@ -54,7 +58,7 @@ public class Main implements Runnable {
 			this.add(5); // 1.7.9
 		}
 	});
-	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig", "timbayens" };
+	public static final String[] AUTHORS = new String[]{"bigteddy98", "ferrybig", "timbayens"};
 	public static final Random random = new Random();
 	public volatile Thread mainThread;
 	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();
@@ -76,6 +80,7 @@ public class Main implements Runnable {
 		commands.registerCommand(new TeleportCommand());
 		commands.registerCommand(new StopCommand());
 		commands.registerCommand(new KillCommand());
+		commands.registerCommand(new QuitCommand());
 	}
 
 	private static Main instance;
@@ -88,9 +93,12 @@ public class Main implements Runnable {
 	}
 
 	public void sendToMainThread(Runnable run) {
-		synchronized (sendToMainThread) {
-			sendToMainThread.add(run);
-		}
+		if (isCurrentThreadMainThread())
+			run.run();
+		else
+			synchronized (sendToMainThread) {
+				sendToMainThread.add(run);
+			}
 	}
 
 	public static void main(String[] args) {
@@ -119,7 +127,7 @@ public class Main implements Runnable {
 
 		ThreadGroup nettyListeners = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Netty Listeners");
 		EnderLogger.info("Starting Netty listeners... [" + this.port + "]");
-		for (final int nettyPort : new int[] { this.port }) {
+		for (final int nettyPort : new int[]{this.port}) {
 
 			Thread t;
 			(t = new Thread(nettyListeners, new Runnable() {
@@ -309,8 +317,7 @@ public class Main implements Runnable {
 
 		if ((latestChunkUpdate++ & 0b0001_1111) == 0) { // faster than % 31 == 0
 			for (EnderPlayer p : onlinePlayers) {
-				if(p.isDead()) 
-				{
+				if (p.isDead()) {
 					p.networkManager.forcePacketFlush();
 					continue;
 				}
@@ -320,10 +327,17 @@ public class Main implements Runnable {
 			this.mainWorld.updateEntities(onlinePlayers);
 		}
 	}
+	
+	public void broadcastMessage(Message message)
+	{
+		Packet p = new PacketOutChatMessage(message);
+		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
+			player.getNetworkManager().sendPacket(p);
+		}
+	}
 
 	/**
-	 * Schedule a server shutdown, calling this methodes says to the main thread
-	 * that the server need to shutdown
+	 * Schedule a server shutdown, calling this methodes says to the main thread that the server need to shutdown
 	 */
 	public void scheduleShutdown() {
 		this.mainThread.interrupt();
@@ -363,5 +377,9 @@ public class Main implements Runnable {
 			}
 		}
 		return null;
+	}
+
+	public static boolean isCurrentThreadMainThread() {
+		return Main.getInstance().mainThread == Thread.currentThread();
 	}
 }

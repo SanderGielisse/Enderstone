@@ -2,6 +2,7 @@ package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -24,9 +25,12 @@ import javax.crypto.spec.IvParameterSpec;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.chat.Message;
+import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.GameMode;
 import org.enderstone.server.entity.PlayerTextureStore;
+import org.enderstone.server.packet.codec.DiscardingReader;
 import org.enderstone.server.packet.codec.MinecraftServerCodex;
 import org.enderstone.server.packet.login.PacketOutLoginSucces;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
@@ -52,6 +56,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	private int length;
 
 	private final Queue<Packet> packets = new LinkedList<>();
+	private volatile boolean isConnected = true;
 
 	public EncryptionSettings getEncryptionSettings() {
 		return encryptionSettings;
@@ -72,9 +77,8 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		encryptionSettings.verifyToken = new byte[16];
 		Main.random.nextBytes(encryptionSettings.verifyToken);
 	}
-	
-	public void forcePacketFlush()
-	{
+
+	public void forcePacketFlush() {
 		synchronized (packets) {
 			Packet p;
 			while ((p = packets.poll()) != null) {
@@ -103,34 +107,30 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		if (player != null && player.isOnline()) {
-			final EnderPlayer subPlayer = player;
-			Main.getInstance().sendToMainThread(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						subPlayer.onDisconnect();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					if (Main.getInstance().onlinePlayers.contains(subPlayer)) {
-						Main.getInstance().onlinePlayers.remove(subPlayer);
-
-						for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
-							for (String name : ep.visiblePlayers) {
-								if (name.equals(subPlayer.getPlayerName()) && !subPlayer.getPlayerName().equals(ep.getPlayerName())) {
-									ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[]{subPlayer.getEntityId()}));
-								}
-							}
-						}
-					}
-				}
-			});
-			player.isOnline = false;
-		}
+		this.onDisconnect();
 		super.channelInactive(ctx);
 	}
+
+	private void onDisconnect() {
+		if (this.isConnected == false) return;
+		synchronized (packets) {
+			if (this.isConnected == false) return;
+			this.isConnected = false;
+			this.packets.clear();
+			if (player != null && player.isOnline()) {
+				final EnderPlayer subPlayer = player;
+				Main.getInstance().sendToMainThread(new Runnable() {
+
+					@Override
+					public void run() {
+						subPlayer.onDisconnect();
+					}
+				});
+				player.isOnline = false;
+			}
+		}
+	}
+
 	private MinecraftServerCodex codex;
 
 	public MinecraftServerCodex createCodex() {
@@ -141,11 +141,14 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		return codex;
 	}
 
-	public synchronized void sendPacket(Packet... packets) {
-		for (Packet packet : packets) {
-			this.packets.offer(packet);
+	public void sendPacket(Packet... packets) {
+		if (this.isConnected == false) return;
+		synchronized (packets) {
+			if (this.isConnected == false) return;
+			for (Packet packet : packets) {
+				this.packets.offer(packet);
+			}
 		}
-		ctx.flush();
 	}
 
 	public void setupEncryption(final SecretKey key) throws IOException {
@@ -207,7 +210,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						sendPacket(new PacketOutLoginSucces(player.uuid.toString(), player.getPlayerName()));
 
 						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) GameMode.SURVIVAL.getId(), (byte) 0, (byte) 1, (byte) 60, "default"));
-						
+
 						EnderWorld mainWorld = Main.getInstance().mainWorld;
 						Location spawn = mainWorld.getSpawn();
 						Location loc = player.getLocation();
@@ -216,7 +219,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						loc.setZ(spawn.getZ());
 						loc.setYaw(spawn.getYaw());
 						loc.setPitch(spawn.getPitch());
-						
+
 						mainWorld.doChunkUpdatesForPlayer(player, player.chunkInformer, 1);
 						player.onSpawn();
 						sendPacket(new PacketOutSpawnPosition(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()));
@@ -274,11 +277,28 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	}
 
 	public void disconnect(String message) {
+		this.disconnect(new SimpleMessage(message));
+	}
+
+	public void disconnect(Message message) {
 		try {
-			EnderLogger.error("Disconnecting unverified connection (name: " + this.wantedName + "): " + message);
-			ctx.close();
+			this.ctx.channel().pipeline().addFirst("packet_r_disconnected", new DiscardingReader());
+			if (this.player == null)
+				EnderLogger.info("Kicking unregistered channel (" + this.wantedName + "" + this.uuid + "): " + message.toPlainText());
+			else
+				EnderLogger.info("Kicking (" + this.wantedName + "," + this.uuid + "): " + message.toPlainText());
+			Packet p = codex.getDisconnectionPacket(message);
+			System.out.println(p);
+			this.ctx.channel().pipeline().addFirst(new DiscardingReader());
+			if (p != null)
+				ctx.write(p);
 		} catch (Exception ex) {
 			EnderLogger.exception(ex);
+		}
+		finally
+		{
+			this.onDisconnect();
+			ctx.close();
 		}
 	}
 }

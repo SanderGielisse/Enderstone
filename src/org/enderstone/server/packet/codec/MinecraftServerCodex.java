@@ -5,11 +5,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import java.io.IOException;
 import java.util.List;
+import org.enderstone.server.chat.Message;
 import org.enderstone.server.packet.HandshakeState;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketHandshake;
 import org.enderstone.server.packet.PacketManager;
+import org.enderstone.server.packet.login.PacketOutLoginPlayerDisconnect;
+import org.enderstone.server.packet.play.PacketOutPlayerDisconnect;
 
 /**
  *
@@ -119,5 +122,15 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 
 	public void setState(HandshakeState state) {
 		this.state = state;
+	}
+	
+	public Packet getDisconnectionPacket(Message m)
+	{
+		switch(this.state)
+		{
+			case LOGIN: return new PacketOutLoginPlayerDisconnect(m);
+			case PLAY: return new PacketOutPlayerDisconnect(m);
+		}
+		return null;
 	}
 }

@@ -12,11 +12,12 @@ import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
 import org.enderstone.server.chat.ChatColor;
 import org.enderstone.server.chat.Message;
+import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.inventory.Inventory;
-import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.inventory.Inventory.InventoryType;
+import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
@@ -114,7 +115,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		this.uuid = uuid;
 		this.textureValue = textures.getSkin().value;
 		this.textureSignature = textures.getSkin().signature;
-		EnderLogger.info(userName + " logged in with uuid "+uuid);
+		EnderLogger.info(userName + " logged in with uuid " + uuid);
 	}
 
 	@Override
@@ -159,7 +160,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 			player.getNetworkManager().sendPacket(packet);
 			this.getNetworkManager().sendPacket(new PacketOutPlayerListItem(player.getPlayerName(), true, (short) 1));
 		}
-		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " joined the game!");
+		Main.getInstance().broadcastMessage(new SimpleMessage(ChatColor.YELLOW + this.getPlayerName() + " joined the game!"));
 		this.inventory = new Inventory(this);
 	}
 
@@ -222,7 +223,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 	}
 
-	public void onDisconnect() throws Exception {
+	public void onDisconnect() {
 		this.isOnline = false;
 		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " left the game!");
 		Main.getInstance().mainWorld.players.remove(this);
@@ -230,6 +231,17 @@ public class EnderPlayer extends Entity implements CommandSender {
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
 			p.getNetworkManager().sendPacket(new PacketOutPlayerListItem(this.getPlayerName(), false, (short) 1));
 		}
+		if (Main.getInstance().onlinePlayers.contains(this)) {
+			Main.getInstance().onlinePlayers.remove(this);
+			for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
+				for (String name : ep.visiblePlayers) {
+					if (name.equals(this.getPlayerName()) && !this.getPlayerName().equals(ep.getPlayerName())) {
+						ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[]{this.getEntityId()}));
+					}
+				}
+			}
+		}
+		Main.getInstance().broadcastMessage(new SimpleMessage(ChatColor.YELLOW + playerName + " left the game!"));
 	}
 
 	@Override
