@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import java.io.IOException;
 import java.util.List;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.packet.HandshakeState;
 import org.enderstone.server.packet.NetworkManager;
@@ -38,6 +39,7 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf buf) throws IOException {
 		packet.writeFully(buf);
+		EnderLogger.debug("-->: "+packet);
 	}
 
 	@Override
@@ -98,7 +100,7 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 					default: {
 						Packet packet = PacketManager.getPacketInstance(id, state);
 						if (packet == null)
-							throw new IOException("Packet decode failed:"
+							throw new DecodeException("Packet decode failed:"
 									+ "\nPacket ID: 0x" + Integer.toHexString(id) + ""
 									+ "\nHandshake state: " + this.state
 									+ "\nPacket size: " + length
@@ -108,6 +110,7 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 					}
 					break;
 				}
+				EnderLogger.debug("<--: "+in);
 				out.add(in);
 			} catch (IOException | InstantiationException | IllegalAccessException ex) {
 				throw new DecodeException("Packet decode failed:"

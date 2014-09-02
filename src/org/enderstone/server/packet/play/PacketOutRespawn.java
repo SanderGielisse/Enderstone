@@ -53,12 +53,12 @@ public class PacketOutRespawn extends Packet {
 				
 				@Override
 				public void run() {
-					refillInventory(networkManager);
+					//refillInventory(networkManager);
 				}
 			});
 			return;
 		}
-		refillInventory(networkManager);
+		//refillInventory(networkManager);
 	}
 	
 	public void refillInventory(NetworkManager networkManager){

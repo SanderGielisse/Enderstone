@@ -17,17 +17,17 @@ public class PacketKeepAlive extends Packet {
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
-		this.keepAliveId = buf.readInt();
+		this.keepAliveId = readVarInt(buf);
 	}
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		buf.writeInt(keepAliveId);
+		writeVarInt(keepAliveId, buf);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return getIntSize() + getVarIntSize(getId());
+		return getVarIntSize(keepAliveId) + getVarIntSize(getId());
 	}
 
 	@Override

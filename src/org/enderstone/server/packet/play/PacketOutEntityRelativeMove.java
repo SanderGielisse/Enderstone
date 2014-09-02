@@ -27,7 +27,7 @@ public class PacketOutEntityRelativeMove extends Packet {
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		buf.writeInt(entityId);
+		writeVarInt(entityId,buf);
 		buf.writeByte(dX);
 		buf.writeByte(dY);
 		buf.writeByte(dZ);
@@ -36,7 +36,7 @@ public class PacketOutEntityRelativeMove extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return getIntSize() + 4 + getVarIntSize(getId());
+		return getVarIntSize(entityId) + 4 + getVarIntSize(getId());
 	}
 
 	@Override

@@ -6,8 +6,8 @@ import org.enderstone.server.packet.Packet;
 
 public class PacketInAnimation extends Packet {
 
-	private int entityId;
-	private byte animation;
+	//private int entityId;
+	//private byte animation;
 
 	public PacketInAnimation() {
 		//TODO protocol website UNKNOWN
@@ -15,8 +15,8 @@ public class PacketInAnimation extends Packet {
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
-		this.entityId = buf.readInt();
-		this.animation = buf.readByte();
+		//this.entityId = readVarInt(buf);
+		//this.animation = buf.readByte();
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class PacketInAnimation extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return getIntSize() + 1 + getVarIntSize(getId());
+		return /*getIntSize() + 1*/ + getVarIntSize(getId());
 	}
 
 	@Override
@@ -34,11 +34,11 @@ public class PacketInAnimation extends Packet {
 		return 0x0A;
 	}
 
-	public int getEntityId() {
-		return entityId;
-	}
+	//public int getEntityId() {
+	//	return entityId;
+	//}
 
-	public byte getAnimation() {
-		return animation;
-	}
+	//public byte getAnimation() {
+	//	return animation;
+	//}
 }
