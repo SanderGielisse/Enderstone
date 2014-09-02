@@ -4,6 +4,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
@@ -299,5 +300,13 @@ public class EnderChunk {
 	public boolean isValid()
 	{
 		return this.isValid;
+	}
+	
+	public final AtomicReference<ChunkState> chunkState = new AtomicReference<>(ChunkState.LOADED);
+	
+	public enum ChunkState {
+		LOADED, LOADED_SAVE, 
+		UNLOADED, UNLOADED_SAVE,
+		SAVING, GONE
 	}
 }
