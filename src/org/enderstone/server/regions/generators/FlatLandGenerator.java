@@ -13,7 +13,7 @@ public class FlatLandGenerator extends ChunkGenerator {
 		
 		r[0] = new BlockId[4096];
 		for (int i = 0; i < r[0].length; i++) {
-			r[0][i] = BlockId.COBBLESTONE;
+			r[0][i] = BlockId.DIRT;
 		}
 		return r;
 	}

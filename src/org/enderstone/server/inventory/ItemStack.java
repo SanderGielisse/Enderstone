@@ -23,35 +23,30 @@ public class ItemStack {
 	private short blockId;
 	private byte amount;
 	private short damage;
-	private byte nbtLength;
-	private byte[] nbtData;
 	private CompoundTag compoundTag;
+	
+	public ItemStack(short blockId, byte amount, short damage){
+		this(blockId, amount, damage, null);
+	}
 
-	public ItemStack(short blockId, byte amount, short damage) {
+	public ItemStack(short blockId, byte amount, short damage, CompoundTag compoundTag) {
 		this.blockId = blockId;
 		this.amount = amount;
 		this.damage = damage;
-		this.updateNBTData();
+		this.compoundTag = compoundTag;
+		if (compoundTag == null) {
+			this.updateNBTData();
+		}
 	}
 
 	public void updateNBTData() {
 		Map<String, Tag> map = new HashMap<>();
-
 		map.put("Count", new ByteTag("Count", this.getAmount()));
 		map.put("Damage", new ShortTag("Damage", this.getDamage()));
-		map.put("id", new StringTag("id", "minecraft:grass")); //TODO -> String in 1.8+
-
-		this.compoundTag = new CompoundTag("", map);
-
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		try (NBTOutputStream stream = new NBTOutputStream(outStream)) {
-			stream.writeTag(compoundTag);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		this.nbtData = outStream.toByteArray();
-		this.nbtLength = (byte) nbtData.length;
+		map.put("id", new ShortTag("id", blockId)); // TODO -> String
+																// in 1.8+
+		this.compoundTag = new CompoundTag("Item", map);
+		this.compoundTag = null;
 	}
 
 	public short getBlockId() {
@@ -78,24 +73,11 @@ public class ItemStack {
 		this.damage = damage;
 	}
 
-	public byte getNbtLength() {
-		return nbtLength;
-	}
-
-	public void setNbtLength(byte nbtLength) {
-		this.nbtLength = nbtLength;
-	}
-
-	public byte[] getNbtData() {
-		return nbtData;
-	}
-
-	public void setNbtData(byte[] nbtData) {
-		this.nbtData = nbtData;
-	}
-
 	public CompoundTag getCompoundTag() {
 		return compoundTag;
 	}
 
+	public void setCompoundTag(CompoundTag compoundTag) {
+		this.compoundTag = compoundTag;
+	}
 }

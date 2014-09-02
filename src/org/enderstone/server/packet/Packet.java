@@ -1,6 +1,11 @@
 package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map.Entry;
@@ -10,6 +15,9 @@ import org.enderstone.server.Vector;
 import org.enderstone.server.entity.DataWatcher;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.codec.DecodeException;
+import org.jnbt.CompoundTag;
+import org.jnbt.NBTInputStream;
+import org.jnbt.NBTOutputStream;
 
 public abstract class Packet {
 
@@ -98,12 +106,16 @@ public abstract class Packet {
 		buf.writeShort(stack.getBlockId());
 		buf.writeByte(stack.getAmount());
 		buf.writeShort(stack.getDamage());
-		buf.writeByte(stack.getNbtLength());
-		
-		if (stack.getNbtLength() == -1) {
+
+		if (stack.getCompoundTag() == null) {
+			buf.writeByte(0);
 			return;
 		}
-		buf.writeBytes(stack.getNbtData());
+		try (NBTOutputStream outStream = new NBTOutputStream(new DataOutputStream(new ByteBufOutputStream(buf)))) {
+			outStream.writeTag(stack.getCompoundTag());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static ItemStack readItemStack(ByteBuf buf) {
@@ -117,17 +129,17 @@ public abstract class Packet {
 		stack.setAmount(buf.readByte());
 		stack.setDamage(buf.readShort());
 
-		byte nbtLength = buf.readByte();
-		stack.setNbtLength(nbtLength);
-
-		if (nbtLength == 0) {
+		int index = buf.readerIndex();
+		if (buf.readByte() == 0) {
 			return stack;
 		}
+		buf.readerIndex(index);
 
-		byte[] data = new byte[nbtLength];
-		buf.readBytes(data, 0, nbtLength);
-		stack.setNbtData(data);
-
+		try (NBTInputStream nbtInStream = new NBTInputStream(new DataInputStream(new ByteBufInputStream(buf)))) {
+			stack.setCompoundTag((CompoundTag) nbtInStream.readTag());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return stack;
 	}
 
@@ -252,15 +264,24 @@ public abstract class Packet {
 
 	public static int getItemStackSize(ItemStack stack) {
 		int total = 0;
-		total += getShortSize();
-		if (stack == null || stack.getBlockId() == -1) {
+		if (stack == null) {
+			total += 1;
 			return total;
 		}
-		total += (2 + getShortSize());
-		if (stack.getNbtLength() == 0) {
-			return total;
+		total += (getShortSize() * 2) + 1;
+		if (stack.getCompoundTag() == null) {
+			return total++;
 		}
-		total += stack.getNbtLength();
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			try (NBTOutputStream outStream = new NBTOutputStream(new DataOutputStream(out))) {
+				outStream.writeTag(stack.getCompoundTag());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			total += out.toByteArray().length;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		return total;
 	}
 
@@ -286,51 +307,48 @@ public abstract class Packet {
 
 	public void writeFully(ByteBuf buf) throws IOException, DecodeException {
 		int writerIndex = buf.writerIndex();
-		int packetContentSize  = getSize();
+		int packetContentSize = getSize();
 		int id = getId();
 		int exceptedSize = getVarIntSize(packetContentSize);
-		int totalSize = exceptedSize+packetContentSize;
+		int totalSize = exceptedSize + packetContentSize;
 		buf.ensureWritable(totalSize);
-		
+
 		writeVarInt(packetContentSize, buf);
 		writeVarInt(id, buf);
 		write(buf);
-		
+
 		int newIndex = buf.writerIndex();
 		if (writerIndex + totalSize != newIndex) {
-			throw new DecodeException("!!! Invalid send packet !!! "
-					+ "\nExcepted size: " + totalSize + " "
-					+ "\nReal size:" + (buf.writerIndex() - writerIndex) + " "
-					+ "\nPacket: " + this.toString());
+			throw new DecodeException("!!! Invalid send packet !!! " + "\nExcepted size: " + totalSize + " " + "\nReal size:" + (buf.writerIndex() - writerIndex) + " " + "\nPacket: " + this.toString());
 		}
 	}
-	
-	public static Location readLocation(ByteBuf buf){
+
+	public static Location readLocation(ByteBuf buf) {
 		long value = buf.readLong();
 		double x = value >> 38;
 		double y = value << 26 >> 52;
 		double z = value << 38 >> 38;
-		return new Location("", x,y,z,0F,0F);
+		return new Location("", x, y, z, 0F, 0F);
 	}
-	
-	public static void writeLocation(Location loc , ByteBuf buf){
+
+	public static void writeLocation(Location loc, ByteBuf buf) {
 		buf.writeLong((loc.getBlockX() & 0x3FFFFFF) << 38 | (loc.getBlockY() & 0xFFF) << 26 | (loc.getBlockZ() & 0x3FFFFFF));
 	}
-	
-	public static int getLocationSize(){
+
+	public static int getLocationSize() {
 		return getLongSize();
 	}
-	
-	public static UUID readUUID(ByteBuf buf){
+
+	public static UUID readUUID(ByteBuf buf) {
 		return new UUID(buf.readLong(), buf.readLong());
 	}
-	
-	public static void writeUUID(UUID uuid, ByteBuf buf){
+
+	public static void writeUUID(UUID uuid, ByteBuf buf) {
 		buf.writeLong(uuid.getMostSignificantBits());
 		buf.writeLong(uuid.getLeastSignificantBits());
 	}
-	
-	public static int getUUIDSize(){
+
+	public static int getUUIDSize() {
 		return 16;
 	}
 }
