@@ -9,11 +9,13 @@ public class PacketOutEntityLook extends Packet {
 	private int entityId;
 	private byte yaw;
 	private byte pitch;
+	private boolean onGround;
 
-	public PacketOutEntityLook(int entityId, byte yaw, byte pitch) {
+	public PacketOutEntityLook(int entityId, byte yaw, byte pitch, boolean onGround) {
 		this.entityId = entityId;
 		this.yaw = yaw;
 		this.pitch = pitch;
+		this.onGround = onGround;
 	}
 
 	@Override
@@ -23,14 +25,15 @@ public class PacketOutEntityLook extends Packet {
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		buf.writeInt(entityId);
+		writeVarInt(entityId, buf);
 		buf.writeByte(yaw);
 		buf.writeByte(pitch);
+		buf.writeBoolean(onGround);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return getIntSize() + 2 + getVarIntSize(getId());
+		return getVarIntSize(entityId) + 3 + getVarIntSize(getId());
 	}
 
 	@Override

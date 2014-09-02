@@ -59,7 +59,8 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	public void regenerateEncryptionSettings() {
 		encryptionSettings = new EncryptionSettings();
-		//encryptionSettings.serverid = new BigInteger(130, Main.random).toString(32).substring(0, 20);
+		// encryptionSettings.serverid = new BigInteger(130,
+		// Main.random).toString(32).substring(0, 20);
 		encryptionSettings.serverid = "";
 		KeyPairGenerator keyPairGenerator;
 		try {
@@ -72,14 +73,13 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		encryptionSettings.verifyToken = new byte[16];
 		Main.random.nextBytes(encryptionSettings.verifyToken);
 	}
-	
-	public void forcePacketFlush()
-	{
+
+	public void forcePacketFlush() {
 		synchronized (packets) {
 			Packet p;
 			while ((p = packets.poll()) != null) {
 				ctx.write(p);
-				//EnderLogger.debug("Out: "+p.toString());
+				// EnderLogger.debug("Out: "+p.toString());
 				p.onSend(this);
 			}
 			ctx.flush();
@@ -88,9 +88,10 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
-		if (this.ctx == null) this.ctx = ctx;
+		if (this.ctx == null)
+			this.ctx = ctx;
 		((Packet) msg).onRecieve(this);
-		//EnderLogger.debug("in: " + msg);
+		// EnderLogger.debug("in: " + msg);
 		forcePacketFlush();
 	}
 
@@ -120,7 +121,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 							for (String name : ep.visiblePlayers) {
 								if (name.equals(subPlayer.getPlayerName()) && !subPlayer.getPlayerName().equals(ep.getPlayerName())) {
-									ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[]{subPlayer.getEntityId()}));
+									ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { subPlayer.getEntityId() }));
 								}
 							}
 						}
@@ -131,6 +132,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		}
 		super.channelInactive(ctx);
 	}
+
 	private MinecraftServerCodex codex;
 
 	public MinecraftServerCodex createCodex() {
@@ -186,13 +188,16 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	}
 
 	public void spawnPlayer() {
-		if (player != null) throw new IllegalStateException();
+		if (player != null)
+			throw new IllegalStateException();
 		if (this.uuid == null) {
 			this.disconnect("Illegal uuid");
 			return;
 		}
 		if (this.skinBlob == null)
-			this.skinBlob = PlayerTextureStore.DEFAULT_STORE; // Null oject design pattern
+			this.skinBlob = PlayerTextureStore.DEFAULT_STORE; // Null oject
+																// design
+																// pattern
 
 		player = new EnderPlayer(wantedName, this, uuid, this.skinBlob);
 		final Object lock = new Object();
@@ -206,8 +211,8 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 						sendPacket(new PacketOutLoginSucces(player.uuid.toString(), player.getPlayerName()));
 
-						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) GameMode.SURVIVAL.getId(), (byte) 0, (byte) 1, (byte) 60, "default"));
-						
+						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) GameMode.SURVIVAL.getId(), (byte) 0, (byte) 1, (byte) 60, "default", false));
+
 						EnderWorld mainWorld = Main.getInstance().mainWorld;
 						Location spawn = mainWorld.getSpawn();
 						Location loc = player.getLocation();
@@ -216,10 +221,10 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						loc.setZ(spawn.getZ());
 						loc.setYaw(spawn.getYaw());
 						loc.setPitch(spawn.getPitch());
-						
+
 						mainWorld.doChunkUpdatesForPlayer(player, player.chunkInformer, 1);
 						player.onSpawn();
-						sendPacket(new PacketOutSpawnPosition(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()));
+						sendPacket(new PacketOutSpawnPosition(spawn));
 
 						int i = 0;
 						if (player.isCreative)
@@ -232,7 +237,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 							i = (byte) (i | 0x8);
 
 						sendPacket(new PacketOutPlayerAbilities((byte) i, 0.1F, 0.1F));
-						sendPacket(new PacketOutPlayerPositionLook(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), false));
+						sendPacket(new PacketOutPlayerPositionLook(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), (byte) 0b00000));
 						sendPacket(new PacketOutUpdateHealth(player.getHealth(), player.food, player.foodSaturation));
 
 					} catch (Exception e) {

@@ -21,13 +21,13 @@ public class PacketOutEntityHeadLook extends Packet {
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		buf.writeInt(entityId);
+		writeVarInt(entityId, buf);
 		buf.writeByte(yaw);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return getIntSize() + 1 + getVarIntSize(getId());
+		return getVarIntSize(entityId) + 1 + getVarIntSize(getId());
 	}
 
 	@Override

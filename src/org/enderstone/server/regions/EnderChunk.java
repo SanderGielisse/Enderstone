@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import org.enderstone.server.EnderLogger;
+import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketOutBlockChange;
@@ -96,7 +97,7 @@ public class EnderChunk {
 			if (Main.getInstance().mainWorld.players.containsKey(player)) {
 				if (Main.getInstance().mainWorld.players.get(player).contains(this)) {
 					try {
-						player.getNetworkManager().sendPacket(new PacketOutBlockChange((this.getX() * 16) + x, y, (this.getZ() * 16) + z, material.getId(), data));
+						player.getNetworkManager().sendPacket(new PacketOutBlockChange(new Location("", (this.getX() * 16) + x, y, (this.getZ() * 16) + z, (float) 0,(float) 0), material.getId(), data));
 					} catch (Exception e) {
 						EnderLogger.exception(e);
 					}

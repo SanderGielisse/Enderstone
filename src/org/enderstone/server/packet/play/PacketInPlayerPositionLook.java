@@ -11,30 +11,15 @@ public class PacketInPlayerPositionLook extends Packet {
 
 	private double x;
 	private double feetY;
-	private double headY;
 	private double z;
 	private float yaw;
 	private float pitch;
 	private boolean onGround;
-
-	public PacketInPlayerPositionLook() {
-	}
-
-	public PacketInPlayerPositionLook(double x, double feetY, double headY, double z, float yaw, float pitch, boolean onGround) {
-		this.x = x;
-		this.feetY = feetY;
-		this.headY = headY;
-		this.z = z;
-		this.yaw = yaw;
-		this.pitch = pitch;
-		this.onGround = onGround;
-	}
-
+	
 	@Override
 	public void read(ByteBuf buf) throws IOException {
 		this.x = buf.readDouble();
 		this.feetY = buf.readDouble();
-		this.headY = buf.readDouble();
 		this.z = buf.readDouble();
 		this.yaw = buf.readFloat();
 		this.pitch = buf.readFloat();
@@ -48,7 +33,7 @@ public class PacketInPlayerPositionLook extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return (getDoubleSize() * 4) + (getFloatSize() * 2) + 1 + getVarIntSize(getId());
+		return (getDoubleSize() * 3) + (getFloatSize() * 2) + 1 + getVarIntSize(getId());
 	}
 
 	@Override
@@ -93,7 +78,7 @@ public class PacketInPlayerPositionLook extends Packet {
 	}
 
 	public double getHeadY() {
-		return headY;
+		return getFeetY() + 1.62;
 	}
 
 	public double getZ() {

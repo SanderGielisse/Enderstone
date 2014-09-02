@@ -36,6 +36,7 @@ public class EnderChunkMap {
 
 	public PacketOutChunkData toPacket(int x, int z) {
 		byte[] com = this.getCompressed();
-		return new PacketOutChunkData(x, z, true, (short) (primaryBitmap & '\uffff'), (short) (extendedBitmap & '\uffff'), com.length, com);
+		//TODO
+		return new PacketOutChunkData(x, z, true, (short) (primaryBitmap & '\uffff'), com.length, com);
 	}
 }

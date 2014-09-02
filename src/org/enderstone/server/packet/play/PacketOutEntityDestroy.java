@@ -6,15 +6,11 @@ import org.enderstone.server.packet.Packet;
 
 public class PacketOutEntityDestroy extends Packet {
 
-	private byte length;
+	private int length;
 	private Integer[] ids;
 
 	public PacketOutEntityDestroy(Integer[] ids) {
-		if (ids.length > 127) {
-			throw new IllegalArgumentException("You can't despawn more than 127 entities with only one packet.");
-		}
-
-		this.length = (byte) ids.length;
+		this.length = ids.length;
 		this.ids = ids;
 	}
 
@@ -25,7 +21,7 @@ public class PacketOutEntityDestroy extends Packet {
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		buf.writeByte(length);
+		writeVarInt(length, buf);
 		for (int i = 0; i < length; i++) {
 			buf.writeInt(this.ids[i]);
 		}

@@ -9,11 +9,11 @@ import org.enderstone.server.packet.Packet;
 
 public class PacketInClientStatus extends Packet {
 
-	private byte actionId;
+	private int actionId;
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
-		this.actionId = buf.readByte();
+		this.actionId = buf.readUnsignedByte();
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class PacketInClientStatus extends Packet {
 		}
 	}
 
-	public byte getActionId() {
+	public int getActionId() {
 		return actionId;
 	}
 }

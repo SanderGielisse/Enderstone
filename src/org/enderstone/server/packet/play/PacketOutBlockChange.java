@@ -2,22 +2,17 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.Location;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutBlockChange extends Packet {
 
-	private int x;
-	private int y;
-	private int z;
-	private int blockId;
-	private byte metadata;
+	private Location loc;
+	private int blockIdData;
 
-	public PacketOutBlockChange(int x, int y, int z, int blockId, byte metadata) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.blockId = blockId;
-		this.metadata = metadata;
+	public PacketOutBlockChange(Location loc, int blockId, byte dataValue) {
+		this.loc = loc;
+		this.blockIdData = (blockId << 4) | dataValue;
 	}
 
 	@Override
@@ -27,16 +22,13 @@ public class PacketOutBlockChange extends Packet {
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		buf.writeInt(x);
-		buf.writeByte(y);
-		buf.writeInt(z);
-		writeVarInt(blockId, buf);
-		buf.writeByte(metadata);
+		writeLocation(loc, buf);
+		writeVarInt(blockIdData, buf);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return (getIntSize() * 2) + 2 + getVarIntSize(blockId) + getVarIntSize(getId());
+		return getLocationSize() + getVarIntSize(blockIdData) + getVarIntSize(getId());
 	}
 
 	@Override

@@ -13,17 +13,13 @@ import org.enderstone.server.regions.BlockId;
 public class PacketInPlayerDigging extends Packet {
 
 	private byte status;
-	private int x;
-	private byte y;
-	private int z;
+	private Location loc;
 	private byte face;
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
 		this.status = buf.readByte();
-		this.x = buf.readInt();
-		this.y = buf.readByte();
-		this.z = buf.readInt();
+		this.loc = readLocation(buf);
 		this.face = buf.readByte();
 	}
 
@@ -34,7 +30,7 @@ public class PacketInPlayerDigging extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return 3 + (2 * getIntSize()) + getVarIntSize(getId());
+		return 2 + getLocationSize() + getVarIntSize(getId());
 	}
 
 	@Override
@@ -47,11 +43,14 @@ public class PacketInPlayerDigging extends Packet {
 
 			@Override
 			public void run() {
-				Location loc = new Location("", getX(), getY(), getZ(), 0F, 0F);
+				int x = getLocation().getBlockX();
+				int y = getLocation().getBlockY();
+				int z = getLocation().getBlockZ();
+				
 				short blockId = Main.getInstance().mainWorld.getBlockIdAt(x, y, z).getId();
 				if (getStatus() == 2) {
 					if (networkManager.player.getLocation().isInRange(6, loc)) {
-						Main.getInstance().mainWorld.setBlockAt(getX(), getY(), getZ(), BlockId.AIR, (byte) 0);
+						Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
 					}
 					Main.getInstance().mainWorld.broadcastSound("dig.grass", x, y, z, 1F, (byte) 63, loc, networkManager.player);
 					Main.getInstance().mainWorld.addEntity(new EntityItem(loc, new ItemStack((short)2, (byte) 4, (short) 0)));
@@ -64,16 +63,8 @@ public class PacketInPlayerDigging extends Packet {
 		return status;
 	}
 
-	public int getX() {
-		return x;
-	}
-
-	public byte getY() {
-		return y;
-	}
-
-	public int getZ() {
-		return z;
+	public Location getLocation(){
+		return loc;
 	}
 
 	public byte getFace() {

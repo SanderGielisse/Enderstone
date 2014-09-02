@@ -10,18 +10,21 @@ public class PacketOutChatMessage extends Packet {
 
 	private Message message;
 	private String jsonChat;
+	private byte position;
 
-	public PacketOutChatMessage(String chatMessage, boolean json) {
+	public PacketOutChatMessage(String chatMessage, boolean json, byte position) {
 		if (json) {
 			this.jsonChat = chatMessage;
 		} else {
 			this.message = new SimpleMessage(chatMessage);
 		}
+		this.position = position;
 	}
 	
-	public PacketOutChatMessage(Message message)
+	public PacketOutChatMessage(Message message, byte position)
 	{
 		this.message = message;
+		this.position = position;
 	}
 
 	@Override
@@ -31,12 +34,13 @@ public class PacketOutChatMessage extends Packet {
 			throw new IllegalArgumentException("The chat messages can't be any longer than 32767 bytes!");
 		}
 		writeString(this.jsonChat, buf);
+		buf.writeByte(getId());
 	}
 
 	@Override
 	public int getSize() throws IOException {
 		if(this.jsonChat == null) this.jsonChat = message.toMessageJson();
-		return getStringSize(this.jsonChat) + getVarIntSize(getId());
+		return getStringSize(this.jsonChat) + 1 + getVarIntSize(getId());
 	}
 
 	@Override

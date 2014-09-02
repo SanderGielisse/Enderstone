@@ -68,17 +68,22 @@ public class Location {
 	public void setPitch(float pitch) {
 		this.pitch = pitch;
 	}
-
+	
+	public static int floor(double num) {
+		final int floor = (int) num;
+		return floor == num ? floor : floor - (int) (Double.doubleToRawLongBits(num) >>> 63);
+	}
+	
 	public int getBlockX() {
-		return (int) this.getX();
+		return floor(getX());
 	}
 
 	public int getBlockZ() {
-		return (int) this.getZ();
+		return floor(getY());
 	}
 
 	public int getBlockY() {
-		return (int) this.getY();
+		return floor(getZ());
 	}
 
 	public boolean isInRange(int viewDistance, Location otherLoc) {

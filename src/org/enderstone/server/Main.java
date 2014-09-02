@@ -50,7 +50,7 @@ public class Main implements Runnable {
 		private static final long serialVersionUID = 1L;
 
 		{
-			this.add(5); // 1.7.9
+			this.add(47); // 1.8
 		}
 	});
 	public static final String[] AUTHORS = new String[] { "bigteddy98", "ferrybig", "timbayens" };

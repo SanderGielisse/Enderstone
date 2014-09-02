@@ -11,21 +11,16 @@ public class PacketOutChunkData extends Packet {
 	private int z;
 	private boolean groundUpContinuous;
 	private short primaryBitMap;
-	private short addBitMap;
 	private int size;
 	private byte[] data;
 
-	public PacketOutChunkData(int x, int z, boolean groundUpContinuous, short primaryBitMap, short addBitMap, int size, byte[] data) {
+	public PacketOutChunkData(int x, int z, boolean groundUpContinuous, short primaryBitMap, int size, byte[] data) {
 		this.x = x;
 		this.z = z;
 		this.groundUpContinuous = groundUpContinuous;
 		this.primaryBitMap = primaryBitMap;
-		this.addBitMap = addBitMap;
 		this.size = size;
 		this.data = data;
-	}
-
-	public PacketOutChunkData() {
 	}
 
 	@Override
@@ -39,14 +34,13 @@ public class PacketOutChunkData extends Packet {
 		buf.writeInt(z);
 		buf.writeBoolean(groundUpContinuous);
 		buf.writeShort(primaryBitMap);
-		buf.writeShort(addBitMap);
-		buf.writeInt(size);
+		writeVarInt(size, buf);
 		buf.writeBytes(data, 0, size);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return (3 * getIntSize()) + 1 + (2 * getShortSize()) + data.length + getVarIntSize(getId());
+		return (2 * getIntSize()) + 1 + getShortSize() + getVarIntSize(size) + data.length + getVarIntSize(getId());
 	}
 
 	@Override
@@ -67,7 +61,7 @@ public class PacketOutChunkData extends Packet {
 	}
 
 	public static PacketOutChunkData clearChunk(int x, int z) {
-		return new PacketOutChunkData(x, z, true, (short) 0, (short) 0, emptyChunk.length, emptyChunk);
+		return new PacketOutChunkData(x, z, true, (short) 0, emptyChunk.length, emptyChunk);
 	}
 
 	@Override

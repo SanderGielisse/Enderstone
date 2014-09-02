@@ -10,12 +10,14 @@ public class PacketOutEntityRelativeMove extends Packet {
 	private byte dX;
 	private byte dY;
 	private byte dZ;
+	private boolean onGround;
 
-	public PacketOutEntityRelativeMove(int entityId, byte dX, byte dY, byte dZ) {
+	public PacketOutEntityRelativeMove(int entityId, byte dX, byte dY, byte dZ, boolean onGround) {
 		this.entityId = entityId;
 		this.dX = dX;
 		this.dY = dY;
 		this.dZ = dZ;
+		this.onGround = onGround;
 	}
 
 	@Override
@@ -29,11 +31,12 @@ public class PacketOutEntityRelativeMove extends Packet {
 		buf.writeByte(dX);
 		buf.writeByte(dY);
 		buf.writeByte(dZ);
+		buf.writeBoolean(onGround);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return getIntSize() + 3 + getVarIntSize(getId());
+		return getIntSize() + 4 + getVarIntSize(getId());
 	}
 
 	@Override

@@ -11,18 +11,15 @@ public class PacketOutPlayerPositionLook extends Packet {
 	private double z;
 	private float yaw;
 	private float pitch;
-	private boolean onGround;
+	private byte flags;
 
-	public PacketOutPlayerPositionLook() {
-	}
-
-	public PacketOutPlayerPositionLook(double x, double y, double z, float yaw, float pitch, boolean onGround) {
+	public PacketOutPlayerPositionLook(double x, double y, double z, float yaw, float pitch, byte flags) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.yaw = yaw;
 		this.pitch = pitch;
-		this.onGround = onGround;
+		this.flags = flags;
 	}
 
 	@Override
@@ -37,7 +34,7 @@ public class PacketOutPlayerPositionLook extends Packet {
 		buf.writeDouble(z);
 		buf.writeFloat(yaw);
 		buf.writeFloat(pitch);
-		buf.writeBoolean(onGround);
+		buf.writeByte(flags);
 	}
 
 	@Override

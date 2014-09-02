@@ -16,11 +16,7 @@ public class PacketOutEntityStatus extends Packet {
 	public PacketOutEntityStatus(int entityId, Status entityStatus) {
 		this.entityId = entityId;
 		this.entityStatus = entityStatus;
-	}
-
-	public PacketOutEntityStatus() {
-	}
-	
+	}	
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
@@ -35,10 +31,7 @@ public class PacketOutEntityStatus extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		int size = 0;
-		size += 4;
-		size += 1;
-		return size + getVarIntSize(getId());
+		return getIntSize() + 1 + getVarIntSize(getId());
 	}
 
 	@Override

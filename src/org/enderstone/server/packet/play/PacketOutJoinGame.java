@@ -12,17 +12,16 @@ public class PacketOutJoinGame extends Packet {
 	private byte difficulty;
 	private byte maxPlayers;
 	private String levelType;
+	private boolean reducedDebugInfo;
 
-	public PacketOutJoinGame() {
-	}
-
-	public PacketOutJoinGame(int entityId, byte gamemode, byte dimension, byte difficulty, byte maxPlayers, String levelType) {
+	public PacketOutJoinGame(int entityId, byte gamemode, byte dimension, byte difficulty, byte maxPlayers, String levelType, boolean reducedDebugInfo) {
 		this.entityId = entityId;
 		this.gamemode = gamemode;
 		this.dimension = dimension;
 		this.difficulty = difficulty;
 		this.maxPlayers = maxPlayers;
 		this.levelType = levelType;
+		this.reducedDebugInfo = reducedDebugInfo;
 	}
 
 	@Override
@@ -38,11 +37,12 @@ public class PacketOutJoinGame extends Packet {
 		buf.writeByte(difficulty);
 		buf.writeByte(maxPlayers);
 		writeString(levelType, buf);
+		buf.writeBoolean(reducedDebugInfo);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return getIntSize() + 4 + getStringSize(levelType) + getVarIntSize(getId());
+		return getIntSize() + 5 + getStringSize(levelType) + getVarIntSize(getId());
 	}
 
 	@Override

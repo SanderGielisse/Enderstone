@@ -9,12 +9,8 @@ public class PacketInAnimation extends Packet {
 	private int entityId;
 	private byte animation;
 
-	public PacketInAnimation(int entityId, byte animation) {
-		this.entityId = entityId;
-		this.animation = animation;
-	}
-
 	public PacketInAnimation() {
+		//TODO protocol website UNKNOWN
 	}
 
 	@Override

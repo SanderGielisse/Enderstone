@@ -1,10 +1,10 @@
 package org.enderstone.server.packet.play;
 
-import org.enderstone.server.packet.NetworkManager;
-import org.enderstone.server.packet.Packet;
-
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.Location;
+import org.enderstone.server.packet.NetworkManager;
+import org.enderstone.server.packet.Packet;
 
 /**
  *
@@ -13,11 +13,16 @@ import java.io.IOException;
 public class PacketInTabComplete extends Packet {
 
 	private String halfCommand;
-
+	private boolean hasPosition;
+	private Location lookingAt;
 	
 	@Override
 	public void read(ByteBuf buf) throws IOException {
 		halfCommand = readString(buf);
+		hasPosition = buf.readBoolean();
+		if(hasPosition){
+			lookingAt = readLocation(buf);
+		}
 	}
 
 	@Override
@@ -27,7 +32,7 @@ public class PacketInTabComplete extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return getStringSize(halfCommand) + getVarIntSize(getId());
+		return getStringSize(halfCommand) + 1 + (hasPosition ? getLocationSize() : 0) + getVarIntSize(getId());
 	}
 
 	@Override
