@@ -79,11 +79,11 @@ public class Location {
 	}
 
 	public int getBlockZ() {
-		return floor(getY());
+		return floor(getZ());
 	}
 
 	public int getBlockY() {
-		return floor(getZ());
+		return floor(getY());
 	}
 
 	public boolean isInRange(int viewDistance, Location otherLoc) {
