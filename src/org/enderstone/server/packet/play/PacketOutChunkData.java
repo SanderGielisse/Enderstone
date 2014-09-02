@@ -3,6 +3,8 @@ package org.enderstone.server.packet.play;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.util.zip.Deflater;
+import org.enderstone.server.Location;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutChunkData extends Packet {
@@ -51,13 +53,7 @@ public class PacketOutChunkData extends Packet {
 	private final static byte[] emptyChunk;
 
 	static {
-		byte[] buildBuffer = new byte[256];
-		Deflater deflator = new Deflater(9);
-		deflator.setInput(buildBuffer);
-		deflator.finish();
-		int size = deflator.deflate(buildBuffer);
-		emptyChunk = new byte[size];
-		System.arraycopy(buildBuffer, 0, emptyChunk, 0, size);
+		emptyChunk = new byte[256];
 	}
 
 	public static PacketOutChunkData clearChunk(int x, int z) {
@@ -68,4 +64,5 @@ public class PacketOutChunkData extends Packet {
 	public String toString() {
 		return "PacketOutChunkData{" + "x=" + x + ", z=" + z + ", size=" + size + '}';
 	}
+
 }

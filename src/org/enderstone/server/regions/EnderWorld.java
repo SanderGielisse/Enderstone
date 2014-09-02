@@ -28,11 +28,11 @@ public class EnderWorld {
 	private Long seed = null;
 	private final RegionSet loadedChunks = new RegionSet();
 	public final Map<EnderPlayer, RegionSet> players = new LinkedHashMap<>();
-	private final ChunkGenerator generator = new FlatLandGenerator();
+	private final ChunkGenerator generator = new TimTest();
 	private final Random random = new Random();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
 	public final Set<Entity> entities = new HashSet<>();
-	private Location spawnLocation = new Location(null, 0, 20, 0, 0f, 0f);
+	private Location spawnLocation = new Location(null, 0, 80, 0, 0f, 0f);
 
 	public EnderChunk getOrCreateChunk(int x, int z) {
 		EnderChunk r = getChunk(x, z);

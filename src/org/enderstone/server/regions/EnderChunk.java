@@ -1,5 +1,6 @@
 package org.enderstone.server.regions;
 
+import static java.lang.System.out;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
@@ -31,6 +32,22 @@ public class EnderChunk {
 	private boolean isValid = true;
 
 	public EnderChunk(int x, int z, short[][] blockID, byte[][] data, byte[] biome, List<BlockData> blockData) {
+		if (blockID.length != MAX_CHUNK_SECTIONS) {
+			throw new IllegalArgumentException("blockID.length != 16");
+		}
+		for (int i = 0; i < MAX_CHUNK_SECTIONS; i++) {
+			if (blockID[i] == null) continue;
+			if (blockID[i].length != MAX_CHUNK_SECTIONS * MAX_CHUNK_SECTIONS * MAX_CHUNK_SECTIONS)
+				throw new IllegalArgumentException("blockID[i].length != MAX_CHUNK_SECTIONS * MAX_CHUNK_SECTIONS * MAX_CHUNK_SECTIONS");
+		}
+		if (data.length != MAX_CHUNK_SECTIONS) {
+			throw new IllegalArgumentException("data.length != 16");
+		}
+		for (int i = 0; i < MAX_CHUNK_SECTIONS; i++) {
+			if (data[i] == null) continue;
+			if (data[i].length != MAX_CHUNK_SECTIONS * MAX_CHUNK_SECTIONS * MAX_CHUNK_SECTIONS)
+				throw new IllegalArgumentException("data[i].length != MAX_CHUNK_SECTIONS * MAX_CHUNK_SECTIONS * MAX_CHUNK_SECTIONS");
+		}
 		this.z = z;
 		this.blockID = blockID;
 		this.data = data;
@@ -155,7 +172,6 @@ public class EnderChunk {
 	public EnderChunkMap build(boolean flag, int i) {
 		int j = 0;
 
-		int k = 0;
 		EnderChunkMap chunkmap = new EnderChunkMap();
 		byte[] abyte = new byte[196864];
 		int l;
@@ -166,14 +182,6 @@ public class EnderChunk {
 			for (l = 0; l < blockID.length; ++l) {
 				if (blockID[l] != null && (!flag) && (i & 1 << l) != 0) {
 					chunkmap.primaryBitmap |= 1 << l;
-					for (short s : blockID[l]) {
-						if (s > 255) {
-							// chunkmap.extendedBitmap |= 1 << l; // No support
-							// for extended block ids
-							++k;
-							break;
-						}
-					}
 				}
 			}
 		}
@@ -193,7 +201,9 @@ public class EnderChunk {
 //				}
 //			}
 			for (l = 0; l < blockID.length; l++) {
+
 				if ((blockID[l] != null) && ((!flag) || (blockID[l] != null)) && ((i & 1 << l) != 0)) {
+					int lastIndex = j;
 					short[] idArray = this.blockID[l];
 					for (int ind = 0; ind < idArray.length; ind++) {
 						int id = idArray[ind] & 0xFF;
@@ -202,7 +212,7 @@ public class EnderChunk {
 						abyte[(j++)] = ((byte) (val & 0xFF));
 						abyte[(j++)] = ((byte) (val >> '\b' & 0xFF));
 					}
-
+					assert lastIndex + blockID[l].length * 2 == j;
 				}
 
 			}
@@ -212,7 +222,9 @@ public class EnderChunk {
 		 */
 		{
 			for (l = 0; l < data.length; ++l) {
+
 				if (data[l] != null && (!flag) && (i & 1 << l) != 0) {
+					int lastIndex = j;
 					byte[] nibblearray = data[l];
 					byte halfData = 0;
 					boolean hd = false;
@@ -227,6 +239,7 @@ public class EnderChunk {
 						}
 						hd = !hd;
 					}
+					assert lastIndex + data[l].length / 2 == j;
 					// j += nibblearray.length / 2 ;
 				}
 			}
@@ -237,6 +250,7 @@ public class EnderChunk {
 		{
 			for (l = 0; l < blockID.length; ++l) {
 				if (blockID[l] != null && (!flag) && (i & 1 << l) != 0) {
+					int lastIndex = j;
 					short[] nibblearray = blockID[l];
 					byte halfData = 0;
 					boolean hd = false;
@@ -251,6 +265,7 @@ public class EnderChunk {
 						}
 						hd = !hd;
 					}
+					assert lastIndex + data[l].length / 2 == j;
 					// j += nibblearray.length / 2 ;
 				}
 			}
@@ -259,16 +274,15 @@ public class EnderChunk {
 		 * Biomes
 		 */
 		{
-			if (flag) {
-				byte[] abyte2 = biome;
+			byte[] abyte2 = biome;
 
-				System.arraycopy(abyte2, 0, abyte, j, abyte2.length);
-				j += abyte2.length;
-			}
+			System.arraycopy(abyte2, 0, abyte, j, abyte2.length);
+			j += abyte2.length;
 		}
 		/**
 		 * Copy
 		 */
+
 		chunkmap.chunkData = new byte[j];
 		System.arraycopy(abyte, 0, chunkmap.chunkData, 0, j);
 

@@ -4,12 +4,17 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.Location;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.regions.BlockId;
 
 public class PacketOutBlockChange extends Packet {
 
 	private Location loc;
 	private int blockIdData;
 
+	public PacketOutBlockChange(Location loc, BlockId blockId, byte dataValue) {
+		this(loc, blockId.getId(), dataValue);
+	}
+	
 	public PacketOutBlockChange(Location loc, int blockId, byte dataValue) {
 		this.loc = loc;
 		this.blockIdData = (blockId << 4) | dataValue;
