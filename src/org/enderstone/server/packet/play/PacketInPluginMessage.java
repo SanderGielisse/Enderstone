@@ -25,7 +25,7 @@ public class PacketInPluginMessage extends Packet {
 	@Override
 	public void read(ByteBuf buf) throws IOException {
 		this.channel = readString(buf);
-		this.length = buf.readShort();
+		this.length = (short) readVarInt(buf);
 		this.data = new byte[length];
 		buf.readBytes(this.data, 0, this.length);
 	}
@@ -37,7 +37,7 @@ public class PacketInPluginMessage extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return getStringSize(channel) + getShortSize() + data.length + getVarIntSize(getId());
+		return getStringSize(channel) + getVarIntSize(length) + data.length + getVarIntSize(getId());
 	}
 
 	@Override

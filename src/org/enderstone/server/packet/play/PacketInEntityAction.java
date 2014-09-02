@@ -12,9 +12,9 @@ public class PacketInEntityAction extends Packet {
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
-		this.entityId = buf.readInt();
+		this.entityId = readVarInt(buf);
 		this.actionId = buf.readByte();
-		this.jumpBoost = buf.readInt();
+		this.jumpBoost = readVarInt(buf);
 	}
 
 	@Override

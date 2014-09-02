@@ -23,13 +23,18 @@ public class PacketOutEntityDestroy extends Packet {
 	public void write(ByteBuf buf) throws IOException {
 		writeVarInt(length, buf);
 		for (int i = 0; i < length; i++) {
-			buf.writeInt(this.ids[i]);
+			writeVarInt(this.ids[i],buf);
 		}
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return getVarIntSize(length) + (getIntSize() * ids.length) + getVarIntSize(getId());
+		int size = 0;
+		size += getVarIntSize(length);
+		for (int i = 0; i < length; i++) {
+			size += getVarIntSize(ids[i]);
+		}
+		return size + getVarIntSize(getId());
 	}
 
 	@Override
