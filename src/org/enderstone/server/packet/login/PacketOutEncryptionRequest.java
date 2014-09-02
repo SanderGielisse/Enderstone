@@ -37,9 +37,9 @@ public class PacketOutEncryptionRequest extends Packet {
 	public void write(ByteBuf buf) throws IOException {
 		if (publicKeyBytes == null) publicKeyBytes = publicKey.getEncoded();
 		writeString(serverid, buf);
-		buf.writeShort(publicKeyBytes.length);
-		buf.writeBytes(publicKeyBytes);
-		buf.writeShort(verifyTokenSize);
+		writeVarInt(publicKeyBytes.length, buf);
+		buf.writeBytes(publicKeyBytes, 0, publicKeyBytes.length);
+		writeVarInt(verifyTokenSize, buf);
 		buf.writeBytes(verifyToken, 0, verifyTokenSize);
 	}
 
@@ -48,9 +48,9 @@ public class PacketOutEncryptionRequest extends Packet {
 		if (publicKeyBytes == null) publicKeyBytes = publicKey.getEncoded();
 		int size = 0;
 		size += getStringSize(serverid);
-		size += getShortSize();
+		size += getVarIntSize(publicKeyBytes.length);
 		size += publicKeyBytes.length;
-		size += getShortSize();
+		size += getVarIntSize(publicKeyBytes.length);
 		size += verifyTokenSize;
 		return size + getVarIntSize(getId());
 	}
