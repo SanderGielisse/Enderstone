@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.enderstone.server.inventory;
 
 import java.io.ByteArrayOutputStream;
@@ -29,7 +23,7 @@ public class ItemStack {
 	private short blockId;
 	private byte amount;
 	private short damage;
-	private short nbtLength;
+	private byte nbtLength;
 	private byte[] nbtData;
 	private CompoundTag compoundTag;
 
@@ -45,7 +39,7 @@ public class ItemStack {
 
 		map.put("Count", new ByteTag("Count", this.getAmount()));
 		map.put("Damage", new ShortTag("Damage", this.getDamage()));
-		map.put("id", new StringTag("id", "" + getBlockId())); //TODO -> String in 1.8+
+		map.put("id", new StringTag("id", "minecraft:grass")); //TODO -> String in 1.8+
 
 		this.compoundTag = new CompoundTag("", map);
 
@@ -57,7 +51,7 @@ public class ItemStack {
 		}
 
 		this.nbtData = outStream.toByteArray();
-		this.nbtLength = (short) nbtData.length;
+		this.nbtLength = (byte) nbtData.length;
 	}
 
 	public short getBlockId() {
@@ -84,11 +78,11 @@ public class ItemStack {
 		this.damage = damage;
 	}
 
-	public short getNbtLength() {
+	public byte getNbtLength() {
 		return nbtLength;
 	}
 
-	public void setNbtLength(short nbtLength) {
+	public void setNbtLength(byte nbtLength) {
 		this.nbtLength = nbtLength;
 	}
 

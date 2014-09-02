@@ -98,7 +98,7 @@ public abstract class Packet {
 		buf.writeShort(stack.getBlockId());
 		buf.writeByte(stack.getAmount());
 		buf.writeShort(stack.getDamage());
-		buf.writeShort(stack.getNbtLength());
+		buf.writeByte(stack.getNbtLength());
 		
 		if (stack.getNbtLength() == -1) {
 			return;
@@ -117,10 +117,10 @@ public abstract class Packet {
 		stack.setAmount(buf.readByte());
 		stack.setDamage(buf.readShort());
 
-		short nbtLength = buf.readShort();
+		byte nbtLength = buf.readByte();
 		stack.setNbtLength(nbtLength);
 
-		if (nbtLength == -1) {
+		if (nbtLength == 0) {
 			return stack;
 		}
 
@@ -252,12 +252,12 @@ public abstract class Packet {
 
 	public static int getItemStackSize(ItemStack stack) {
 		int total = 0;
+		total += getShortSize();
 		if (stack == null || stack.getBlockId() == -1) {
-			total += getShortSize();
 			return total;
 		}
-		total += (1 + (3 * getShortSize()));
-		if (stack.getNbtLength() == -1) {
+		total += (2 + getShortSize());
+		if (stack.getNbtLength() == 0) {
 			return total;
 		}
 		total += stack.getNbtLength();
