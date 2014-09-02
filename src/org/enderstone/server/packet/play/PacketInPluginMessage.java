@@ -13,6 +13,7 @@ public class PacketInPluginMessage extends Packet {
 	private byte[] data;
 
 	public PacketInPluginMessage() {
+		//TODO UNKNOWN
 	}
 
 	public PacketInPluginMessage(String channel, short length, byte[] data) {

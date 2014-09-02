@@ -1,14 +1,14 @@
 package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
-import org.enderstone.server.EnderLogger;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map.Entry;
+import java.util.UUID;
+import org.enderstone.server.Location;
 import org.enderstone.server.Vector;
 import org.enderstone.server.entity.DataWatcher;
 import org.enderstone.server.inventory.ItemStack;
-import org.enderstone.server.inventory.Inventory.InventoryType;
 import org.enderstone.server.packet.codec.DecodeException;
 
 public abstract class Packet {
@@ -303,5 +303,34 @@ public abstract class Packet {
 					+ "\nReal size:" + (buf.writerIndex() - writerIndex) + " "
 					+ "\nPacket: " + this.toString());
 		}
+	}
+	
+	public static Location readLocation(ByteBuf buf){
+		long value = buf.readLong();
+		double x = value >> 38;
+		double y = value << 26 >> 52;
+		double z = value << 38 >> 38;
+		return new Location("", x,y,z,0F,0F);
+	}
+	
+	public static void writeLocation(Location loc , ByteBuf buf){
+		buf.writeLong((loc.getBlockX() & 0x3FFFFFF) << 38 | (loc.getBlockY() & 0xFFF) << 26 | (loc.getBlockZ() & 0x3FFFFFF));
+	}
+	
+	public static int getLocationSize(){
+		return getLongSize();
+	}
+	
+	public static UUID readUUID(ByteBuf buf){
+		return new UUID(buf.readLong(), buf.readLong());
+	}
+	
+	public static void writeUUID(UUID uuid, ByteBuf buf){
+		buf.writeLong(uuid.getMostSignificantBits());
+		buf.writeLong(uuid.getLeastSignificantBits());
+	}
+	
+	public static int getUUIDSize(){
+		return 16;
 	}
 }

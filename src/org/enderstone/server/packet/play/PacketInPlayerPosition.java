@@ -12,17 +12,15 @@ public class PacketInPlayerPosition extends Packet {
 
 	private double x;
 	private double feetY;
-	private double headY;
 	private double z;
 	private boolean onGround;
 
 	public PacketInPlayerPosition() {
 	}
 
-	public PacketInPlayerPosition(double x, double feetY, double headY, double z, boolean onGround) {
+	public PacketInPlayerPosition(double x, double feetY, double z, boolean onGround) {
 		this.x = x;
 		this.feetY = feetY;
-		this.headY = headY;
 		this.z = z;
 		this.onGround = onGround;
 	}
@@ -31,7 +29,6 @@ public class PacketInPlayerPosition extends Packet {
 	public void read(ByteBuf buf) throws IOException {
 		this.x = buf.readDouble();
 		this.feetY = buf.readDouble();
-		this.headY = buf.readDouble();
 		this.z = buf.readDouble();
 		this.onGround = buf.readBoolean();
 	}
@@ -43,7 +40,7 @@ public class PacketInPlayerPosition extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return (getDoubleSize() * 4) + 1 + getVarIntSize(getId());
+		return (getDoubleSize() * 3) + 1 + getVarIntSize(getId());
 	}
 
 	@Override
@@ -91,7 +88,7 @@ public class PacketInPlayerPosition extends Packet {
 	}
 
 	public double getHeadY() {
-		return headY;
+		return getFeetY() + 1.62;
 	}
 
 	public double getZ() {

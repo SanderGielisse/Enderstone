@@ -11,9 +11,7 @@ import org.enderstone.server.regions.BlockId;
 
 public class PacketInBlockPlacement extends Packet {
 
-	private int x;
-	private byte y;
-	private int z;
+	private Location loc;
 	private byte direction;
 	private ItemStack heldItem;
 	private byte cursorX;
@@ -22,13 +20,10 @@ public class PacketInBlockPlacement extends Packet {
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
-		this.x = buf.readInt();
-		this.y = buf.readByte();
-		this.z = buf.readInt();
+		this.loc = readLocation(buf);
 		this.direction = buf.readByte();
 		this.heldItem = readItemStack(buf);
-		this.cursorX = buf.readByte(); // The position of the crosshair on the
-										// block
+		this.cursorX = buf.readByte(); // The position of the crosshair on the block
 		this.cursorY = buf.readByte();
 		this.cursorZ = buf.readByte();
 	}
@@ -40,7 +35,7 @@ public class PacketInBlockPlacement extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return (getIntSize() * 2) + 5 + getItemStackSize(this.heldItem) + getVarIntSize(getId());
+		return getLocationSize() + 4 + getItemStackSize(heldItem) + getVarIntSize(getId());
 	}
 
 	@Override
@@ -57,9 +52,9 @@ public class PacketInBlockPlacement extends Packet {
 
 			@Override
 			public void run() {
-				int x = getX();
-				int y = getY();
-				int z = getZ();
+				int x = getLocation().getBlockX();
+				int y = getLocation().getBlockY();
+				int z = getLocation().getBlockZ();
 
 				byte direct = getDirection();
 				if (direct == 0) {
@@ -75,9 +70,7 @@ public class PacketInBlockPlacement extends Packet {
 				} else if (direct == 5) {
 					x++;
 				}
-
-				Location loc;
-				if (networkManager.player.getLocation().isInRange(6, loc = new Location("", getX(), getY(), getZ(), 0F, 0F))) {
+				if (networkManager.player.getLocation().isInRange(6, loc)) {
 					ItemStack stack = getHeldItem();
 					if (stack.getBlockId() == BlockId.LAVA_BUCKET.getId()) {
 						stack.setBlockId(BlockId.LAVA.getId());
@@ -93,16 +86,8 @@ public class PacketInBlockPlacement extends Packet {
 		});
 	}
 
-	public int getX() {
-		return x;
-	}
-
-	public byte getY() {
-		return y;
-	}
-
-	public int getZ() {
-		return z;
+	public Location getLocation(){
+		return loc;
 	}
 
 	public byte getDirection() {

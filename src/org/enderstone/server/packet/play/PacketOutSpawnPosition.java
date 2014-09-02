@@ -2,21 +2,15 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.Location;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutSpawnPosition extends Packet {
 
-	private int x;
-	private int y;
-	private int z;
+	private Location loc;
 
-	public PacketOutSpawnPosition() {
-	}
-
-	public PacketOutSpawnPosition(int x, int y, int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	public PacketOutSpawnPosition(Location loc) {
+		this.loc = loc;
 	}
 
 	@Override
@@ -26,14 +20,12 @@ public class PacketOutSpawnPosition extends Packet {
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
+		writeLocation(loc, buf);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return (getIntSize() * 3) + getVarIntSize(getId());
+		return getLocationSize() + getVarIntSize(getId());
 	}
 
 	@Override

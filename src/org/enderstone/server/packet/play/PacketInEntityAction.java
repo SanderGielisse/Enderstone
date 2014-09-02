@@ -24,7 +24,7 @@ public class PacketInEntityAction extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return (getIntSize() * 2) + 1 + getVarIntSize(getId());
+		return getVarIntSize(entityId) + 1 + getVarIntSize(jumpBoost) + getVarIntSize(getId());
 	}
 
 	@Override

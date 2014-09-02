@@ -2,10 +2,12 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.Main;
 import org.enderstone.server.inventory.Inventory.InventoryType;
+import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.regions.BlockId;
 
 public class PacketOutRespawn extends Packet {
 
@@ -45,7 +47,21 @@ public class PacketOutRespawn extends Packet {
 	}
 	
 	@Override
-	public void onSend(NetworkManager networkManager) {
-		networkManager.player.inventory.setItem(InventoryType.HOTBAR, 1, new ItemStack((short) 2, (byte) 3, (short) 0));
+	public void onSend(final NetworkManager networkManager) {
+		if(!Thread.currentThread().equals(Main.getInstance().mainThread)){
+			Main.getInstance().sendToMainThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					refillInventory(networkManager);
+				}
+			});
+			return;
+		}
+		refillInventory(networkManager);
+	}
+	
+	public void refillInventory(NetworkManager networkManager){
+		networkManager.player.inventory.setItem(InventoryType.HOTBAR, 5, new ItemStack(BlockId.DIRT.getId(), (byte) 101, (short) 1));
 	}
 }

@@ -13,20 +13,7 @@ public class PacketInClientSettings extends Packet {
 	private byte renderDistance;
 	private byte chatFlags;
 	private boolean chatColors;
-	private byte difficulty;
-	private boolean showCapes;
-
-	public PacketInClientSettings(String locale, byte renderDistance, byte chatFlags, boolean chatColors, byte difficulty, boolean showCapes) {
-		this.locale = locale;
-		this.renderDistance = renderDistance;
-		this.chatFlags = chatFlags;
-		this.chatColors = chatColors;
-		this.difficulty = difficulty;
-		this.showCapes = showCapes;
-	}
-
-	public PacketInClientSettings() {
-	}
+	private int displayedSkinParts;
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
@@ -34,8 +21,7 @@ public class PacketInClientSettings extends Packet {
 		this.renderDistance = buf.readByte();
 		this.chatFlags = buf.readByte();
 		this.chatColors = buf.readBoolean();
-		this.difficulty = buf.readByte();
-		this.showCapes = buf.readBoolean();
+		this.displayedSkinParts = buf.readUnsignedByte();
 	}
 
 	@Override
@@ -45,7 +31,7 @@ public class PacketInClientSettings extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return getStringSize(locale) + 5 + getVarIntSize(getId());
+		return getStringSize(locale) + 4 + getVarIntSize(getId());
 	}
 
 	@Override
@@ -63,10 +49,9 @@ public class PacketInClientSettings extends Packet {
 				if((player=networkManager.player) == null) return;
 				player.clientSettings.setChatColors(chatColors);
 				player.clientSettings.setChatFlags(chatFlags);
-				player.clientSettings.setDifficulty(difficulty);
 				player.clientSettings.setLocale(locale);
 				player.clientSettings.setRenderDistance(renderDistance);
-				player.clientSettings.setShowCapes(showCapes);
+				player.clientSettings.setDisplayedSkinParts(displayedSkinParts);
 			}
 		});
 	}
@@ -85,13 +70,5 @@ public class PacketInClientSettings extends Packet {
 
 	public boolean getChatColors() {
 		return chatColors;
-	}
-
-	public byte getDifficulty() {
-		return difficulty;
-	}
-
-	public boolean getShowCapes() {
-		return showCapes;
 	}
 }

@@ -11,11 +11,17 @@ public class PacketInUseEntity extends Packet {
 
 	private int targetId;
 	private byte mouseClick;
+	private float targetX;
+	private float targetY;
+	private float targetZ;
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
 		this.targetId = buf.readInt();
 		this.mouseClick = buf.readByte();
+		this.targetX = buf.readFloat();
+		this.targetY = buf.readFloat();
+		this.targetZ = buf.readFloat();
 	}
 
 	@Override
@@ -25,7 +31,7 @@ public class PacketInUseEntity extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return getIntSize() + 1 + getVarIntSize(getId());
+		return getIntSize() + 1 + (getFloatSize() * 3) + getVarIntSize(getId());
 	}
 
 	@Override

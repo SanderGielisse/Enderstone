@@ -7,10 +7,10 @@ import org.enderstone.server.packet.Packet;
 public class PacketOutUpdateHealth extends Packet {
 
 	private float health;
-	private short food;
+	private int food;
 	private float foodSaturation;
 
-	public PacketOutUpdateHealth(float health, short food, float foodSaturation) {
+	public PacketOutUpdateHealth(float health, int food, float foodSaturation) {
 		this.health = health;
 		this.food = food;
 		this.foodSaturation = foodSaturation;
@@ -24,13 +24,13 @@ public class PacketOutUpdateHealth extends Packet {
 	@Override
 	public void write(ByteBuf buf) throws IOException {
 		buf.writeFloat(health);
-		buf.writeShort(food);
+		writeVarInt(food, buf);
 		buf.writeFloat(foodSaturation);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return (getFloatSize() * 2) + getShortSize() + getVarIntSize(getId());
+		return (getFloatSize() * 2) + getVarIntSize(food) + getVarIntSize(getId());
 	}
 
 	@Override

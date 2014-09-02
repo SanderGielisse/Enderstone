@@ -27,6 +27,9 @@ import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
+import org.enderstone.server.packet.play.PacketOutPlayerListItem.Action;
+import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionAddPlayer;
+import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionRemovePlayer;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
@@ -45,7 +48,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public HashSet<String> visiblePlayers = new HashSet<>();
 	public HashSet<Entity> canSeeEntity = new HashSet<>();
 	/**
-	 * If this is above 0, then the server is waiting for a correction on the last teleport the server sended
+	 * If this is above 0, then the server is waiting for a correction on the
+	 * last teleport the server sended
 	 */
 	public int waitingForValidMoveAfterTeleport = 0;
 	public final UUID uuid;
@@ -66,7 +70,6 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public float foodSaturation = 0;
 	public Inventory inventory;
 
-	// our alternative for the stupid Steve skins :D
 	private final String textureValue;
 	private final String textureSignature;
 	public int keepAliveID = 0;
@@ -148,14 +151,24 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return playerName;
 	}
 
+	public ProfileProperty getTextureProperty() {
+		return new ProfileProperty("textures", textureValue, true, textureSignature);
+	}
+
+	public ProfileProperty[] getProfileProperties() {
+		ProfileProperty[] list = new ProfileProperty[1];
+		list[0] = getTextureProperty();
+		return list;
+	}
+
 	@Override
 	public void onSpawn() {
 		this.updateDataWatcher();
 
-		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(this.getPlayerName(), this.isOnline, (short) 1);
+		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(this.uuid, this.getPlayerName(), getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") });
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			player.getNetworkManager().sendPacket(packet);
-			this.getNetworkManager().sendPacket(new PacketOutPlayerListItem(player.getPlayerName(), true, (short) 1));
+			this.getNetworkManager().sendPacket(new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(player.uuid, player.getPlayerName(), player.getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") }));
 		}
 		Main.getInstance().broadcastMessage(new SimpleMessage(ChatColor.YELLOW + this.getPlayerName() + " joined the game!"));
 		this.inventory = new Inventory(this);
@@ -184,10 +197,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	public Packet getSpawnPacket() {
-		List<ProfileProperty> list = new ArrayList<>();
-		ProfileProperty prop = new ProfileProperty("textures", this.textureValue, this.textureSignature);
-		list.add(prop);
-		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid.toString(), this.getPlayerName(), list, this.getLocation().getBlockX(), this.getLocation().getBlockY(), this.getLocation().getBlockZ(), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), (short) 0, this.getDataWatcher());
+		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, (int) (this.getLocation().getX() * 32.0D), (int) (this.getLocation().getY() * 32.0D), (int) (this.getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (short) 0, this.getDataWatcher());
 	}
 
 	public void onPlayerChat(final String message) {
@@ -226,7 +236,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		Main.getInstance().mainWorld.players.remove(this);
 
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
-			p.getNetworkManager().sendPacket(new PacketOutPlayerListItem(this.getPlayerName(), false, (short) 1));
+			p.getNetworkManager().sendPacket(new PacketOutPlayerListItem(new Action[] { new ActionRemovePlayer(this.uuid) }));
 		}
 		if (Main.getInstance().onlinePlayers.contains(this)) {
 			Main.getInstance().onlinePlayers.remove(this);
@@ -277,10 +287,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 		if (moveUpdates++ % 40 == 0 || dx > 127 || dx < -127 || dy > 127 || dy < -127 || dz > 127 || dz < -127) {
 			// teleport
-			packet = new PacketOutEntityTeleport(this.getEntityId(), (int) (this.getLocation().getX() * 32.0D), (int) (this.getLocation().getY() * 32.0D), (int) (this.getLocation().getZ() * 32.0D), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch());
+			packet = new PacketOutEntityTeleport(this.getEntityId(), (int) (this.getLocation().getX() * 32.0D), (int) (this.getLocation().getY() * 32.0D), (int) (this.getLocation().getZ() * 32.0D), (byte) this.getLocation().getYaw(), (byte) this.getLocation().getPitch(), false);
 		} else {
 			// movement
-			packet = new PacketOutEntityRelativeMove(this.getEntityId(), (byte) dx, (byte) dy, (byte) dz);
+			packet = new PacketOutEntityRelativeMove(this.getEntityId(), (byte) dx, (byte) dy, (byte) dz, false);
 		}
 
 		Iterator<String> players = this.visiblePlayers.iterator();
@@ -303,7 +313,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public void broadcastRotation(float pitch, float yaw) {
 		Iterator<String> players = this.visiblePlayers.iterator();
 
-		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F), (byte) Utill.calcYaw(pitch * 256.0F / 360.0F));
+		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F), (byte) Utill.calcYaw(pitch * 256.0F / 360.0F), false);
 		Packet pack2 = new PacketOutEntityHeadLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F));
 
 		while (players.hasNext()) {
@@ -334,7 +344,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		if (!this.isOnline)
 			return false;
 		try {
-			this.networkManager.sendPacket(new PacketOutChatMessage(message));
+			this.networkManager.sendPacket(new PacketOutChatMessage(message, (byte) 0));
 			return true;
 		} catch (Exception ex) {
 			try {
@@ -368,9 +378,9 @@ public class EnderPlayer extends Entity implements CommandSender {
 		oldLocation.setPitch(newLocation.getPitch());
 		oldLocation.setYaw(newLocation.getYaw());
 
-		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(newLocation.getX(), newLocation.getY(), newLocation.getZ(), newLocation.getYaw(), newLocation.getPitch(), false));
+		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(newLocation.getX(), newLocation.getY(), newLocation.getZ(), newLocation.getYaw(), newLocation.getPitch(), (byte) 0b00000));
 
-		PacketOutEntityTeleport packet = new PacketOutEntityTeleport(this.getEntityId(), (int) (newLocation.getX() * 32.0D), (int) (newLocation.getY() * 32.0D), (int) (newLocation.getZ() * 32.0D), (byte) newLocation.getYaw(), (byte) newLocation.getPitch());
+		PacketOutEntityTeleport packet = new PacketOutEntityTeleport(this.getEntityId(), (int) (newLocation.getX() * 32.0D), (int) (newLocation.getY() * 32.0D), (int) (newLocation.getZ() * 32.0D), (byte) newLocation.getYaw(), (byte) newLocation.getPitch(), false);
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (!ep.equals(this)) {
 				ep.getNetworkManager().sendPacket(packet);
@@ -417,15 +427,17 @@ public class EnderPlayer extends Entity implements CommandSender {
 		if (damage <= 0) {
 			throw new IllegalArgumentException("Damage cannot be smaller or equal to zero.");
 		}
-		if (this.godMode) return;
+		if (this.godMode)
+			return;
 		super.damage(damage);
 	}
 
 	@Override
 	protected void onHealthUpdate(float health, float oldHealth) {
 		networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
-		if (health > 0) return;
-		Packet packet = new PacketOutEntityDestroy(new Integer[]{this.getEntityId()});
+		if (health > 0)
+			return;
+		Packet packet = new PacketOutEntityDestroy(new Integer[] { this.getEntityId() });
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (ep.visiblePlayers.contains(this.getPlayerName())) {
 				ep.visiblePlayers.remove(this.getPlayerName());
@@ -456,7 +468,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	public void setOnGround(boolean onGround) {
 		if (this.isOnGround == false && onGround == true) {
-			if (this.canFly) return; // Flying players don't get damage in vanilla
+			if (this.canFly)
+				return; // Flying players don't get damage in vanilla
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
 			if (change > 0) {
@@ -490,8 +503,9 @@ public class EnderPlayer extends Entity implements CommandSender {
 	}
 
 	/**
-	 * Class used to store the client side settings from the user, the reason I included setters and getters is that we
-	 * can add a event or simulair to the code later on
+	 * Class used to store the client side settings from the user, the reason I
+	 * included setters and getters is that we can add a event or simulair to
+	 * the code later on
 	 *
 	 * @author ferrybig
 	 */
@@ -501,8 +515,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		private byte renderDistance = 3;
 		private byte chatFlags = 0;
 		private boolean chatColors = true;
-		private byte difficulty = 2;
-		private boolean showCapes = true;
+		private int displayedSkinParts = 0;
 
 		public String getLocale() {
 			return locale;
@@ -536,21 +549,12 @@ public class EnderPlayer extends Entity implements CommandSender {
 			this.chatColors = chatColors;
 		}
 
-		public byte getDifficulty() {
-			return difficulty;
+		public int getDisplayedSkinParts() {
+			return displayedSkinParts;
 		}
 
-		public void setDifficulty(byte difficulty) {
-			this.difficulty = difficulty;
+		public void setDisplayedSkinParts(int displayedSkinParts) {
+			this.displayedSkinParts = displayedSkinParts;
 		}
-
-		public boolean isShowCapes() {
-			return showCapes;
-		}
-
-		public void setShowCapes(boolean showCapes) {
-			this.showCapes = showCapes;
-		}
-
 	}
 }
