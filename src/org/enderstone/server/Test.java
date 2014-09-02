@@ -3,7 +3,6 @@ package org.enderstone.server;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import org.enderstone.server.chat.AdvancedMessage;
 import org.enderstone.server.entity.DataWatcher;

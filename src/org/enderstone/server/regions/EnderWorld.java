@@ -14,11 +14,7 @@ import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.Entity;
-import org.enderstone.server.packet.Packet;
-import org.enderstone.server.packet.play.PacketOutEntityDestroy;
-import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
-import org.enderstone.server.packet.play.PacketOutSpawnObject;
 import org.enderstone.server.regions.generators.TimTest;
 import org.enderstone.server.util.IntegerArrayComparator;
 

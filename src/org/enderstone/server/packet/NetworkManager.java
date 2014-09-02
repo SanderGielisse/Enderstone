@@ -2,10 +2,8 @@ package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.io.IOException;
@@ -33,7 +31,6 @@ import org.enderstone.server.entity.PlayerTextureStore;
 import org.enderstone.server.packet.codec.DiscardingReader;
 import org.enderstone.server.packet.codec.MinecraftServerCodex;
 import org.enderstone.server.packet.login.PacketOutLoginSucces;
-import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutJoinGame;
 import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;

@@ -38,7 +38,6 @@ import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
-import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.uuid.UUIDFactory;
 

@@ -1,7 +1,6 @@
 package org.enderstone.server.entity;
 
 import java.util.List;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.inventory.ItemStack;
