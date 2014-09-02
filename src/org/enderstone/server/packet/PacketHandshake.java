@@ -65,6 +65,7 @@ public class PacketHandshake extends Packet {
 	@Override
 	public void onRecieve(NetworkManager networkManager) {
 		networkManager.latestHandshakePacket = this;
+		networkManager.clientVersion = this.protocol;
 	}
 	
 	

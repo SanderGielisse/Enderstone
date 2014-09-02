@@ -50,6 +50,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	private EncryptionSettings encryptionSettings;
 	public UUID uuid;
 	public PlayerTextureStore skinBlob;
+	public int clientVersion;
 
 	public PacketHandshake latestHandshakePacket;
 	public volatile int handShakeStatus = -1;
