@@ -39,9 +39,11 @@ public class Inventory {
 			slot = this.HOTBAR.get(slotNumber);
 		}
 		this.ITEMS.put(slot, stack);
-
-		EnderLogger.debug("PLAYER: " + player);
-
 		player.getNetworkManager().sendPacket(new PacketOutSetSlot((byte) 0, (short) slot, stack));
+	}
+	
+	public void setRawItem(int slotNumber, ItemStack stack){
+		this.ITEMS.put(slotNumber, stack);
+		player.getNetworkManager().sendPacket(new PacketOutSetSlot((byte) 0, (short) slotNumber, stack));
 	}
 }
