@@ -20,14 +20,14 @@ import org.json.JSONObject;
  */
 public class PacketInEncryptionResponse extends Packet {
 
-	byte[] sharedSecret;
-	byte[] verifyToken;
+	private byte[] sharedSecret;
+	private byte[] verifyToken;
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
-		this.sharedSecret = new byte[buf.readShort()];
+		this.sharedSecret = new byte[readVarInt(buf)];
 		buf.readBytes(this.sharedSecret);
-		this.verifyToken = new byte[buf.readShort()];
+		this.verifyToken = new byte[readVarInt(buf)];
 		buf.readBytes(this.verifyToken);
 	}
 
@@ -38,7 +38,7 @@ public class PacketInEncryptionResponse extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return 2 + 2 + sharedSecret.length + verifyToken.length + getVarIntSize(getId());
+		return getVarIntSize(sharedSecret.length) + getVarIntSize(verifyToken.length) + sharedSecret.length + verifyToken.length + getVarIntSize(getId());
 	}
 
 	@Override
