@@ -45,7 +45,7 @@ public class EntityItem extends Entity {
 	@Override
 	public Packet getSpawnPacket() {
 		Location loc = this.getLocation();
-		return new PacketOutSpawnObject(getEntityId(), (byte) 2, (int) ((loc.getX() + 0.5) * 32.0D), (int) ((loc.getY() + 0.5) * 32.0D), (int) ((loc.getZ() + 0.5) * 32.0D), (byte) 0, (byte) 0, 0, (short) 2, (short) 2, (short) 2);
+		return new PacketOutSpawnObject(getEntityId(), (byte) 2, (int) ((loc.getX() + 0.5) * 32.0D), (int) ((loc.getY() + 0.25) * 32.0D), (int) ((loc.getZ() + 0.5) * 32.0D), (byte) 0, (byte) 0, 0, (short) 2, (short) 2, (short) 2);
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public final class NBTOutputStream implements Closeable {
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public NBTOutputStream(OutputStream os) throws IOException {
-		this.os = new DataOutputStream(new GZIPOutputStream(os));
+		this.os = new DataOutputStream(os);
 	}
 	
 	/**

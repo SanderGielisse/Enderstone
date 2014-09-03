@@ -68,7 +68,7 @@ public final class NBTInputStream implements Closeable {
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public NBTInputStream(InputStream is) throws IOException {
-		this.is = new DataInputStream(new GZIPInputStream(is));
+		this.is = new DataInputStream(is);
 	}
 	
 	/**

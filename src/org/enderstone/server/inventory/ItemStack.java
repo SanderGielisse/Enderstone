@@ -17,15 +17,10 @@
  */
 package org.enderstone.server.inventory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.enderstone.server.EnderLogger;
 import org.jnbt.ByteTag;
 import org.jnbt.CompoundTag;
-import org.jnbt.NBTOutputStream;
 import org.jnbt.ShortTag;
 import org.jnbt.StringTag;
 import org.jnbt.Tag;
@@ -60,10 +55,9 @@ public class ItemStack {
 		Map<String, Tag> map = new HashMap<>();
 		map.put("Count", new ByteTag("Count", this.getAmount()));
 		map.put("Damage", new ShortTag("Damage", this.getDamage()));
-		map.put("id", new ShortTag("id", blockId)); // TODO -> String
-																// in 1.8+
+		map.put("id", new StringTag("id", "minecraft:grass"));
 		this.compoundTag = new CompoundTag("Item", map);
-		this.compoundTag = null;
+		//this.compoundTag = null;
 	}
 
 	public short getBlockId() {
