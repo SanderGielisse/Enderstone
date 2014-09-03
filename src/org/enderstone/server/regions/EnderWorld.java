@@ -150,7 +150,6 @@ public class EnderWorld {
 			} catch (Exception e) {
 				EnderLogger.exception(e);
 			}
-			System.out.println("Populated chunk "+c.getX()+","+c.getZ());
 		} finally {
 			c.hasPopulated = didPopulate;
 		}
