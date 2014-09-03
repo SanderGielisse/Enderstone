@@ -35,7 +35,16 @@ public class EnderWorld {
 	private Location spawnLocation = new Location(null, 0, 80, 0, 0f, 0f);
 
 	public EnderChunk getOrCreateChunk(int x, int z) {
-		EnderChunk r = getChunk(x, z);
+		return getOrCreateChunk(x, z, true);
+	}
+
+	private EnderChunk getOrCreateChunk(int x, int z, boolean checkChunkPopulation) {
+		EnderChunk c = this.getOrCreateChunk0(x, z);
+		return checkChunkPopulation ? checkChunkPopulation(c) : c;
+	}
+
+	private EnderChunk getOrCreateChunk0(int x, int z) {
+		EnderChunk r = getChunk(x, z, false);
 		if (r != null) {
 			return r;
 		}
@@ -46,7 +55,6 @@ public class EnderWorld {
 		if (blocks.length != AMOUNT_OF_CHUNKSECTIONS) {
 			blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
 		}
-
 		short[][] id = new short[16][];
 		byte[][] data = new byte[16][];
 		for (int i = 0; i < blocks.length; i++) {
@@ -65,19 +73,34 @@ public class EnderWorld {
 			}
 		}
 		loadedChunks.add(r = new EnderChunk(x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>()));
-		return checkChunkPopulation(r);
+		return r;
 	}
 
 	public EnderChunk getChunk(int x, int z) {
-		EnderChunk loaded = this.loadChunk(x, z);
-		if (loaded != null) {
-			return loaded;
-		}
-		return checkChunkPopulation(this.loadedChunks.get(x, z));
+		return getChunk(x, z, true);
 	}
 
-	public EnderChunk loadChunk(int x, int z) {
-		return checkChunkPopulation(null);
+	private EnderChunk getChunk(int x, int z, boolean checkChunkPopulation) {
+		EnderChunk c = this.getChunk0(x, z);
+		return checkChunkPopulation ? checkChunkPopulation(c) : c;
+	}
+
+	private EnderChunk getChunk0(int x, int z) {
+		return this.loadedChunks.get(x, z);
+
+	}
+
+	private EnderChunk loadChunk(int x, int z) {
+		return loadChunk(x, z, true);
+	}
+
+	private EnderChunk loadChunk(int x, int z, boolean checkChunkPopulation) {
+		EnderChunk c = this.loadChunk0(x, z);
+		return checkChunkPopulation ? checkChunkPopulation(c) : c;
+	}
+
+	private EnderChunk loadChunk0(int x, int z) {
+		return null;
 	}
 
 	public void saveChunk(EnderChunk ender) {
@@ -96,7 +119,7 @@ public class EnderWorld {
 					if (k == 0 && i == 0) {
 						continue;
 					}
-					EnderChunk found = this.getChunk(i + c.getX(), k + c.getZ());
+					EnderChunk found = this.getOrCreateChunk(i + c.getX(), k + c.getZ(), false);
 					if (found == null) {
 						return c;
 					}
@@ -110,6 +133,7 @@ public class EnderWorld {
 			} catch (Exception e) {
 				EnderLogger.exception(e);
 			}
+			System.out.println("Populated chunk "+c.getX()+","+c.getZ());
 		} finally {
 			c.hasPopulated = didPopulate;
 		}
@@ -135,6 +159,7 @@ public class EnderWorld {
 	public void doChunkUpdatesForPlayer(EnderPlayer player, ChunkInformer informer, int radius, boolean force) {
 		synchronized (informer) {
 			RegionSet playerChunks = players.get(player);
+			List<EnderChunk> newPlayerChunks = new ArrayList<>();
 			if (playerChunks == null) {
 				players.put(player, playerChunks = new RegionSet());
 			}
@@ -174,6 +199,7 @@ public class EnderWorld {
 					Iterator<EnderChunk> loop = copy.iterator();
 					while (loop.hasNext()) {
 						EnderChunk i = loop.next();
+
 						playerChunks.remove(i);
 						informer.removeChunk(i);
 					}
@@ -187,13 +213,14 @@ public class EnderWorld {
 						cx = l[0];
 						cz = l[1];
 						EnderChunk c = getOrCreateChunk(cx, cz);
-						playerChunks.add(c);
+						newPlayerChunks.add(c);
 						informer.sendChunk(c);
 						index++;
 					}
 				}
 			} finally {
 				informer.done();
+				playerChunks.addAll(newPlayerChunks);
 			}
 		}
 	}
