@@ -346,7 +346,7 @@ public class Main implements Runnable {
 	
 	public void broadcastMessage(Message message)
 	{
-		Packet p = new PacketOutChatMessage(message, (byte) 0);
+		Packet p = new PacketOutChatMessage(message, (byte) 1);
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			player.getNetworkManager().sendPacket(p);
 		}

@@ -51,7 +51,7 @@ public class PacketOutChatMessage extends Packet {
 			throw new IllegalArgumentException("The chat messages can't be any longer than 32767 bytes!");
 		}
 		writeString(this.jsonChat, buf);
-		buf.writeByte(getId());
+		buf.writeByte(position);
 	}
 
 	@Override
