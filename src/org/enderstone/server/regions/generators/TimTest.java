@@ -80,8 +80,23 @@ public class TimTest extends ChunkGenerator {
 
 		pops.add(new BlockPopulator() {
 
+			public void setBlock(int x, int z, EnderChunk source){
+				source.setBlock(x, source.getHighestBlock(x, z)+1, z, BlockId.RED_ROSE, (byte) 0);
+			}
 			@Override
 			public void populate(EnderWorld world, Random random, EnderChunk source) {
+				setBlock(1, 0, source);
+				setBlock(0, 1, source);
+				
+				setBlock(14, 15, source);
+				setBlock(15, 14, source);
+				
+				setBlock(1, 15, source);
+				setBlock(0, 14, source);
+				
+				setBlock(15, 1, source);
+				setBlock(14, 0, source);
+				
 				int x = random.nextInt(15), z = random.nextInt(15);
 				try {
 					source.setBlock(x, source.getHighestBlock(x, z), z, BlockId.LOG, (byte) 1);
