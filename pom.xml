@@ -61,4 +61,7 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+    <properties>
+        <netbeans.hint.license>licenseheader</netbeans.hint.license>
+    </properties>
 </project>
