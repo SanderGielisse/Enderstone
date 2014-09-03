@@ -50,7 +50,7 @@ public class PacketOutSpawnPlayer extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		return getVarIntSize(entityId) + getUUIDSize() + (getIntSize() * 3) + 2 + getShortSize() + getDataWatcherSize(dataWatcher);
+		return getVarIntSize(entityId) + getUUIDSize() + (getIntSize() * 3) + 2 + getShortSize() + getDataWatcherSize(dataWatcher) + getVarIntSize(getId());
 	}
 
 	@Override

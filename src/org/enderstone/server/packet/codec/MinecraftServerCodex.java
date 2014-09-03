@@ -38,8 +38,11 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf buf) throws IOException {
+		try{
 		packet.writeFully(buf);
-		EnderLogger.debug("-->: "+packet);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -110,7 +113,6 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 					}
 					break;
 				}
-				EnderLogger.debug("<--: "+in);
 				out.add(in);
 			} catch (IOException | InstantiationException | IllegalAccessException ex) {
 				throw new DecodeException("Packet decode failed:"
