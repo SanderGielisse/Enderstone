@@ -49,11 +49,4 @@ public class PacketInCloseWindow extends Packet {
 	public byte getWindowId() {
 		return windowId;
 	}
-
-	@Override
-	public void onRecieve(NetworkManager networkManager) {
-		super.onRecieve(networkManager); //To change body of generated methods, choose Tools | Templates.
-	}
-	
-	
 }

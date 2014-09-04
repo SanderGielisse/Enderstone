@@ -40,12 +40,12 @@ public class PacketInConfirmTransaction extends Packet{
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return 1 + 2 + 1 + getVarIntSize(getId());
+		return 1 + getShortSize() + 1 + getVarIntSize(getId());
 	}
 
 	@Override

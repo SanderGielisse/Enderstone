@@ -29,6 +29,7 @@ import org.enderstone.server.packet.play.PacketInClickWindow;
 import org.enderstone.server.packet.play.PacketInClientSettings;
 import org.enderstone.server.packet.play.PacketInClientStatus;
 import org.enderstone.server.packet.play.PacketInCloseWindow;
+import org.enderstone.server.packet.play.PacketInConfirmTransaction;
 import org.enderstone.server.packet.play.PacketInCreativeInventoryAction;
 import org.enderstone.server.packet.play.PacketInEntityAction;
 import org.enderstone.server.packet.play.PacketInHeldItemChange;
@@ -80,6 +81,7 @@ public class PacketManager {
 		play.put(0x0B, PacketInEntityAction.class);
 		play.put(0x0D, PacketInCloseWindow.class);
 		play.put(0x0E, PacketInClickWindow.class);
+		play.put(0x0F, PacketInConfirmTransaction.class);
 	}
 
 	public static Class<? extends Packet> getPacket(int id, HandshakeState handshake) {

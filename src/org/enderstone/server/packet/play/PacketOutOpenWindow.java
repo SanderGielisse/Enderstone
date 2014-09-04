@@ -15,7 +15,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
@@ -53,17 +52,12 @@ public class PacketOutOpenWindow extends Packet {
 	@Override
 	public int getSize() throws IOException {
 		if(windowMessageString == null) windowMessageString = windowMessage.toMessageJson();
-		int size = 0;
-		size += getStringSize(inventoryType);
-		size += getStringSize(windowMessageString);
-		size += 2;
-		if(inventoryType.equals("EntityHorse")) size += getVarIntSize(entityId);
-		return size;
+		return 1 + getStringSize(inventoryType) + getStringSize(windowMessageString) + 1 + (inventoryType.equals("EntityHorse") ? getIntSize() : 0) + getVarIntSize(getId());
 	}
 
 	@Override
 	public byte getId() {
-		return 0x2d;
+		return 0x2D;
 	}
 	
 }

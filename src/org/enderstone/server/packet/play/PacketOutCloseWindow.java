@@ -15,23 +15,20 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.packet.Packet;
 
-/**
- *
- * @author Fernando
- */
-public class PacketOutConfirmTransaction extends Packet{
+public class PacketOutCloseWindow extends Packet{
 
 	private byte windowId;
-	private short actionNumber;
-	private boolean accepted;
-	
+
+	public PacketOutCloseWindow(byte windowId) {
+		this.windowId = windowId;
+	}
+
 	@Override
 	public void read(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
@@ -40,18 +37,15 @@ public class PacketOutConfirmTransaction extends Packet{
 	@Override
 	public void write(ByteBuf buf) throws IOException {
 		buf.writeByte(windowId);
-		buf.writeShort(actionNumber);
-		buf.writeBoolean(accepted);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return 1 + 2 + 1 + getVarIntSize(getId());
+		return 1 + getVarIntSize(getId());
 	}
 
 	@Override
 	public byte getId() {
-		return 0x32;
+		return 0x2E;
 	}
-	
 }
