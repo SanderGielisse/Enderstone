@@ -79,6 +79,6 @@ public class PacketOutRespawn extends Packet {
 	}
 	
 	public void refillInventory(NetworkManager networkManager){
-		networkManager.player.inventory.setItem(InventoryType.HOTBAR, 5, new ItemStack(BlockId.DIRT.getId(), (byte) 101, (short) 1));
+		//networkManager.player.inventory.setItem(InventoryType.HOTBAR, 5, new ItemStack(BlockId.DIRT.getId(), (byte) 101, (short) 1));
 	}
 }

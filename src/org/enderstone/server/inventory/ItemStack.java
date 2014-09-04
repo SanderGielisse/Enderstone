@@ -17,10 +17,18 @@
  */
 package org.enderstone.server.inventory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.enderstone.server.regions.BlockId;
 import org.jnbt.ByteTag;
 import org.jnbt.CompoundTag;
+import org.jnbt.NBTInputStream;
+import org.jnbt.NBTOutputStream;
 import org.jnbt.ShortTag;
 import org.jnbt.StringTag;
 import org.jnbt.Tag;
@@ -29,15 +37,14 @@ import org.jnbt.Tag;
  *
  * @author Fernando
  */
-
-public class ItemStack {
+public class ItemStack implements Cloneable {
 
 	private short blockId;
 	private byte amount;
 	private short damage;
 	private CompoundTag compoundTag;
-	
-	public ItemStack(short blockId, byte amount, short damage){
+
+	public ItemStack(short blockId, byte amount, short damage) {
 		this(blockId, amount, damage, null);
 	}
 
@@ -90,5 +97,29 @@ public class ItemStack {
 
 	public void setCompoundTag(CompoundTag compoundTag) {
 		this.compoundTag = compoundTag;
+	}
+	
+	@Override
+	@SuppressWarnings("CloneDeclaresCloneNotSupported")
+	public ItemStack clone() { //TODO Faster clone and what if compoundtag == null? 
+		try {
+			ItemStack s = (ItemStack) super.clone();
+			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+			new NBTOutputStream(bytes).writeTag(compoundTag);
+			s.setCompoundTag((CompoundTag)new NBTInputStream(new ByteArrayInputStream(bytes.toByteArray())).readTag());
+			return s;
+		} catch (CloneNotSupportedException | IOException err) {
+			throw new AssertionError(err);
+		}
+	}
+	
+	public BlockId getId()
+	{
+		return BlockId.byId(this.blockId);
+	}
+	
+	public boolean materialTypeMatches(ItemStack other)
+	{
+		return other.blockId == this.blockId; // TODO do this better (also compare item damages)
 	}
 }

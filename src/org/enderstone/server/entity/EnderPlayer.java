@@ -33,6 +33,7 @@ import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.inventory.Inventory;
+import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
@@ -59,6 +60,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	private static final int MAX_CHUNKS_EVERY_UPDATE = 16;
 
+	public final InventoryHandler handler = new InventoryHandler(this);
 	public final ClientSettings clientSettings = new ClientSettings();
 	public final NetworkManager networkManager;
 	public final String playerName;
@@ -188,7 +190,6 @@ public class EnderPlayer extends Entity implements CommandSender {
 			this.getNetworkManager().sendPacket(new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(player.uuid, player.getPlayerName(), player.getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") }));
 		}
 		Main.getInstance().broadcastMessage(new SimpleMessage(ChatColor.YELLOW + this.getPlayerName() + " joined the game!"));
-		this.inventory = new Inventory(this);
 	}
 
 	@Override
