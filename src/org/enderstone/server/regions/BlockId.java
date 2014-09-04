@@ -402,4 +402,9 @@ public enum BlockId {
 	public String toString() {
 		return "BlockId{" + "id=" + id + ", validBlock=" + validBlock + '}';
 	}
+	
+	public int getMaxStackSize()
+	{
+		return 64; // TODO add exception for damageable blocks, snowballs and others
+	}
 }

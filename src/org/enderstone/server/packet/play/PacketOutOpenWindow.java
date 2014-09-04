@@ -1,4 +1,4 @@
-/* 
+/*
  * Enderstone
  * Copyright (C) 2014 Sander Gielisse and Fernando van Loenhout
  *
@@ -15,45 +15,56 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import org.enderstone.server.packet.NetworkManager;
+import org.enderstone.server.chat.Message;
 import org.enderstone.server.packet.Packet;
 
-public class PacketInCloseWindow extends Packet {
-
+/**
+ *
+ * @author Fernando
+ */
+public class PacketOutOpenWindow extends Packet {
 	private byte windowId;
+	private String inventoryType;
+	private Message windowMessage;
+	private transient String windowMessageString;
+	private byte maxSlots;
+	private int entityId;
 
 	@Override
 	public void read(ByteBuf buf) throws IOException {
-		this.windowId = buf.readByte();
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
+		if(windowMessageString == null) windowMessageString = windowMessage.toMessageJson();
+		buf.writeByte(windowId);
+		writeString(inventoryType, buf);
+		writeString(windowMessageString, buf);
+		buf.writeByte(maxSlots);
+		if(inventoryType.equals("EntityHorse")) writeVarInt(entityId, buf);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return 1 + getVarIntSize(getId());
+		if(windowMessageString == null) windowMessageString = windowMessage.toMessageJson();
+		int size = 0;
+		size += Byte.BYTES;
+		size += getStringSize(inventoryType);
+		size += getStringSize(windowMessageString);
+		size += Byte.BYTES;
+		if(inventoryType.equals("EntityHorse")) size += getVarIntSize(entityId);
+		return size;
 	}
 
 	@Override
 	public byte getId() {
-		return 0x0D;
+		return 0x2d;
 	}
-
-	public byte getWindowId() {
-		return windowId;
-	}
-
-	@Override
-	public void onRecieve(NetworkManager networkManager) {
-		super.onRecieve(networkManager); //To change body of generated methods, choose Tools | Templates.
-	}
-	
 	
 }

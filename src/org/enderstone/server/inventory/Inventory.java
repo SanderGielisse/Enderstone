@@ -17,50 +17,147 @@
  */
 package org.enderstone.server.inventory;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.AbstractList;
 import java.util.List;
-import java.util.Map;
-import org.enderstone.server.EnderLogger;
-import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.packet.play.PacketOutSetSlot;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.enderstone.server.util.FixedSizeList;
 
-public class Inventory {
+public abstract class Inventory implements AutoCloseable {
+
+	protected final int size;
+	protected final InventoryType type;
+	protected final List<ItemStack> items;
+	private final List<InventoryListener> listeners;
+
+	protected Inventory(InventoryType type, final int size, InventoryListener... listeners) {
+		this.type = type;
+		this.size = size;
+		this.items = new InventoryWrapper(size);
+		this.listeners = new CopyOnWriteArrayList<>(listeners);
+	}
+
+	public void setRawItem(int slotNumber, ItemStack stack) {
+		this.items.set(slotNumber, stack);
+	}
+
+	public void getRawItem(int slotNumber) {
+		this.items.get(slotNumber);
+	}
+
+	public void addListener(InventoryListener listener) {
+		this.listeners.add(listener);
+	}
+
+	public void removeListener(InventoryListener listener) {
+		this.listeners.remove(listener);
+	}
+
+	protected void callSlotChance(int slot, ItemStack oldStack, ItemStack newStack) {
+		for (InventoryListener l : Inventory.this.listeners) {
+			l.onSlotChange(Inventory.this, slot, oldStack, newStack);
+		}
+	}
+	
+	protected void callPropertyChance(int slot, short property, short oldValue, short newValue) {
+		for (InventoryListener l : Inventory.this.listeners) {
+			l.onPropertyChange(this, property, oldValue, newValue);
+		}
+	}
+
+	@Override
+	public final void close() {
+		this.close0();
+		for (InventoryListener l : this.listeners) {
+			l.closeInventory(this);
+		}
+	}
+
+	protected abstract void close0();
+
+	protected static ItemStack tryAddItem(List<ItemStack> inventory, ItemStack stack)
+	{
+		List<ItemStack> mainInv = inventory;
+		int i = 0;
+		int s = mainInv.size();
+		for(;i < s; i++)
+		{
+			ItemStack tmp = mainInv.get(i);
+			if(tmp == null)
+			{
+				mainInv.set(i, stack);
+				return null;
+			}
+			if(tmp.materialTypeMatches(stack))
+			{
+				int tmpSize = tmp.getAmount();
+				int maxSize = tmp.getId().getMaxStackSize();
+				int moreNeeded = maxSize - tmpSize;
+				if(moreNeeded >= stack.getAmount())
+				{
+					tmp.setAmount((byte) (tmpSize + stack.getAmount()));
+					mainInv.set(i, tmp);
+					return null;
+				}
+				else
+				{
+					stack.setAmount((byte) (stack.getAmount() - moreNeeded));
+					tmp.setAmount((byte) (tmpSize + moreNeeded));
+				}
+			}
+		}
+		return stack;
+	}
+	
+	private class InventoryWrapper extends AbstractList<ItemStack> {
+
+		private final int offset;
+
+		public InventoryWrapper(int size) {
+			main = new FixedSizeList<>(new ItemStack[size]);
+			offset = 0;
+		}
+
+		public InventoryWrapper(List<ItemStack> parent, int offset) {
+			main = parent;
+			this.offset = offset;
+		}
+		private final List<ItemStack> main;
+
+		@Override
+		public ItemStack get(int index) {
+			return main.get(index).clone();
+		}
+
+		@Override
+		public ItemStack set(int index, ItemStack newStack) {
+			ItemStack oldValue = this.main.set(index, newStack);
+			if (oldValue != newStack)
+				Inventory.this.callSlotChance(index, oldValue, newStack);
+			return oldValue;
+		}
+
+		@Override
+		public List<ItemStack> subList(int fromIndex, int toIndex) {
+			return new InventoryWrapper(main.subList(fromIndex, toIndex), toIndex);
+		}
+
+		@Override
+		public int size() {
+			return main.size();
+		}
+	}
+	
+	public interface InventoryListener {
+
+		public void onSlotChange(Inventory inv, int slot, ItemStack oldStack, ItemStack newStack);
+
+		public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue);
+		
+		public void closeInventory(Inventory inv);
+	}
 
 	public enum InventoryType {
-		EQUIPMENT(), CRAFTING(), INVENTORY(), HOTBAR();
-	}
-	
-	private EnderPlayer player;
 
-	public Inventory(EnderPlayer player) {
-		this.player = player;
-	}
-
-	private final List<Integer> EQUIPMENT = Arrays.asList(new Integer[] { 5, 6, 7, 8 });
-	private final List<Integer> CRAFTING = Arrays.asList(new Integer[] { 1, 2, 3, 4, 0 });
-	private final List<Integer> INVENTORY = Arrays.asList(new Integer[] { 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35 });
-	private final List<Integer> HOTBAR = Arrays.asList(new Integer[] { 36, 37, 38, 39, 40, 41, 42, 43, 44 });
-
-	private final Map<Integer, ItemStack> ITEMS = new HashMap<>();
-
-	public void setItem(InventoryType type, int slotNumber, ItemStack stack) {
-		int slot = 0;
-		if (type == InventoryType.EQUIPMENT) {
-			slot = this.EQUIPMENT.get(slotNumber);
-		} else if (type == InventoryType.CRAFTING) {
-			slot = this.CRAFTING.get(slotNumber);
-		} else if (type == InventoryType.INVENTORY) {
-			slot = this.INVENTORY.get(slotNumber);
-		} else if (type == InventoryType.HOTBAR) {
-			slot = this.HOTBAR.get(slotNumber);
-		}
-		this.ITEMS.put(slot, stack);
-		player.getNetworkManager().sendPacket(new PacketOutSetSlot((byte) 0, (short) slot, stack));
-	}
-	
-	public void setRawItem(int slotNumber, ItemStack stack){
-		this.ITEMS.put(slotNumber, stack);
-		player.getNetworkManager().sendPacket(new PacketOutSetSlot((byte) 0, (short) slotNumber, stack));
+		EQUIPMENT(), CRAFTING(), INVENTORY();
 	}
 }

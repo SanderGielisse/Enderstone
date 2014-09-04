@@ -1,4 +1,4 @@
-/* 
+/*
  * Enderstone
  * Copyright (C) 2014 Sander Gielisse and Fernando van Loenhout
  *
@@ -15,45 +15,43 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
-public class PacketInCloseWindow extends Packet {
+/**
+ *
+ * @author Fernando
+ */
+public class PacketOutConfirmTransaction extends Packet{
 
 	private byte windowId;
-
+	private short actionNumber;
+	private boolean accepted;
+	
 	@Override
 	public void read(ByteBuf buf) throws IOException {
-		this.windowId = buf.readByte();
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
+		buf.writeByte(windowId);
+		buf.writeShort(actionNumber);
+		buf.writeBoolean(accepted);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return 1 + getVarIntSize(getId());
+		return 1 + 2 + 1 + getVarIntSize(getId());
 	}
 
 	@Override
 	public byte getId() {
-		return 0x0D;
+		return 0x32;
 	}
-
-	public byte getWindowId() {
-		return windowId;
-	}
-
-	@Override
-	public void onRecieve(NetworkManager networkManager) {
-		super.onRecieve(networkManager); //To change body of generated methods, choose Tools | Templates.
-	}
-	
 	
 }
