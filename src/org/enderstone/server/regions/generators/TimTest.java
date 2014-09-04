@@ -17,9 +17,9 @@
  */
 package org.enderstone.server.regions.generators;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.BlockPopulator;
 import org.enderstone.server.regions.ChunkGenerator;
@@ -27,10 +27,10 @@ import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.generators.util.SimplexOctaveGenerator;
 
-public class TimTest extends ChunkGenerator {
+public class TimTest implements ChunkGenerator {
 
 	@Override
-	public BlockId[][] generateExtBlockSections(EnderWorld world, Random random, int i, int o, BiomeGrid biomes) {
+	public BlockId[][] generateExtBlockSections(EnderWorld world, Random random, int i, int o) {
 		BlockId[][] chunk = new BlockId[16][];
 
 		SimplexOctaveGenerator land = new SimplexOctaveGenerator(world, 8);
@@ -76,27 +76,28 @@ public class TimTest extends ChunkGenerator {
 
 	@Override
 	public List<BlockPopulator> getDefaultPopulators(EnderWorld world) {
-		List<BlockPopulator> pops = super.getDefaultPopulators(world);
+		List<BlockPopulator> pops = new ArrayList<>();
 
 		pops.add(new BlockPopulator() {
 
-			public void setBlock(int x, int z, EnderChunk source){
-				source.setBlock(x, source.getHighestBlock(x, z)+1, z, BlockId.RED_ROSE, (byte) 0);
+			public void setBlock(int x, int z, EnderChunk source) {
+				source.setBlock(x, source.getHighestBlock(x, z) + 1, z, BlockId.RED_ROSE, (byte) 0);
 			}
+
 			@Override
 			public void populate(EnderWorld world, Random random, EnderChunk source) {
 				setBlock(1, 0, source);
 				setBlock(0, 1, source);
-				
+
 				setBlock(14, 15, source);
 				setBlock(15, 14, source);
-				
+
 				setBlock(1, 15, source);
 				setBlock(0, 14, source);
-				
+
 				setBlock(15, 1, source);
 				setBlock(14, 0, source);
-				
+
 				int x = random.nextInt(15), z = random.nextInt(15);
 				try {
 					source.setBlock(x, source.getHighestBlock(x, z), z, BlockId.LOG, (byte) 1);
@@ -106,5 +107,29 @@ public class TimTest extends ChunkGenerator {
 			}
 		});
 		return pops;
+	}
+
+	private void setBlock(int x, int y, int z, BlockId[][] chunk, BlockId material) {
+		if (chunk[y >> 4] == null) {
+			chunk[y >> 4] = new BlockId[16 * 16 * 16];
+		}
+		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {
+			return;
+		}
+		chunk[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = material;
+	}
+
+	private BlockId getBlock(int x, int y, int z, BlockId[][] chunk) {
+		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {
+			return BlockId.AIR;
+		}
+		if (chunk[y >> 4] == null) {
+			return BlockId.AIR;
+		}
+		BlockId id = chunk[y >> 4][((y & 0xF) << 8) | (z << 4) | x];
+		if (id == null) {
+			id = BlockId.AIR;
+		}
+		return id;
 	}
 }

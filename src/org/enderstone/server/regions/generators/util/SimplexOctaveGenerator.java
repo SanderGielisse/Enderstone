@@ -8,6 +8,9 @@ import org.enderstone.server.regions.EnderWorld;
  * 
  * @Author Bukkit - https://github.com/Bukkit/Bukkit-Bleeding/tree/master/src/main/java/org/bukkit/util/noise
  * 
+ * Our changes:
+ * - The package name.
+ * 
  * Creates simplex noise through unbiased octaves
  */
 public class SimplexOctaveGenerator extends OctaveGenerator {

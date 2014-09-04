@@ -8,6 +8,9 @@ import org.enderstone.server.regions.EnderWorld;
  * 
  * @Author Bukkit - https://github.com/Bukkit/Bukkit-Bleeding/tree/master/src/main/java/org/bukkit/util/noise
  * 
+ * Our changes:
+ * - The package name.
+ * 
  * Generates simplex-based noise.
  * <p>
  * This is a modified version of the freely published version in the paper by

@@ -3,6 +3,10 @@ package org.enderstone.server.regions.generators.util;
 /**
  * 
  * @Author Bukkit - https://github.com/Bukkit/Bukkit-Bleeding/tree/master/src/main/java/org/bukkit/util/noise
+ * 
+ * Our changes:
+ * - The package name.
+ * 
  * Creates noise using unbiased octaves
  */
 public abstract class OctaveGenerator {
