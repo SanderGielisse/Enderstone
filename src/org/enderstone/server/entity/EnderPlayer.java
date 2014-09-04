@@ -250,7 +250,6 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	public void onDisconnect() {
 		this.isOnline = false;
-		Utill.broadcastMessage(ChatColor.YELLOW + this.getPlayerName() + " left the game!");
 		Main.getInstance().mainWorld.players.remove(this);
 
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
