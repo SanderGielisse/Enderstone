@@ -52,6 +52,7 @@ import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSpawnPosition;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
+import org.enderstone.server.packet.play.PacketOutUpdateTime;
 import org.enderstone.server.regions.EnderWorld;
 
 public class NetworkManager extends ChannelHandlerAdapter {
@@ -226,7 +227,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 						sendPacket(new PacketOutLoginSucces(player.uuid.toString(), player.getPlayerName()));
 						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) GameMode.SURVIVAL.getId(), (byte) 0, (byte) 1, (byte) 60, "default", false));
-
+						sendPacket(new PacketOutUpdateTime(0,Main.getInstance().mainWorld.getTime()));
 						EnderWorld mainWorld = Main.getInstance().mainWorld;
 						Location spawn = mainWorld.getSpawn();
 						Location loc = player.getLocation();

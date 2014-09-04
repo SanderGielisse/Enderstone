@@ -46,6 +46,7 @@ public class EnderWorld {
 	public final Map<EnderPlayer, RegionSet> players = new LinkedHashMap<>();
 	private final ChunkGenerator generator = new TimTest();
 	private final Random random = new Random();
+	private long time = random.nextInt();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
 	public final Set<Entity> entities = new HashSet<>();
 	private Location spawnLocation = new Location(null, 0, 80, 0, 0f, 0f);
@@ -234,6 +235,13 @@ public class EnderWorld {
 		return seed;
 	}
 
+	/**
+	 * @return the time
+	 */
+	public long getTime() {
+		return time;
+	}
+
 	public static interface ChunkInformer {
 
 		public void sendChunk(EnderChunk chunk);
@@ -276,4 +284,8 @@ public class EnderWorld {
 		this.spawnLocation = spawnLocation;
 	}
 
+	public void serverTick()
+	{
+		this.time += 1;
+	}
 }

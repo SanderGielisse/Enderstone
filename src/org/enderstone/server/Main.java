@@ -55,6 +55,7 @@ import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
+import org.enderstone.server.packet.play.PacketOutUpdateTime;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.uuid.UUIDFactory;
 
@@ -221,7 +222,7 @@ public class Main implements Runnable {
 				}
 
 				try {
-					serverTick();
+					serverTick(tick);
 				} catch (Exception e) {
 					EnderLogger.error("Problem while running ServerTick()");
 					EnderLogger.exception(e);
@@ -323,7 +324,7 @@ public class Main implements Runnable {
 	private int latestKeepAlive = 0;
 	private int latestChunkUpdate = 0;
 
-	private void serverTick() {
+	private void serverTick(long tick) {
 		if ((latestKeepAlive++ & 0b0011_1111) == 0) { // faster than % 64 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));
@@ -341,10 +342,15 @@ public class Main implements Runnable {
 			}
 			this.mainWorld.updateEntities(onlinePlayers);
 		}
+
+		if ((tick & 0b0011_1111) == 0) // faster than % 64 == 0
+			for (EnderPlayer p : onlinePlayers) {
+				p.getNetworkManager().sendPacket(new PacketOutUpdateTime(tick, this.mainWorld.getTime()));
+			}
+		this.mainWorld.serverTick();
 	}
-	
-	public void broadcastMessage(Message message)
-	{
+
+	public void broadcastMessage(Message message) {
 		Packet p = new PacketOutChatMessage(message, (byte) 1);
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			player.getNetworkManager().sendPacket(p);
