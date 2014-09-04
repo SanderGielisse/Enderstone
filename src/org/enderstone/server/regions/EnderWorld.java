@@ -32,7 +32,6 @@ import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.Entity;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
-import org.enderstone.server.regions.generators.FlatLandGenerator;
 import org.enderstone.server.regions.generators.TimTest;
 import org.enderstone.server.util.IntegerArrayComparator;
 
@@ -105,19 +104,6 @@ public class EnderWorld {
 	private EnderChunk getChunk0(int x, int z) {
 		return this.loadedChunks.get(x, z);
 
-	}
-
-	private EnderChunk loadChunk(int x, int z) {
-		return loadChunk(x, z, true);
-	}
-
-	private EnderChunk loadChunk(int x, int z, boolean checkChunkPopulation) {
-		EnderChunk c = this.loadChunk0(x, z);
-		return checkChunkPopulation ? checkChunkPopulation(c) : c;
-	}
-
-	private EnderChunk loadChunk0(int x, int z) {
-		return null;
 	}
 
 	public void saveChunk(EnderChunk ender) {

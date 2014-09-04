@@ -37,7 +37,7 @@ public class EnderChunk {
 
 	protected final static int CHUNK_SECTION_SIZE = 16;
 	protected final static int MAX_CHUNK_SECTIONS = 16;
-	private static final Reference<EnderChunkMap> NULL_REFERENCE = new WeakReference(null);
+	private static final Reference<EnderChunkMap> NULL_REFERENCE = new WeakReference<EnderChunkMap>(null);
 	private final int z;
 	private final short[][] blockID;
 	private final byte[][] data;
@@ -206,17 +206,6 @@ public class EnderChunk {
 		 * Write first byte of block id's
 		 */
 		{
-//			for (l = 0; l < chunk.blockID.length; ++l) {
-//				if (chunk.blockID[l] != null && (!flag) && (i & 1 << l) != 0) {
-//					short[] abyte1 = chunk.blockID[l];
-//					for (int t = 0; t < abyte1.length; t++) {
-//						int full = abyte1[t] << 4 | chunk.data[l][t];
-//						abyte[(t << 1) + j] = (byte) (abyte1[t] >> 8);
-//						abyte[(t << 1) + 1 + j] = (byte) (abyte1[t] & 0b1111_1111);
-//					}
-//					j += abyte1.length * 2;
-//				}
-//			}
 			for (l = 0; l < blockID.length; l++) {
 
 				if ((blockID[l] != null) && ((!flag) || (blockID[l] != null)) && ((i & 1 << l) != 0)) {

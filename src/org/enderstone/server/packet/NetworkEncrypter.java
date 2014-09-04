@@ -19,7 +19,6 @@ package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -39,12 +38,12 @@ import org.enderstone.server.EnderLogger;
  */
 public class NetworkEncrypter {
 
-	private final Cipher chipper;
+	private final Cipher cipher;
 	private byte[] decryptBuffer = new byte[0];
 	private byte[] encryptBuffer = new byte[0];
 
-	public NetworkEncrypter(Cipher chipper) {
-		this.chipper = chipper;
+	public NetworkEncrypter(Cipher cipher) {
+		this.cipher = cipher;
 	}
 
 	private byte[] fillInBuffer(ByteBuf paramByteBuf) {
@@ -60,8 +59,8 @@ public class NetworkEncrypter {
 		int i = inbytes.readableBytes();
 		byte[] arrayOfByte = fillInBuffer(inbytes);
 
-		ByteBuf localByteBuf = ctx.alloc().heapBuffer(this.chipper.getOutputSize(i));
-		localByteBuf.writerIndex(this.chipper.update(arrayOfByte, 0, i, localByteBuf.array(), localByteBuf.arrayOffset()));
+		ByteBuf localByteBuf = ctx.alloc().heapBuffer(this.cipher.getOutputSize(i));
+		localByteBuf.writerIndex(this.cipher.update(arrayOfByte, 0, i, localByteBuf.array(), localByteBuf.arrayOffset()));
 
 		return localByteBuf;
 	}
@@ -70,39 +69,15 @@ public class NetworkEncrypter {
 		int bytes = toEcrypt.readableBytes();
 		byte[] arrayOfByte = fillInBuffer(toEcrypt);
 
-		int j = this.chipper.getOutputSize(bytes);
+		int j = this.cipher.getOutputSize(bytes);
 		if (this.encryptBuffer.length < j) {
 			this.encryptBuffer = new byte[j];
 		}
-		int encryptedSize = this.chipper.update(arrayOfByte, 0, bytes, this.encryptBuffer);
+		int encryptedSize = this.cipher.update(arrayOfByte, 0, bytes, this.encryptBuffer);
 		output.writeBytes(this.encryptBuffer, 0, encryptedSize);
 	}
-	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-	private static String javaHexDigest(String data) {
-		MessageDigest digest = null;
-		try {
-			digest = MessageDigest.getInstance("SHA-1");
-			digest.reset();
-			digest.update(data.getBytes("UTF-8"));
-		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-			EnderLogger.exception(e);
-			throw new Error("We cannot run a minecraft server under this platform!", e);
-		}
-		byte[] hash = digest.digest();
-		boolean negative = (hash[0] & 0x80) == 0x80;
-		if (negative)
-			hash = twosCompliment(hash);
-		String digests = getHexString(hash);
-		if (digests.startsWith("0")) {
-			digests = digests.replaceFirst("0", digests);
-		}
-		if (negative) {
-			digests = "-" + digests;
-		}
-		digests = digests.toLowerCase();
-		return digests;
-	}
+	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
 	public static String getHexString(byte[] bytes) {
 		char[] hexChars = new char[bytes.length * 2];
@@ -115,38 +90,26 @@ public class NetworkEncrypter {
 		return new String(hexChars);
 	}
 
-	private static byte[] twosCompliment(byte[] p) {
-		int i;
-		boolean carry = true;
-		for (i = p.length - 1; i >= 0; i--) {
-			p[i] = (byte) ~p[i];
-			if (carry) {
-				carry = p[i] == 0xFF;
-				p[i]++;
-			}
-		}
-		return p;
-	}
-
-	public static byte[] b(Key paramKey, byte[] paramArrayOfByte) {
-		return a(2, paramKey, paramArrayOfByte);
-	}
-
-	private static byte[] a(int paramInt, Key paramKey, byte[] paramArrayOfByte) {
+	public static byte[] toCipherArray(Key paramKey, byte[] paramArrayOfByte) {
 		try {
-			return a(paramInt, paramKey.getAlgorithm(), paramKey).doFinal(paramArrayOfByte);
-		} catch (IllegalBlockSizeException | BadPaddingException ex) {
-			EnderLogger.exception(ex);
+			return toCipherArray(2, paramKey, paramArrayOfByte);
+		} catch (IllegalBlockSizeException | BadPaddingException e) {
+			System.err.println("Cipher creation failed!");
+			EnderLogger.exception(e);
 		}
-		System.err.println("Cipher data failed!");
 		return null;
 	}
 
-	private static Cipher a(int paramInt, String paramString, Key paramKey) {
+	private static byte[] toCipherArray(int arg0, Key cipherKey, byte[] byteArray) throws IllegalBlockSizeException, BadPaddingException {
+		Cipher cipher = toCipher(arg0, cipherKey.getAlgorithm(), cipherKey);
+		return cipher.doFinal(byteArray);
+	}
+
+	private static Cipher toCipher(int arg0, String certificate, Key cipherKey) {
 		try {
-			Cipher localCipher = Cipher.getInstance(paramString);
-			localCipher.init(paramInt, paramKey);
-			return localCipher;
+			Cipher newCipher = Cipher.getInstance(certificate);
+			newCipher.init(arg0, cipherKey);
+			return newCipher;
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException ex) {
 			EnderLogger.exception(ex);
 		}
@@ -164,26 +127,20 @@ public class NetworkEncrypter {
 		return new String(hexChars);
 	}
 
-	public static byte[] a(String paramString, PublicKey paramPublicKey, SecretKey paramSecretKey) {
+	public static byte[] decode(String paramString, PublicKey paramPublicKey, SecretKey paramSecretKey){
 		try {
-			return a("SHA-1", new byte[][]{paramString.getBytes("ISO_8859_1"), paramSecretKey.getEncoded(), paramPublicKey.getEncoded()});
-		} catch (UnsupportedEncodingException ex) {
-			EnderLogger.exception(ex);
+			return toByteArray("SHA-1", new byte[][] { paramString.getBytes("ISO_8859_1"), paramSecretKey.getEncoded(), paramPublicKey.getEncoded() });
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
 		return null;
 	}
 
-	private static byte[] a(String paramString, byte[][] paramArrayOfByte) {
-		try {
-			MessageDigest localMessageDigest = MessageDigest.getInstance(paramString);
-			for (byte[] arrayOfByte1 : paramArrayOfByte) {
-				localMessageDigest.update(arrayOfByte1);
-			}
-			return localMessageDigest.digest();
-		} catch (NoSuchAlgorithmException ex) {
-			EnderLogger.exception(ex);
+	private static byte[] toByteArray(String paramString, byte[][] byteArrayList) throws NoSuchAlgorithmException {
+		MessageDigest messageDigest = MessageDigest.getInstance(paramString);
+		for (byte[] byteArray : byteArrayList) {
+			messageDigest.update(byteArray);
 		}
-		return null;
+		return messageDigest.digest();
 	}
 }

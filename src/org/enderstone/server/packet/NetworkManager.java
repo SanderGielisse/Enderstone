@@ -18,7 +18,6 @@
 package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -58,7 +57,6 @@ import org.enderstone.server.regions.EnderWorld;
 public class NetworkManager extends ChannelHandlerAdapter {
 
 	public ChannelHandlerContext ctx;
-	private Channel channel;
 	public EnderPlayer player;
 	public String wantedName;
 	private EncryptionSettings encryptionSettings;
@@ -68,7 +66,6 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	public PacketHandshake latestHandshakePacket;
 	public volatile int handShakeStatus = -1;
-	private int length;
 
 	private final Queue<Packet> packets = new LinkedList<>();
 	private volatile boolean isConnected = true;

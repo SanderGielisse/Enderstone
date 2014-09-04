@@ -186,7 +186,7 @@ public class EnderBlock implements Block {
 
 			@Override
 			public void setBlock(BlockId id, byte data) {
-				throw new IllegalStateException("Cannot set the block of a readonly copy");
+				throw new IllegalStateException("Cannot set the block of a read-only copy");
 			}
 
 			@Override

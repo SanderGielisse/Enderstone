@@ -19,8 +19,6 @@ package org.enderstone.server.packet;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import org.enderstone.server.packet.login.PacketInEncryptionResponse;
 import org.enderstone.server.packet.login.PacketInLoginStart;
 import org.enderstone.server.packet.play.PacketInAbilities;
@@ -43,7 +41,6 @@ import org.enderstone.server.packet.play.PacketInPluginMessage;
 import org.enderstone.server.packet.play.PacketInTabComplete;
 import org.enderstone.server.packet.play.PacketInUseEntity;
 import org.enderstone.server.packet.play.PacketKeepAlive;
-import org.enderstone.server.packet.play.PacketOutPlayerDisconnect;
 import org.enderstone.server.packet.status.PacketInRequest;
 import org.enderstone.server.packet.status.PacketPing;
 
@@ -96,7 +93,7 @@ public class PacketManager {
 		} else if (handshake == HandshakeState.PLAY) {
 			map = play;
 		} else {
-			throw new IllegalArgumentException("I don't know the packet table for the specified handshakestate! "+ handshake);
+			throw new IllegalArgumentException("I don't know the packet table for the specified handshakestate: "+ handshake);
 		}
 
 		Class<? extends Packet> packet = map.get(id);

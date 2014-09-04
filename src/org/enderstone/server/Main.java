@@ -180,7 +180,6 @@ public class Main implements Runnable {
 			long tick = 0;
 
 			@Override
-			@SuppressWarnings("SleepWhileInLoop")
 			public void run() {
 				EnderLogger.info("[ServerThread] Main Server Thread initialized and started!");
 				EnderLogger.info("[ServerThread] " + NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + port + "!");

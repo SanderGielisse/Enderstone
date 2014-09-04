@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * This Set is used to store the chunks in a hashset manner from a world, it generaly has better performace over a
+ * This Set is used to store the chunks in a HashSet manner from a world, it generally has better performance over a
  * HashSet for chunks since its focussed on storing chunks from a region together in the same subnode
  *
  * @author ferrybig
@@ -103,11 +103,12 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 	public Iterator<EnderChunk> iterator() {
 		return new Iterator<EnderChunk>() {
 
-			EnderChunk next;
-			int i3 = Integer.MAX_VALUE;
-			Node n2;
-			int i1, i2;
-			boolean hasNext = true;
+			private EnderChunk next;
+			private int loopSize = Integer.MAX_VALUE;
+			private Node node;
+			private int chunkX;
+			private int chunkZ;
+			private boolean hasNext = true;
 
 			private boolean calculateNext() {
 				if (hasNext == false) {
@@ -115,27 +116,27 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 				}
 				mainLoop:
 				while (next == null) {
-					if (i3 >= 32 * 32) {
-						i3 = 0;
+					if (loopSize >= 32 * 32) {
+						loopSize = 0;
 
-						if (n2 != null) {
-							n2 = n2.next;
+						if (node != null) {
+							node = node.next;
 						}
-						while (n2 == null) {
-							n2 = RegionSet.this.chunkBuckets[i1][i2];
-							if (i1 >= 15) {
-								if (i2 >= 15) {
+						while (node == null) {
+							node = RegionSet.this.chunkBuckets[chunkX][chunkZ];
+							if (chunkX >= 15) {
+								if (chunkZ >= 15) {
 									break mainLoop;
 								}
-								i2++;
-								i1 = 0;
+								chunkZ++;
+								chunkX = 0;
 							} else {
-								i1++;
+								chunkX++;
 							}
 						}
 					}
-					next = n2.regionChunks[i3];
-					i3++;
+					next = node.regionChunks[loopSize];
+					loopSize++;
 				}
 				if (next == null) {
 					hasNext = false;
@@ -166,7 +167,7 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 
 			@Override
 			public void remove() {
-				throw new IllegalStateException("NOPE NOPE NOPE");
+				throw new IllegalStateException("NOPE!");
 			}
 		};
 	}
@@ -174,45 +175,21 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 	@Override
 	public int size() {
 		int size = 0;
-		for (Node[] n : chunkBuckets) {
-			for (Node n1 : n) {
-				if (n1 == null) {
+		for (Node[] nodes : chunkBuckets) {
+			for (Node singleNode : nodes) {
+				if (singleNode == null) {
 					continue;
 				}
 				do {
-					for (EnderChunk c : n1.regionChunks) {
+					for (EnderChunk c : singleNode.regionChunks) {
 						if (c != null) {
 							size++;
 						}
 					}
-				} while ((n1 = n1.next) != null);
+				} while ((singleNode = singleNode.next) != null);
 			}
 		}
 		return size;
-	}
-
-	private Node getNode(int rX, int rZ) {
-		Node n = this.chunkBuckets[maskCordinate(rX)][maskCordinate(rZ)];
-		if (n != null) {
-			do {
-				if (n.regionX == rX && n.regionZ == rZ)
-					return n;
-			} while ((n = n.next) != null);
-		}
-		return n;
-	}
-
-	private Node getOrCreateNode(int rX, int rZ) {
-		Node n = this.chunkBuckets[maskCordinate(rX)][maskCordinate(rZ)];
-		if (n == null)
-			return this.chunkBuckets[maskCordinate(rX)][maskCordinate(rZ)] = new Node(rX, rZ);
-		Node prev;
-		do {
-			prev = n;
-			if (n.regionX == rX && n.regionZ == rZ)
-				return n;
-		} while ((n = n.next) != null);
-		return prev.next = new Node(rX, rZ);
 	}
 
 	@Override
