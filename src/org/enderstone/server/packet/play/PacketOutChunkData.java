@@ -19,9 +19,6 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import java.util.zip.Deflater;
-import org.enderstone.server.Location;
-import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutChunkData extends Packet {

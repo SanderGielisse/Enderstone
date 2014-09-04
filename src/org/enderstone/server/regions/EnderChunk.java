@@ -17,10 +17,8 @@
  */
 package org.enderstone.server.regions;
 
-import static java.lang.System.out;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.enderstone.server.EnderLogger;
@@ -42,8 +40,8 @@ public class EnderChunk {
 	private final short[][] blockID;
 	private final byte[][] data;
 	private final byte[] biome;
-	private final List<BlockData> blockData;
-	private final List<BlockData> activeBlockData = new LinkedList<>();
+	//private final List<BlockData> blockData;
+	//private final List<BlockData> activeBlockData = new LinkedList<>();
 	private final int x;
 	public boolean hasPopulated = false;
 	private boolean isValid = true;
@@ -69,7 +67,7 @@ public class EnderChunk {
 		this.blockID = blockID;
 		this.data = data;
 		this.biome = biome;
-		this.blockData = blockData;
+		//this.blockData = blockData;
 		this.x = x;
 	}
 
@@ -235,7 +233,7 @@ public class EnderChunk {
 					byte halfData = 0;
 					boolean hd = false;
 
-					for (byte block : nibblearray) {
+					for (int counter = 0; counter < nibblearray.length; counter++) {
 						byte blockLigth = 15;
 						if (hd) {
 							halfData = (byte) ((blockLigth << 4) | halfData);
@@ -261,7 +259,7 @@ public class EnderChunk {
 					byte halfData = 0;
 					boolean hd = false;
 
-					for (short block : nibblearray) {
+					for (int counter = 0; counter < nibblearray.length; counter++) {
 						byte skyLigth = (byte) (15);
 						if (hd) {
 							halfData = (byte) ((skyLigth << 4) | halfData);

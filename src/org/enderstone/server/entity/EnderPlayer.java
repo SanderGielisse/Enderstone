@@ -422,12 +422,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 						System.arraycopy(split, 1, args, 0, args.length);
 					} else
 						args = new String[0];
-					String commandBeforeSplit = message.substring(0, message.length() - split[0].length());
 					out = Main.getInstance().commands.executeTabList(null, split[0], EnderPlayer.this, args);
 				} else {
 					final String[] split = message.split(" ", -1);
 					String lastPart = split[split.length - 1];
-					String commandBeforeSplit = message.substring(0, message.length() - lastPart.length());
 					out = Command.calculateMissingArgumentsPlayer(lastPart, EnderPlayer.this);
 				}
 				EnderPlayer.this.networkManager.sendPacket(new PacketOutTabComplete(out));

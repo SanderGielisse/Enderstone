@@ -19,7 +19,6 @@ package org.enderstone.server.commands.vanila;
 
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.commands.Command;
-import static org.enderstone.server.commands.Command.COMMAND_SUCCES;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;

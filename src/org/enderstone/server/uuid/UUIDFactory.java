@@ -18,14 +18,11 @@
 package org.enderstone.server.uuid;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.enderstone.server.EnderLogger;
-import org.enderstone.server.Main;
 import org.enderstone.server.entity.PlayerTextureStore;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

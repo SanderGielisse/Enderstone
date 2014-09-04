@@ -46,12 +46,12 @@ public class NetworkEncrypter {
 		this.cipher = cipher;
 	}
 
-	private byte[] fillInBuffer(ByteBuf paramByteBuf) {
-		int bytes = paramByteBuf.readableBytes();
+	private byte[] fillInBuffer(ByteBuf buffer) {
+		int bytes = buffer.readableBytes();
 		if (this.decryptBuffer.length < bytes) {
 			this.decryptBuffer = new byte[bytes];
 		}
-		paramByteBuf.readBytes(this.decryptBuffer, 0, bytes);
+		buffer.readBytes(this.decryptBuffer, 0, bytes);
 		return this.decryptBuffer;
 	}
 
@@ -90,9 +90,9 @@ public class NetworkEncrypter {
 		return new String(hexChars);
 	}
 
-	public static byte[] toCipherArray(Key paramKey, byte[] paramArrayOfByte) {
+	public static byte[] toCipherArray(Key key, byte[] byteArray) {
 		try {
-			return toCipherArray(2, paramKey, paramArrayOfByte);
+			return toCipherArray(2, key, byteArray);
 		} catch (IllegalBlockSizeException | BadPaddingException e) {
 			System.err.println("Cipher creation failed!");
 			EnderLogger.exception(e);
@@ -127,17 +127,18 @@ public class NetworkEncrypter {
 		return new String(hexChars);
 	}
 
-	public static byte[] decode(String paramString, PublicKey paramPublicKey, SecretKey paramSecretKey){
+	public static byte[] decode(String string, PublicKey publicKey, SecretKey secretKey){
 		try {
-			return toByteArray("SHA-1", new byte[][] { paramString.getBytes("ISO_8859_1"), paramSecretKey.getEncoded(), paramPublicKey.getEncoded() });
+			return toByteArray("SHA-1", new byte[][] { string.getBytes("ISO_8859_1"), secretKey.getEncoded(), publicKey.getEncoded() });
 		} catch (Exception e) {
+			System.err.println("Cipher creation failed!");
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	private static byte[] toByteArray(String paramString, byte[][] byteArrayList) throws NoSuchAlgorithmException {
-		MessageDigest messageDigest = MessageDigest.getInstance(paramString);
+	private static byte[] toByteArray(String string, byte[][] byteArrayList) throws NoSuchAlgorithmException {
+		MessageDigest messageDigest = MessageDigest.getInstance(string);
 		for (byte[] byteArray : byteArrayList) {
 			messageDigest.update(byteArray);
 		}

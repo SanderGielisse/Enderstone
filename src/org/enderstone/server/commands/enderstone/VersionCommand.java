@@ -21,7 +21,6 @@ import java.util.Arrays;
 import org.enderstone.server.Main;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.commands.Command;
-import static org.enderstone.server.commands.Command.COMMAND_SUCCES;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;

@@ -21,9 +21,6 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.packet.Packet;
-import static org.enderstone.server.packet.Packet.getStringSize;
-import static org.enderstone.server.packet.Packet.getVarIntSize;
-import static org.enderstone.server.packet.Packet.writeString;
 
 /**
  *

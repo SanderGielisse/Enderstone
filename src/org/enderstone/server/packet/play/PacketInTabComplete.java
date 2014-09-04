@@ -61,6 +61,14 @@ public class PacketInTabComplete extends Packet {
 		return halfCommand;
 	}
 	
+	public boolean hasPosition() {
+		return hasPosition;
+	}
+
+	public Location getLookingAt() {
+		return lookingAt;
+	}
+
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
 		networkManager.player.onPlayerChatComplete(this);

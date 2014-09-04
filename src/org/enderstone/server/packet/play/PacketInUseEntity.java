@@ -88,4 +88,24 @@ public class PacketInUseEntity extends Packet {
 			}
 		});
 	}
+
+	public int getTargetId() {
+		return targetId;
+	}
+
+	public int getMouseClick() {
+		return mouseClick;
+	}
+
+	public float getTargetX() {
+		return targetX;
+	}
+
+	public float getTargetY() {
+		return targetY;
+	}
+
+	public float getTargetZ() {
+		return targetZ;
+	}
 }
