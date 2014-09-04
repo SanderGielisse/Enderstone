@@ -168,7 +168,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	public void setupEncryption(final SecretKey key) throws IOException {
 		final Cipher decrypter = generateKey(2, key);
 		final Cipher encrypter = generateKey(1, key);
-		ctx.pipeline().addBefore("decrypt", "packet_rw_converter", new MessageToMessageDecoder<ByteBuf>() {
+		ctx.pipeline().addBefore("packet_rw_converter", "decrypt", new MessageToMessageDecoder<ByteBuf>() {
 
 			NetworkEncrypter chipper = new NetworkEncrypter(decrypter);
 
@@ -179,7 +179,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			}
 
 		});
-		ctx.pipeline().addBefore("encrypt", "packet_rw_converter", new MessageToByteEncoder<ByteBuf>() {
+		ctx.pipeline().addBefore("packet_rw_converter", "encrypt", new MessageToByteEncoder<ByteBuf>() {
 
 			NetworkEncrypter chipper = new NetworkEncrypter(encrypter);
 

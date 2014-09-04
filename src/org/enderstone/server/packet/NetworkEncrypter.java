@@ -56,12 +56,10 @@ public class NetworkEncrypter {
 	}
 
 	protected ByteBuf decrypt(ChannelHandlerContext ctx, ByteBuf inbytes) throws ShortBufferException {
-		int i = inbytes.readableBytes();
-		byte[] arrayOfByte = fillInBuffer(inbytes);
-
-		ByteBuf localByteBuf = ctx.alloc().heapBuffer(this.cipher.getOutputSize(i));
-		localByteBuf.writerIndex(this.cipher.update(arrayOfByte, 0, i, localByteBuf.array(), localByteBuf.arrayOffset()));
-
+		int readableBytes = inbytes.readableBytes();
+		byte[] byteArray = fillInBuffer(inbytes);
+		ByteBuf localByteBuf = ctx.alloc().heapBuffer(this.cipher.getOutputSize(readableBytes));
+		localByteBuf.writerIndex(this.cipher.update(byteArray, 0, readableBytes, localByteBuf.array(), localByteBuf.arrayOffset()));
 		return localByteBuf;
 	}
 
@@ -77,71 +75,30 @@ public class NetworkEncrypter {
 		output.writeBytes(this.encryptBuffer, 0, encryptedSize);
 	}
 
-	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
-
-	public static String getHexString(byte[] bytes) {
-		char[] hexChars = new char[bytes.length * 2];
-		int v;
-		for (int j = 0; j < bytes.length; j++) {
-			v = bytes[j] & 0xFF;
-			hexChars[j * 2] = hexArray[v >>> 4];
-			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-		}
-		return new String(hexChars);
-	}
-
-	public static byte[] toCipherArray(Key key, byte[] byteArray) {
+	public static byte[] toCipherArray(Key key, byte[] array) {
 		try {
-			return toCipherArray(2, key, byteArray);
-		} catch (IllegalBlockSizeException | BadPaddingException e) {
-			System.err.println("Cipher creation failed!");
+			Cipher newCipher = Cipher.getInstance(key.getAlgorithm());
+			newCipher.init(2, key);
+			return newCipher.doFinal(array);
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException e) {
 			EnderLogger.exception(e);
+			System.err.println("Cipher creation failed!");
 		}
 		return null;
-	}
-
-	private static byte[] toCipherArray(int arg0, Key cipherKey, byte[] byteArray) throws IllegalBlockSizeException, BadPaddingException {
-		Cipher cipher = toCipher(arg0, cipherKey.getAlgorithm(), cipherKey);
-		return cipher.doFinal(byteArray);
-	}
-
-	private static Cipher toCipher(int arg0, String certificate, Key cipherKey) {
-		try {
-			Cipher newCipher = Cipher.getInstance(certificate);
-			newCipher.init(arg0, cipherKey);
-			return newCipher;
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException ex) {
-			EnderLogger.exception(ex);
-		}
-		System.err.println("Cipher creation failed!");
-		return null;
-	}
-
-	public static String bytesToHex(byte[] bytes) {
-		char[] hexChars = new char[bytes.length * 2];
-		for (int j = 0; j < bytes.length; j++) {
-			int v = bytes[j] & 0xFF;
-			hexChars[j * 2] = hexArray[v >>> 4];
-			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-		}
-		return new String(hexChars);
 	}
 
 	public static byte[] decode(String string, PublicKey publicKey, SecretKey secretKey){
 		try {
-			return toByteArray("SHA-1", new byte[][] { string.getBytes("ISO_8859_1"), secretKey.getEncoded(), publicKey.getEncoded() });
+			byte[][] multiDimensionalArray = new byte[][] { string.getBytes("ISO_8859_1"), secretKey.getEncoded(), publicKey.getEncoded() };
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+			for (byte[] byteArray : multiDimensionalArray) {
+				messageDigest.update(byteArray);
+			}
+			return messageDigest.digest();
 		} catch (Exception e) {
 			System.err.println("Cipher creation failed!");
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	private static byte[] toByteArray(String string, byte[][] byteArrayList) throws NoSuchAlgorithmException {
-		MessageDigest messageDigest = MessageDigest.getInstance(string);
-		for (byte[] byteArray : byteArrayList) {
-			messageDigest.update(byteArray);
-		}
-		return messageDigest.digest();
 	}
 }

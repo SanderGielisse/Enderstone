@@ -67,7 +67,7 @@ public class PacketOutEncryptionRequest extends Packet {
 		size += getStringSize(serverid);
 		size += getVarIntSize(publicKeyBytes.length);
 		size += publicKeyBytes.length;
-		size += getVarIntSize(publicKeyBytes.length);
+		size += getVarIntSize(verifyTokenSize);
 		size += verifyTokenSize;
 		return size + getVarIntSize(getId());
 	}

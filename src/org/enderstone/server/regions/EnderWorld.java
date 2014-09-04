@@ -208,12 +208,12 @@ public class EnderWorld {
 					Arrays.sort(chunkLoad, 0, index, new IntegerArrayComparator(px, pz));
 					if (maxSize < chunkLoad.length) chunkLoad[maxSize] = null;
 					index = 0;
-					for (int[] l : chunkLoad) {
-						if (l == null) {
+					for (int[] load : chunkLoad) {
+						if (load == null) {
 							break;
 						}
-						cx = l[0];
-						cz = l[1];
+						cx = load[0];
+						cz = load[1];
 						EnderChunk c = getOrCreateChunk(cx, cz);
 						newPlayerChunks.add(c);
 						informer.sendChunk(c);

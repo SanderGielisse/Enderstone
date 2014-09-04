@@ -179,24 +179,22 @@ public class EnderChunk {
 		if ((map = compressed.get()) != null) {
 			return map;
 		}
-		map = build(false, 65535);
+		map = build(65535);
 		compressed = new WeakReference<>(map);
 		return map;
 	}
 
-	public EnderChunkMap build(boolean flag, int i) {
-		int j = 0;
-
+	public EnderChunkMap build(int totalChunkSize) {
+		int currentIndex = 0;
 		EnderChunkMap chunkmap = new EnderChunkMap();
-		byte[] abyte = new byte[196864];
-		int l;
+		byte[] totalArray = new byte[196864];
 		/**
 		 * Calculate bitmasks & empty sections
 		 */
 		{
-			for (l = 0; l < blockID.length; ++l) {
-				if (blockID[l] != null && (!flag) && (i & 1 << l) != 0) {
-					chunkmap.primaryBitmap |= 1 << l;
+			for (int blockLength = 0; blockLength < blockID.length; ++blockLength) {
+				if (blockID[blockLength] != null && (totalChunkSize & 1 << blockLength) != 0) {
+					chunkmap.primaryBitmap |= 1 << blockLength;
 				}
 			}
 		}
@@ -204,32 +202,31 @@ public class EnderChunk {
 		 * Write first byte of block id's
 		 */
 		{
-			for (l = 0; l < blockID.length; l++) {
+			for (int blockLength = 0; blockLength < blockID.length; blockLength++) {
 
-				if ((blockID[l] != null) && ((!flag) || (blockID[l] != null)) && ((i & 1 << l) != 0)) {
-					int lastIndex = j;
-					short[] idArray = this.blockID[l];
-					for (int ind = 0; ind < idArray.length; ind++) {
-						int id = idArray[ind] & 0xFF;
-						int dataId = this.data[l][ind];
+				if ((blockID[blockLength] != null) && (blockID[blockLength] != null) && ((totalChunkSize & 1 << blockLength) != 0)) {
+					int lastIndex = currentIndex;
+					short[] idArray = this.blockID[blockLength];
+					for (int idSize = 0; idSize < idArray.length; idSize++) {
+						int id = idArray[idSize] & 0xFF;
+						int dataId = this.data[blockLength][idSize];
 						char val = (char) (id << 4 | dataId);
-						abyte[(j++)] = ((byte) (val & 0xFF));
-						abyte[(j++)] = ((byte) (val >> '\b' & 0xFF));
+						totalArray[(currentIndex++)] = ((byte) (val & 0xFF));
+						totalArray[(currentIndex++)] = ((byte) (val >> '\b' & 0xFF));
 					}
-					assert lastIndex + blockID[l].length * 2 == j;
+					assert lastIndex + blockID[blockLength].length * 2 == currentIndex;
 				}
-
 			}
 		}
 		/**
-		 * Block Ligth - uses data because its the same size as the ligthing array we don't have
+		 * Block Light - uses data because its the same size as the lightning array we don't have
 		 */
 		{
-			for (l = 0; l < data.length; ++l) {
+			for (int blockLength = 0; blockLength < data.length; ++blockLength) {
 
-				if (data[l] != null && (!flag) && (i & 1 << l) != 0) {
-					int lastIndex = j;
-					byte[] nibblearray = data[l];
+				if (data[blockLength] != null && (totalChunkSize & 1 << blockLength) != 0) {
+					int lastIndex = currentIndex;
+					byte[] nibblearray = data[blockLength];
 					byte halfData = 0;
 					boolean hd = false;
 
@@ -237,25 +234,25 @@ public class EnderChunk {
 						byte blockLigth = 15;
 						if (hd) {
 							halfData = (byte) ((blockLigth << 4) | halfData);
-							abyte[j++] = halfData;
+							totalArray[currentIndex++] = halfData;
 						} else {
 							halfData = blockLigth;
 						}
 						hd = !hd;
 					}
-					assert lastIndex + data[l].length / 2 == j;
+					assert lastIndex + data[blockLength].length / 2 == currentIndex;
 					// j += nibblearray.length / 2 ;
 				}
 			}
 		}
 		/**
-		 * Sky light - uses blockid because its the same size as the sky array we don't have
+		 * Skylight - uses BlockID array because its the same size as the sky array we don't have
 		 */
 		{
-			for (l = 0; l < blockID.length; ++l) {
-				if (blockID[l] != null && (!flag) && (i & 1 << l) != 0) {
-					int lastIndex = j;
-					short[] nibblearray = blockID[l];
+			for (int blockLength = 0; blockLength < blockID.length; ++blockLength) {
+				if (blockID[blockLength] != null && (totalChunkSize & 1 << blockLength) != 0) {
+					int lastIndex = currentIndex;
+					short[] nibblearray = blockID[blockLength];
 					byte halfData = 0;
 					boolean hd = false;
 
@@ -263,13 +260,13 @@ public class EnderChunk {
 						byte skyLigth = (byte) (15);
 						if (hd) {
 							halfData = (byte) ((skyLigth << 4) | halfData);
-							abyte[j++] = halfData;
+							totalArray[currentIndex++] = halfData;
 						} else {
 							halfData = skyLigth;
 						}
 						hd = !hd;
 					}
-					assert lastIndex + data[l].length / 2 == j;
+					assert lastIndex + data[blockLength].length / 2 == currentIndex;
 					// j += nibblearray.length / 2 ;
 				}
 			}
@@ -278,18 +275,17 @@ public class EnderChunk {
 		 * Biomes
 		 */
 		{
-			byte[] abyte2 = biome;
-
-			System.arraycopy(abyte2, 0, abyte, j, abyte2.length);
-			j += abyte2.length;
+			byte[] newArray = biome;
+			System.arraycopy(newArray, 0, totalArray, currentIndex, newArray.length);
+			currentIndex += newArray.length;
 		}
 		/**
 		 * Copy
 		 */
-
-		chunkmap.chunkData = new byte[j];
-		System.arraycopy(abyte, 0, chunkmap.chunkData, 0, j);
-
+		{
+			chunkmap.chunkData = new byte[currentIndex];
+			System.arraycopy(totalArray, 0, chunkmap.chunkData, 0, currentIndex);
+		}
 		return chunkmap;
 	}
 
