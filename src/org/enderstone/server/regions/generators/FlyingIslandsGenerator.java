@@ -17,9 +17,11 @@
  */
 package org.enderstone.server.regions.generators;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-
 import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.BlockPopulator;
 import org.enderstone.server.regions.ChunkGenerator;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.generators.util.SimplexOctaveGenerator;
@@ -28,10 +30,10 @@ import org.enderstone.server.regions.generators.util.SimplexOctaveGenerator;
  *
  * @author Fernando
  */
-public class FlyingIslandsGenerator extends ChunkGenerator {
+public class FlyingIslandsGenerator implements ChunkGenerator {
 
 	@Override
-	public BlockId[][] generateExtBlockSections(EnderWorld world, Random random, int ChunkX, int ChunkZ, ChunkGenerator.BiomeGrid biomes) {
+	public BlockId[][] generateExtBlockSections(EnderWorld world, Random random, int ChunkX, int ChunkZ) {
 		BlockId[][] chunk = new BlockId[16][];
 
 		SimplexOctaveGenerator overhangs = new SimplexOctaveGenerator(world, 8);
@@ -135,5 +137,34 @@ public class FlyingIslandsGenerator extends ChunkGenerator {
 			}
 		}
 		return chunk;
+	}
+
+	private void setBlock(int x, int y, int z, BlockId[][] chunk, BlockId material) {
+		if (chunk[y >> 4] == null) {
+			chunk[y >> 4] = new BlockId[16 * 16 * 16];
+		}
+		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {
+			return;
+		}
+		chunk[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = material;
+	}
+
+	private BlockId getBlock(int x, int y, int z, BlockId[][] chunk) {
+		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {
+			return BlockId.AIR;
+		}
+		if (chunk[y >> 4] == null) {
+			return BlockId.AIR;
+		}
+		BlockId id = chunk[y >> 4][((y & 0xF) << 8) | (z << 4) | x];
+		if(id == null){
+			id = BlockId.AIR;
+		}
+		return id;
+	}
+
+	@Override
+	public List<BlockPopulator> getDefaultPopulators(EnderWorld world) {
+		return new ArrayList<>();
 	}
 }

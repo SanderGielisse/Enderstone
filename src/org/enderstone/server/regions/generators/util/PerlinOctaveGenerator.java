@@ -8,6 +8,9 @@ import org.enderstone.server.regions.EnderWorld;
  * 
  * @Author Bukkit - https://github.com/Bukkit/Bukkit-Bleeding/tree/master/src/main/java/org/bukkit/util/noise
  * 
+ * Our changes:
+ * - The package name.
+ * 
  * Creates perlin noise through unbiased octaves
  */
 public class PerlinOctaveGenerator extends OctaveGenerator {

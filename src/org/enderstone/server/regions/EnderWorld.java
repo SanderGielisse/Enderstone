@@ -64,7 +64,7 @@ public class EnderWorld {
 		if (r != null) {
 			return r;
 		}
-		BlockId[][] blocks = generator.generateExtBlockSections(this, new Random(), x, z, null);
+		BlockId[][] blocks = generator.generateExtBlockSections(this, new Random(), x, z);
 		if (blocks == null) {
 			blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
 		}

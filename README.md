@@ -3,7 +3,7 @@ Enderstone Server Software
 GLOBAL INFORMATION
 
 Enderstone is a project started by BigTeddy98 (Sander), Ferrybig (Fernando) and TimBayens (Tim).
-We are trying to make an open-source Minecraft server with a custom API.
+We are trying to make an open-source Minecraft server with a custom API, without using any Mojang Minecraft Server code.
 
 The project is currently using protocol version 47, which means that only Minecraft 1.8 clients will be able to connect.
 
@@ -19,7 +19,8 @@ http://www.gnu.org/copyleft/gpl.html
 
 CREDITS AND LIBRARY LICENSES
 
-The 5 classes in the org/enderstone/server/regions/generators/util package and the class located at org/enderstone/server/regions/ChunkGenerator.java are made by Bukkit, so the credits for that of course go to them.
+The 5 classes in the org/enderstone/server/regions/generators/util package are made by Bukkit. These classes are licensed under the same license as the Enderstone project, the GNU GENERAL PUBLIC LICENSE.
+The only changes we made to these classes are the package names. The credits of course still go to them, as specified in the header of the class.
 
 We use the JNBT library to read and write our NBT data. When you use source located in the org.jnbt package, you accept to the license of JNBT, which can be found in the JNBT_LICENSE.TXT file.
 All credits of the JNBT library (located in the org.jnbt package) go to them.
@@ -27,5 +28,5 @@ All credits of the JNBT library (located in the org.jnbt package) go to them.
 
 MINECRAFT EULA
 
-The Enderstone server software uses the Minecraft protocol to make it able for Minecraft clients to connect. This means you are NOT able to evade the Minecraft EULA.
+The Enderstone server software uses the Minecraft protocol to make it able for Minecraft clients to connect. This means you are NOT able to evade the Minecraft EULA by using Enderstone.
 By running this you accept to the Minecraft EULA, which can be found here: https://account.mojang.com/documents/minecraft_eula
