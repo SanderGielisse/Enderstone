@@ -54,10 +54,9 @@ public class PacketOutOpenWindow extends Packet {
 	public int getSize() throws IOException {
 		if(windowMessageString == null) windowMessageString = windowMessage.toMessageJson();
 		int size = 0;
-		size += Byte.BYTES;
 		size += getStringSize(inventoryType);
 		size += getStringSize(windowMessageString);
-		size += Byte.BYTES;
+		size += 2;
 		if(inventoryType.equals("EntityHorse")) size += getVarIntSize(entityId);
 		return size;
 	}
