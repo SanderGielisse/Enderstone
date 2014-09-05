@@ -39,7 +39,7 @@ public class FixedSizeList<E> extends AbstractList<E> implements RandomAccess, j
 		this(array, 0, array.length);
 	}
 
-	private FixedSizeList(E[] array, int start, int length) {
+	public FixedSizeList(E[] array, int start, int length) {
 		this.array = Objects.requireNonNull(array);
 		this.start = start;
 		this.length = length;
@@ -47,6 +47,11 @@ public class FixedSizeList<E> extends AbstractList<E> implements RandomAccess, j
 
 	@Override
 	public List<E> subList(int fromIndex, int toIndex) {
+		if(toIndex - fromIndex < 0) throw new IllegalArgumentException("toIndex > fromIndex");
+		if(toIndex < 0) throw new IllegalArgumentException("toIndex < 0");
+		if(toIndex - fromIndex > this.length) throw new IllegalArgumentException("requested length to large");
+		if(toIndex > this.length) throw new IllegalArgumentException("toIndex > size()");
+		if(fromIndex == 0 && toIndex == this.length) return this;
 		return new FixedSizeList<>(array, start+fromIndex, toIndex - fromIndex);
 	}
 
@@ -107,6 +112,11 @@ public class FixedSizeList<E> extends AbstractList<E> implements RandomAccess, j
 		return indexOf(o) != -1;
 	}
 
+	@Override
+	public String toString() {
+		return "FixedSizeList{" + "array=" + Arrays.toString(array) + ", start=" + start + ", length=" + length + '}';
+	}
+	
 //	@Override
 //	public Spliterator<E> spliterator() {
 //		return Spliterators.spliterator(array, start, length, Spliterator.ORDERED | Spliterator.SIZED);

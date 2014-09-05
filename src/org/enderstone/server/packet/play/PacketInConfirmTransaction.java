@@ -20,6 +20,8 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.Main;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 /**
@@ -65,4 +67,19 @@ public class PacketInConfirmTransaction extends Packet{
 		return accepted;
 	}
 	
+	@Override
+	public void onRecieve(final NetworkManager networkManager) {
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				networkManager.player.handler.recievePacket(PacketInConfirmTransaction.this);
+			}
+		});
+	}
+
+	@Override
+	public String toString() {
+		return "PacketInConfirmTransaction{" + "windowID=" + windowID + ", actionNumber=" + actionNumber + ", accepted=" + accepted + '}';
+	}
 }

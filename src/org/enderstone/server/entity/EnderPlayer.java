@@ -34,6 +34,7 @@ import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.inventory.Inventory;
 import org.enderstone.server.inventory.InventoryHandler;
+import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
@@ -182,6 +183,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	public void onSpawn() {
+		this.handler.tryPickup(new ItemStack((short) 3, (byte) 1, (short) 1));
 		this.updateDataWatcher();
 
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(this.uuid, this.getPlayerName(), getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") });

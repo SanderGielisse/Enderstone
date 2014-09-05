@@ -76,15 +76,14 @@ public abstract class Inventory implements AutoCloseable {
 
 	protected static ItemStack tryAddItem(List<ItemStack> inventory, ItemStack stack)
 	{
-		List<ItemStack> mainInv = inventory;
 		int i = 0;
-		int s = mainInv.size();
+		int s = inventory.size();
 		for(;i < s; i++)
 		{
-			ItemStack tmp = mainInv.get(i);
+			ItemStack tmp = inventory.get(i);
 			if(tmp == null)
 			{
-				mainInv.set(i, stack);
+				inventory.set(i, stack);
 				return null;
 			}
 			if(tmp.materialTypeMatches(stack))
@@ -95,7 +94,7 @@ public abstract class Inventory implements AutoCloseable {
 				if(moreNeeded >= stack.getAmount())
 				{
 					tmp.setAmount((byte) (tmpSize + stack.getAmount()));
-					mainInv.set(i, tmp);
+					inventory.set(i, tmp);
 					return null;
 				}
 				else
@@ -106,6 +105,11 @@ public abstract class Inventory implements AutoCloseable {
 			}
 		}
 		return stack;
+	}
+
+	@Override
+	public String toString() {
+		return "Inventory{" + "size=" + size + ", type=" + type + ", items=" + items + ", listeners=" + listeners + '}';
 	}
 	
 	private class InventoryWrapper extends AbstractList<ItemStack> {
@@ -125,25 +129,33 @@ public abstract class Inventory implements AutoCloseable {
 
 		@Override
 		public ItemStack get(int index) {
-			return main.get(index).clone();
+			ItemStack stack = main.get(index);
+			if(stack == null)
+				return null;
+			return stack.clone();
 		}
 
 		@Override
 		public ItemStack set(int index, ItemStack newStack) {
 			ItemStack oldValue = this.main.set(index, newStack);
 			if (oldValue != newStack)
-				Inventory.this.callSlotChance(index, oldValue, newStack);
+				Inventory.this.callSlotChance(index + offset, oldValue, newStack);
 			return oldValue;
 		}
 
 		@Override
 		public List<ItemStack> subList(int fromIndex, int toIndex) {
-			return new InventoryWrapper(main.subList(fromIndex, toIndex), toIndex);
+			return new InventoryWrapper(main.subList(fromIndex, toIndex), fromIndex);
 		}
 
 		@Override
 		public int size() {
 			return main.size();
+		}
+
+		@Override
+		public String toString() {
+			return "InventoryWrapper{" + "offset=" + offset + ", main=" + main + '}';
 		}
 	}
 	

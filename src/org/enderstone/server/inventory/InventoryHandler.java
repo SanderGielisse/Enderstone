@@ -18,9 +18,15 @@
 
 package org.enderstone.server.inventory;
 
+import org.enderstone.server.EnderLogger;
+import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketInClickWindow;
+import org.enderstone.server.packet.play.PacketInCloseWindow;
 import org.enderstone.server.packet.play.PacketInConfirmTransaction;
+import org.enderstone.server.packet.play.PacketInCreativeInventoryAction;
+import org.enderstone.server.packet.play.PacketInHeldItemChange;
+import org.enderstone.server.packet.play.PacketOutSetSlot;
 
 /**
  *
@@ -28,22 +34,162 @@ import org.enderstone.server.packet.play.PacketInConfirmTransaction;
  */
 public class InventoryHandler {
 	private final EnderPlayer player;
-	private Inventory openInventory;
+	
+	private final Inventory.InventoryListener listener = new Inventory.InventoryListener()
+	{
+
+		@Override
+		public void onSlotChange(Inventory inv, int slot, ItemStack oldStack, ItemStack newStack) {
+			if(inv != activeInventory && inv != equimentInventory)
+			{
+				inv.removeListener(this);
+				EnderLogger.warn("Removing stale inventory listener from: "+inv);
+				return;
+			}
+			byte windowId = getWindowId(inv);
+			assert windowId >= 0;
+			player.networkManager.sendPacket(new PacketOutSetSlot(windowId, (short) slot, newStack));
+		}
+
+		@Override
+		public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue) {
+			if(inv != activeInventory && inv != equimentInventory)
+			{
+				inv.removeListener(this);
+				EnderLogger.warn("Removing stale inventory listener from: "+inv);
+				return;
+			}
+		}
+
+		@Override
+		public void closeInventory(Inventory inv) {
+			if(inv != activeInventory && inv != equimentInventory)
+			{
+				inv.removeListener(this);
+				EnderLogger.warn("Removing stale inventory listener from: "+inv);
+				return;
+			}
+			
+		}
+		
+	};
 	private final PlayerInventory equimentInventory;
+	private Inventory activeInventory;
+	private final byte playerWindowId = 0;
+	private byte nextWindowId = 1;
+	
+	private byte getWindowId(Inventory inv)
+	{
+		if (inv == this.equimentInventory)
+			return playerWindowId;
+		else if (inv == this.activeInventory)
+			return this.nextWindowId;
+		else
+			return -1;
+	}
 
 	public InventoryHandler(EnderPlayer player) {
 		this.player = player;
 		this.equimentInventory = new PlayerInventory(player);
+		this.equimentInventory.addListener(listener);
+		this.activeInventory = equimentInventory;
 	}
 	
-	public void recievePacket(PacketInClickWindow window)
+	public void recievePacket(PacketInClickWindow packet)
 	{
-		
+		player.sendMessage(new SimpleMessage(packet.toString()));
+		int windowId = packet.getWindowId();
+		int slot = packet.getSlot();
+		int button = packet.getButton();
+		int actionNumber = packet.getActionNumber();
+		int mode = packet.getMode();
+		ItemStack itemStack = packet.getItemStack();
+		if(mode == 0){
+			if(button == 0){
+				//normal left mouse click
+			}else if(button == 1){
+				//normal right mouse click
+			}
+		}else if(mode == 1){
+			if(button == 0){
+				//shift  + left mouse
+			}else if(button == 1){
+				//shift  + right mouse
+			}
+		}else if(mode == 2){
+			if(button == 0){
+				//number key 1
+			}else if(button == 1){
+				//number key 2
+			}else if(button == 2){
+				//number key 3
+			}else if(button == 3){
+				//number key 4
+			}else if(button == 4){
+				//number key 5
+			}else if(button == 5){
+				//number key 6
+			}else if(button == 6){
+				//number key 7
+			}else if(button == 7){
+				//number key 8
+			}else if(button == 8){
+				//number key 9
+			}
+		}else if(mode == 3){
+			//middle mouse click
+		}else if(mode == 4){
+			if(button == 0 && slot != -999){
+				//drop key Q
+			}else if(button == 1 && slot != -999){
+				//ctrl + drop key Q
+			}else if(button == 0 && slot == -999){
+				//left click outside inventory
+			}else if(button == 1 && slot == -999){
+				//right click outside inventory
+			}
+		}else if(mode == 5){
+			if(button == 0){
+				//started left or middle mouse button drag
+			}else if(button == 4){
+				//started right mouse drag
+			}else if(button == 1){
+				//add slot for left-mouse drag
+			}else if(button == 5){
+				//add slot for right-mouse drag
+			}else if(button == 2){
+				//ending left-mouse drag
+			}else if(button == 6){
+				//ending right-mouse drag
+			}
+		}else if(mode == 6){
+			//double click
+		}
 	}
 	
-	public void recievePacket(PacketInConfirmTransaction window)
+	public void recievePacket(PacketInConfirmTransaction packet)
 	{
-		
+		player.sendMessage(new SimpleMessage(packet.toString()));
+	}
+	
+	public void recievePacket(PacketInCloseWindow packet)
+	{
+		player.sendMessage(new SimpleMessage(packet.toString()));
+		if(this.activeInventory != this.equimentInventory)
+		{
+			this.activeInventory.removeListener(listener);
+			this.activeInventory = this.equimentInventory;
+		}
+	}
+	
+	public void recievePacket(PacketInCreativeInventoryAction packet)
+	{
+		player.sendMessage(new SimpleMessage(packet.toString()));
+	}
+	
+	public void recievePacket(PacketInHeldItemChange packet)
+	{
+		player.sendMessage(new SimpleMessage(packet.toString()));
 	}
 	
 	public ItemStack tryPickup(ItemStack stack)
@@ -54,5 +200,20 @@ public class InventoryHandler {
 	public PlayerInventory getPlayerInventory()
 	{
 		return this.equimentInventory;
+	}
+	
+	public void openInventory(Inventory inv)
+	{
+		if(this.activeInventory != this.equimentInventory)
+		{
+			this.activeInventory.removeListener(listener);
+			this.activeInventory = this.equimentInventory;
+		}
+		this.activeInventory = inv;
+		this.activeInventory.addListener(listener);
+		if(++this.nextWindowId < 0)
+		{
+			this.nextWindowId = 1;
+		}
 	}
 }
