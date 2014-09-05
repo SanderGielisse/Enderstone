@@ -204,7 +204,7 @@ public class EnderChunk {
 		{
 			for (int blockLength = 0; blockLength < blockID.length; blockLength++) {
 
-				if ((blockID[blockLength] != null) && (blockID[blockLength] != null) && ((totalChunkSize & 1 << blockLength) != 0)) {
+				if ((blockID[blockLength] != null) && ((totalChunkSize & 1 << blockLength) != 0)) {
 					int lastIndex = currentIndex;
 					short[] idArray = this.blockID[blockLength];
 					for (int idSize = 0; idSize < idArray.length; idSize++) {
