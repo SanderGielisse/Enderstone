@@ -17,6 +17,7 @@
  */
 package org.enderstone.server.regions;
 
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.packet.play.PacketOutChunkData;
 
 /**
@@ -29,6 +30,9 @@ public class EnderChunkMap {
 	public int primaryBitmap;
 
 	public PacketOutChunkData toPacket(int x, int z) {
+		
+		EnderLogger.warn("SIZE: " + chunkData.length);
+		
 		return new PacketOutChunkData(x, z, true, (short) (primaryBitmap & '\uffff'), chunkData.length, chunkData);
 	}
 }
