@@ -19,6 +19,7 @@ package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -75,7 +76,7 @@ public class NetworkEncrypter {
 		output.writeBytes(this.encryptBuffer, 0, encryptedSize);
 	}
 
-	public static byte[] toCipherArray(Key key, byte[] array) {
+	public static byte[] decrypt(Key key, byte[] array) {
 		try {
 			Cipher newCipher = Cipher.getInstance(key.getAlgorithm());
 			newCipher.init(2, key);
@@ -87,17 +88,17 @@ public class NetworkEncrypter {
 		return null;
 	}
 
-	public static byte[] decode(String string, PublicKey publicKey, SecretKey secretKey){
+	public static byte[] createHash(String serverId, PublicKey publicKey, SecretKey secretKey){
 		try {
-			byte[][] multiDimensionalArray = new byte[][] { string.getBytes("ISO_8859_1"), secretKey.getEncoded(), publicKey.getEncoded() };
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-			for (byte[] byteArray : multiDimensionalArray) {
-				messageDigest.update(byteArray);
+			byte[][] bytes = new byte[][] { serverId.getBytes("ISO_8859_1"), secretKey.getEncoded(), publicKey.getEncoded() };
+			MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+			for (byte[] byteArray : bytes) {
+				sha1.update(byteArray);
 			}
-			return messageDigest.digest();
-		} catch (Exception e) {
+			return sha1.digest();
+		} catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
 			System.err.println("Cipher creation failed!");
-			e.printStackTrace();
+			EnderLogger.exception(e);
 		}
 		return null;
 	}

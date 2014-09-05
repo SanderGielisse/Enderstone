@@ -66,11 +66,11 @@ public class PacketInEncryptionResponse extends Packet {
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
 		NetworkManager.EncryptionSettings ec = networkManager.getEncryptionSettings();
-		this.verifyToken = NetworkEncrypter.toCipherArray(ec.getKeyPair().getPrivate(), this.verifyToken);
-		this.sharedSecret = NetworkEncrypter.toCipherArray(ec.getKeyPair().getPrivate(), this.sharedSecret);
+		this.verifyToken = NetworkEncrypter.decrypt(ec.getKeyPair().getPrivate(), this.verifyToken);
+		this.sharedSecret = NetworkEncrypter.toCiphdecrypttKeyPair().getPrivate(), this.sharedSecret);
 		SecretKey key = new SecretKeySpec(sharedSecret, "AES");
 		try {
-			String hash = new BigInteger(NetworkEncrypter.decode(ec.getServerid(), ec.getKeyPair().getPublic(), key)).toString(16);
+			String hash = new BigInteger(NetworkEncrypter.createHash(ec.getServerid(), ec.getKeyPair().getPublic(), key)).toString(16);
 			String url = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + networkManager.wantedName + "&serverId=" + hash;
 			ServerRequest r = new ServerRequest(url);
 			JSONObject json = r.get();
