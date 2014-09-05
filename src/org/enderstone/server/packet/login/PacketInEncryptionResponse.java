@@ -67,7 +67,7 @@ public class PacketInEncryptionResponse extends Packet {
 	public void onRecieve(final NetworkManager networkManager) {
 		NetworkManager.EncryptionSettings ec = networkManager.getEncryptionSettings();
 		this.verifyToken = NetworkEncrypter.decrypt(ec.getKeyPair().getPrivate(), this.verifyToken);
-		this.sharedSecret = NetworkEncrypter.toCiphdecrypttKeyPair().getPrivate(), this.sharedSecret);
+		this.sharedSecret = NetworkEncrypter.decrypt(ec.getKeyPair().getPrivate(), this.sharedSecret);
 		SecretKey key = new SecretKeySpec(sharedSecret, "AES");
 		try {
 			String hash = new BigInteger(NetworkEncrypter.createHash(ec.getServerid(), ec.getKeyPair().getPublic(), key)).toString(16);
