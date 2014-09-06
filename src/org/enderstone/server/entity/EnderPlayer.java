@@ -57,6 +57,7 @@ import org.enderstone.server.packet.play.PacketOutTabComplete;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderChunk;
+import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 
 public class EnderPlayer extends Entity implements CommandSender {
@@ -98,6 +99,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Deprecated
 	private final PlayerInventory inventory = inventoryHandler.getPlayerInventory();
 
+	public EnderWorld world = Main.getInstance().mainWorld;
 	private final String textureValue;
 	private final String textureSignature;
 	public int keepAliveID = 0;
