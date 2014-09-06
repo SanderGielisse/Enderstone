@@ -287,7 +287,7 @@ public abstract class Packet {
 		}
 		total += (getShortSize() * 2) + 1;
 		if (stack.getCompoundTag() == null) {
-			return total++;
+			return ++total;
 		}
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			try (NBTOutputStream outStream = new NBTOutputStream(new DataOutputStream(out))) {
