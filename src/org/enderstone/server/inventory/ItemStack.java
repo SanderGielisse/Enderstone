@@ -98,28 +98,29 @@ public class ItemStack implements Cloneable {
 	public void setCompoundTag(CompoundTag compoundTag) {
 		this.compoundTag = compoundTag;
 	}
-	
+
 	@Override
 	@SuppressWarnings("CloneDeclaresCloneNotSupported")
-	public ItemStack clone() { //TODO Faster clone and what if compoundtag == null? 
+	public ItemStack clone() {
 		try {
 			ItemStack s = (ItemStack) super.clone();
+			if (compoundTag == null) return s;
 			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 			new NBTOutputStream(bytes).writeTag(compoundTag);
-			s.setCompoundTag((CompoundTag)new NBTInputStream(new ByteArrayInputStream(bytes.toByteArray())).readTag());
+			s.setCompoundTag((CompoundTag) new NBTInputStream(new ByteArrayInputStream(bytes.toByteArray())).readTag());
 			return s;
 		} catch (CloneNotSupportedException | IOException err) {
 			throw new AssertionError(err);
 		}
 	}
-	
-	public BlockId getId()
-	{
+
+	public BlockId getId() {
 		return BlockId.byId(this.blockId);
 	}
-	
-	public boolean materialTypeMatches(ItemStack other)
-	{
-		return other.blockId == this.blockId; // TODO do this better (also compare item damages)
+
+	public boolean materialTypeMatches(ItemStack other) {
+		return other.blockId == this.blockId
+				&& other.damage == this.damage
+				&& (other.compoundTag == null ? this.compoundTag == null : other.compoundTag.equals(this.compoundTag));
 	}
 }
