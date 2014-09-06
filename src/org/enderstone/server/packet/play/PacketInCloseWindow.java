@@ -57,7 +57,7 @@ public class PacketInCloseWindow extends Packet {
 
 			@Override
 			public void run() {
-				networkManager.player.handler.recievePacket(PacketInCloseWindow.this);
+				networkManager.player.getInventoryHandler().recievePacket(PacketInCloseWindow.this);
 			}
 		});
 	}

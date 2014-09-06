@@ -73,7 +73,7 @@ public class PacketInConfirmTransaction extends Packet{
 
 			@Override
 			public void run() {
-				networkManager.player.handler.recievePacket(PacketInConfirmTransaction.this);
+				networkManager.player.getInventoryHandler().recievePacket(PacketInConfirmTransaction.this);
 			}
 		});
 	}

@@ -57,7 +57,7 @@ public class PacketInHeldItemChange extends Packet {
 
 			@Override
 			public void run() {
-				networkManager.player.handler.recievePacket(PacketInHeldItemChange.this);
+				networkManager.player.getInventoryHandler().recievePacket(PacketInHeldItemChange.this);
 			}
 		});
 	}

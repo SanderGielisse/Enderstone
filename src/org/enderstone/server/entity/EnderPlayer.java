@@ -32,9 +32,10 @@ import org.enderstone.server.chat.Message;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
-import org.enderstone.server.inventory.Inventory;
+import org.enderstone.server.inventory.DefaultInventory;
 import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.inventory.PlayerInventory;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
@@ -61,7 +62,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	private static final int MAX_CHUNKS_EVERY_UPDATE = 8;
 
-	public final InventoryHandler handler = new InventoryHandler(this);
+	private final InventoryHandler inventoryHandler = new InventoryHandler(this);
 	public final ClientSettings clientSettings = new ClientSettings();
 	public final NetworkManager networkManager;
 	public final String playerName;
@@ -88,7 +89,13 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public double yLocation;
 	public short food = 20;
 	public float foodSaturation = 0;
-	public Inventory inventory;
+	
+	/**
+	 * Inventory of the player
+	 * @deprecated Use getInventoryHandler().getPlayerInventory() instead
+	 */
+	@Deprecated
+	private final PlayerInventory inventory = inventoryHandler.getPlayerInventory();
 
 	private final String textureValue;
 	private final String textureSignature;
@@ -183,7 +190,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	public void onSpawn() {
-		this.handler.tryPickup(new ItemStack((short) 3, (byte) 1, (short) 1));
+		this.inventoryHandler.tryPickup(new ItemStack((short) 3, (byte) 1, (short) 1));
 		this.updateDataWatcher();
 
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(this.uuid, this.getPlayerName(), getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") });
@@ -517,6 +524,13 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	public boolean isValid() {
 		return this.isOnline;
+	}
+
+	/**
+	 * @return the inventoryHandler
+	 */
+	public InventoryHandler getInventoryHandler() {
+		return inventoryHandler;
 	}
 
 	/**
