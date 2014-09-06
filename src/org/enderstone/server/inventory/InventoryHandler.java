@@ -200,7 +200,7 @@ public class InventoryHandler {
 						other.setAmount(otherAmount);
 						this.activeInventory.getRawItems().set(slot,other);
 					}
-				} if(other == null || other.materialTypeMatches(cursor)) {
+				} else if(other == null || other.materialTypeMatches(cursor)) {
 					if(other == null)
 					{
 						other = cursor.clone();
