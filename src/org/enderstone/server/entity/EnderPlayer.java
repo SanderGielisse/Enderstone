@@ -55,6 +55,7 @@ import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
 import org.enderstone.server.packet.play.PacketOutTabComplete;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
+import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 
@@ -190,7 +191,12 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	public void onSpawn() {
-		this.inventoryHandler.tryPickup(new ItemStack((short) 3, (byte) 1, (short) 1));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.GLASS.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DAYLIGHT_DETECTOR.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.BLAZE_ROD.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COBBLESTONE.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.BAKED_POTATO.getId(), (byte) 1, (short) 0));
 		this.updateDataWatcher();
 
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(this.uuid, this.getPlayerName(), getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") });
