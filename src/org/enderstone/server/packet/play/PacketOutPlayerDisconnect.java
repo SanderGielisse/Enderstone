@@ -19,19 +19,14 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.packet.Packet;
 
 public class PacketOutPlayerDisconnect extends Packet {
-	private String reason;
+	
+	private String plainText;
 	private Message message;
-
-	public PacketOutPlayerDisconnect() {
-	}
-
-	public PacketOutPlayerDisconnect(String reason) {
-		this.reason = reason;
-	}
 
 	public PacketOutPlayerDisconnect(Message reason) {
 		this.message = reason;
@@ -43,17 +38,17 @@ public class PacketOutPlayerDisconnect extends Packet {
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		if (this.reason == null)
-			this.reason = message.toMessageJson();
-		writeString(reason, buf);
+	public void write(ByteBuf buf) throws IOException {		
+		if (this.plainText == null)
+			this.plainText = message.toPlainText();
+		writeString(plainText, buf);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		if (this.reason == null)
-			this.reason = message.toMessageJson();
-		return getStringSize(reason) + getVarIntSize(getId());
+		if (this.plainText == null)
+			this.plainText = message.toPlainText();
+		return getStringSize(plainText) + getVarIntSize(getId());
 	}
 
 	@Override

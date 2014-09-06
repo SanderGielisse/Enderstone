@@ -53,6 +53,7 @@ import org.enderstone.server.commands.vanila.StopCommand;
 import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.Entity;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
@@ -414,5 +415,19 @@ public class Main implements Runnable {
 
 	public static boolean isCurrentThreadMainThread() {
 		return Main.getInstance().mainThread == Thread.currentThread();
+	}
+
+	public Entity getEntityById(int targetId) {
+		for(Entity e : this.mainWorld.entities){
+			if(e.getEntityId() == e.getEntityId()){
+				return e;
+			}
+		}
+		for(EnderPlayer ep : this.onlinePlayers){
+			if(ep.getEntityId() == targetId){
+				return ep;
+			}
+		}
+		return null;
 	}
 }

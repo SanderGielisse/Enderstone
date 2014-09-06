@@ -20,7 +20,9 @@ package org.enderstone.server.packet.play;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.Main;
+import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.Entity;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
@@ -65,25 +67,25 @@ public class PacketInUseEntity extends Packet {
 			@Override
 			public void run() {
 				if (mouseClick == 1) { // left click
-					EnderPlayer player = Main.getInstance().getPlayer(targetId);
-					if (player == null) {
-						networkManager.sendPacket(new PacketOutPlayerDisconnect("Invalid target id, probably a server bug, please report!"));
+					Entity e = Main.getInstance().getEntityById(targetId);
+					if (e == null) {
+						networkManager.sendPacket(new PacketOutPlayerDisconnect(new SimpleMessage("Invalid target id, probably a server bug, please report!")));
 						return;
 					}
-					if (player.isDead()) {
+					if (e.isDead()) {
 						return;
 					}
-					player.onLeftClick(networkManager.player);
+					e.onLeftClick(networkManager.player);
 				} else if (mouseClick == 0) { // right click
-					EnderPlayer player = Main.getInstance().getPlayer(targetId);
-					if (player == null) {
-						networkManager.sendPacket(new PacketOutPlayerDisconnect("Invalid target id, probably a server bug, please report!"));
+					Entity e = Main.getInstance().getEntityById(targetId);
+					if (e == null) {
+						networkManager.sendPacket(new PacketOutPlayerDisconnect(new SimpleMessage("Invalid target id, probably a server bug, please report!")));
 						return;
 					}
-					if (player.isDead()) {
+					if (e.isDead()) {
 						return;
 					}
-					player.onRightClick(networkManager.player);
+					e.onRightClick(networkManager.player);
 				}
 			}
 		});

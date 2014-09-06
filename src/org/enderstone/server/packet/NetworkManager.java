@@ -18,6 +18,7 @@
 package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -333,14 +334,13 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			EnderLogger.warn("Kicking ");
 			this.ctx.channel().pipeline().addFirst(new DiscardingReader());
 			if (p != null)
-				ctx.write(p);
+				ctx.write(p).addListener(ChannelFutureListener.CLOSE);
 		} catch (Exception ex) {
 			EnderLogger.exception(ex);
 		}
 		finally
 		{
 			this.onDisconnect();
-			ctx.close();
 		}
 	}
 	
