@@ -164,7 +164,7 @@ public class FlyingIslandsGenerator implements ChunkGenerator {
 	}
 
 	@Override
-	public List<BlockPopulator> getDefaultPopulators(EnderWorld world) {
+	public List<MultiChunkBlockPopulator> getDefaultPopulators(EnderWorld world) {
 		return new ArrayList<>();
 	}
 }

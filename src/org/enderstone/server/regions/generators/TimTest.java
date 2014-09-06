@@ -75,8 +75,8 @@ public class TimTest implements ChunkGenerator {
 	}
 
 	@Override
-	public List<BlockPopulator> getDefaultPopulators(EnderWorld world) {
-		List<BlockPopulator> pops = new ArrayList<>();
+	public List<MultiChunkBlockPopulator> getDefaultPopulators(EnderWorld world) {
+		List<MultiChunkBlockPopulator> pops = new ArrayList<>();
 
 		pops.add(new BlockPopulator() {
 
