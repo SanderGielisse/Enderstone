@@ -32,7 +32,7 @@ public class PacketOutPlayerDisconnect extends Packet {
 	public PacketOutPlayerDisconnect(String reason) {
 		this.reason = reason;
 	}
-	
+
 	public PacketOutPlayerDisconnect(Message reason) {
 		this.message = reason;
 	}
@@ -44,13 +44,15 @@ public class PacketOutPlayerDisconnect extends Packet {
 
 	@Override
 	public void write(ByteBuf buf) throws IOException {
-		if(this.reason == null) this.reason = message.toMessageJson();
+		if (this.reason == null)
+			this.reason = message.toMessageJson();
 		writeString(reason, buf);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		if(this.reason == null) this.reason = message.toMessageJson();
+		if (this.reason == null)
+			this.reason = message.toMessageJson();
 		return getStringSize(reason) + getVarIntSize(getId());
 	}
 
@@ -58,5 +60,4 @@ public class PacketOutPlayerDisconnect extends Packet {
 	public byte getId() {
 		return 0x40;
 	}
-
 }

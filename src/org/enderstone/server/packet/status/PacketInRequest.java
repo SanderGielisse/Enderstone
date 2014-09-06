@@ -51,8 +51,6 @@ public class PacketInRequest extends Packet {
 
 	@Override
 	public void onRecieve(NetworkManager networkManager) {
-		EnderLogger.info("Pinged at: " + networkManager.latestHandshakePacket.getHostname() + ":" + networkManager.latestHandshakePacket.getPort());
-
 		int protocol = networkManager.latestHandshakePacket.getProtocol();
 		if (!Main.PROTOCOL.contains(protocol)) {
 			protocol = 5;

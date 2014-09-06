@@ -58,7 +58,7 @@ import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 
 public class EnderPlayer extends Entity implements CommandSender {
 
-	private static final int MAX_CHUNKS_EVERY_UPDATE = 8;
+	private static final int MAX_CHUNKS_EVERY_UPDATE = 16;
 
 	public final InventoryHandler handler = new InventoryHandler(this);
 	public final ClientSettings clientSettings = new ClientSettings();

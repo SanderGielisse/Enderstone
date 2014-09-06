@@ -57,7 +57,7 @@ public class Test {
 			System.out.println("Test 4.");
 			
 			DataWatcher watcher = new DataWatcher();
-			watcher.watch(10, new ItemStack((short) 2, (byte) 6, (short) 1));
+			watcher.watch(10, new ItemStack((short) 2, (byte) 6, (short) 1, false));
 			
 			ByteBuf buf = Unpooled.buffer();
 			

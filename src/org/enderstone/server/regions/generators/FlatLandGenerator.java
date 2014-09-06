@@ -35,6 +35,22 @@ public class FlatLandGenerator implements ChunkGenerator {
 		for (int i = 0; i < r[0].length; i++) {
 			r[0][i] = BlockId.DIRT;
 		}
+		
+		r[1] = new BlockId[4096];
+		for (int i = 0; i < r[0].length; i++) {
+			r[1][i] = BlockId.DIRT;
+		}
+		
+		r[2] = new BlockId[4096];
+		for (int i = 0; i < r[0].length; i++) {
+			r[2][i] = BlockId.DIRT;
+		}
+		
+		r[3] = new BlockId[4096];
+		for (int i = 0; i < r[0].length; i++) {
+			r[1][3] = BlockId.DIRT;
+		}
+		
 		return r;
 	}
 

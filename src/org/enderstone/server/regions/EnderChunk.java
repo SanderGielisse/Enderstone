@@ -179,20 +179,22 @@ public class EnderChunk {
 		if ((map = compressed.get()) != null) {
 			return map;
 		}
-		map = build(65535);
+		map = build();
 		compressed = new WeakReference<>(map);
 		return map;
 	}
 
-	public EnderChunkMap build(int totalChunkSize) {
+	public EnderChunkMap build() {
+		int totalChunkSize = 65535;
 		int currentIndex = 0;
 		EnderChunkMap chunkmap = new EnderChunkMap();
 		byte[] totalArray = new byte[196864];
+		int blockLength;
 		/**
 		 * Calculate bitmasks & empty sections
 		 */
 		{
-			for (int blockLength = 0; blockLength < blockID.length; ++blockLength) {
+			for (blockLength = 0; blockLength < blockID.length; blockLength++) {
 				if (blockID[blockLength] != null && (totalChunkSize & 1 << blockLength) != 0) {
 					chunkmap.primaryBitmap |= 1 << blockLength;
 				}
@@ -202,7 +204,7 @@ public class EnderChunk {
 		 * Write first byte of block id's
 		 */
 		{
-			for (int blockLength = 0; blockLength < blockID.length; blockLength++) {
+			for (blockLength = 0; blockLength < blockID.length; blockLength++) {
 
 				if ((blockID[blockLength] != null) && ((totalChunkSize & 1 << blockLength) != 0)) {
 					int lastIndex = currentIndex;
@@ -222,8 +224,7 @@ public class EnderChunk {
 		 * Block Light - uses data because its the same size as the lightning array we don't have
 		 */
 		{
-			for (int blockLength = 0; blockLength < data.length; ++blockLength) {
-
+			for (blockLength = 0; blockLength < data.length; ++blockLength) {
 				if (data[blockLength] != null && (totalChunkSize & 1 << blockLength) != 0) {
 					int lastIndex = currentIndex;
 					byte[] nibblearray = data[blockLength];
@@ -249,7 +250,7 @@ public class EnderChunk {
 		 * Skylight - uses BlockID array because its the same size as the sky array we don't have
 		 */
 		{
-			for (int blockLength = 0; blockLength < blockID.length; ++blockLength) {
+			for (blockLength = 0; blockLength < blockID.length; ++blockLength) {
 				if (blockID[blockLength] != null && (totalChunkSize & 1 << blockLength) != 0) {
 					int lastIndex = currentIndex;
 					short[] nibblearray = blockID[blockLength];

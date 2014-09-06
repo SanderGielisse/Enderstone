@@ -24,15 +24,13 @@ import org.enderstone.server.packet.Packet;
 public class PacketOutPluginMessage extends Packet {
 
 	private String channel;
-	private short length;
 	private byte[] data;
 
 	public PacketOutPluginMessage() {
 	}
 
-	public PacketOutPluginMessage(String channel, short length, byte[] data) {
+	public PacketOutPluginMessage(String channel, byte[] data) {
 		this.channel = channel;
-		this.length = length;
 		this.data = data;
 	}
 
@@ -44,13 +42,12 @@ public class PacketOutPluginMessage extends Packet {
 	@Override
 	public void write(ByteBuf buf) throws IOException {
 		writeString(channel, buf);
-		buf.writeShort(length);
 		buf.writeBytes(data);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return getStringSize(channel) + getShortSize() + data.length + getVarIntSize(getId());
+		return getStringSize(channel) + data.length + getVarIntSize(getId());
 	}
 
 	@Override
@@ -60,10 +57,6 @@ public class PacketOutPluginMessage extends Packet {
 
 	public String getChannel() {
 		return channel;
-	}
-
-	public short getLength() {
-		return length;
 	}
 
 	public byte[] getData() {

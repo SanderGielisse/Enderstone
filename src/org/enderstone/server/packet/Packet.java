@@ -141,7 +141,7 @@ public abstract class Packet {
 			return null;
 		}
 
-		ItemStack stack = new ItemStack(blockId, (byte) -1, (short) -1);
+		ItemStack stack = new ItemStack(blockId, (byte) -1, (short) -1, false);
 
 		stack.setAmount(buf.readByte());
 		stack.setDamage(buf.readShort());
@@ -287,7 +287,8 @@ public abstract class Packet {
 		}
 		total += (getShortSize() * 2) + 1;
 		if (stack.getCompoundTag() == null) {
-			return total++;
+			total++;
+			return total;
 		}
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			try (NBTOutputStream outStream = new NBTOutputStream(new DataOutputStream(out))) {
@@ -296,7 +297,7 @@ public abstract class Packet {
 				e.printStackTrace();
 			}
 			total += out.toByteArray().length;
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return total;
@@ -345,11 +346,11 @@ public abstract class Packet {
 		long x = value >> 38;
 		long y = value << 26 >> 52;
 		long z = value << 38 >> 38;
-		return new Location("", x,y,z,0F,0F);
+		return new Location("", x, y, z, 0F, 0F);
 	}
-	
-	public static void writeLocation(Location loc , ByteBuf buf){
-		buf.writeLong(((long)loc.getBlockX() & 0x3FFFFFF) << 38 | ((long)loc.getBlockY() & 0xFFF) << 26 | (loc.getBlockZ() & 0x3FFFFFF));
+
+	public static void writeLocation(Location loc, ByteBuf buf) {
+		buf.writeLong(((long) loc.getBlockX() & 0x3FFFFFF) << 38 | ((long) loc.getBlockY() & 0xFFF) << 26 | (loc.getBlockZ() & 0x3FFFFFF));
 	}
 
 	public static int getLocationSize() {
