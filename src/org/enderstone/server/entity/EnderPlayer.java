@@ -33,7 +33,6 @@ import org.enderstone.server.chat.Message;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
-import org.enderstone.server.inventory.DefaultInventory;
 import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.inventory.PlayerInventory;
@@ -57,11 +56,11 @@ import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
 import org.enderstone.server.packet.play.PacketOutTabComplete;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
+import org.enderstone.server.permissions.Operator;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
-import org.json.JSONObject;
 
 public class EnderPlayer extends Entity implements CommandSender {
 
@@ -534,6 +533,15 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	protected float getBaseMaxHealth() {
 		return 20;
+	}
+	
+	public boolean hasPermission(String permission){
+		for(Operator operator : Main.getInstance().operators){
+			if(operator.getUUID().equals(this.uuid)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void setOnGround(boolean onGround) {

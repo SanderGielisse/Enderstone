@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
@@ -56,6 +57,8 @@ import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
 import org.enderstone.server.packet.play.PacketOutUpdateTime;
+import org.enderstone.server.permissions.Operator;
+import org.enderstone.server.permissions.OperatorLoader;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.uuid.UUIDFactory;
 
@@ -80,6 +83,7 @@ public class Main implements Runnable {
 	public volatile Thread mainThread;
 	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();
 	public boolean onlineMode = false;
+	public List<Operator> operators = new OperatorLoader().load();
 
 	public Properties prop = null;
 	public UUIDFactory uuidFactory = new UUIDFactory();
@@ -371,6 +375,12 @@ public class Main implements Runnable {
 	 * Any mainthread-shutdown logic belongs to this method
 	 */
 	private void directShutdown() {
+		if(this.operators.isEmpty()){
+			this.operators.add(new Operator("sander2798", UUID.fromString("6743a814-9d41-4d33-af9e-e143bc2d462c")));
+			this.operators.add(new Operator("ferrybig", UUID.fromString("a3cf4b48-220f-4604-83dd-314bab52b022")));
+		}
+		new OperatorLoader().write(operators);
+		
 		if (this.mainThread != null) {
 			this.mainThread.interrupt();
 		}
