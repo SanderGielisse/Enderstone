@@ -17,7 +17,10 @@
  */
 package org.enderstone.server;
 
-public class Location {
+import java.io.IOException;
+import org.enderstone.server.inventory.ItemStack;
+
+public class Location implements Cloneable {
 
 	private String worldName;
 	private double x;
@@ -85,12 +88,12 @@ public class Location {
 	public void setPitch(float pitch) {
 		this.pitch = pitch;
 	}
-	
+
 	public static int floor(double num) {
 		final int floor = (int) num;
 		return floor == num ? floor : floor - (int) (Double.doubleToRawLongBits(num) >>> 63);
 	}
-	
+
 	public int getBlockX() {
 		return floor(getX());
 	}
@@ -103,8 +106,21 @@ public class Location {
 		return floor(getY());
 	}
 
-	public boolean isInRange(int viewDistance, Location otherLoc) {
-		return Math.max(this.x < otherLoc.x ? otherLoc.x - this.x : this.x - otherLoc.x, this.z < otherLoc.z ? otherLoc.z - this.z : this.z - otherLoc.z) < viewDistance;
+	public boolean isInRange(int viewDistance, Location otherLoc, boolean checkY) {
+		if (!checkY) {
+			return Math.max(this.x < otherLoc.x ? otherLoc.x - this.x : this.x - otherLoc.x, this.z < otherLoc.z ? otherLoc.z - this.z : this.z - otherLoc.z) < viewDistance;
+		}else{
+			return Math.max(this.x < otherLoc.x ? otherLoc.x - this.x : this.x - otherLoc.x, Math.max(this.z < otherLoc.z ? otherLoc.z - this.z : this.z - otherLoc.z, this.y < otherLoc.y ? otherLoc.y - this.y : this.y - otherLoc.y)) < viewDistance; 
+		}
+	}
+
+	@Override
+	public Location clone() {
+		try {
+			return (Location) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError(e);
+		}
 	}
 
 	@Override

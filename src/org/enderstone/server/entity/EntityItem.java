@@ -22,6 +22,7 @@ import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.play.PacketOutCollectItem;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutSpawnObject;
@@ -29,10 +30,12 @@ import org.enderstone.server.packet.play.PacketOutSpawnObject;
 public class EntityItem extends Entity {
 
 	private final ItemStack itemstack;
-
-	public EntityItem(Location location, ItemStack stack) {
+	private int pickupDelay;
+	
+	public EntityItem(Location location, ItemStack stack, int pickupDelay) {
 		super(location);
 		this.itemstack = stack;
+		this.pickupDelay = pickupDelay;
 		onSpawn(); // must be called from main thread
 	}
 
@@ -45,7 +48,7 @@ public class EntityItem extends Entity {
 	@Override
 	public Packet getSpawnPacket() {
 		Location loc = this.getLocation();
-		return new PacketOutSpawnObject(getEntityId(), (byte) 2, (int) ((loc.getX() + 0.5) * 32.0D), (int) ((loc.getY() + 0.25) * 32.0D), (int) ((loc.getZ() + 0.5) * 32.0D), (byte) 0, (byte) 0, 0, (short) 2, (short) 2, (short) 2);
+		return new PacketOutSpawnObject(getEntityId(), (byte) 2, (int) ((loc.getX()) * 32.0D), (int) ((loc.getY() + 0.25) * 32.0D), (int) ((loc.getZ()) * 32.0D), (byte) 0, (byte) 0, 1, (short) 0, (short) 0, (short) 0);
 	}
 
 	@Override
@@ -89,11 +92,14 @@ public class EntityItem extends Entity {
 		Packet spawnPacket = this.getSpawnPacket();
 		Packet packet = new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher());
 		for (EnderPlayer pl : onlinePlayers) {
-			if (pl.getLocation().isInRange(40, getLocation()) && !pl.canSeeEntity.contains(this)) {
+			if (pl.getLocation().isInRange(40, getLocation(), true) && !pl.canSeeEntity.contains(this)) {
 				pl.canSeeEntity.add(this);
 				pl.getNetworkManager().sendPacket(spawnPacket);
 				pl.getNetworkManager().sendPacket(packet);
-			} else if (!pl.getLocation().isInRange(40, this.getLocation()) && pl.canSeeEntity.contains(this)) {
+			} else if (!pl.getLocation().isInRange(40, this.getLocation(), true) && pl.canSeeEntity.contains(this)) {
+				pl.canSeeEntity.remove(this);
+				pl.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));
+			} else if (pl.canSeeEntity.contains(this) && !pl.world.entities.contains(this)) {
 				pl.canSeeEntity.remove(this);
 				pl.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));
 			}
@@ -115,8 +121,30 @@ public class EntityItem extends Entity {
 
 	@Override
 	public void updateDataWatcher() {
-		this.getDataWatcher().watch(0, (byte)0);
+		this.getDataWatcher().watch(0, (byte) 0);
 		this.getDataWatcher().watch(1, (short) 300);
 		this.getDataWatcher().watch(10, this.itemstack);
+	}
+
+	@Override
+	public boolean onCollision(EnderPlayer withPlayer) {
+		if (pickupDelay <= 0) {
+			if (withPlayer.canSeeEntity.contains(this)) {
+				ItemStack stack = withPlayer.getInventoryHandler().tryPickup(this.itemstack);
+				if (stack == null) {
+					withPlayer.canSeeEntity.remove(this);
+					Main.getInstance().mainWorld.broadcastPacket(new PacketOutCollectItem(this.getEntityId(), withPlayer.getEntityId()), withPlayer.getLocation());
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public void serverTick() {
+		if (pickupDelay > 0) {
+			pickupDelay--;
+		}
 	}
 }

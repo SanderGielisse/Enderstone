@@ -192,7 +192,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	}
 
 	@Override
-	public void onSpawn() {
+	public void onSpawn() { 
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.GLASS.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DAYLIGHT_DETECTOR.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.BLAZE_ROD.getId(), (byte) 1, (short) 0));
@@ -294,11 +294,11 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
 		Set<Integer> toDespawn = new HashSet<>();
 		for (EnderPlayer pl : onlinePlayers) {
-			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation()) && (!pl.isDead())) {
+			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation(), true) && (!pl.isDead())) {
 				this.visiblePlayers.add(pl.getPlayerName());
 				this.networkManager.sendPacket(pl.getSpawnPacket());
 			}
-			if (!pl.getPlayerName().equals(this.getPlayerName()) && this.visiblePlayers.contains(pl.getPlayerName()) && !pl.getLocation().isInRange(50, this.getLocation())) {
+			if (!pl.getPlayerName().equals(this.getPlayerName()) && this.visiblePlayers.contains(pl.getPlayerName()) && !pl.getLocation().isInRange(50, this.getLocation(), true)) {
 				this.visiblePlayers.remove(pl.getPlayerName());
 				toDespawn.add(pl.getEntityId());
 			}
@@ -307,11 +307,35 @@ public class EnderPlayer extends Entity implements CommandSender {
 			this.networkManager.sendPacket(new PacketOutEntityDestroy(toDespawn.toArray(new Integer[0])));
 		}
 	}
-
-	private int moveUpdates = 0;
-
+	
+	private int latestCheck = 0;
+	private final List<Entity> toRemove = new ArrayList<>();
+	
+	public void checkCollision(){
+		if(latestCheck++ % 5 == 0){
+			//check if item entities nearby
+			
+			for(Entity e : this.world.entities){
+				if(e.getLocation().isInRange(2, this.getLocation(), true)){
+					boolean remove = e.onCollision(this);
+					if(remove){
+						toRemove.add(e);
+					}
+				}
+			}
+			for(Entity e : toRemove){
+				this.world.removeEntity(e);
+				this.world.broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
+			}
+			toRemove.clear();
+		}
+	}
+	
+	private int moveUpdates = 0;	
+	
 	@Override
 	public void broadcastLocation(Location newLocation) {
+		checkCollision();
 
 		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
 		double dy = (newLocation.getY() - this.getLocation().getY()) * 32;
@@ -337,7 +361,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 				continue;
 			}
 
-			if (ep.getLocation().isInRange(50, this.getLocation())) {
+			if (ep.getLocation().isInRange(50, this.getLocation(), true)) {
 				ep.networkManager.sendPacket(packet);
 			}
 		}
@@ -357,7 +381,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 				players.remove();
 				continue;
 			}
-			if (ep.getLocation().isInRange(50, this.getLocation())) {
+			if (ep.getLocation().isInRange(50, this.getLocation(), true)) {
 				ep.networkManager.sendPacket(pack1);
 				ep.networkManager.sendPacket(pack2);
 			}
@@ -509,7 +533,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 				if (change > 5) {
 					// can't find correct sound name
 				} else {
-					Main.getInstance().mainWorld.broadcastSound("damage.fallsmall", getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), 1F, (byte) 63, getLocation(), null);
+					Main.getInstance().mainWorld.broadcastSound("damage.fallsmall", 1F, (byte) 63, getLocation(), null);
 				}
 			}
 		} else if (this.isOnGround == true && onGround == false) {
