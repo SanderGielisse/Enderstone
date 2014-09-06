@@ -235,7 +235,7 @@ public class EnderWorld {
 	public Entity dropItem(ItemStack item, Location loc, int noPickupDelay)
 	{
 		Entity entity;
-		this.addEntity(entity = new EntityItem(loc.clone(), item, 20));
+		this.addEntity(entity = new EntityItem(loc.clone(), item, noPickupDelay));
 		return entity;
 	}
 

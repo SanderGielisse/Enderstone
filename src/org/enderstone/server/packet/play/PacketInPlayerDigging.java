@@ -75,7 +75,7 @@ public class PacketInPlayerDigging extends Packet {
 						Location loca = loc.clone();
 						loca.setX(loca.getX() + 0.5);
 						loca.setZ(loca.getZ() + 0.5);
-						Main.getInstance().mainWorld.addEntity(new EntityItem(loca, new ItemStack(blockId, (byte) 1, (short) networkManager.player.world.getBlockDataAt(x, y, z)), 20));
+						Main.getInstance().mainWorld.addEntity(new EntityItem(loca, new ItemStack(blockId, (byte) 1, (short) networkManager.player.world.getBlockDataAt(x, y, z)), 1));
 					}
 					break;
 					case 3:

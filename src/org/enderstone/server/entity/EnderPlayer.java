@@ -196,15 +196,14 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	public void onSpawn() {
-		this.inventoryHandler.tryPickup(new ItemStack(BlockId.GLASS.getId(), (byte) 1, (short) 0));
-		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DAYLIGHT_DETECTOR.getId(), (byte) 1, (short) 0));
-		this.inventoryHandler.tryPickup(new ItemStack(BlockId.BLAZE_ROD.getId(), (byte) 1, (short) 0));
-		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 1, (short) 0));
-		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COBBLESTONE.getId(), (byte) 1, (short) 0));
-		this.inventoryHandler.tryPickup(new ItemStack(BlockId.BAKED_POTATO.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_PICKAXE.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_SPADE.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 64, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.WORKBENCH.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.CHEST.getId(), (byte) 1, (short) 0));
 		this.updateDataWatcher();
 
-		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(ChatColor.GOLD+ "" + ChatColor.BOLD + "Enderstone Test Server", ChatColor.RED + "" + ChatColor.BOLD + "This server is running an Enderstone build"));
+		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(ChatColor.GOLD + "" + ChatColor.BOLD + "Enderstone Test Server", ChatColor.RED + "" + ChatColor.BOLD + "This server is running an Enderstone build"));
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(this.uuid, this.getPlayerName(), getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") });
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			player.getNetworkManager().sendPacket(packet);
@@ -513,7 +512,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 		for(ItemStack inv : this.getInventoryHandler().getPlayerInventory().getRawItems())
 			if(inv != null)
-				world.dropItem(inv, getLocation(), 20);
+				world.dropItem(inv, getLocation(), 1);
 		Collections.fill(this.getInventoryHandler().getPlayerInventory().getRawItems(), null);
 	}
 
@@ -571,6 +570,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	public boolean isValid() {
 		return this.isOnline;
+	}
+
+	public void kick(String reason) {
+		this.getNetworkManager().disconnect(new SimpleMessage(reason), false);
 	}
 
 	/**

@@ -137,7 +137,7 @@ public class InventoryHandler {
 		if(stack == null) return;
 		if(stack.getAmount() <= 1 || dropFullStack)
 		{
-			this.player.world.dropItem(stack, player.getLocation(), 0);
+			this.player.world.dropItem(stack, player.getLocation(), 10);
 			inventory.set(slot,null);
 		}
 		else
@@ -145,7 +145,7 @@ public class InventoryHandler {
 			stack.setAmount((byte) (stack.getAmount() - 1));
 			ItemStack cloned = stack.clone();
 			cloned.setAmount((byte)1);
-			this.player.world.dropItem(cloned, player.getLocation(), 0);
+			this.player.world.dropItem(cloned, player.getLocation(), 10);
 			inventory.set(slot,stack);
 		}
 	}
@@ -356,5 +356,9 @@ public class InventoryHandler {
 		} else {
 			this.getPlayerInventory().getHotbar().set(slot, oldStack);
 		}
+	}
+	
+	public ItemStack getItemInHand(){
+		return this.getPlayerInventory().getHotbar().get(this.selectedHotbarSlot);
 	}
 }

@@ -423,6 +423,10 @@ public enum BlockId {
 		this.dataClass = clazz;
 		this.validBlock = validBlock;
 	}
+	
+	public boolean isValidBlock() {
+		return validBlock;
+	}
 
 	public String getName() {
 		return name().toLowerCase();

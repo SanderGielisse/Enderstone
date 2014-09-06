@@ -89,20 +89,18 @@ public class PacketInBlockPlacement extends Packet {
 					x++;
 				}
 				if (networkManager.player.getLocation().isInRange(6, loc, true)) {
-					ItemStack stack = getHeldItem();
-					if (stack.getBlockId() == BlockId.LAVA_BUCKET.getId()) {
-						stack.setBlockId(BlockId.LAVA.getId());
-					} else if (stack.getBlockId() == BlockId.WATER_BUCKET.getId()) {
-						stack.setBlockId(BlockId.WATER.getId());
-					} else if (stack.getBlockId() == BlockId.FLINT_AND_STEEL.getId()) {
-						stack.setBlockId(BlockId.FIRE.getId());
-					}
-					Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
-					
 					EnderPlayer pl = networkManager.player;
-					pl.getInventoryHandler().decreaseItemInHand(1);
+
+					if (pl.getInventoryHandler().getItemInHand().getBlockId() != getHeldItem().getBlockId() && pl.getInventoryHandler().getItemInHand().getAmount() != getHeldItem().getAmount()) {
+						return;
+					}
+
+					if (BlockId.byId(getHeldItem().getBlockId()).isValidBlock()) {
+						pl.world.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
+						pl.getInventoryHandler().decreaseItemInHand(1);
+						Main.getInstance().mainWorld.broadcastSound("dig.grass", 1F, (byte) 63, loc, null);
+					}
 				}
-				Main.getInstance().mainWorld.broadcastSound("dig.grass", 1F, (byte) 63, loc, null);
 			}
 		});
 	}
