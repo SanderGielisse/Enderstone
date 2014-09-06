@@ -87,7 +87,7 @@ public class PacketInBlockPlacement extends Packet {
 				} else if (direct == 5) {
 					x++;
 				}
-				if (networkManager.player.getLocation().isInRange(6, loc)) {
+				if (networkManager.player.getLocation().isInRange(6, loc, true)) {
 					ItemStack stack = getHeldItem();
 					if (stack.getBlockId() == BlockId.LAVA_BUCKET.getId()) {
 						stack.setBlockId(BlockId.LAVA.getId());
@@ -98,7 +98,7 @@ public class PacketInBlockPlacement extends Packet {
 					}
 					Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
 				}
-				Main.getInstance().mainWorld.broadcastSound("dig.grass", x, y, z, 1F, (byte) 63, loc, null);
+				Main.getInstance().mainWorld.broadcastSound("dig.grass", 1F, (byte) 63, loc, null);
 			}
 		});
 	}

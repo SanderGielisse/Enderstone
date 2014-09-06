@@ -58,6 +58,10 @@ public abstract class Entity {
 
 	public abstract void onLeftClick(EnderPlayer attacker);
 
+	public boolean onCollision(EnderPlayer withPlayer){
+		return false;
+	}
+	
 	public void damage(float damage) {
 		if (Float.isNaN(this.health))
 			initHealth();
@@ -65,7 +69,7 @@ public abstract class Entity {
 			return;
 		this.setHealth(Math.max(health - damage, 0));
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
-			if (p.getLocation().isInRange(25, getLocation())) {
+			if (p.getLocation().isInRange(25, getLocation(), true)) {
 				p.getNetworkManager().sendPacket(new PacketOutEntityStatus(getEntityId(), PacketOutEntityStatus.Status.LIVING_ENTITY_HURT));
 				p.getNetworkManager().sendPacket(new PacketOutSoundEffect(isDead() ? getDeadSound() : getDamageSound(), location));
 				p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
@@ -170,5 +174,8 @@ public abstract class Entity {
 		if (entityId != other.entityId)
 			return false;
 		return true;
+	}
+
+	public void serverTick() {
 	}
 }

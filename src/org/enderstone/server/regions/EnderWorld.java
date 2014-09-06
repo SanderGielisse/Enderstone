@@ -33,6 +33,8 @@ import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.Entity;
 import org.enderstone.server.entity.EntityItem;
 import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.regions.generators.TimTest;
 import org.enderstone.server.util.IntegerArrayComparator;
@@ -233,7 +235,7 @@ public class EnderWorld {
 	public Entity dropItem(ItemStack item, Location loc, int noPickupDelay)
 	{
 		Entity entity;
-		this.addEntity(entity = new EntityItem(loc, item)); // TODO do something with noPickupDelay
+		this.addEntity(entity = new EntityItem(loc.clone(), item, 20));
 		return entity;
 	}
 
@@ -262,10 +264,10 @@ public class EnderWorld {
 		public int maxChunks();
 	}
 
-	public void broadcastSound(String soundName, int x, int y, int z, float volume, byte pitch, Location loc, EnderPlayer exceptOne) {
-		PacketOutSoundEffect packet = new PacketOutSoundEffect(soundName, x, y, z, volume, pitch);
+	public void broadcastSound(String soundName, float volume, byte pitch, Location loc, EnderPlayer exceptOne) {
+		PacketOutSoundEffect packet = new PacketOutSoundEffect(soundName, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), volume, pitch);
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
-			if ((!ep.equals(exceptOne)) && loc.isInRange(15, ep.getLocation())) {
+			if ((!ep.equals(exceptOne)) && loc.isInRange(15, ep.getLocation(), true)) {
 				ep.getNetworkManager().sendPacket(packet);
 			}
 		}
@@ -273,6 +275,13 @@ public class EnderWorld {
 
 	public void addEntity(Entity e) {
 		this.entities.add(e);
+	}
+	
+	public void removeEntity(Entity e){
+		if(this.entities.contains(e)){
+			this.entities.remove(e);
+			this.broadcastPacket(new PacketOutEntityDestroy(new Integer[] {e.getEntityId()}), e.getLocation());
+		}
 	}
 
 	public void updateEntities(List<EnderPlayer> onlinePlayers) {
@@ -295,6 +304,17 @@ public class EnderWorld {
 
 	public void serverTick()
 	{
+		for(Entity e : this.entities){
+			e.serverTick();
+		}
 		this.time += 1;
+	}
+	
+	public void broadcastPacket(Packet packet, Location loc){
+		for(EnderPlayer ep : Main.getInstance().onlinePlayers){
+			if(ep.getLocation().isInRange(35, loc, true)){
+				ep.getNetworkManager().sendPacket(packet);
+			}
+		}
 	}
 }
