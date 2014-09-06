@@ -19,10 +19,11 @@ package org.enderstone.server.regions;
 
 import java.util.List;
 import java.util.Random;
+import org.enderstone.server.regions.generators.MultiChunkBlockPopulator;
 
 public interface ChunkGenerator {
 
 	public BlockId[][] generateExtBlockSections(EnderWorld world, Random random, int x, int z);
 
-	public List<BlockPopulator> getDefaultPopulators(EnderWorld world);
+	public List<MultiChunkBlockPopulator> getDefaultPopulators(EnderWorld world);
 }

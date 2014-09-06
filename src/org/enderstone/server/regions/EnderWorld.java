@@ -36,6 +36,7 @@ import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
+import org.enderstone.server.regions.generators.MultiChunkBlockPopulator;
 import org.enderstone.server.regions.generators.TimTest;
 import org.enderstone.server.util.IntegerArrayComparator;
 
@@ -122,6 +123,7 @@ public class EnderWorld {
 		boolean didPopulate = false;
 		try {
 			c.hasPopulated = true;
+			EnderChunk[] array = new EnderChunk[9];
 			for (int i = -1; i <= 1; i++) {
 				for (int k = -1; k <= 1; k++) {
 					if (k == 0 && i == 0) {
@@ -131,12 +133,14 @@ public class EnderWorld {
 					if (found == null) {
 						return c;
 					}
+					array[(i+1)+(k+1)*3] = found;
 				}
 			}
+			array[(0+1)+(0+1)*3] = c;
 			didPopulate = true;
 			try {
-				for (BlockPopulator blocks : generator.getDefaultPopulators(this)) {
-					blocks.populate(this, random, c);
+				for (MultiChunkBlockPopulator blocks : generator.getDefaultPopulators(this)) {
+					blocks.populate(this, random, new MultiChunkBlockPopulator.ChunkGrid(array));
 				}
 			} catch (Exception e) {
 				EnderLogger.exception(e);

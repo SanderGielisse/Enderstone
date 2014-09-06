@@ -55,8 +55,8 @@ public class FlatLandGenerator implements ChunkGenerator {
 	}
 
 	@Override
-	public List<BlockPopulator> getDefaultPopulators(EnderWorld world) {
-		List<BlockPopulator> p = new ArrayList<>();
+	public List<MultiChunkBlockPopulator> getDefaultPopulators(EnderWorld world) {
+		List<MultiChunkBlockPopulator> p = new ArrayList<>();
 		p.add(new BlockPopulator() {
 
 			@Override

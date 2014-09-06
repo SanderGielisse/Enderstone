@@ -18,11 +18,18 @@
 package org.enderstone.server.regions;
 
 import java.util.Random;
+import org.enderstone.server.regions.generators.MultiChunkBlockPopulator;
 
 /**
  *
  * @author Fernando
  */
-public interface BlockPopulator {
+public abstract class BlockPopulator implements MultiChunkBlockPopulator {
+
+	@Override
+	public void populate(EnderWorld sourceWorld, Random random, ChunkGrid chunkGrid) {
+		this.populate(sourceWorld, random, chunkGrid.getPrimairyChunk());
+	}
+	
     public abstract void populate(EnderWorld world, Random random, EnderChunk source);
 }
