@@ -285,9 +285,6 @@ public class EnderChunk {
 		 */
 		{
 			chunkmap.chunkData = new byte[currentIndex];
-			
-			EnderLogger.warn("Current index: " + currentIndex + " TotalArray size: " + totalArray.length);
-			
 			System.arraycopy(totalArray, 0, chunkmap.chunkData, 0, currentIndex);
 		}
 		return chunkmap;

@@ -18,6 +18,7 @@
 package org.enderstone.server.packet.login;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.UUID;
@@ -57,7 +58,18 @@ public class PacketInLoginStart extends Packet {
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
 		assert networkManager.player == null;
+		
 		networkManager.wantedName = name;
+		
+		try {
+			ByteBuf tempBuf = Unpooled.buffer();
+			new PacketOutSetCompression(1).writeFully(tempBuf);
+			networkManager.ctx.pipeline().channel().writeAndFlush(tempBuf);
+			networkManager.enableCompression();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		if (Main.getInstance().onlineMode) {
 			networkManager.regenerateEncryptionSettings();
 			NetworkManager.EncryptionSettings en = networkManager.getEncryptionSettings();

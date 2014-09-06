@@ -19,6 +19,7 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.packet.Packet;

@@ -32,7 +32,6 @@ import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.Entity;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
-import org.enderstone.server.regions.generators.FlatLandGenerator;
 import org.enderstone.server.regions.generators.TimTest;
 import org.enderstone.server.util.IntegerArrayComparator;
 
@@ -45,7 +44,7 @@ public class EnderWorld {
 	private Long seed = null;
 	private final RegionSet loadedChunks = new RegionSet();
 	public final Map<EnderPlayer, RegionSet> players = new LinkedHashMap<>();
-	private final ChunkGenerator generator = new FlatLandGenerator();
+	private final ChunkGenerator generator = new TimTest();
 	private final Random random = new Random();
 	private long time = random.nextInt();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;

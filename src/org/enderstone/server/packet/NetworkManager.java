@@ -45,6 +45,8 @@ import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.GameMode;
 import org.enderstone.server.entity.PlayerTextureStore;
 import org.enderstone.server.packet.codec.DiscardingReader;
+import org.enderstone.server.packet.codec.MinecraftCompressionCodex;
+import org.enderstone.server.packet.codec.MinecraftDecompressionCodex;
 import org.enderstone.server.packet.codec.MinecraftServerCodex;
 import org.enderstone.server.packet.login.PacketOutLoginSucces;
 import org.enderstone.server.packet.play.PacketOutJoinGame;
@@ -64,7 +66,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	public UUID uuid;
 	public PlayerTextureStore skinBlob;
 	public int clientVersion;
-
+	
 	public PacketHandshake latestHandshakePacket;
 	public volatile int handShakeStatus = -1;
 
@@ -97,7 +99,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			Packet p;
 			while ((p = packets.poll()) != null) {
 				ctx.write(p);
-				// EnderLogger.debug("Out: "+p.toString());
+				//EnderLogger.debug("Out: "+p.toString());
 				p.onSend(this);
 			}
 			ctx.flush();
@@ -317,5 +319,10 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			this.onDisconnect();
 			ctx.close();
 		}
+	}
+	
+	public void enableCompression(){
+		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_r_decompressor", new MinecraftDecompressionCodex());
+		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_w_compressor", new MinecraftCompressionCodex());
 	}
 }

@@ -62,5 +62,4 @@ public class PacketOutLoginPlayerDisconnect extends Packet {
 	public byte getId() {
 		return 0x00;
 	}
-
 }
