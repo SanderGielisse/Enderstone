@@ -81,6 +81,11 @@ public class ItemStack implements Cloneable {
 	public void setAmount(byte amount) {
 		this.amount = amount;
 	}
+	
+	public void setAmount(int amount) {
+		if(amount > 256 || amount < 0) throw new IllegalArgumentException("Provided itemstack amount is to high! " + amount);
+		this.amount = (byte) amount;
+	}
 
 	public short getDamage() {
 		return damage;
@@ -143,4 +148,11 @@ public class ItemStack implements Cloneable {
 		if (this.damage != other.damage) return false;
 		return Objects.equals(this.compoundTag, other.compoundTag);
 	}
+
+	@Override
+	public String toString() {
+		return "ItemStack{" + "Id=" + blockId + ", amount=" + amount + ", data=" + damage + ", tag=" + compoundTag + '}';
+	}
+	
+	
 }

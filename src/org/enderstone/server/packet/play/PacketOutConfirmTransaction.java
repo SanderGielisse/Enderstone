@@ -28,6 +28,12 @@ import org.enderstone.server.packet.Packet;
  */
 public class PacketOutConfirmTransaction extends Packet{
 
+	public PacketOutConfirmTransaction(byte windowId, short actionNumber, boolean accepted) {
+		this.windowId = windowId;
+		this.actionNumber = actionNumber;
+		this.accepted = accepted;
+	}
+
 	private byte windowId;
 	private short actionNumber;
 	private boolean accepted;

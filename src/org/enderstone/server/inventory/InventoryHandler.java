@@ -31,10 +31,12 @@ import org.enderstone.server.packet.play.PacketInCreativeInventoryAction;
 import org.enderstone.server.packet.play.PacketInHeldItemChange;
 import org.enderstone.server.packet.play.PacketInPlayerDigging;
 import org.enderstone.server.packet.play.PacketOutCloseWindow;
+import org.enderstone.server.packet.play.PacketOutConfirmTransaction;
 import org.enderstone.server.packet.play.PacketOutOpenWindow;
 import org.enderstone.server.packet.play.PacketOutSetSlot;
 import org.enderstone.server.packet.play.PacketOutWindowItems;
 import org.enderstone.server.packet.play.PacketOutWindowProperty;
+import org.enderstone.server.util.FixedSizeList;
 
 /**
  *
@@ -90,7 +92,7 @@ public class InventoryHandler {
 	private final byte playerWindowId = 0;
 	private byte nextWindowId = 1;
 	private int selectedHotbarSlot = 0;
-	private ItemStack itemOnCursor;
+	private List<ItemStack> itemOnCursor = new FixedSizeList<>(new ItemStack[1]);
 	
 	private byte getWindowId(Inventory inv)
 	{
@@ -162,17 +164,57 @@ public class InventoryHandler {
 	public void recievePacket(PacketInClickWindow packet)
 	{
 		player.sendMessage(new SimpleMessage(packet.toString()));
-		int windowId = packet.getWindowId();
+		boolean correctTransaction = false;
+		byte windowId = packet.getWindowId();
 		int slot = packet.getSlot();
 		int button = packet.getButton();
-		int actionNumber = packet.getActionNumber();
+		short actionNumber = packet.getActionNumber();
 		int mode = packet.getMode();
 		ItemStack itemStack = packet.getItemStack();
-		if (mode == 0) {
+		if(windowId != this.nextWindowId && windowId != 0)
+		{
+			correctTransaction = false;
+			player.sendMessage(new SimpleMessage("Invalid inventory interaction!"));
+		}
+		else if (mode == 0) {
 			if (button == 0) {
 				//normal left mouse click
+				swapItems(this.itemOnCursor, 0 , this.activeInventory.getRawItems(), slot);
+				correctTransaction = true;
 			} else if (button == 1) {
 				//normal right mouse click
+				ItemStack cursor = this.itemOnCursor.get(0);
+				ItemStack other = this.activeInventory.getRawItems().get(slot);
+				if(cursor == null && other == null) return;
+				if(cursor == null){
+					int amout = other.getAmount();
+					int otherAmount = amout / 2;
+					int cursorAmount = amout - otherAmount;
+					cursor = other.clone();
+					cursor.setAmount(cursorAmount);
+					this.itemOnCursor.set(0, cursor);
+					if(otherAmount == 0)
+						this.activeInventory.getRawItems().set(slot,null);
+					else
+					{
+						other.setAmount(otherAmount);
+						this.activeInventory.getRawItems().set(slot,other);
+					}
+				} if(other == null || other.materialTypeMatches(cursor)) {
+					if(other == null)
+					{
+						other = cursor.clone();
+						other.setAmount(0);
+					}
+					if(cursor.getAmount() > 1)
+					{
+						cursor.setAmount(cursor.getAmount() - 1);
+						this.itemOnCursor.set(0, cursor);
+					}
+					other.setAmount(other.getAmount() + 1);
+					this.activeInventory.getRawItems().set(slot,other);
+				}
+				correctTransaction = true;
 			}
 		} else if (mode == 1) {
 			if (button == 0) {
@@ -184,15 +226,18 @@ public class InventoryHandler {
 			// Press on number on keyboard
 			int targetSlot = button;
 			swapItems(this.equimentInventory.getHotbar(),targetSlot,this.activeInventory.getRawItems(),slot);
+			correctTransaction = true;
 		} else if (mode == 3) {
 			//middle mouse click
 		} else if (mode == 4) {
 			if (button == 0 && slot != -999) {
 				//drop key Q
 				drop(this.activeInventory.getRawItems(), false, this.selectedHotbarSlot);
+				correctTransaction = true;
 			} else if (button == 1 && slot != -999) {
 				//ctrl + drop key Q
 				drop(this.activeInventory.getRawItems(), true, this.selectedHotbarSlot);
+				correctTransaction = true;
 			} else if (button == 0 && slot == -999) {
 				//left click outside inventory
 			} else if (button == 1 && slot == -999) {
@@ -215,11 +260,12 @@ public class InventoryHandler {
 		} else if (mode == 6) {
 			//double click
 		}
+		player.networkManager.sendPacket(new PacketOutConfirmTransaction(windowId,actionNumber,correctTransaction));
 	}
 	
 	public void recievePacket(PacketInConfirmTransaction packet)
 	{
-		player.sendMessage(new SimpleMessage(packet.toString()));
+		//player.sendMessage(new SimpleMessage(packet.toString()));
 	}
 	
 	public void recievePacket(PacketInCloseWindow packet)
@@ -263,8 +309,8 @@ public class InventoryHandler {
 	public void openInventory(Inventory inv)
 	{
 		if(inv == null) inv = equimentInventory;
-		this.drop(Collections.singletonList(this.itemOnCursor), true, 0);
-		itemOnCursor = null;
+		this.drop(this.itemOnCursor, true, 0);
+		itemOnCursor.set(0,null);
 		if(activeInventory != equimentInventory)
 		{
 			activeInventory.removeListener(listener);
