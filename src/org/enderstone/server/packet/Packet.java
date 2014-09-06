@@ -282,7 +282,7 @@ public abstract class Packet {
 	public static int getItemStackSize(ItemStack stack) {
 		int total = 0;
 		if (stack == null) {
-			total += 1;
+			total += getShortSize();
 			return total;
 		}
 		total += (getShortSize() * 2) + 1;
