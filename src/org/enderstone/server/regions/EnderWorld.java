@@ -31,6 +31,8 @@ import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.Entity;
+import org.enderstone.server.entity.EntityItem;
+import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.regions.generators.TimTest;
 import org.enderstone.server.util.IntegerArrayComparator;
@@ -226,6 +228,13 @@ public class EnderWorld {
 				playerChunks.addAll(newPlayerChunks);
 			}
 		}
+	}
+	
+	public Entity dropItem(ItemStack item, Location loc, int noPickupDelay)
+	{
+		Entity entity;
+		this.addEntity(entity = new EntityItem(loc, item)); // TODO do something with noPickupDelay
+		return entity;
 	}
 
 	public long getSeed() {

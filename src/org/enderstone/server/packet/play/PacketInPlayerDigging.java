@@ -55,6 +55,7 @@ public class PacketInPlayerDigging extends Packet {
 		return 0x07;
 	}
 
+	@Override
 	public void onRecieve(final NetworkManager networkManager) {
 		Main.getInstance().sendToMainThread(new Runnable() {
 
@@ -63,14 +64,23 @@ public class PacketInPlayerDigging extends Packet {
 				int x = getLocation().getBlockX();
 				int y = getLocation().getBlockY();
 				int z = getLocation().getBlockZ();
-				
+
 				short blockId = Main.getInstance().mainWorld.getBlockIdAt(x, y, z).getId();
-				if (getStatus() == 2) {
-					if (networkManager.player.getLocation().isInRange(6, loc)) {
-						Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
+				switch (getStatus()) {
+					case 2: {
+						if (networkManager.player.getLocation().isInRange(6, loc)) {
+							Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
+						}
+						Main.getInstance().mainWorld.broadcastSound("dig.grass", x, y, z, 1F, (byte) 63, loc, networkManager.player);
+						Main.getInstance().mainWorld.addEntity(new EntityItem(loc, new ItemStack(blockId, (byte) 1, (short) networkManager.player.world.getBlockDataAt(x, y, z))));
 					}
-					Main.getInstance().mainWorld.broadcastSound("dig.grass", x, y, z, 1F, (byte) 63, loc, networkManager.player);
-					Main.getInstance().mainWorld.addEntity(new EntityItem(loc, new ItemStack(blockId, (byte) 1, (short) 0)));
+					break;
+					case 3:
+					case 4:
+					{
+						networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
+					}
+					break;
 				}
 			}
 		});
@@ -80,11 +90,16 @@ public class PacketInPlayerDigging extends Packet {
 		return status;
 	}
 
-	public Location getLocation(){
+	public Location getLocation() {
 		return loc;
 	}
 
 	public byte getFace() {
 		return face;
+	}
+
+	@Override
+	public String toString() {
+		return "PacketInPlayerDigging{" + "status=" + status + ", loc=" + loc + ", face=" + face + '}';
 	}
 }

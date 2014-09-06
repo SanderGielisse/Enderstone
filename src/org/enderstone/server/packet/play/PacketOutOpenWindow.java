@@ -20,6 +20,7 @@ package org.enderstone.server.packet.play;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.chat.Message;
+import org.enderstone.server.inventory.Inventory.InventoryType;
 import org.enderstone.server.packet.Packet;
 
 /**
@@ -28,12 +29,20 @@ import org.enderstone.server.packet.Packet;
  */
 public class PacketOutOpenWindow extends Packet {
 	private byte windowId;
-	private String inventoryType;
+	private InventoryType inventoryType;
 	private Message windowMessage;
 	private transient String windowMessageString;
 	private byte maxSlots;
 	private int entityId;
 
+	public PacketOutOpenWindow(byte windowId, InventoryType inventoryType, Message windowMessage, byte maxSlots, int entityId) {
+		this.windowId = windowId;
+		this.inventoryType = inventoryType;
+		this.windowMessage = windowMessage;
+		this.maxSlots = maxSlots;
+		this.entityId = entityId;
+	}
+	
 	@Override
 	public void read(ByteBuf buf) throws IOException {
 		throw new UnsupportedOperationException("Not supported yet.");
@@ -43,16 +52,16 @@ public class PacketOutOpenWindow extends Packet {
 	public void write(ByteBuf buf) throws IOException {
 		if(windowMessageString == null) windowMessageString = windowMessage.toMessageJson();
 		buf.writeByte(windowId);
-		writeString(inventoryType, buf);
+		writeString(inventoryType.getInventoryType(), buf);
 		writeString(windowMessageString, buf);
 		buf.writeByte(maxSlots);
-		if(inventoryType.equals("EntityHorse")) writeVarInt(entityId, buf);
+		if(inventoryType == InventoryType.ENTITY_HORSE) writeVarInt(entityId, buf);
 	}
 
 	@Override
 	public int getSize() throws IOException {
 		if(windowMessageString == null) windowMessageString = windowMessage.toMessageJson();
-		return 1 + getStringSize(inventoryType) + getStringSize(windowMessageString) + 1 + (inventoryType.equals("EntityHorse") ? getIntSize() : 0) + getVarIntSize(getId());
+		return 1 + getStringSize(inventoryType.getInventoryType()) + getStringSize(windowMessageString) + 1 + (inventoryType == InventoryType.ENTITY_HORSE ? getIntSize() : 0) + getVarIntSize(getId());
 	}
 
 	@Override

@@ -27,12 +27,12 @@ import org.enderstone.server.util.MergedList;
  *
  * @author Fernando
  */
-public class PlayerInventory extends Inventory{
+public class PlayerInventory extends DefaultInventory{
 
 	private final EnderPlayer player;
 
 	public PlayerInventory(EnderPlayer player) {
-		super(InventoryType.INVENTORY, 45);
+		super(InventoryType.PLAYER_INVENTORY, 45);
 		this.player = player;
 	}
 	
@@ -96,7 +96,7 @@ public class PlayerInventory extends Inventory{
 		ItemStack stack = this.getHotbar().get(index);
 		if(stack == null)return false;
 		int amount = stack.getAmount();
-		ItemStack result = Inventory.tryAddItem(this.getTopInventory(), stack);
+		ItemStack result = DefaultInventory.tryAddItem(this.getTopInventory(), stack);
 		if(result != null && result.getAmount() == amount)
 		{
 			return true;
@@ -111,7 +111,7 @@ public class PlayerInventory extends Inventory{
 		ItemStack stack = this.getTopInventory().get(index);
 		if(stack == null)return false;
 		int amount = stack.getAmount();
-		ItemStack result = Inventory.tryAddItem(this.getHotbar(), stack);
+		ItemStack result = DefaultInventory.tryAddItem(this.getHotbar(), stack);
 		if(result != null && result.getAmount() == amount)
 		{
 			return true;
@@ -122,6 +122,6 @@ public class PlayerInventory extends Inventory{
 	
 	public ItemStack pickUpItem(ItemStack item)
 	{
-		return Inventory.tryAddItem(this.getItemInsertionOrder(), item);
+		return DefaultInventory.tryAddItem(this.getItemInsertionOrder(), item);
 	}
 }
