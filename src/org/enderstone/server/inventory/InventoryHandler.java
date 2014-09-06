@@ -346,4 +346,15 @@ public class InventoryHandler {
 	{
 		this.player.networkManager.sendPacket(new PacketOutWindowItems(this.nextWindowId,equimentInventory.getRawItems().toArray(new ItemStack[equimentInventory.getSize()])));
 	}
+	
+	public void decreaseItemInHand(int i) {
+		int slot = this.selectedHotbarSlot;
+		ItemStack oldStack = this.getPlayerInventory().getHotbar().get(slot);
+		oldStack.setAmount(oldStack.getAmount() - i);
+		if (oldStack.getAmount() <= 0) {
+			this.getPlayerInventory().getHotbar().set(slot, null);
+		} else {
+			this.getPlayerInventory().getHotbar().set(slot, oldStack);
+		}
+	}
 }
