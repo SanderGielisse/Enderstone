@@ -60,9 +60,7 @@ public class ItemStack implements Cloneable {
 
 	public void updateNBTData() {
 		Map<String, Tag> map = new HashMap<>();
-		map.put("Count", new ByteTag("Count", this.getAmount()));
-		map.put("Damage", new ShortTag("Damage", this.getDamage()));
-		map.put("id", new StringTag("id", "minecraft:grass"));
+		if (map.isEmpty()) return;
 		this.compoundTag = new CompoundTag("Item", map);
 		//this.compoundTag = null;
 	}
