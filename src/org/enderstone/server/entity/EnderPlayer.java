@@ -18,6 +18,7 @@
 package org.enderstone.server.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -476,6 +477,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 				ep.getNetworkManager().sendPacket(packet);
 			}
 		}
+		for(ItemStack inv : this.getInventoryHandler().getPlayerInventory().getRawItems())
+			if(inv != null)
+				world.dropItem(inv, getLocation(), 20);
+		Collections.fill(this.getInventoryHandler().getPlayerInventory().getRawItems(), null);
 	}
 
 	@Override

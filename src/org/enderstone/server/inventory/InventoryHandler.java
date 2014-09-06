@@ -339,7 +339,11 @@ public class InventoryHandler {
 		for(int i = 0; i < size && !isNonEmpty; i++)
 			if(items.get(i) != null)
 				isNonEmpty = true;
-		if(!isNonEmpty) return;
-		this.player.networkManager.sendPacket(new PacketOutWindowItems(this.nextWindowId,inv.getRawItems().toArray(new ItemStack[size])));
+		if(isNonEmpty) updateInventory();
+	}
+	
+	public void updateInventory()
+	{
+		this.player.networkManager.sendPacket(new PacketOutWindowItems(this.nextWindowId,equimentInventory.getRawItems().toArray(new ItemStack[equimentInventory.getSize()])));
 	}
 }

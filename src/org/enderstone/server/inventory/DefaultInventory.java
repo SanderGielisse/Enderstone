@@ -106,6 +106,11 @@ public abstract class DefaultInventory implements Inventory {
 			l.closeInventory(this);
 		}
 	}
+	
+	public void clearInventory()
+	{
+		for(int i = 0; i < getSize(); i++) this.setRawItem(i, null);
+	}
 
 	protected abstract void close0();
 
