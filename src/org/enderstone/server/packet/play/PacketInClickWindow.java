@@ -20,6 +20,7 @@ package org.enderstone.server.packet.play;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.EnderLogger;
+import org.enderstone.server.Main;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
@@ -59,69 +60,14 @@ public class PacketInClickWindow extends Packet {
 	}
 	
 	@Override
-	public void onRecieve(NetworkManager networkManager) {
-		EnderLogger.warn("WindowId: " + windowId + " Slot: " + slot + " Button: " + button + " ActionNumber: " + actionNumber + " Mode: " + mode + " Air: " + ((itemStack == null) || (itemStack.getBlockId() == (short)0)));
-		if(mode == 0){
-			if(button == 0){
-				//normal left mouse click
-			}else if(button == 1){
-				//normal right mouse click
+	public void onRecieve(final NetworkManager networkManager) {
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				networkManager.player.getInventoryHandler().recievePacket(PacketInClickWindow.this);
 			}
-		}else if(mode == 1){
-			if(button == 0){
-				//shift  + left mouse
-			}else if(button == 1){
-				//shift  + right mouse
-			}
-		}else if(mode == 2){
-			if(button == 0){
-				//number key 1
-			}else if(button == 1){
-				//number key 2
-			}else if(button == 2){
-				//number key 3
-			}else if(button == 3){
-				//number key 4
-			}else if(button == 4){
-				//number key 5
-			}else if(button == 5){
-				//number key 6
-			}else if(button == 6){
-				//number key 7
-			}else if(button == 7){
-				//number key 8
-			}else if(button == 8){
-				//number key 9
-			}
-		}else if(mode == 3){
-			//middle mouse click
-		}else if(mode == 4){
-			if(button == 0 && slot != -999){
-				//drop key Q
-			}else if(button == 1 && slot != -999){
-				//ctrl + drop key Q
-			}else if(button == 0 && slot == -999){
-				//left click outside inventory
-			}else if(button == 1 && slot == -999){
-				//right click outside inventory
-			}
-		}else if(mode == 5){
-			if(button == 0){
-				//started left or middle mouse button drag
-			}else if(button == 4){
-				//started right mouse drag
-			}else if(button == 1){
-				//add slot for left-mouse drag
-			}else if(button == 5){
-				//add slot for right-mouse drag
-			}else if(button == 2){
-				//ending left-mouse drag
-			}else if(button == 6){
-				//ending right-mouse drag
-			}
-		}else if(mode == 6){
-			//double click
-		}
+		});
 	}
 
 	public byte getWindowId() {
@@ -146,5 +92,10 @@ public class PacketInClickWindow extends Packet {
 
 	public ItemStack getItemStack() {
 		return itemStack;
+	}
+
+	@Override
+	public String toString() {
+		return "PacketInClickWindow{" + "windowId=" + windowId + ", slot=" + slot + ", button=" + button + ", actionNumber=" + actionNumber + ", mode=" + mode + ", itemStack=" + itemStack + '}';
 	}
 }

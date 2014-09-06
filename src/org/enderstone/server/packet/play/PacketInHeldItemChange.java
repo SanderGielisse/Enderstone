@@ -19,6 +19,8 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.Main;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 
 public class PacketInHeldItemChange extends Packet {
@@ -47,5 +49,21 @@ public class PacketInHeldItemChange extends Packet {
 
 	public short getSlot() {
 		return slot;
+	}
+	
+	@Override
+	public void onRecieve(final NetworkManager networkManager) {
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				networkManager.player.getInventoryHandler().recievePacket(PacketInHeldItemChange.this);
+			}
+		});
+	}
+
+	@Override
+	public String toString() {
+		return "PacketInHeldItemChange{" + "slot=" + slot + '}';
 	}
 }

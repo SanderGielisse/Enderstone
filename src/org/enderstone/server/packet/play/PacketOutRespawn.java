@@ -20,11 +20,8 @@ package org.enderstone.server.packet.play;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.Main;
-import org.enderstone.server.inventory.Inventory.InventoryType;
-import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
-import org.enderstone.server.regions.BlockId;
 
 public class PacketOutRespawn extends Packet {
 

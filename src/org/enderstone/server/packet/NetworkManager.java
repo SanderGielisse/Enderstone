@@ -23,6 +23,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -32,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.logging.Level;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
@@ -295,19 +297,40 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		}
 	}
 
+	/**
+	 * Disconnected the player with the specified warning
+	 * @param message the disconnect message
+	 * @deprecated This method doesn't know the real cause of the disconnect, use disconnect(Message, boolean) instead
+	 */
+	@Deprecated
 	public void disconnect(String message) {
-		this.disconnect(new SimpleMessage(message));
+		this.disconnect(message, true);
+	}
+	
+	public void disconnect(String message, boolean byError) {
+		this.disconnect(new SimpleMessage(message), byError);
+	}
+	
+	@Deprecated
+	public void disconnect(Message message) {
+		this.disconnect(message, true);
 	}
 
-	public void disconnect(Message message) {
+	/**
+	 * Disconnects the player
+	 * @param message the message to kick the player
+	 * @param byError if true, then the reason of the kick is printed in the console
+	 */
+	public void disconnect(Message message, boolean byError) {
 		try {
 			this.ctx.channel().pipeline().addFirst("packet_r_disconnected", new DiscardingReader());
+			Level level = byError ? Level.WARNING : Level.INFO;
 			if (this.player == null)
-				EnderLogger.info("Kicking unregistered channel (" + this.wantedName + "" + this.uuid + "): " + message.toPlainText());
+				EnderLogger.logger.log(level, "Kicking unregistered channel " + this.digitalName() + ": " + message.toPlainText());
 			else
-				EnderLogger.info("Kicking (" + this.wantedName + "," + this.uuid + "): " + message.toPlainText());
+				EnderLogger.logger.log(level, "Kicking " + this.digitalName() +": " + message.toPlainText());
 			Packet p = codex.getDisconnectionPacket(message);
-			System.out.println(p);
+			EnderLogger.warn("Kicking ");
 			this.ctx.channel().pipeline().addFirst(new DiscardingReader());
 			if (p != null)
 				ctx.write(p);
@@ -324,5 +347,10 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	public void enableCompression(){
 		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_r_decompressor", new MinecraftDecompressionCodex());
 		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_w_compressor", new MinecraftCompressionCodex());
+	}
+	public String digitalName()
+	{
+		InetSocketAddress address = (InetSocketAddress)ctx.channel().remoteAddress();
+		return "["+address.getAddress()+"|"+address.getPort()+"]-("+String.valueOf(this.wantedName)+"";
 	}
 }

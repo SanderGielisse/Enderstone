@@ -32,8 +32,10 @@ import org.enderstone.server.chat.Message;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
-import org.enderstone.server.inventory.Inventory;
+import org.enderstone.server.inventory.DefaultInventory;
 import org.enderstone.server.inventory.InventoryHandler;
+import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.inventory.PlayerInventory;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
@@ -53,14 +55,16 @@ import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
 import org.enderstone.server.packet.play.PacketOutTabComplete;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
+import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderChunk;
+import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 
 public class EnderPlayer extends Entity implements CommandSender {
 
 	private static final int MAX_CHUNKS_EVERY_UPDATE = 16;
 
-	public final InventoryHandler handler = new InventoryHandler(this);
+	private final InventoryHandler inventoryHandler = new InventoryHandler(this);
 	public final ClientSettings clientSettings = new ClientSettings();
 	public final NetworkManager networkManager;
 	public final String playerName;
@@ -87,8 +91,15 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public double yLocation;
 	public short food = 20;
 	public float foodSaturation = 0;
-	public Inventory inventory;
+	
+	/**
+	 * Inventory of the player
+	 * @deprecated Use getInventoryHandler().getPlayerInventory() instead
+	 */
+	@Deprecated
+	private final PlayerInventory inventory = inventoryHandler.getPlayerInventory();
 
+	public EnderWorld world = Main.getInstance().mainWorld;
 	private final String textureValue;
 	private final String textureSignature;
 	public int keepAliveID = 0;
@@ -182,6 +193,12 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	public void onSpawn() {
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.GLASS.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DAYLIGHT_DETECTOR.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.BLAZE_ROD.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COBBLESTONE.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.BAKED_POTATO.getId(), (byte) 1, (short) 0));
 		this.updateDataWatcher();
 
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(this.uuid, this.getPlayerName(), getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") });
@@ -515,6 +532,13 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	public boolean isValid() {
 		return this.isOnline;
+	}
+
+	/**
+	 * @return the inventoryHandler
+	 */
+	public InventoryHandler getInventoryHandler() {
+		return inventoryHandler;
 	}
 
 	/**

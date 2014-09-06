@@ -141,7 +141,7 @@ public abstract class Packet {
 			return null;
 		}
 
-		ItemStack stack = new ItemStack(blockId, (byte) -1, (short) -1, false);
+		ItemStack stack = new ItemStack(blockId, (byte) -1, (short) -1);
 
 		stack.setAmount(buf.readByte());
 		stack.setDamage(buf.readShort());
@@ -282,13 +282,12 @@ public abstract class Packet {
 	public static int getItemStackSize(ItemStack stack) {
 		int total = 0;
 		if (stack == null) {
-			total += 1;
+			total += getShortSize();
 			return total;
 		}
 		total += (getShortSize() * 2) + 1;
 		if (stack.getCompoundTag() == null) {
-			total++;
-			return total;
+			return ++total;
 		}
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 			try (NBTOutputStream outStream = new NBTOutputStream(new DataOutputStream(out))) {

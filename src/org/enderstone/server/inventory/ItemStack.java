@@ -22,6 +22,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.enderstone.server.regions.BlockId;
 import org.jnbt.ByteTag;
 import org.jnbt.CompoundTag;
@@ -42,25 +45,23 @@ public class ItemStack implements Cloneable {
 	private short damage;
 	private CompoundTag compoundTag;
 
-	public ItemStack(short blockId, byte amount, short damage, boolean generateNBT) {
-		this(blockId, amount, damage, null, generateNBT);
+	public ItemStack(short blockId, byte amount, short damage) {
+		this(blockId, amount, damage, null);
 	}
 
-	public ItemStack(short blockId, byte amount, short damage, CompoundTag compoundTag, boolean generateNBT) {
+	public ItemStack(short blockId, byte amount, short damage, CompoundTag compoundTag) {
 		this.blockId = blockId;
 		this.amount = amount;
 		this.damage = damage;
 		this.compoundTag = compoundTag;
-		if (compoundTag == null && generateNBT) {
+		if (compoundTag == null) {
 			this.updateNBTData();
 		}
 	}
 
-	public void updateNBTData() {
+	private void updateNBTData() {
 		Map<String, Tag> map = new HashMap<>();
-		map.put("Count", new ByteTag("Count", this.getAmount()));
-		map.put("Damage", new ShortTag("Damage", this.getDamage()));
-		map.put("id", new StringTag("id", "minecraft:grass"));
+		if (map.isEmpty()) return;
 		this.compoundTag = new CompoundTag("Item", map);
 		//this.compoundTag = null;
 	}
@@ -96,28 +97,50 @@ public class ItemStack implements Cloneable {
 	public void setCompoundTag(CompoundTag compoundTag) {
 		this.compoundTag = compoundTag;
 	}
-	
+
 	@Override
 	@SuppressWarnings("CloneDeclaresCloneNotSupported")
-	public ItemStack clone() { //TODO Faster clone and what if compoundtag == null? 
+	public ItemStack clone() {
 		try {
 			ItemStack s = (ItemStack) super.clone();
+			if (compoundTag == null) return s;
 			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 			new NBTOutputStream(bytes).writeTag(compoundTag);
-			s.setCompoundTag((CompoundTag)new NBTInputStream(new ByteArrayInputStream(bytes.toByteArray())).readTag());
+			s.setCompoundTag((CompoundTag) new NBTInputStream(new ByteArrayInputStream(bytes.toByteArray())).readTag());
 			return s;
 		} catch (CloneNotSupportedException | IOException err) {
 			throw new AssertionError(err);
 		}
 	}
-	
-	public BlockId getId()
-	{
+
+	public BlockId getId() {
 		return BlockId.byId(this.blockId);
 	}
-	
-	public boolean materialTypeMatches(ItemStack other)
-	{
-		return other.blockId == this.blockId; // TODO do this better (also compare item damages)
+
+	public boolean materialTypeMatches(ItemStack other) {
+		return other.blockId == this.blockId
+				&& other.damage == this.damage
+				&& (other.compoundTag == null ? this.compoundTag == null : other.compoundTag.equals(this.compoundTag));
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		hash = 23 * hash + this.blockId;
+		hash = 23 * hash + this.amount;
+		hash = 23 * hash + this.damage;
+		hash = 23 * hash + Objects.hashCode(this.compoundTag);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		final ItemStack other = (ItemStack) obj;
+		if (this.blockId != other.blockId) return false;
+		if (this.amount != other.amount) return false;
+		if (this.damage != other.damage) return false;
+		return Objects.equals(this.compoundTag, other.compoundTag);
 	}
 }
