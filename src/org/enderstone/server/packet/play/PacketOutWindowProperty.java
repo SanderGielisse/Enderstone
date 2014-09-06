@@ -26,6 +26,12 @@ public class PacketOutWindowProperty extends Packet{
 	private byte windowId;
 	private short property;
 	private short value;
+
+	public PacketOutWindowProperty(byte windowId, short property, short value) {
+		this.windowId = windowId;
+		this.property = property;
+		this.value = value;
+	}
 	
 	@Override
 	public void read(ByteBuf buf) throws IOException {
