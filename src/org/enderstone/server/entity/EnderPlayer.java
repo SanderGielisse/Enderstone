@@ -46,6 +46,7 @@ import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
+import org.enderstone.server.packet.play.PacketOutPlayerListHeaderFooter;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.Action;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionAddPlayer;
@@ -59,6 +60,7 @@ import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
+import org.json.JSONObject;
 
 public class EnderPlayer extends Entity implements CommandSender {
 
@@ -192,7 +194,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	}
 
 	@Override
-	public void onSpawn() { 
+	public void onSpawn() {
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.GLASS.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DAYLIGHT_DETECTOR.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.BLAZE_ROD.getId(), (byte) 1, (short) 0));
@@ -201,6 +203,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.BAKED_POTATO.getId(), (byte) 1, (short) 0));
 		this.updateDataWatcher();
 
+		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(ChatColor.GOLD+ "" + ChatColor.BOLD + "Enderstone Test Server", ChatColor.RED + "" + ChatColor.BOLD + "This server is running an Enderstone build"));
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(this.uuid, this.getPlayerName(), getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") });
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			player.getNetworkManager().sendPacket(packet);

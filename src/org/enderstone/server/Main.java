@@ -280,6 +280,8 @@ public class Main implements Runnable {
 				EnderLogger.warn("Your server-icon.png needs to be 64*64!");
 				return false;
 			}
+		}catch(Exception e){
+			return false;
 		}
 	}
 
