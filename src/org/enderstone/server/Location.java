@@ -106,4 +106,9 @@ public class Location {
 	public boolean isInRange(int viewDistance, Location otherLoc) {
 		return Math.max(this.x < otherLoc.x ? otherLoc.x - this.x : this.x - otherLoc.x, this.z < otherLoc.z ? otherLoc.z - this.z : this.z - otherLoc.z) < viewDistance;
 	}
+
+	@Override
+	public String toString() {
+		return "Location{" + "world=" + worldName + ", x=" + x + ", y=" + y + ", z=" + z + ", yaw=" + yaw + ", pitch=" + pitch + '}';
+	}
 }

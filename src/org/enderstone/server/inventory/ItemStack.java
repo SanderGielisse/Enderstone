@@ -148,4 +148,11 @@ public class ItemStack implements Cloneable {
 		if (this.damage != other.damage) return false;
 		return Objects.equals(this.compoundTag, other.compoundTag);
 	}
+
+	@Override
+	public String toString() {
+		return "ItemStack{" + "Id=" + blockId + ", amount=" + amount + ", data=" + damage + ", tag=" + compoundTag + '}';
+	}
+	
+	
 }
