@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.enderstone.server.regions.BlockId;
@@ -120,5 +121,26 @@ public class ItemStack implements Cloneable {
 		return other.blockId == this.blockId
 				&& other.damage == this.damage
 				&& (other.compoundTag == null ? this.compoundTag == null : other.compoundTag.equals(this.compoundTag));
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		hash = 23 * hash + this.blockId;
+		hash = 23 * hash + this.amount;
+		hash = 23 * hash + this.damage;
+		hash = 23 * hash + Objects.hashCode(this.compoundTag);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		final ItemStack other = (ItemStack) obj;
+		if (this.blockId != other.blockId) return false;
+		if (this.amount != other.amount) return false;
+		if (this.damage != other.damage) return false;
+		return Objects.equals(this.compoundTag, other.compoundTag);
 	}
 }
