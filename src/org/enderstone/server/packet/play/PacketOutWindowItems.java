@@ -27,11 +27,21 @@ public class PacketOutWindowItems extends Packet{
 	private byte windowId;
 	private short count;
 	private ItemStack[] slotData;
+
+	public PacketOutWindowItems(byte windowId, ItemStack[] slotData) {
+		this(windowId, slotData, (short)slotData.length);
+	}
+
+	public PacketOutWindowItems(byte windowId, ItemStack[] slotData, short count) {
+		this.windowId = windowId;
+		this.slotData = slotData;
+	}
 	
 	@Override
 	public void read(ByteBuf buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
+	
 	@Override
 	public void write(ByteBuf buf) throws IOException {
 		buf.writeByte(windowId);
@@ -41,6 +51,7 @@ public class PacketOutWindowItems extends Packet{
 			writeItemStack(slotData[i], buf);
 		}
 	}
+	
 	@Override
 	public int getSize() throws IOException {
 		int stackSize = 0;
@@ -49,6 +60,7 @@ public class PacketOutWindowItems extends Packet{
 		}
 		return 1 + getShortSize() + stackSize + getVarIntSize(getId());
 	}
+	
 	@Override
 	public byte getId() {
 		return 0x30;
