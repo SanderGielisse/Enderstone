@@ -87,7 +87,7 @@ public class PlayerInventory extends DefaultInventory{
 	
 	@Override
 	public void close0() {
-		this.player.networkManager.disconnect(new SimpleMessage("Main inventory closed (this may not happen!)"));
+		this.player.networkManager.disconnect(new SimpleMessage("Main inventory closed (this may not happen!)"),true);
 	}
 	
 	public boolean shiftClickHotbar(int index)

@@ -56,6 +56,7 @@ public class PacketInClientStatus extends Packet {
 			networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
 			networkManager.player.teleport(new Location("", 0, 80, 0, 0F, 0F));
 			networkManager.player.heal();
+			networkManager.player.getInventoryHandler().updateInventory();
 		}
 	}
 
