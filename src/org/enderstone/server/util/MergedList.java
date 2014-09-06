@@ -40,14 +40,14 @@ public class MergedList<E> extends AbstractList<E> implements RandomAccess, java
 	
 	@Override
 	public E get(int index) {
-		Entry<List<E>,Integer> entry;
-		return (entry = this.indexes.get(index)).getKey().get(entry.getValue());
+		Entry<List<E>,Integer> entry  = this.indexes.get(index);
+		return entry.getKey().get(entry.getValue());
 	}
 
 	@Override
 	public E set(int index, E element) {
-		Entry<List<E>,Integer> entry;
-		return (entry = this.indexes.get(index)).getKey().set(entry.getValue(),element);
+		Entry<List<E>,Integer> entry  = this.indexes.get(index);
+		return entry.getKey().set(entry.getValue(),element);
 	}
 
 	@Override
