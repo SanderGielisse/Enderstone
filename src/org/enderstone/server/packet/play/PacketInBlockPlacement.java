@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
@@ -97,6 +98,9 @@ public class PacketInBlockPlacement extends Packet {
 						stack.setBlockId(BlockId.FIRE.getId());
 					}
 					Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
+					
+					EnderPlayer pl = networkManager.player;
+					pl.getInventoryHandler().decreaseItemInHand(1);
 				}
 				Main.getInstance().mainWorld.broadcastSound("dig.grass", 1F, (byte) 63, loc, null);
 			}
