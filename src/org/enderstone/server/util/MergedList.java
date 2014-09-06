@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.RandomAccess;
 
 /**
@@ -53,6 +54,21 @@ public class MergedList<E> extends AbstractList<E> implements RandomAccess, java
 	@Override
 	public int size() {
 		return indexes.size();
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 43 * hash + Objects.hashCode(this.indexes);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		final MergedList<?> other = (MergedList<?>) obj;
+		return Objects.equals(this.indexes, other.indexes);
 	}
 	
 	public static class Builder<E> {

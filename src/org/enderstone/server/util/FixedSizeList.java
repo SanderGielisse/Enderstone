@@ -121,4 +121,22 @@ public class FixedSizeList<E> extends AbstractList<E> implements RandomAccess, j
 //	public Spliterator<E> spliterator() {
 //		return Spliterators.spliterator(array, start, length, Spliterator.ORDERED | Spliterator.SIZED);
 //	}
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = 97 * hash + Arrays.deepHashCode(this.array);
+		hash = 97 * hash + this.start;
+		hash = 97 * hash + this.length;
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		final FixedSizeList<?> other = (FixedSizeList<?>) obj;
+		if (!Arrays.deepEquals(this.array, other.array)) return false;
+		if (this.start != other.start) return false;
+		return this.length == other.length;
+	}
 }
