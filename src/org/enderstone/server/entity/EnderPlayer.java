@@ -315,7 +315,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	private final List<Entity> toRemove = new ArrayList<>();
 	
 	public void checkCollision(){
-		if(latestCheck++ % 5 == 0){
+		if(latestCheck++ % 3 == 0){
 			//check if item entities nearby
 			
 			for(Entity e : this.world.entities){
@@ -338,6 +338,9 @@ public class EnderPlayer extends Entity implements CommandSender {
 	
 	@Override
 	public void broadcastLocation(Location newLocation) {
+		if(this.isDead()){
+			return;
+		}
 		checkCollision();
 
 		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
@@ -372,6 +375,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	@Override
 	public void broadcastRotation(float pitch, float yaw) {
+		if(isDead()){
+			return;
+		}
+		
 		Iterator<String> players = this.visiblePlayers.iterator();
 
 		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F), (byte) Utill.calcYaw(pitch * 256.0F / 360.0F), false);
