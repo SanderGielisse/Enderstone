@@ -11,7 +11,9 @@ LICENSE
 
 The project is currently licensed under the GNU General Public License.
 The text version of the license can be found in the LICENSE.txt file.
-The license means you are allowed to use it, change it, improve it and publish it, but you are not allowed to change or remove the license headers.
+The license means you are allowed to use it, change it, improve it and publish it.
+You you are not allowed to change the names of copyright owners in the license header, neither are you allowed to remove the license headers.
+For a total explanation of what is allowed and what isn't, please check the LICENSE.txt file.
 
 GNU General Public License online:
 http://www.gnu.org/copyleft/gpl.html
@@ -29,4 +31,4 @@ All credits of the JNBT library (located in the org.jnbt package) go to them.
 MINECRAFT EULA
 
 The Enderstone server software uses the Minecraft protocol to make it able for Minecraft clients to connect. This means you are NOT able to evade the Minecraft EULA by using Enderstone.
-By running this you accept to the Minecraft EULA, which can be found here: https://account.mojang.com/documents/minecraft_eula
+By running this, or any modified version of our project, you accept to the Minecraft EULA, which can be found here: https://account.mojang.com/documents/minecraft_eula
