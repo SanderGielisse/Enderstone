@@ -19,6 +19,7 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
@@ -65,7 +66,7 @@ public class PacketInUseEntity extends Packet {
 		Main.getInstance().sendToMainThread(new Runnable() {
 
 			@Override
-			public void run() {
+			public void run() {				
 				if (mouseClick == 1) { // left click
 					Entity e = Main.getInstance().getEntityById(targetId);
 					if (e == null) {

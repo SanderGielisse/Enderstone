@@ -18,6 +18,7 @@
 package org.enderstone.server.entity;
 
 import java.util.List;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.Packet;
@@ -62,7 +63,7 @@ public abstract class Entity {
 		return false;
 	}
 	
-	public void damage(float damage) {
+	public void damage(float damage) {		
 		if (Float.isNaN(this.health))
 			initHealth();
 		if (health == 0)

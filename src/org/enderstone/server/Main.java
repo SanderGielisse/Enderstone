@@ -419,7 +419,7 @@ public class Main implements Runnable {
 
 	public Entity getEntityById(int targetId) {
 		for(Entity e : this.mainWorld.entities){
-			if(e.getEntityId() == e.getEntityId()){
+			if(e.getEntityId() == targetId){
 				return e;
 			}
 		}

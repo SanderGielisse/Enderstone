@@ -17,10 +17,14 @@
  */
 package org.enderstone.server.entity;
 
+import java.util.ArrayList;
 import java.util.List;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
+import org.enderstone.server.entity.drops.EntityDrop;
+import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
@@ -75,6 +79,7 @@ public class EntityMob extends Entity {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
+		damage(1F);
 	}
 
 	@Override
@@ -160,6 +165,28 @@ public class EntityMob extends Entity {
 	public void updateDataWatcher() {
 		this.getDataWatcher().watch(0, (byte) 0);
 		this.getDataWatcher().watch(1, (short) 1);
-		this.getDataWatcher().watch(6, 20F);
+		this.getDataWatcher().watch(6, getHealth());
+	}
+
+	public List<EntityDrop> getDrops() {
+		List<EntityDrop> drops = new ArrayList<EntityDrop>();
+		drops.add(new EntityDrop(new ItemStack((short) 2, (byte) 1, (byte) 0), 100));
+		return drops;
+	}
+
+	@Override
+	protected void onHealthUpdate(float newHealth, float lastHealth) {
+		if (newHealth <= 0) {
+			// entity died, remove it
+			world.removeEntity(this);
+
+			// do entity drops
+			List<EntityDrop> drops = this.getDrops();
+			for (EntityDrop drop : drops) {
+				if (Main.random.nextInt(100) <= drop.getDropChance()) {
+					world.addEntity(new EntityItem(getLocation(), drop.getStack().clone(), 5));
+				}
+			}
+		}
 	}
 }

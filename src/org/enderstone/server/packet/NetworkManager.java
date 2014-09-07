@@ -331,7 +331,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			else
 				EnderLogger.logger.log(level, "Kicking " + this.digitalName() +": " + message.toPlainText());
 			Packet p = codex.getDisconnectionPacket(message);
-			EnderLogger.warn("Kicking ");
+			EnderLogger.warn("Kicked ");
 			this.ctx.channel().pipeline().addFirst(new DiscardingReader());
 			if (p != null)
 				ctx.write(p).addListener(ChannelFutureListener.CLOSE);
