@@ -22,6 +22,7 @@ import java.io.DataOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map.Entry;
 import java.util.UUID;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Vector;
 import org.enderstone.server.entity.DataWatcher;
@@ -163,7 +164,12 @@ public class PacketDataWrapper {
 	}
 
 	public float readFloat() {
-		return this.buffer.readFloat();
+		float f = this.buffer.readFloat();
+		if (Float.isNaN(f)) {
+			disconnect();
+			return 0F;
+		}
+		return f;
 	}
 
 	public Location readLocation() {
@@ -228,7 +234,12 @@ public class PacketDataWrapper {
 	}
 
 	public double readDouble() {
-		return this.buffer.readDouble();
+		double value =  this.buffer.readDouble();
+		if(Double.isNaN(value)){
+			disconnect();
+			return 0.0D;
+		}
+		return value;
 	}
 
 	public void readBytes(byte[] data, int i, int length) {
@@ -320,7 +331,6 @@ public class PacketDataWrapper {
 		this.buffer.writeFloat(value);
 	}
 
-
 	public void writeUUID(UUID uuid) {
 		this.writeLong(uuid.getMostSignificantBits());
 		this.writeLong(uuid.getLeastSignificantBits());
@@ -328,5 +338,10 @@ public class PacketDataWrapper {
 
 	public void writeDouble(double value) {
 		this.buffer.writeDouble(value);
+	}
+	
+	private void disconnect() {
+		this.networkManager.disconnect("You were disconnected for sending invalid data to the server.", true);
+		EnderLogger.warn((networkManager.player == null ? networkManager.toString() : networkManager.player.getName()) + " was disconnected for sending invalid data to the server.");
 	}
 }

@@ -17,7 +17,6 @@
  */
 package org.enderstone.server.packet;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 
 public class PacketHandshake extends Packet {
