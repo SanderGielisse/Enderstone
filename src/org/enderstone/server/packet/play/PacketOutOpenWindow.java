@@ -17,11 +17,11 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.inventory.Inventory.InventoryType;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 /**
  *
@@ -44,18 +44,18 @@ public class PacketOutOpenWindow extends Packet {
 	}
 	
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		if(windowMessageString == null) windowMessageString = windowMessage.toMessageJson();
-		buf.writeByte(windowId);
-		writeString(inventoryType.getInventoryType(), buf);
-		writeString(windowMessageString, buf);
-		buf.writeByte(maxSlots);
-		if(inventoryType == InventoryType.ENTITY_HORSE) writeVarInt(entityId, buf);
+		wrapper.writeByte(windowId);
+		wrapper.writeString(inventoryType.getInventoryType());
+		wrapper.writeString(windowMessageString);
+		wrapper.writeByte(maxSlots);
+		if(inventoryType == InventoryType.ENTITY_HORSE) wrapper.writeVarInt(entityId);
 	}
 
 	@Override

@@ -17,9 +17,9 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketInEntityAction extends Packet {
 
@@ -28,14 +28,14 @@ public class PacketInEntityAction extends Packet {
 	private int jumpBoost;
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.entityId = readVarInt(buf);
-		this.actionId = buf.readByte();
-		this.jumpBoost = readVarInt(buf);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.entityId = wrapper.readVarInt();
+		this.actionId = wrapper.readByte();
+		this.jumpBoost = wrapper.readVarInt();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 

@@ -17,11 +17,10 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
-
 import java.io.IOException;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketInPluginMessage extends Packet {
 
@@ -30,14 +29,14 @@ public class PacketInPluginMessage extends Packet {
 	private byte[] data;
 	
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.channel = readString(buf);
-		this.data = new byte[this.length = buf.readableBytes()];
-		buf.readBytes(this.data, 0, this.length);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.channel = wrapper.readString();
+		this.data = new byte[this.length = wrapper.readableBytes()];
+		wrapper.readBytes(this.data, 0, this.length);
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 

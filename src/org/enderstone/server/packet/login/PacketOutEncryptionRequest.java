@@ -17,10 +17,10 @@
  */
 package org.enderstone.server.packet.login;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.security.PublicKey;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 /**
  *
@@ -46,18 +46,18 @@ public class PacketOutEncryptionRequest extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new UnsupportedOperationException("Cannot read outgoing packet");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		if (publicKeyBytes == null) publicKeyBytes = publicKey.getEncoded();
-		writeString(serverid, buf);
-		writeVarInt(publicKeyBytes.length, buf);
-		buf.writeBytes(publicKeyBytes, 0, publicKeyBytes.length);
-		writeVarInt(verifyTokenSize, buf);
-		buf.writeBytes(verifyToken, 0, verifyTokenSize);
+		wrapper.writeString(serverid);
+		wrapper.writeVarInt(publicKeyBytes.length);
+		wrapper.writeBytes(publicKeyBytes, 0, publicKeyBytes.length);
+		wrapper.writeVarInt(verifyTokenSize);
+		wrapper.writeBytes(verifyToken, 0, verifyTokenSize);
 	}
 
 	@Override

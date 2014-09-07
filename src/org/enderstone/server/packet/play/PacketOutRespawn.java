@@ -17,11 +17,9 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import org.enderstone.server.Main;
-import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutRespawn extends Packet {
 
@@ -38,16 +36,16 @@ public class PacketOutRespawn extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		buf.writeInt(dimension);
-		buf.writeByte(difficulty);
-		buf.writeByte(gamemode);
-		writeString(levelType, buf);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeInt(dimension);
+		wrapper.writeByte(difficulty);
+		wrapper.writeByte(gamemode);
+		wrapper.writeString(levelType);
 	}
 
 	@Override
@@ -58,24 +56,5 @@ public class PacketOutRespawn extends Packet {
 	@Override
 	public byte getId() {
 		return 0x07;
-	}
-	
-	@Override
-	public void onSend(final NetworkManager networkManager) {
-		if(!Thread.currentThread().equals(Main.getInstance().mainThread)){
-			Main.getInstance().sendToMainThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					//refillInventory(networkManager);
-				}
-			});
-			return;
-		}
-		//refillInventory(networkManager);
-	}
-	
-	public void refillInventory(NetworkManager networkManager){
-		//networkManager.player.inventory.setItem(InventoryType.HOTBAR, 5, new ItemStack(BlockId.DIRT.getId(), (byte) 101, (short) 1));
 	}
 }

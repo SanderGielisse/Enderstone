@@ -17,10 +17,10 @@
  */
 package org.enderstone.server.packet.status;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketPing extends Packet {
 
@@ -34,13 +34,13 @@ public class PacketPing extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		time = buf.readLong();
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		time = wrapper.readLong();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		buf.writeLong(time);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeLong(time);
 	}
 
 	@Override

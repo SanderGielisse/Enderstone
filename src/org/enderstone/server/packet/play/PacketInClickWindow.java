@@ -17,13 +17,12 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketInClickWindow extends Packet {
 
@@ -35,17 +34,17 @@ public class PacketInClickWindow extends Packet {
 	private ItemStack itemStack;
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.windowId = buf.readByte();
-		this.slot = buf.readShort();
-		this.button = buf.readByte();
-		this.actionNumber = buf.readShort();
-		this.mode = buf.readByte();
-		this.itemStack = readItemStack(buf);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.windowId = wrapper.readByte();
+		this.slot = wrapper.readShort();
+		this.button = wrapper.readByte();
+		this.actionNumber = wrapper.readShort();
+		this.mode = wrapper.readByte();
+		this.itemStack = wrapper.readItemStack();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 

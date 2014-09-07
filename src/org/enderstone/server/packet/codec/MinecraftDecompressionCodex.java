@@ -23,26 +23,36 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
 import java.util.List;
 import java.util.zip.Inflater;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class MinecraftDecompressionCodex extends ReplayingDecoder<Void>{
 
 	private final Inflater decompressor = new Inflater();
+	private final NetworkManager networkManager;
 	
+	public MinecraftDecompressionCodex(NetworkManager networkManager) {
+		this.networkManager = networkManager;
+	}
+
 	@Override
-	protected void decode(ChannelHandlerContext ctx, ByteBuf compressedBuffer, List<Object> out) throws Exception {
+	protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
+		PacketDataWrapper compressedBuffer = new PacketDataWrapper(networkManager, buf);
+		
 		if(compressedBuffer.readableBytes() == 0){
 			return;
 		}
-		int totalSize = Packet.readVarInt(compressedBuffer); //total byte count
-		int uncompressedSize = Packet.readVarInt(compressedBuffer); //uncompressed size
+		int totalSize = compressedBuffer.readVarInt(); //total byte count
+		int uncompressedSize = compressedBuffer.readVarInt(); //uncompressed size
 		int dataSize = totalSize - Packet.getVarIntSize(uncompressedSize);
 		
-		ByteBuf uncompressedBuffer = Unpooled.buffer();
+		ByteBuf tempBuf = Unpooled.buffer();
+		PacketDataWrapper uncompressedBuffer = new PacketDataWrapper(networkManager, tempBuf);
 		
-		if(uncompressedSize == 0){			
-			Packet.writeVarInt(totalSize - Packet.getVarIntSize(0), uncompressedBuffer);
-			uncompressedBuffer.writeBytes(compressedBuffer, 0, dataSize);
+		if(uncompressedSize == 0){
+			uncompressedBuffer.writeVarInt(totalSize - Packet.getVarIntSize(0));
+			uncompressedBuffer.writeBytes(compressedBuffer.getBuffer(), 0, dataSize);
 		}else{
 			byte[] compressedPacket = new byte[totalSize - Packet.getVarIntSize(uncompressedSize)];
 			compressedBuffer.readBytes(compressedPacket);
@@ -50,10 +60,10 @@ public class MinecraftDecompressionCodex extends ReplayingDecoder<Void>{
 			decompressor.setInput(compressedPacket);
 			byte[] uncompressedPacket = new byte[uncompressedSize];
 			decompressor.inflate(uncompressedPacket);
-			Packet.writeVarInt(uncompressedSize, uncompressedBuffer);
+			uncompressedBuffer.writeVarInt(uncompressedSize);
 			uncompressedBuffer.writeBytes(uncompressedPacket);
 			decompressor.reset();
 		}
-		out.add(uncompressedBuffer);
+		out.add(uncompressedBuffer.getBuffer());
 	}
 }

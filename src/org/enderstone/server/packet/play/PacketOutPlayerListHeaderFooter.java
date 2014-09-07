@@ -17,10 +17,10 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutPlayerListHeaderFooter extends Packet {
 
@@ -36,20 +36,20 @@ public class PacketOutPlayerListHeaderFooter extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		if(jsonHeader == null){
 			jsonHeader = new SimpleMessage(header).toMessageJson();
 		}
 		if(jsonFooter == null){
 			jsonFooter = new SimpleMessage(footer).toMessageJson();
 		}
-		writeString(jsonHeader, buf);
-		writeString(jsonFooter, buf);
+		wrapper.writeString(jsonHeader);
+		wrapper.writeString(jsonFooter);
 	}
 
 	@Override

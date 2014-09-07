@@ -17,11 +17,11 @@
  */
 package org.enderstone.server.packet.login;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.packet.HandshakeState;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutLoginSucces extends Packet {
 
@@ -37,15 +37,14 @@ public class PacketOutLoginSucces extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.UUID = readString(buf);
-		this.username = readString(buf);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		writeString(UUID, buf);
-		writeString(username, buf);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeString(UUID);
+		wrapper.writeString(username);
 	}
 
 	@Override

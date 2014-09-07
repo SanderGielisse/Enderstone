@@ -17,7 +17,6 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
@@ -25,6 +24,7 @@ import org.enderstone.server.entity.EntityItem;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 import org.enderstone.server.regions.BlockId;
 
 public class PacketInPlayerDigging extends Packet {
@@ -34,14 +34,14 @@ public class PacketInPlayerDigging extends Packet {
 	private byte face;
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.status = buf.readByte();
-		this.loc = readLocation(buf);
-		this.face = buf.readByte();
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.status = wrapper.readByte();
+		this.loc = wrapper.readLocation();
+		this.face = wrapper.readByte();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 
@@ -66,13 +66,13 @@ public class PacketInPlayerDigging extends Packet {
 				int z = getLocation().getBlockZ();
 
 				short blockId = Main.getInstance().mainWorld.getBlockIdAt(x, y, z).getId();
-				
-				if(getStatus() == 0){
-					if(BlockId.byId(blockId).doesInstantBreak()){
+
+				if (getStatus() == 0) {
+					if (BlockId.byId(blockId).doesInstantBreak()) {
 						status = (byte) 2;
 						onRecieve(networkManager);
 					}
-				}else if (getStatus() == 2) {
+				} else if (getStatus() == 2) {
 					if (networkManager.player.getLocation().isInRange(6, loc, true)) {
 						Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
 					}

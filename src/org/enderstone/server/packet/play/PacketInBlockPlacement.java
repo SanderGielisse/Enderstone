@@ -17,15 +17,14 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 import org.enderstone.server.regions.BlockId;
 
 public class PacketInBlockPlacement extends Packet {
@@ -38,17 +37,17 @@ public class PacketInBlockPlacement extends Packet {
 	private byte cursorZ;
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.loc = readLocation(buf);
-		this.direction = buf.readByte();
-		this.heldItem = readItemStack(buf);
-		this.cursorX = buf.readByte(); // The position of the crosshair on the block
-		this.cursorY = buf.readByte();
-		this.cursorZ = buf.readByte();
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.loc = wrapper.readLocation();
+		this.direction = wrapper.readByte();
+		this.heldItem = wrapper.readItemStack();
+		this.cursorX = wrapper.readByte(); // The position of the crosshair on the block
+		this.cursorY = wrapper.readByte();
+		this.cursorZ = wrapper.readByte();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 

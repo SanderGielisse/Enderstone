@@ -17,11 +17,11 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.util.UUID;
 import org.enderstone.server.entity.ProfileProperty;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutPlayerListItem extends Packet {
 
@@ -36,17 +36,17 @@ public class PacketOutPlayerListItem extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		writeVarInt(action, buf);
-		writeVarInt(length, buf);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeVarInt(action);
+		wrapper.writeVarInt(length);
 
 		for (Action action : actions) {
-			action.write(buf);
+			action.write(wrapper);
 		}
 	}
 
@@ -77,7 +77,7 @@ public class PacketOutPlayerListItem extends Packet {
 
 		public abstract int getActionId();
 
-		public abstract void write(ByteBuf buf) throws IOException;
+		public abstract void write(PacketDataWrapper wrapper) throws IOException;
 
 		public abstract int getSize() throws IOException;
 	}
@@ -107,24 +107,24 @@ public class PacketOutPlayerListItem extends Packet {
 		}
 
 		@Override
-		public void write(ByteBuf buf) throws IOException {
-			writeUUID(getUUID(), buf);
-			writeString(name, buf);
-			writeVarInt(properties.length, buf);
+		public void write(PacketDataWrapper wrapper) throws IOException {
+			wrapper.writeUUID(getUUID());
+			wrapper.writeString(name);
+			wrapper.writeVarInt(properties.length);
 
 			for (ProfileProperty prop : properties) {
-				writeString(prop.getName(), buf);
-				writeString(prop.getValue(), buf);
-				buf.writeBoolean(prop.isSigned());
+				wrapper.writeString(prop.getName());
+				wrapper.writeString(prop.getValue());
+				wrapper.writeBoolean(prop.isSigned());
 				if (prop.isSigned()) {
-					writeString(prop.getSignature(), buf);
+					wrapper.writeString(prop.getSignature());
 				}
 			}
-			writeVarInt(gamemode, buf);
-			writeVarInt(ping, buf);
-			buf.writeBoolean(hasDisplayName);
+			wrapper.writeVarInt(gamemode);
+			wrapper.writeVarInt(ping);
+			wrapper.writeBoolean(hasDisplayName);
 			if (hasDisplayName) {
-				writeString(jsonDisplayName, buf);
+				wrapper.writeString(jsonDisplayName);
 			}
 		}
 
@@ -153,9 +153,9 @@ public class PacketOutPlayerListItem extends Packet {
 		}
 
 		@Override
-		public void write(ByteBuf buf) throws IOException {
-			writeUUID(getUUID(), buf);
-			writeVarInt(gamemode, buf);
+		public void write(PacketDataWrapper wrapper) throws IOException {
+			wrapper.writeUUID(getUUID());
+			wrapper.writeVarInt(gamemode);
 		}
 
 		@Override
@@ -179,9 +179,9 @@ public class PacketOutPlayerListItem extends Packet {
 		}
 
 		@Override
-		public void write(ByteBuf buf) throws IOException {
-			writeUUID(getUUID(), buf);
-			writeVarInt(ping, buf);
+		public void write(PacketDataWrapper wrapper) throws IOException {
+			wrapper.writeUUID(getUUID());
+			wrapper.writeVarInt(ping);
 		}
 
 		@Override
@@ -207,11 +207,11 @@ public class PacketOutPlayerListItem extends Packet {
 		}
 
 		@Override
-		public void write(ByteBuf buf) throws IOException {
-			writeUUID(getUUID(), buf);
-			buf.writeBoolean(hasDisplayName);
+		public void write(PacketDataWrapper wrapper) throws IOException {
+			wrapper.writeUUID(getUUID());
+			wrapper.writeBoolean(hasDisplayName);
 			if (hasDisplayName) {
-				writeString(jsonDisplayName, buf);
+				wrapper.writeString(jsonDisplayName);
 			}
 		}
 
@@ -233,14 +233,13 @@ public class PacketOutPlayerListItem extends Packet {
 		}
 
 		@Override
-		public void write(ByteBuf buf) throws IOException {
-			writeUUID(getUUID(), buf);
+		public void write(PacketDataWrapper wrapper) throws IOException {
+			wrapper.writeUUID(getUUID());
 		}
 
 		@Override
 		public int getSize() throws IOException {
 			return getUUIDSize();
 		}
-
 	}
 }

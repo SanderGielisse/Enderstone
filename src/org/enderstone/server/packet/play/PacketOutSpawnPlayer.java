@@ -17,11 +17,11 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.util.UUID;
 import org.enderstone.server.entity.DataWatcher;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutSpawnPlayer extends Packet {
 
@@ -48,21 +48,21 @@ public class PacketOutSpawnPlayer extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		writeVarInt(entityId, buf);
-		writeUUID(uuid, buf);
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
-		buf.writeByte(yaw);
-		buf.writeByte(pitch);
-		buf.writeShort(currentSlot);
-		writeDataWatcher(dataWatcher, buf);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeVarInt(entityId);
+		wrapper.writeUUID(uuid);
+		wrapper.writeInt(x);
+		wrapper.writeInt(y);
+		wrapper.writeInt(z);
+		wrapper.writeByte(yaw);
+		wrapper.writeByte(pitch);
+		wrapper.writeShort(currentSlot);
+		wrapper.writeDataWatcher(dataWatcher);
 	}
 
 	@Override

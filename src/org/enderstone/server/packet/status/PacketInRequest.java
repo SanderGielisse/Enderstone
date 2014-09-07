@@ -17,25 +17,21 @@
  */
 package org.enderstone.server.packet.status;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 import org.json.JSONObject;
 
 public class PacketInRequest extends Packet {
 
-	// no fields
-
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		// none
+	public void read(PacketDataWrapper wrapper) throws IOException {
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 
@@ -56,6 +52,7 @@ public class PacketInRequest extends Packet {
 			protocol = Main.DEFAULT_PROTOCOL;
 		}
 
+		//TODO fix thread-safety problem on onlinePlayers.size();
 		JSONObject json = new JSONObject();
 		json.put("version", new JSONObject().put("name", Main.PROTOCOL_VERSION).put("protocol", protocol));
 		json.put("players", new JSONObject().put("max", 20).put("online", Main.getInstance().onlinePlayers.size()));

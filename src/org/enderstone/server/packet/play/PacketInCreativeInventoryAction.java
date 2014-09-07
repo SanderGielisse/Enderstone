@@ -17,12 +17,12 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.Main;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketInCreativeInventoryAction extends Packet {
 
@@ -30,13 +30,13 @@ public class PacketInCreativeInventoryAction extends Packet {
 	private ItemStack clicked;
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.slot = buf.readShort();
-		this.clicked = readItemStack(buf);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.slot = wrapper.readShort();
+		this.clicked = wrapper.readItemStack();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 

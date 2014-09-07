@@ -17,29 +17,26 @@
  */
 package org.enderstone.server.packet.status;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutResponse extends Packet {
 
 	private String jsonResponse;
-
-	public PacketOutResponse() {
-	}
 
 	public PacketOutResponse(String jsonResponse) {
 		this.jsonResponse = jsonResponse;
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.jsonResponse = readString(buf);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.jsonResponse = wrapper.readString();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		writeString(jsonResponse, buf);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeString(jsonResponse);
 	}
 
 	@Override

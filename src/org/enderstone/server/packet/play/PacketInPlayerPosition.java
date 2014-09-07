@@ -18,12 +18,12 @@
 package org.enderstone.server.packet.play;
 
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketInPlayerPosition extends Packet {
 
@@ -43,15 +43,15 @@ public class PacketInPlayerPosition extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.x = buf.readDouble();
-		this.feetY = buf.readDouble();
-		this.z = buf.readDouble();
-		this.onGround = buf.readBoolean();
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.x = wrapper.readDouble();
+		this.feetY = wrapper.readDouble();
+		this.z = wrapper.readDouble();
+		this.onGround = wrapper.readBoolean();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 

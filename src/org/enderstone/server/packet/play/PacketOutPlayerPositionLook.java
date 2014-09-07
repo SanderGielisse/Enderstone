@@ -17,9 +17,9 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutPlayerPositionLook extends Packet {
 
@@ -40,18 +40,18 @@ public class PacketOutPlayerPositionLook extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		buf.writeDouble(x);
-		buf.writeDouble(y);
-		buf.writeDouble(z);
-		buf.writeFloat(yaw);
-		buf.writeFloat(pitch);
-		buf.writeByte(flags);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeDouble(x);
+		wrapper.writeDouble(y);
+		wrapper.writeDouble(z);
+		wrapper.writeFloat(yaw);
+		wrapper.writeFloat(pitch);
+		wrapper.writeByte(flags);
 	}
 
 	@Override

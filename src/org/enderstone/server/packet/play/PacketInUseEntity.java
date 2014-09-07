@@ -17,15 +17,13 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.chat.SimpleMessage;
-import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.Entity;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketInUseEntity extends Packet {
 
@@ -36,18 +34,18 @@ public class PacketInUseEntity extends Packet {
 	private float targetZ;
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.targetId = readVarInt(buf);
-		this.mouseClick = readVarInt(buf);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.targetId = wrapper.readVarInt();
+		this.mouseClick = wrapper.readVarInt();
 		if (mouseClick == 2) {
-			this.targetX = buf.readFloat();
-			this.targetY = buf.readFloat();
-			this.targetZ = buf.readFloat();
+			this.targetX = wrapper.readFloat();
+			this.targetY = wrapper.readFloat();
+			this.targetZ = wrapper.readFloat();
 		}
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 

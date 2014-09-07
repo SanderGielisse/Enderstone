@@ -17,9 +17,9 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutEntityTeleport extends Packet {
 
@@ -42,19 +42,19 @@ public class PacketOutEntityTeleport extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		writeVarInt(entityId, buf);
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
-		buf.writeByte(yaw);
-		buf.writeByte(pitch);
-		buf.writeBoolean(onGround);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeVarInt(entityId);
+		wrapper.writeInt(x);
+		wrapper.writeInt(y);
+		wrapper.writeInt(z);
+		wrapper.writeByte(yaw);
+		wrapper.writeByte(pitch);
+		wrapper.writeBoolean(onGround);
 	}
 
 	@Override

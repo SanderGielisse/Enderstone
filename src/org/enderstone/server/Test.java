@@ -52,19 +52,5 @@ public class Test {
 			for (int i = 0; i < size; i++)
 				System.out.println(test[i][0] + "," + test[i][1]);
 		}
-
-		{
-			System.out.println("Test 4.");
-			
-			DataWatcher watcher = new DataWatcher();
-			watcher.watch(10, new ItemStack((short) 2, (byte) 6, (short) 1));
-			
-			ByteBuf buf = Unpooled.buffer();
-			
-			Packet.writeDataWatcher(watcher, buf);
-
-			DataWatcher watcher2 = Packet.readDataWatcher(buf);
-			System.out.println(((ItemStack) watcher2.getWatchedCopy().get(10)).getAmount());
-		}
 	}
 }

@@ -38,19 +38,19 @@ public class PacketHandshake extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.protocol = readVarInt(buf);
-		this.hostname = readString(buf);
-		this.port = buf.readShort();
-		this.nextState = readVarInt(buf);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.protocol = wrapper.readVarInt();
+		this.hostname = wrapper.readString();
+		this.port = wrapper.readShort();
+		this.nextState = wrapper.readVarInt();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		writeVarInt(protocol, buf);
-		writeString(hostname, buf);
-		buf.writeShort(port);
-		writeVarInt(nextState, buf);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeVarInt(protocol);
+		wrapper.writeString(hostname);
+		wrapper.writeShort(port);
+		wrapper.writeVarInt(nextState);
 	}
 
 	@Override

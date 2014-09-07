@@ -22,11 +22,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import java.io.IOException;
 import java.util.List;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.packet.HandshakeState;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 import org.enderstone.server.packet.PacketHandshake;
 import org.enderstone.server.packet.PacketManager;
 import org.enderstone.server.packet.login.PacketOutLoginPlayerDisconnect;
@@ -55,15 +55,16 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf buf) throws IOException {
-		try{
-		packet.writeFully(buf);
-		}catch(Exception e){
+		try {
+			packet.writeFully(new PacketDataWrapper(manager, buf));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws DecodeException {
+	protected void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws DecodeException {
+		PacketDataWrapper buf = new PacketDataWrapper(manager, buffer);
 		while (buf.readableBytes() > 0) {
 			buf.markReaderIndex();
 			int readBytes = buf.readableBytes();
@@ -93,7 +94,7 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 				buf.resetReaderIndex();
 				return;
 			}
-			int id = Packet.readVarInt(buf);
+			int id = buf.readVarInt();
 			Packet in;
 			try {
 				switch (state) {

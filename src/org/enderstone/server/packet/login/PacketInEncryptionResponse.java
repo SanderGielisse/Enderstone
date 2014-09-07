@@ -18,7 +18,6 @@
 package org.enderstone.server.packet.login;
 
 import static org.enderstone.server.uuid.UUIDFactory.parseUUID;
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.math.BigInteger;
 import javax.crypto.SecretKey;
@@ -28,6 +27,7 @@ import org.enderstone.server.entity.PlayerTextureStore;
 import org.enderstone.server.packet.NetworkEncrypter;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 import org.enderstone.server.uuid.ServerRequest;
 import org.json.JSONObject;
 
@@ -41,15 +41,15 @@ public class PacketInEncryptionResponse extends Packet {
 	private byte[] verifyToken;
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.sharedSecret = new byte[readVarInt(buf)];
-		buf.readBytes(this.sharedSecret);
-		this.verifyToken = new byte[readVarInt(buf)];
-		buf.readBytes(this.verifyToken);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.sharedSecret = new byte[wrapper.readVarInt()];
+		wrapper.readBytes(this.sharedSecret);
+		this.verifyToken = new byte[wrapper.readVarInt()];
+		wrapper.readBytes(this.verifyToken);
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
@@ -75,13 +75,13 @@ public class PacketInEncryptionResponse extends Packet {
 			ServerRequest r = new ServerRequest(url);
 			JSONObject json = r.get();
 			if (json == null) {
-				networkManager.disconnect("invalid encryption token");
+				networkManager.disconnect("invalid encryption token", false);
 				return;
 			}
 			String uuid = json.optString("id", null);
 			networkManager.wantedName = json.optString("name", networkManager.wantedName);
 			if (uuid == null) {
-				networkManager.disconnect("invalid session server response: \n" + url + "\n" + json.toString());
+				networkManager.disconnect("invalid session server response: \n" + url + "\n" + json.toString(), false);
 				return;
 			}
 			networkManager.uuid = parseUUID(uuid);
@@ -89,7 +89,7 @@ public class PacketInEncryptionResponse extends Packet {
 			networkManager.setupEncryption(key);
 			networkManager.spawnPlayer();
 		} catch (IOException ex) {
-			networkManager.disconnect("internal exception: " + ex.toString());
+			networkManager.disconnect("internal exception: " + ex.toString(), false);
 			EnderLogger.exception(ex);
 		}
 	}

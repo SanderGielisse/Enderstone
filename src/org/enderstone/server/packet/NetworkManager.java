@@ -345,8 +345,8 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	}
 	
 	public void enableCompression(){
-		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_r_decompressor", new MinecraftDecompressionCodex());
-		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_w_compressor", new MinecraftCompressionCodex());
+		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_r_decompressor", new MinecraftDecompressionCodex(this));
+		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_w_compressor", new MinecraftCompressionCodex(this));
 	}
 	public String digitalName()
 	{

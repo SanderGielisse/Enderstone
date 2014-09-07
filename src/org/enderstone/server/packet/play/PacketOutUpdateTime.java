@@ -18,9 +18,9 @@
 
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 /**
  *
@@ -37,14 +37,14 @@ public class PacketOutUpdateTime extends Packet {
 	}
 	
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		buf.writeLong(serverTick);
-		buf.writeLong(worldTick);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeLong(serverTick);
+		wrapper.writeLong(worldTick);
 	}
 
 	@Override
@@ -56,5 +56,4 @@ public class PacketOutUpdateTime extends Packet {
 	public byte getId() {
 		return 0x03;
 	}
-	
 }

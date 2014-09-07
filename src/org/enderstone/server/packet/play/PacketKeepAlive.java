@@ -17,9 +17,9 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketKeepAlive extends Packet {
 
@@ -33,13 +33,13 @@ public class PacketKeepAlive extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.keepAliveId = readVarInt(buf);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.keepAliveId = wrapper.readVarInt();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		writeVarInt(keepAliveId, buf);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeVarInt(keepAliveId);
 	}
 
 	@Override

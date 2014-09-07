@@ -17,10 +17,10 @@
  */
 package org.enderstone.server.packet.play;
 
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutSetSlot extends Packet {
 
@@ -35,15 +35,15 @@ public class PacketOutSetSlot extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		buf.writeByte(windowId);
-		buf.writeShort(slot);
-		writeItemStack(stack, buf);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeByte(windowId);
+		wrapper.writeShort(slot);
+		wrapper.writeItemStack(stack);
 	}
 
 	@Override

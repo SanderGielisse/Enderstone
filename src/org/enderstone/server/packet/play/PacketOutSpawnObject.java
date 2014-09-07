@@ -18,8 +18,8 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
-import io.netty.buffer.ByteBuf;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class PacketOutSpawnObject extends Packet {
 
@@ -51,25 +51,25 @@ public class PacketOutSpawnObject extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
+	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
-		writeVarInt(entityId, buf);
-		buf.writeByte(entityType);
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
-		buf.writeByte(pitch);
-		buf.writeByte(yaw);
+	public void write(PacketDataWrapper wrapper) throws IOException {
+		wrapper.writeVarInt(entityId);
+		wrapper.writeByte(entityType);
+		wrapper.writeInt(x);
+		wrapper.writeInt(y);
+		wrapper.writeInt(z);
+		wrapper.writeByte(pitch);
+		wrapper.writeByte(yaw);
 
-		buf.writeInt(dataSize);
+		wrapper.writeInt(dataSize);
 		if (dataSize > 0) {
-			buf.writeShort(dataOne);
-			buf.writeShort(dataTwo);
-			buf.writeShort(dataThree);
+			wrapper.writeShort(dataOne);
+			wrapper.writeShort(dataTwo);
+			wrapper.writeShort(dataThree);
 		}
 	}
 

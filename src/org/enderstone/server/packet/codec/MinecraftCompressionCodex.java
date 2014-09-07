@@ -22,15 +22,25 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.zip.Deflater;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 
 public class MinecraftCompressionCodex extends MessageToByteEncoder<ByteBuf> {
 
 	private final Deflater compressor = new Deflater(8);
-
+	private final NetworkManager networkManager;
+	
+	public MinecraftCompressionCodex(NetworkManager networkManager) {
+		this.networkManager = networkManager;
+	}
+	
 	@Override
-	protected void encode(ChannelHandlerContext ctx, ByteBuf incoming, ByteBuf outgoing) throws Exception {
-		int startSize = Packet.readVarInt(incoming);		
+	protected void encode(ChannelHandlerContext ctx, ByteBuf bufIn, ByteBuf bufOut) throws Exception {
+		PacketDataWrapper incoming = new PacketDataWrapper(networkManager, bufIn);
+		PacketDataWrapper outgoing = new PacketDataWrapper(networkManager, bufOut);
+		
+		int startSize = incoming.readVarInt();
 		
 		{ // compress it
 			ByteBuf temporarilyBuf = Unpooled.buffer();
@@ -49,8 +59,8 @@ public class MinecraftCompressionCodex extends MessageToByteEncoder<ByteBuf> {
 			} while (!compressor.finished());
 			compressor.reset();
 			
-			Packet.writeVarInt(temporarilyBuf.readableBytes() + Packet.getVarIntSize(startSize), outgoing);
-			Packet.writeVarInt(startSize, outgoing);
+			outgoing.writeVarInt(temporarilyBuf.readableBytes() + Packet.getVarIntSize(startSize));
+			outgoing.writeVarInt(startSize);
 			outgoing.writeBytes(temporarilyBuf);
 			temporarilyBuf.release();
 		}

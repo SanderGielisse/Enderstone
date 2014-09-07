@@ -26,6 +26,7 @@ import org.enderstone.server.Main;
 import org.enderstone.server.entity.PlayerTextureStore;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
+import org.enderstone.server.packet.PacketDataWrapper;
 import org.enderstone.server.uuid.UUIDFactory;
 
 public class PacketInLoginStart extends Packet {
@@ -41,12 +42,12 @@ public class PacketInLoginStart extends Packet {
 	}
 
 	@Override
-	public void read(ByteBuf buf) throws IOException {
-		this.name = readString(buf);
+	public void read(PacketDataWrapper wrapper) throws IOException {
+		this.name = wrapper.readString();
 	}
 
 	@Override
-	public void write(ByteBuf buf) throws IOException {
+	public void write(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be written.");
 	}
 
@@ -63,7 +64,7 @@ public class PacketInLoginStart extends Packet {
 		
 		try {
 			ByteBuf tempBuf = Unpooled.buffer();
-			new PacketOutSetCompression(1).writeFully(tempBuf);
+			new PacketOutSetCompression(1).writeFully(new PacketDataWrapper(networkManager, tempBuf));
 			networkManager.ctx.pipeline().channel().writeAndFlush(tempBuf);
 			networkManager.enableCompression();
 		} catch (IOException e) {
