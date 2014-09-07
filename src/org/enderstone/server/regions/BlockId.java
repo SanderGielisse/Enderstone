@@ -61,7 +61,7 @@ public enum BlockId {
 	WOOL(35, true),
 	PISTON_MOVING_PIECE(36, true),
 	YELLOW_FLOWER(37, true),
-	RED_ROSE(38, true),
+	RED_ROSE(38, true, true),
 	BROWN_MUSHROOM(39, true),
 	RED_MUSHROOM(40, true),
 	GOLD_BLOCK(41, true),
@@ -413,6 +413,7 @@ public enum BlockId {
 	private final int id;
 	private final boolean validBlock;
 	private final Class<?> dataClass;
+	private boolean doesInstantBreak = false;
 
 	private BlockId(int id, boolean validBlock) {
 		this(id, validBlock, null);
@@ -422,6 +423,15 @@ public enum BlockId {
 		this.id = id;
 		this.dataClass = clazz;
 		this.validBlock = validBlock;
+	}
+	
+	private BlockId(int id, boolean validBlock, boolean doesInstantBreak) {
+		this(id, validBlock);
+		this.doesInstantBreak = doesInstantBreak;
+	}
+	
+	public boolean doesInstantBreak(){
+		return this.doesInstantBreak;
 	}
 	
 	public boolean isValidBlock() {

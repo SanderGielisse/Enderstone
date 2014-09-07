@@ -66,24 +66,25 @@ public class PacketInPlayerDigging extends Packet {
 				int z = getLocation().getBlockZ();
 
 				short blockId = Main.getInstance().mainWorld.getBlockIdAt(x, y, z).getId();
-				switch (getStatus()) {
-					case 2: {
-						if (networkManager.player.getLocation().isInRange(6, loc, true)) {
-							Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
-						}
-						Main.getInstance().mainWorld.broadcastSound("dig.grass", 1F, (byte) 63, loc, networkManager.player);
-						Location loca = loc.clone();
-						loca.setX(loca.getX() + 0.5);
-						loca.setZ(loca.getZ() + 0.5);
-						Main.getInstance().mainWorld.addEntity(new EntityItem(loca, new ItemStack(blockId, (byte) 1, (short) networkManager.player.world.getBlockDataAt(x, y, z)), 1));
+				
+				if(getStatus() == 0){
+					if(BlockId.byId(blockId).doesInstantBreak()){
+						status = (byte) 2;
+						onRecieve(networkManager);
 					}
-					break;
-					case 3:
-					case 4:
-					{
-						networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
+				}else if (getStatus() == 2) {
+					if (networkManager.player.getLocation().isInRange(6, loc, true)) {
+						Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
 					}
-					break;
+					Main.getInstance().mainWorld.broadcastSound("dig.grass", 1F, (byte) 63, loc, networkManager.player);
+					Location loca = loc.clone();
+					loca.setX(loca.getX() + 0.5);
+					loca.setZ(loca.getZ() + 0.5);
+					Main.getInstance().mainWorld.addEntity(new EntityItem(loca, new ItemStack(blockId, (byte) 1, (short) networkManager.player.world.getBlockDataAt(x, y, z)), 1));
+				} else if (getStatus() == 3) {
+					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
+				} else if (getStatus() == 4) {
+					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
 				}
 			}
 		});
