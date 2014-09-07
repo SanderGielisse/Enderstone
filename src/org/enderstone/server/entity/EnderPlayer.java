@@ -19,6 +19,7 @@ package org.enderstone.server.entity;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
+import org.enderstone.server.chat.CachedMessage;
 import org.enderstone.server.chat.ChatColor;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.chat.SimpleMessage;
@@ -105,6 +107,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	private final String textureValue;
 	private final String textureSignature;
 	public int keepAliveID = 0;
+	public final EnumSet<PlayerDebugger> debugOutputs = EnumSet.noneOf(PlayerDebugger.class);
 
 	public ChunkInformer chunkInformer = new ChunkInformer() {
 
@@ -400,6 +403,12 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public void playSound(String soundName, float volume, byte pitch) {
 		networkManager.sendPacket(new PacketOutSoundEffect(soundName, getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), volume, pitch));
 	}
+	
+	public void debug(String message, PlayerDebugger level)
+	{
+		if(level == null) level = PlayerDebugger.OTHER;
+		if(debugOutputs.contains(level)) sendRawMessage(new SimpleMessage(message));
+	}
 
 	@Override
 	public boolean sendMessage(Message message) {
@@ -645,5 +654,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 		public void setDisplayedSkinParts(int displayedSkinParts) {
 			this.displayedSkinParts = displayedSkinParts;
 		}
+	}
+	
+	public enum PlayerDebugger
+	{
+		INVENTORY, PACKET, OTHER, 
 	}
 }
