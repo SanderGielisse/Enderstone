@@ -135,9 +135,9 @@ public class Main implements Runnable {
 		Main.instance = this;
 		EnderLogger.info("Starting " + NAME + " " + VERSION + " server version " + PROTOCOL_VERSION + ".");
 		EnderLogger.info("Authors: " + Arrays.asList(AUTHORS).toString());
-		EnderLogger.info("Loading config.ender file...");
+		EnderLogger.info("Loading server.properties file...");
 		this.loadConfigFromDisk();
-		EnderLogger.info("Loaded config.ender file!");
+		EnderLogger.info("Loaded server.properties file!");
 
 		EnderLogger.info("Loading favicon...");
 		try {
@@ -294,7 +294,7 @@ public class Main implements Runnable {
 	}
 
 	public void saveConfigToDisk(boolean defaultt) {
-		try (OutputStream output = new FileOutputStream("config.ender")) {
+		try (OutputStream output = new FileOutputStream("server.properties")) {
 			if (defaultt) {
 				prop.setProperty("motd", "Another Enderstone server!");
 				prop.setProperty("port", "25565");
@@ -309,7 +309,7 @@ public class Main implements Runnable {
 
 	public Properties loadConfigFromDisk() {
 		prop = new Properties();
-		try (InputStream input = new FileInputStream("config.ender")) {
+		try (InputStream input = new FileInputStream("server.properties")) {
 			prop.load(input);
 			port = Integer.parseInt(prop.getProperty("port"));
 		} catch (FileNotFoundException e) {
@@ -333,8 +333,32 @@ public class Main implements Runnable {
 
 	private int latestKeepAlive = 0;
 	private int latestChunkUpdate = 0;
+	private int latestHeal = 0;
+	private int latestFood = 0;
 
 	private void serverTick(long tick) {
+
+		if (latestFood++ % (20 * 20) == 0) { // every 20 seconds
+			for (EnderPlayer ep : onlinePlayers) {
+				if (!ep.isDead()) {
+					if ((ep.getFood() - 1) >= 0) {
+						ep.setFood(ep.getFood() - 1);
+					} else {
+						ep.damage(1F);
+					}
+				}
+			}
+		}
+		if (latestHeal++ % (20 * 10) == 0) { // every 10 seconds
+			for (EnderPlayer ep : onlinePlayers) {
+				if (!ep.isDead()) {
+					if ((ep.getHealth() + 0.5F) <= ep.getMaxHealth() && ep.getFood() > 0) {
+						ep.setHealth(ep.getHealth() + 0.5F);
+					}
+				}
+			}
+		}
+		
 		if ((latestKeepAlive++ & 0b0011_1111) == 0) { // faster than % 64 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));
@@ -353,10 +377,15 @@ public class Main implements Runnable {
 			this.mainWorld.updateEntities(onlinePlayers);
 		}
 
-		if ((tick & 0b0011_1111) == 0) // faster than % 64 == 0
+		if ((tick & 0b0011_1111) == 0){ // faster than % 64 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				p.getNetworkManager().sendPacket(new PacketOutUpdateTime(tick, this.mainWorld.getTime()));
 			}
+		}
+		
+		
+		
+		
 		this.mainWorld.serverTick();
 	}
 

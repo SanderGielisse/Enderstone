@@ -29,7 +29,6 @@ import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
-import org.enderstone.server.chat.CachedMessage;
 import org.enderstone.server.chat.ChatColor;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.chat.SimpleMessage;
@@ -510,8 +509,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	protected void onHealthUpdate(float health, float oldHealth) {
 		networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
-		if (health > 0)
+		if (health > 0) {
 			return;
+		}
+		this.food = 20;
 		Packet packet = new PacketOutEntityDestroy(new Integer[] { this.getEntityId() });
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (ep.visiblePlayers.contains(this.getPlayerName())) {
@@ -519,9 +520,11 @@ public class EnderPlayer extends Entity implements CommandSender {
 				ep.getNetworkManager().sendPacket(packet);
 			}
 		}
-		for(ItemStack inv : this.getInventoryHandler().getPlayerInventory().getRawItems())
-			if(inv != null)
+		for (ItemStack inv : this.getInventoryHandler().getPlayerInventory().getRawItems()) {
+			if (inv != null) {
 				world.dropItem(inv, getLocation(), 1);
+			}
+		}
 		Collections.fill(this.getInventoryHandler().getPlayerInventory().getRawItems(), null);
 	}
 
@@ -587,6 +590,18 @@ public class EnderPlayer extends Entity implements CommandSender {
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
 		this.damage(1F);
+	}
+
+	public int getFood() {
+		return this.food;
+	}
+	
+	public void setFood(int foodLevel){
+		if(foodLevel < 0 || foodLevel > 20){
+			throw new IllegalArgumentException(foodLevel + " is not a valid food level value");
+		}
+		this.food = (short) foodLevel;
+		this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(getHealth(), food, 0));
 	}
 
 	@Override

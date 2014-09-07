@@ -53,7 +53,7 @@ public class PacketInClientStatus extends Packet {
 		if (getActionId() == 0) {
 			networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
 			networkManager.player.teleport(new Location("", 0, 80, 0, 0F, 0F));
-			networkManager.player.heal();
+			networkManager.player.heal(); //TODO a player shouldn't heal when it sends this packet???
 			networkManager.player.getInventoryHandler().updateInventory();
 		}
 	}
