@@ -72,6 +72,7 @@ public class Main implements Runnable {
 	private static final int CANT_KEEP_UP_TIMEOUT = -10000;
 	private static final int MAX_VIEW_DISTANCE = 10;
 	private static final int MAX_SLEEP = 100;
+	public static final int DEFAULT_PROTOCOL = 47;
 	public static final Set<Integer> PROTOCOL = Collections.unmodifiableSet(new HashSet<Integer>() {
 		private static final long serialVersionUID = 1L;
 

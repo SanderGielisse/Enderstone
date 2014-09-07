@@ -53,7 +53,7 @@ public class PacketInRequest extends Packet {
 	public void onRecieve(NetworkManager networkManager) {
 		int protocol = networkManager.latestHandshakePacket.getProtocol();
 		if (!Main.PROTOCOL.contains(protocol)) {
-			protocol = 5;
+			protocol = Main.DEFAULT_PROTOCOL;
 		}
 
 		JSONObject json = new JSONObject();
