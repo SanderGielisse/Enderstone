@@ -19,6 +19,7 @@ package org.enderstone.server.packet.play;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
@@ -91,10 +92,18 @@ public class PacketInBlockPlacement extends Packet {
 				if (networkManager.player.getLocation().isInRange(6, loc, true)) {
 					EnderPlayer pl = networkManager.player;
 
-					if (pl.getInventoryHandler().getItemInHand().getBlockId() != getHeldItem().getBlockId() && pl.getInventoryHandler().getItemInHand().getAmount() != getHeldItem().getAmount()) {
+					if (getHeldItem() == null || pl.getInventoryHandler().getItemInHand() == null) {
+						if (pl.world.getBlockIdAt(x, y, z).getId() == 0) {
+							pl.sendBlockUpdate(new Location("", x, y, z, (byte) 0, (byte) 0), (short)0, (byte) 0); //tell client it failed and set the block back to air
+						}
 						return;
 					}
-
+					if (pl.getInventoryHandler().getItemInHand().getBlockId() != getHeldItem().getBlockId() && pl.getInventoryHandler().getItemInHand().getAmount() != getHeldItem().getAmount()) {
+						if (pl.world.getBlockIdAt(x, y, z).getId() == 0) {
+							pl.sendBlockUpdate(new Location("", x, y, z, (byte) 0, (byte) 0), (short)0, (byte) 0); //tell client it failed and set the block back to air
+						}
+						return;
+					}
 					if (BlockId.byId(getHeldItem().getBlockId()).isValidBlock()) {
 						pl.world.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
 						pl.getInventoryHandler().decreaseItemInHand(1);

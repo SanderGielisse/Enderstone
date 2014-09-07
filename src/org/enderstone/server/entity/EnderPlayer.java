@@ -39,6 +39,7 @@ import org.enderstone.server.inventory.PlayerInventory;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
+import org.enderstone.server.packet.play.PacketOutBlockChange;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
 import org.enderstone.server.packet.play.PacketOutChunkData;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
@@ -563,6 +564,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 			this.yLocation = this.getLocation().getY();
 		}
 		this.isOnGround = onGround;
+	}
+	
+	public void sendBlockUpdate(Location loc, short blockId, byte dataValue) {
+		this.getNetworkManager().sendPacket(new PacketOutBlockChange(loc, blockId, dataValue));
 	}
 
 	@Override
