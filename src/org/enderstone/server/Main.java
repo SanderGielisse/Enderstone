@@ -45,6 +45,7 @@ import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.commands.CommandMap;
+import org.enderstone.server.commands.enderstone.DebugCommand;
 import org.enderstone.server.commands.enderstone.PingCommand;
 import org.enderstone.server.commands.enderstone.QuitCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
@@ -104,6 +105,7 @@ public class Main implements Runnable {
 		commands.registerCommand(new StopCommand());
 		commands.registerCommand(new KillCommand());
 		commands.registerCommand(new QuitCommand());
+		commands.registerCommand(new DebugCommand());
 	}
 
 	private static Main instance;
