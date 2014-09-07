@@ -19,6 +19,7 @@ package org.enderstone.server.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
@@ -103,7 +104,7 @@ public class EntityMob extends Entity {
 	}
 
 	@Override
-	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
+	public void updatePlayers(Set<EnderPlayer> onlinePlayers) {
 		for (EnderPlayer ep : onlinePlayers) {
 			if (ep.getLocation().isInRange(40, this.getLocation(), false) && !ep.canSeeEntity.contains(this)) {
 				ep.canSeeEntity.add(this);
@@ -111,7 +112,7 @@ public class EntityMob extends Entity {
 			} else if (!ep.getLocation().isInRange(40, this.getLocation(), false) && ep.canSeeEntity.contains(this)) {
 				ep.canSeeEntity.remove(this);
 				ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));
-			} else if (ep.canSeeEntity.contains(this) && !ep.world.entities.contains(this)) {
+			} else if (ep.canSeeEntity.contains(this) && !Main.getInstance().getWorld(ep).entities.contains(this)) {
 				ep.canSeeEntity.remove(this);
 				ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));
 			}
@@ -184,7 +185,7 @@ public class EntityMob extends Entity {
 			List<EntityDrop> drops = this.getDrops();
 			for (EntityDrop drop : drops) {
 				if (Main.random.nextInt(100) <= drop.getDropChance()) {
-					world.addEntity(new EntityItem(getLocation(), drop.getStack().clone(), 5));
+					world.addEntity(new EntityItem(world, getLocation(), drop.getStack().clone(), 5));
 				}
 			}
 		}

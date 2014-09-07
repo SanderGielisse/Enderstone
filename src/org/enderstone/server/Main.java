@@ -92,7 +92,6 @@ public class Main implements Runnable {
 	public UUIDFactory uuidFactory = new UUIDFactory();
 	public String FAVICON = null;
 	public int port;
-	public final EnderWorld mainWorld = new EnderWorld();
 	public volatile boolean isRunning = true;
 	public final CommandMap commands;
 
@@ -110,7 +109,8 @@ public class Main implements Runnable {
 
 	private static Main instance;
 
-	public final List<EnderPlayer> onlinePlayers = new ArrayList<>();
+	public final Set<EnderPlayer> onlinePlayers = new HashSet<>();
+	public final Set<EnderWorld> worlds = new HashSet<>();
 	private final List<Runnable> sendToMainThread = Collections.synchronizedList(new ArrayList<Runnable>());
 
 	public static Main getInstance() {
@@ -149,7 +149,7 @@ public class Main implements Runnable {
 			EnderLogger.warn("Error while reading server-icon.png!");
 			EnderLogger.exception(e);
 		}
-
+		
 		ThreadGroup nettyListeners = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Netty Listeners");
 		EnderLogger.info("Starting Netty listeners... [" + this.port + "]");
 		for (final int nettyPort : new int[]{this.port}) {
@@ -193,6 +193,9 @@ public class Main implements Runnable {
 				EnderLogger.info("[ServerThread] Main Server Thread initialized and started!");
 				EnderLogger.info("[ServerThread] " + NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + port + "!");
 
+				worlds.add(new EnderWorld("world1"));
+				worlds.add(new EnderWorld("world2"));
+				
 				try {
 					while (Main.this.isRunning) {
 						mainServerTick();
@@ -371,22 +374,22 @@ public class Main implements Runnable {
 					p.networkManager.forcePacketFlush();
 					continue;
 				}
-				mainWorld.doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.getRenderDistance() - 1, MAX_VIEW_DISTANCE));
+				p.getWorld().doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.getRenderDistance() - 1, MAX_VIEW_DISTANCE));
 				p.updatePlayers(onlinePlayers);
 			}
-			this.mainWorld.updateEntities(onlinePlayers);
+			for (EnderWorld world : worlds) {
+				world.updateEntities(onlinePlayers);
+			}
 		}
 
 		if ((tick & 0b0011_1111) == 0){ // faster than % 64 == 0
 			for (EnderPlayer p : onlinePlayers) {
-				p.getNetworkManager().sendPacket(new PacketOutUpdateTime(tick, this.mainWorld.getTime()));
+				p.getNetworkManager().sendPacket(new PacketOutUpdateTime(tick, this.getWorld(p).getTime()));
 			}
 		}
-		
-		
-		
-		
-		this.mainWorld.serverTick();
+		for(EnderWorld world : worlds){
+			world.serverTick();
+		}
 	}
 
 	public void broadcastMessage(Message message) {
@@ -448,15 +451,26 @@ public class Main implements Runnable {
 	public static boolean isCurrentThreadMainThread() {
 		return Main.getInstance().mainThread == Thread.currentThread();
 	}
-
-	public Entity getEntityById(int targetId) {
-		for(Entity e : this.mainWorld.entities){
-			if(e.getEntityId() == targetId){
-				return e;
+	
+	public EnderWorld getWorld(EnderPlayer player){
+		for(EnderWorld world : this.worlds){
+			if(world.players.containsKey(player)){
+				return world;
 			}
 		}
-		for(EnderPlayer ep : this.onlinePlayers){
-			if(ep.getEntityId() == targetId){
+		return null;
+	}
+
+	public Entity getEntityById(int targetId) {
+		for (EnderWorld w : this.worlds) {
+			for (Entity e : w.entities) {
+				if (e.getEntityId() == targetId) {
+					return e;
+				}
+			}
+		}
+		for (EnderPlayer ep : this.onlinePlayers) {
+			if (ep.getEntityId() == targetId) {
 				return ep;
 			}
 		}

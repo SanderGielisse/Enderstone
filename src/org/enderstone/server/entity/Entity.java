@@ -17,8 +17,7 @@
  */
 package org.enderstone.server.entity;
 
-import java.util.List;
-import org.enderstone.server.EnderLogger;
+import java.util.Set;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.packet.Packet;
@@ -134,7 +133,7 @@ public abstract class Entity {
 
 	protected abstract float getBaseMaxHealth();
 
-	public abstract void updatePlayers(List<EnderPlayer> onlinePlayers);
+	public abstract void updatePlayers(Set<EnderPlayer> onlinePlayers);
 
 	public abstract void broadcastLocation(Location newLocation);
 

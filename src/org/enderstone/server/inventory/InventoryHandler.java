@@ -20,6 +20,7 @@ package org.enderstone.server.inventory;
 import java.util.Collections;
 import java.util.List;
 import org.enderstone.server.EnderLogger;
+import org.enderstone.server.Main;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.inventory.Inventory.InventoryListener;
@@ -35,6 +36,7 @@ import org.enderstone.server.packet.play.PacketOutOpenWindow;
 import org.enderstone.server.packet.play.PacketOutSetSlot;
 import org.enderstone.server.packet.play.PacketOutWindowItems;
 import org.enderstone.server.packet.play.PacketOutWindowProperty;
+import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.util.FixedSizeList;
 
 /**
@@ -123,16 +125,18 @@ public class InventoryHandler {
 	}
 
 	protected void drop(List<ItemStack> inventory, boolean dropFullStack, int slot) {
+		EnderWorld world = Main.getInstance().getWorld(player);
 		ItemStack stack = inventory.get(slot);
-		if (stack == null) return;
+		if (stack == null)
+			return;
 		if (stack.getAmount() <= 1 || dropFullStack) {
-			this.player.world.dropItem(stack, player.getLocation(), 10);
+			world.dropItem(stack, world, player.getLocation(), 10);
 			inventory.set(slot, null);
 		} else {
 			stack.setAmount((byte) (stack.getAmount() - 1));
 			ItemStack cloned = stack.clone();
 			cloned.setAmount((byte) 1);
-			this.player.world.dropItem(cloned, player.getLocation(), 10);
+			world.dropItem(cloned, world, player.getLocation(), 10);
 			inventory.set(slot, stack);
 		}
 	}

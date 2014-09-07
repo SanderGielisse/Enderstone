@@ -17,20 +17,19 @@
  */
 package org.enderstone.server;
 
+import org.enderstone.server.regions.EnderWorld;
+
 public class Location implements Cloneable {
 
-	private String worldName;
+	private EnderWorld world;
 	private double x;
 	private double y;
 	private double z;
 	private float yaw;
 	private float pitch;
-
-	public Location() {
-	}
-
-	public Location(String worldName, double x, double y, double z, float yaw, float pitch) {
-		this.worldName = worldName;
+	
+	public Location(EnderWorld world, double x, double y, double z, float yaw, float pitch) {
+		this.world = world;
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -38,12 +37,12 @@ public class Location implements Cloneable {
 		this.pitch = pitch;
 	}
 
-	public String getWorldName() {
-		return worldName;
+	public EnderWorld getWorldName() {
+		return world;
 	}
 
-	public void setWorldName(String worldName) {
-		this.worldName = worldName;
+	public void setWorld(EnderWorld world) {
+		this.world = world;
 	}
 
 	public double getX() {
@@ -102,8 +101,8 @@ public class Location implements Cloneable {
 	public int getBlockY() {
 		return floor(getY());
 	}
-	
-	public Location add(double x, double y, double z){
+
+	public Location add(double x, double y, double z) {
 		this.x += x;
 		this.y += y;
 		this.z += z;
@@ -111,10 +110,15 @@ public class Location implements Cloneable {
 	}
 
 	public boolean isInRange(int viewDistance, Location otherLoc, boolean checkY) {
+		if (this.world != null && otherLoc.world != null) {
+			if (!this.world.worldName.equals(otherLoc.world.worldName)) {
+				return false;
+			}
+		}
 		if (!checkY) {
 			return Math.max(this.x < otherLoc.x ? otherLoc.x - this.x : this.x - otherLoc.x, this.z < otherLoc.z ? otherLoc.z - this.z : this.z - otherLoc.z) < viewDistance;
-		}else{
-			return Math.max(this.x < otherLoc.x ? otherLoc.x - this.x : this.x - otherLoc.x, Math.max(this.z < otherLoc.z ? otherLoc.z - this.z : this.z - otherLoc.z, this.y < otherLoc.y ? otherLoc.y - this.y : this.y - otherLoc.y)) < viewDistance; 
+		} else {
+			return Math.max(this.x < otherLoc.x ? otherLoc.x - this.x : this.x - otherLoc.x, Math.max(this.z < otherLoc.z ? otherLoc.z - this.z : this.z - otherLoc.z, this.y < otherLoc.y ? otherLoc.y - this.y : this.y - otherLoc.y)) < viewDistance;
 		}
 	}
 
@@ -129,6 +133,6 @@ public class Location implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "Location{" + "world=" + worldName + ", x=" + x + ", y=" + y + ", z=" + z + ", yaw=" + yaw + ", pitch=" + pitch + '}';
+		return "Location{" + "world=" + world.toString() + ", x=" + x + ", y=" + y + ", z=" + z + ", yaw=" + yaw + ", pitch=" + pitch + '}';
 	}
 }

@@ -36,7 +36,6 @@ import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.ItemStack;
-import org.enderstone.server.inventory.PlayerInventory;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
@@ -96,14 +95,6 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public short food = 20;
 	public float foodSaturation = 0;
 	
-	/**
-	 * Inventory of the player
-	 * @deprecated Use getInventoryHandler().getPlayerInventory() instead
-	 */
-	@Deprecated
-	private final PlayerInventory inventory = inventoryHandler.getPlayerInventory();
-
-	public EnderWorld world = Main.getInstance().mainWorld;
 	private final String textureValue;
 	private final String textureSignature;
 	public int keepAliveID = 0;
@@ -143,8 +134,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 	};
 
-	public EnderPlayer(String userName, NetworkManager networkManager, UUID uuid, PlayerTextureStore textures) {
-		super(new Location());
+	public EnderPlayer(EnderWorld world, String userName, NetworkManager networkManager, UUID uuid, PlayerTextureStore textures) {
+		super(world.getSpawn().clone());
 		this.networkManager = networkManager;
 		this.playerName = userName;
 		this.uuid = uuid;
@@ -272,7 +263,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	public void onDisconnect() {
 		this.isOnline = false;
-		Main.getInstance().mainWorld.players.remove(this);
+		Main.getInstance().getWorld(this).players.remove(this);
 
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
 			p.getNetworkManager().sendPacket(new PacketOutPlayerListItem(new Action[] { new ActionRemovePlayer(this.uuid) }));
@@ -296,7 +287,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	}
 
 	@Override
-	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
+	public void updatePlayers(Set<EnderPlayer> onlinePlayers) {
 		Set<Integer> toDespawn = new HashSet<>();
 		for (EnderPlayer pl : onlinePlayers) {
 			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation(), true) && (!pl.isDead())) {
@@ -320,7 +311,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		if(latestCheck++ % 3 == 0){
 			//check if item entities nearby
 			
-			for(Entity e : this.world.entities){
+			for(Entity e : Main.getInstance().getWorld(this).entities){
 				if(e.getLocation().isInRange(2, this.getLocation(), true)){
 					boolean remove = e.onCollision(this);
 					if(remove){
@@ -329,8 +320,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 				}
 			}
 			for(Entity e : toRemove){
-				this.world.removeEntity(e);
-				this.world.broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
+				Main.getInstance().getWorld(this).removeEntity(e);
+				Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
 			}
 			toRemove.clear();
 		}
@@ -522,7 +513,8 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 		for (ItemStack inv : this.getInventoryHandler().getPlayerInventory().getRawItems()) {
 			if (inv != null) {
-				world.dropItem(inv, getLocation(), 1);
+				EnderWorld world = Main.getInstance().getWorld(this);
+				world.dropItem(inv, world, getLocation(), 1);
 			}
 		}
 		Collections.fill(this.getInventoryHandler().getPlayerInventory().getRawItems(), null);
@@ -568,7 +560,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 				if (change > 5) {
 					// can't find correct sound name
 				} else {
-					Main.getInstance().mainWorld.broadcastSound("damage.fallsmall", 1F, (byte) 63, getLocation(), null);
+					Main.getInstance().getWorld(this).broadcastSound("damage.fallsmall", 1F, (byte) 63, getLocation(), null);
 				}
 			}
 		} else if (this.isOnGround == true && onGround == false) {
@@ -602,6 +594,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 		}
 		this.food = (short) foodLevel;
 		this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(getHealth(), food, 0));
+	}
+	
+	public EnderWorld getWorld(){
+		return Main.getInstance().getWorld(this);
 	}
 
 	@Override

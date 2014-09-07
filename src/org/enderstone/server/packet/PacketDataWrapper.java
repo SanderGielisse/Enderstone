@@ -17,6 +17,9 @@
  */
 package org.enderstone.server.packet;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -30,9 +33,6 @@ import org.enderstone.server.inventory.ItemStack;
 import org.jnbt.CompoundTag;
 import org.jnbt.NBTInputStream;
 import org.jnbt.NBTOutputStream;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
 
 public class PacketDataWrapper {
 
@@ -176,7 +176,7 @@ public class PacketDataWrapper {
 		long x = value >> 38;
 		long y = value << 26 >> 52;
 		long z = value << 38 >> 38;
-		return new Location("", x, y, z, 0F, 0F);
+		return new Location(null, x, y, z, 0F, 0F);
 	}
 
 	public long readLong() {

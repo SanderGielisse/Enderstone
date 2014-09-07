@@ -74,7 +74,7 @@ public class PacketInPlayerPositionLook extends Packet {
 					}
 					networkManager.player.waitingForValidMoveAfterTeleport = 0;
 				}
-				networkManager.player.broadcastLocation(new Location("", getX(), getFeetY(), getZ(), getYaw(), getPitch()));
+				networkManager.player.broadcastLocation(new Location(networkManager.player.getWorld(), getX(), getFeetY(), getZ(), getYaw(), getPitch()));
 				networkManager.player.broadcastRotation(getPitch(), getYaw());
 				loc.setX(getX());
 				loc.setY(getFeetY());

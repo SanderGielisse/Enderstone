@@ -86,7 +86,7 @@ public class PacketInPlayerPosition extends Packet {
 						}
 						networkManager.player.waitingForValidMoveAfterTeleport = 0;
 					}
-					networkManager.player.broadcastLocation(new Location("", getX(), getFeetY(), getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
+					networkManager.player.broadcastLocation(new Location(networkManager.player.getWorld(), getX(), getFeetY(), getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
 					loc.setX(getX());
 					loc.setY(getFeetY());
 					loc.setZ(getZ());

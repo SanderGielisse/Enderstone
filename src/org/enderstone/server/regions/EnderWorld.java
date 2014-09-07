@@ -54,7 +54,12 @@ public class EnderWorld {
 	private long time = random.nextInt();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
 	public final Set<Entity> entities = new HashSet<>();
-	private Location spawnLocation = new Location(null, 0, 80, 0, 0f, 0f);
+	private Location spawnLocation = new Location(this, 0, 80, 0, 0f, 0f);
+	public final String worldName;
+
+	public EnderWorld(String worldName) {
+		this.worldName = worldName;
+	}
 
 	public EnderChunk getOrCreateChunk(int x, int z) {
 		return getOrCreateChunk(x, z, true);
@@ -94,7 +99,7 @@ public class EnderWorld {
 				}
 			}
 		}
-		loadedChunks.add(r = new EnderChunk(x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>()));
+		loadedChunks.add(r = new EnderChunk(this, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>()));
 		return r;
 	}
 
@@ -240,10 +245,10 @@ public class EnderWorld {
 		}
 	}
 	
-	public Entity dropItem(ItemStack item, Location loc, int noPickupDelay)
+	public Entity dropItem(ItemStack item, EnderWorld world, Location loc, int noPickupDelay)
 	{
 		Entity entity;
-		this.addEntity(entity = new EntityItem(loc.clone(), item, noPickupDelay));
+		this.addEntity(entity = new EntityItem(world, loc.clone(), item, noPickupDelay));
 		return entity;
 	}
 
@@ -292,7 +297,7 @@ public class EnderWorld {
 		}
 	}
 
-	public void updateEntities(List<EnderPlayer> onlinePlayers) {
+	public void updateEntities(Set<EnderPlayer> onlinePlayers) {
 		for (Entity e : this.entities) {
 			e.updatePlayers(onlinePlayers);
 		}

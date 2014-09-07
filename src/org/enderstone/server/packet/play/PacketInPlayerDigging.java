@@ -26,6 +26,7 @@ import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.EnderWorld;
 
 public class PacketInPlayerDigging extends Packet {
 
@@ -64,8 +65,10 @@ public class PacketInPlayerDigging extends Packet {
 				int x = getLocation().getBlockX();
 				int y = getLocation().getBlockY();
 				int z = getLocation().getBlockZ();
-
-				short blockId = Main.getInstance().mainWorld.getBlockIdAt(x, y, z).getId();
+				
+				EnderWorld world = Main.getInstance().getWorld(networkManager.player);
+				loc.setWorld(world);
+				short blockId = world.getBlockIdAt(x, y, z).getId();
 
 				if (getStatus() == 0) {
 					if (BlockId.byId(blockId).doesInstantBreak()) {
@@ -74,13 +77,13 @@ public class PacketInPlayerDigging extends Packet {
 					}
 				} else if (getStatus() == 2) {
 					if (networkManager.player.getLocation().isInRange(6, loc, true)) {
-						Main.getInstance().mainWorld.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
+						world.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
 					}
-					Main.getInstance().mainWorld.broadcastSound("dig.grass", 1F, (byte) 63, loc, networkManager.player);
+					world.broadcastSound("dig.grass", 1F, (byte) 63, loc, networkManager.player);
 					Location loca = loc.clone();
 					loca.setX(loca.getX() + 0.5);
 					loca.setZ(loca.getZ() + 0.5);
-					Main.getInstance().mainWorld.addEntity(new EntityItem(loca, new ItemStack(blockId, (byte) 1, (short) networkManager.player.world.getBlockDataAt(x, y, z)), 1));
+					world.addEntity(new EntityItem(world,loca, new ItemStack(blockId, (byte) 1, (short) world.getBlockDataAt(x, y, z)), 1));
 				} else if (getStatus() == 3) {
 					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
 				} else if (getStatus() == 4) {

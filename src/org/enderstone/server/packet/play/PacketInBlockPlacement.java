@@ -88,25 +88,26 @@ public class PacketInBlockPlacement extends Packet {
 				} else if (direct == 5) {
 					x++;
 				}
+				loc.setWorld(networkManager.player.getWorld());
 				if (networkManager.player.getLocation().isInRange(6, loc, true)) {
 					EnderPlayer pl = networkManager.player;
 
 					if (getHeldItem() == null || pl.getInventoryHandler().getItemInHand() == null) {
-						if (pl.world.getBlockIdAt(x, y, z).getId() == 0) {
-							pl.sendBlockUpdate(new Location("", x, y, z, (byte) 0, (byte) 0), (short)0, (byte) 0); //tell client it failed and set the block back to air
+						if (Main.getInstance().getWorld(pl).getBlockIdAt(x, y, z).getId() == 0) {
+							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short)0, (byte) 0); //tell client it failed and set the block back to air
 						}
 						return;
 					}
 					if (pl.getInventoryHandler().getItemInHand().getBlockId() != getHeldItem().getBlockId() && pl.getInventoryHandler().getItemInHand().getAmount() != getHeldItem().getAmount()) {
-						if (pl.world.getBlockIdAt(x, y, z).getId() == 0) {
-							pl.sendBlockUpdate(new Location("", x, y, z, (byte) 0, (byte) 0), (short)0, (byte) 0); //tell client it failed and set the block back to air
+						if (Main.getInstance().getWorld(pl).getBlockIdAt(x, y, z).getId() == 0) {
+							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short)0, (byte) 0); //tell client it failed and set the block back to air
 						}
 						return;
 					}
 					if (BlockId.byId(getHeldItem().getBlockId()).isValidBlock()) {
-						pl.world.setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
+						Main.getInstance().getWorld(pl).setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
 						pl.getInventoryHandler().decreaseItemInHand(1);
-						Main.getInstance().mainWorld.broadcastSound("dig.grass", 1F, (byte) 63, loc, null);
+						Main.getInstance().getWorld(networkManager.player).broadcastSound("dig.grass", 1F, (byte) 63, loc, null);
 					}
 				}
 			}

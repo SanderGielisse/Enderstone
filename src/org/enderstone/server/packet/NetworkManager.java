@@ -212,7 +212,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		if (player != null)
 			throw new IllegalStateException();
 		if (this.uuid == null) {
-			this.disconnect("Illegal uuid");
+			this.disconnect("Illegal uuid", true);
 			return;
 		}
 		if (this.skinBlob == null)
@@ -220,21 +220,22 @@ public class NetworkManager extends ChannelHandlerAdapter {
 																// design
 																// pattern
 
-		player = new EnderPlayer(wantedName, this, uuid, this.skinBlob);
 		final Object lock = new Object();
 		synchronized (lock) {
 			Main.getInstance().sendToMainThread(new Runnable() {
 
 				@Override
 				public void run() {
+					EnderWorld world = (EnderWorld) Main.getInstance().worlds.toArray()[0];
+					
+					EnderLogger.debug("Player spawning in world: " + world.worldName);
+					player = new EnderPlayer(world, wantedName, NetworkManager.this, uuid, skinBlob);
 					Main.getInstance().onlinePlayers.add(player);
 					try {
-
 						sendPacket(new PacketOutLoginSucces(player.uuid.toString(), player.getPlayerName()));
 						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) GameMode.SURVIVAL.getId(), (byte) 0, (byte) 1, (byte) 60, "default", false));
-						sendPacket(new PacketOutUpdateTime(0,Main.getInstance().mainWorld.getTime()));
-						EnderWorld mainWorld = Main.getInstance().mainWorld;
-						Location spawn = mainWorld.getSpawn();
+						sendPacket(new PacketOutUpdateTime(0, world.getTime()));
+						Location spawn = world.getSpawn();
 						Location loc = player.getLocation();
 						loc.setX(spawn.getX());
 						loc.setY(spawn.getY());
@@ -242,7 +243,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						loc.setYaw(spawn.getYaw());
 						loc.setPitch(spawn.getPitch());
 
-						mainWorld.doChunkUpdatesForPlayer(player, player.chunkInformer, 1);
+						world.doChunkUpdatesForPlayer(player, player.chunkInformer, 1);
 						player.onSpawn();
 						sendPacket(new PacketOutSpawnPosition(spawn));
 

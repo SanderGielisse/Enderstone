@@ -17,7 +17,7 @@
  */
 package org.enderstone.server.entity;
 
-import java.util.List;
+import java.util.Set;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.inventory.ItemStack;
@@ -26,16 +26,19 @@ import org.enderstone.server.packet.play.PacketOutCollectItem;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutSpawnObject;
+import org.enderstone.server.regions.EnderWorld;
 
 public class EntityItem extends Entity {
 
+	private final EnderWorld world;
 	private final ItemStack itemstack;
 	private int pickupDelay;
 	
-	public EntityItem(Location location, ItemStack stack, int pickupDelay) {
+	public EntityItem(EnderWorld world, Location location, ItemStack stack, int pickupDelay) {
 		super(location);
 		this.itemstack = stack;
 		this.pickupDelay = pickupDelay;
+		this.world = world;
 		onSpawn(); // must be called from main thread
 	}
 
@@ -88,7 +91,7 @@ public class EntityItem extends Entity {
 	}
 
 	@Override
-	public void updatePlayers(List<EnderPlayer> onlinePlayers) {
+	public void updatePlayers(Set<EnderPlayer> onlinePlayers) {
 		Packet spawnPacket = this.getSpawnPacket();
 		Packet packet = new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher());
 		for (EnderPlayer pl : onlinePlayers) {
@@ -99,7 +102,7 @@ public class EntityItem extends Entity {
 			} else if (!pl.getLocation().isInRange(40, this.getLocation(), true) && pl.canSeeEntity.contains(this)) {
 				pl.canSeeEntity.remove(this);
 				pl.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));
-			} else if (pl.canSeeEntity.contains(this) && !pl.world.entities.contains(this)) {
+			} else if (pl.canSeeEntity.contains(this) && !Main.getInstance().getWorld(pl).entities.contains(this)) {
 				pl.canSeeEntity.remove(this);
 				pl.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));
 			}
@@ -133,7 +136,7 @@ public class EntityItem extends Entity {
 				ItemStack stack = withPlayer.getInventoryHandler().tryPickup(this.itemstack);
 				if (stack == null) {
 					withPlayer.canSeeEntity.remove(this);
-					Main.getInstance().mainWorld.broadcastPacket(new PacketOutCollectItem(this.getEntityId(), withPlayer.getEntityId()), withPlayer.getLocation());
+					Main.getInstance().getWorld(withPlayer).broadcastPacket(new PacketOutCollectItem(this.getEntityId(), withPlayer.getEntityId()), withPlayer.getLocation());
 					return true;
 				}
 			}
@@ -153,8 +156,8 @@ public class EntityItem extends Entity {
 			Location loc = getLocation().clone();
 			loc.add(0, -1, 0);
 
-			if (Main.getInstance().mainWorld.getBlockIdAt(loc).getId() == 0) {
-				while (Main.getInstance().mainWorld.getBlockIdAt(loc.add(0, -1, 0)).getId() == 0) {
+			if (world.getBlockIdAt(loc).getId() == 0) {
+				while (world.getBlockIdAt(loc.add(0, -1, 0)).getId() == 0) { //TODO make it able to fall through blocks such as torches etc.
 					if (loc.getBlockY() < 0) {
 						break;
 					}

@@ -45,8 +45,10 @@ public class EnderChunk {
 	private final int x;
 	public boolean hasPopulated = false;
 	private boolean isValid = true;
+	private EnderWorld world;
 
-	public EnderChunk(int x, int z, short[][] blockID, byte[][] data, byte[] biome, List<BlockData> blockData) {
+	public EnderChunk(EnderWorld world, int x, int z, short[][] blockID, byte[][] data, byte[] biome, List<BlockData> blockData) {
+		this.world = world;
 		if (blockID.length != MAX_CHUNK_SECTIONS) {
 			throw new IllegalArgumentException("blockID.length != 16");
 		}
@@ -127,12 +129,14 @@ public class EnderChunk {
 		this.data[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = data;
 
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
-			if (Main.getInstance().mainWorld.players.containsKey(player)) {
-				if (Main.getInstance().mainWorld.players.get(player).contains(this)) {
-					try {
-						player.getNetworkManager().sendPacket(new PacketOutBlockChange(new Location("", (this.getX() * 16) + x, y, (this.getZ() * 16) + z, (float) 0, (float) 0), material.getId(), data));
-					} catch (Exception e) {
-						EnderLogger.exception(e);
+			if (player.getWorld().players.containsKey(player)) {
+				if (player.getWorld().worldName.equals(world.worldName)) {
+					if (player.getWorld().players.get(player).contains(this)) {
+						try {
+							player.getNetworkManager().sendPacket(new PacketOutBlockChange(new Location(player.getWorld(), (this.getX() * 16) + x, y, (this.getZ() * 16) + z, (float) 0, (float) 0), material.getId(), data));
+						} catch (Exception e) {
+							EnderLogger.exception(e);
+						}
 					}
 				}
 			}

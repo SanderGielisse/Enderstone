@@ -75,7 +75,7 @@ public class TeleportCommand extends SimpleCommand {
 					}
 				}
 
-				Location toLocation = new Location("", Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]), 0F, 0F);
+				Location toLocation = new Location(ep.getWorld(), Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]), 0F, 0F);
 				ep.teleport(toLocation);
 			} else {
 				sender.sendMessage(new SimpleMessage("You can only use the command this way if you are a player."));

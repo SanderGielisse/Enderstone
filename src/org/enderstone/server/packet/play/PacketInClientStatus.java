@@ -19,6 +19,7 @@ package org.enderstone.server.packet.play;
 
 import java.io.IOException;
 import org.enderstone.server.Location;
+import org.enderstone.server.Main;
 import org.enderstone.server.entity.GameMode;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
@@ -49,13 +50,19 @@ public class PacketInClientStatus extends Packet {
 	}
 
 	@Override
-	public void onRecieve(NetworkManager networkManager) {
-		if (getActionId() == 0) {
-			networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
-			networkManager.player.teleport(new Location("", 0, 80, 0, 0F, 0F));
-			networkManager.player.heal(); //TODO a player shouldn't heal when it sends this packet???
-			networkManager.player.getInventoryHandler().updateInventory();
-		}
+	public void onRecieve(final NetworkManager networkManager) {
+		networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				if (getActionId() == 0) {
+					networkManager.player.teleport(new Location(networkManager.player.getWorld(), 0, 80, 0, 0F, 0F));
+					networkManager.player.getInventoryHandler().updateInventory();
+					networkManager.player.heal();
+				}
+			}
+		});
 	}
 
 	public int getActionId() {
