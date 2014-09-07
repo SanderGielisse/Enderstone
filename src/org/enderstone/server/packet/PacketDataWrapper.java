@@ -135,8 +135,7 @@ public class PacketDataWrapper {
 		try {
 			return new String(b, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return null;
+			throw new Error("No UTF-8 support? This server platform is not supported!", e);
 		}
 	}
 
