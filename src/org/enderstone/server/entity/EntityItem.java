@@ -141,10 +141,30 @@ public class EntityItem extends Entity {
 		return false;
 	}
 	
+	private int gravityCheck;
+	
 	@Override
 	public void serverTick() {
 		if (pickupDelay > 0) {
 			pickupDelay--;
+		}
+
+		if (gravityCheck++ % 20 == 0) {
+			Location loc = getLocation().clone();
+			loc.add(0, -1, 0);
+
+			if (Main.getInstance().mainWorld.getBlockIdAt(loc).getId() == 0) {
+				while (Main.getInstance().mainWorld.getBlockIdAt(loc.add(0, -1, 0)).getId() == 0) {
+					if (loc.getBlockY() < 0) {
+						break;
+					}
+				}
+				this.getLocation().setX(loc.getX());
+				this.getLocation().setY(loc.getY());
+				this.getLocation().setZ(loc.getZ());
+				this.getLocation().setYaw(loc.getYaw());
+				this.getLocation().setPitch(loc.getPitch());
+			}
 		}
 	}
 }

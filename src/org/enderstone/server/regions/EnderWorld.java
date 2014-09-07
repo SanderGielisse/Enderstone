@@ -154,6 +154,10 @@ public class EnderWorld {
 	public BlockId getBlockIdAt(int x, int y, int z) {
 		return getOrCreateChunk(x >> 4, z >> 4).getBlock(x & 0xF, y & 0xFF, z & 0xF);
 	}
+	
+	public BlockId getBlockIdAt(Location loc) {
+		return getOrCreateChunk(loc.getBlockX() >> 4, loc.getBlockZ() >> 4).getBlock(loc.getBlockX() & 0xF, loc.getBlockY() & 0xFF, loc.getBlockZ() & 0xF);
+	}
 
 	public byte getBlockDataAt(int x, int y, int z) {
 		return getOrCreateChunk(x >> 4, z >> 4).getData(x & 0xF, y & 0xFF, z & 0xF);

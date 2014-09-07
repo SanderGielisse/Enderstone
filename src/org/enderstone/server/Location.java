@@ -17,9 +17,6 @@
  */
 package org.enderstone.server;
 
-import java.io.IOException;
-import org.enderstone.server.inventory.ItemStack;
-
 public class Location implements Cloneable {
 
 	private String worldName;
@@ -104,6 +101,13 @@ public class Location implements Cloneable {
 
 	public int getBlockY() {
 		return floor(getY());
+	}
+	
+	public Location add(double x, double y, double z){
+		this.x += x;
+		this.y += y;
+		this.z += z;
+		return this;
 	}
 
 	public boolean isInRange(int viewDistance, Location otherLoc, boolean checkY) {
