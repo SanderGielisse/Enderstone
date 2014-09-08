@@ -195,7 +195,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 		toWorld.players.add(this);
 		this.getLocation().cloneFrom(toWorld.getSpawn());
 		this.loadedChunks.clear();
-		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 10);
+		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 3);
 		networkManager.player.getInventoryHandler().updateInventory();
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(toWorld.getSpawn().getX(), toWorld.getSpawn().getY(), toWorld.getSpawn().getZ(), 0F, 0F, (byte) 1));
 	}
