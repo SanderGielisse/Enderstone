@@ -108,11 +108,6 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public ChunkInformer chunkInformer = new ChunkInformer() {
 
 		private List<EnderChunk> cache = new ArrayList<>();
-
-		@Override
-		public List<EnderChunk> getCache(){
-			return cache;
-		}
 		
 		@Override
 		public void sendChunk(EnderChunk chunk) {
@@ -143,6 +138,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 			return MAX_CHUNKS_EVERY_UPDATE;
 		}
 	};
+	private final RegionSet loadedChunks = new RegionSet();
 
 	public EnderPlayer(EnderWorld world, String userName, NetworkManager networkManager, UUID uuid, PlayerTextureStore textures) {
 		super(world.getSpawn().clone());
@@ -195,11 +191,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 		this.getNetworkManager().sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
 		EnderWorld currentWorld = this.getWorld();
 		EnderLogger.warn("Switching player " + this.getPlayerName() + " from world " + currentWorld.worldName + " to " + toWorld.worldName + ".");
-		if(currentWorld.players.containsKey(this)){
-			currentWorld.players.remove(this);
-		}
+		assert currentWorld.players.remove(this);
+		toWorld.players.add(this);
 		this.getLocation().cloneFrom(toWorld.getSpawn());
-		this.chunkInformer.getCache().clear();
+		this.loadedChunks.clear();
 		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 10);
 		networkManager.player.getInventoryHandler().updateInventory();
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(toWorld.getSpawn().getX(), toWorld.getSpawn().getY(), toWorld.getSpawn().getZ(), 0F, 0F, (byte) 1));
@@ -638,6 +633,10 @@ public class EnderPlayer extends Entity implements CommandSender {
 	 */
 	public InventoryHandler getInventoryHandler() {
 		return inventoryHandler;
+	}
+
+	public RegionSet getLoadedChunks() {
+		return this.loadedChunks;
 	}
 
 	/**

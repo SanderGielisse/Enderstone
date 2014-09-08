@@ -458,7 +458,7 @@ public class Main implements Runnable {
 	
 	public EnderWorld getWorld(EnderPlayer player){
 		for(EnderWorld world : this.worlds){
-			if(world.players.containsKey(player)){
+			if(world.players.contains(player)){
 				return world;
 			}
 		}

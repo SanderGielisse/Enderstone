@@ -47,12 +47,12 @@ public class EnderWorld {
 
 	private Long seed = null;
 	private final RegionSet loadedChunks = new RegionSet();
-	public final Map<EnderPlayer, RegionSet> players = new LinkedHashMap<>();
 	private final ChunkGenerator generator;
 	private final Random random = new Random();
 	private long time = random.nextInt();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
 	public final Set<Entity> entities = new HashSet<>();
+	public final Set<EnderPlayer> players = new HashSet<>();
 	private Location spawnLocation;
 	public final String worldName;
 
@@ -178,11 +178,8 @@ public class EnderWorld {
 
 	public void doChunkUpdatesForPlayer(EnderPlayer player, ChunkInformer informer, int radius, boolean force) {
 		synchronized (informer) {
-			RegionSet playerChunks = players.get(player);
+			RegionSet playerChunks = player.getLoadedChunks();
 			List<EnderChunk> newPlayerChunks = new ArrayList<>();
-			if (playerChunks == null) {
-				players.put(player, playerChunks = new RegionSet());
-			}
 			int r2 = radius * 2 + 1;
 			int px = player.getLocation().getBlockX() >> 4;
 			int cx = (px) - radius;
@@ -275,8 +272,6 @@ public class EnderWorld {
 		public void done();
 
 		public int maxChunks();
-		
-		public List<EnderChunk> getCache();
 	}
 
 	public void broadcastSound(String soundName, float volume, byte pitch, Location loc, EnderPlayer exceptOne) {

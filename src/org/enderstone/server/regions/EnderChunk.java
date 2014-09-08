@@ -129,14 +129,12 @@ public class EnderChunk {
 		this.data[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = data;
 
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
-			if (player.getWorld().players.containsKey(player)) {
-				if (player.getWorld().worldName.equals(world.worldName)) {
-					if (player.getWorld().players.get(player).contains(this)) {
-						try {
-							player.getNetworkManager().sendPacket(new PacketOutBlockChange(new Location(player.getWorld(), (this.getX() * 16) + x, y, (this.getZ() * 16) + z, (float) 0, (float) 0), material.getId(), data));
-						} catch (Exception e) {
-							EnderLogger.exception(e);
-						}
+			if (player.getWorld().worldName.equals(world.worldName)) {
+				if (player.getLoadedChunks().contains(this)) {
+					try {
+						player.getNetworkManager().sendPacket(new PacketOutBlockChange(new Location(player.getWorld(), (this.getX() * 16) + x, y, (this.getZ() * 16) + z, (float) 0, (float) 0), material.getId(), data));
+					} catch (Exception e) {
+						EnderLogger.exception(e);
 					}
 				}
 			}

@@ -230,6 +230,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 					EnderLogger.debug("Player " + wantedName + " spawning in world: " + world.worldName);
 					player = new EnderPlayer(world, wantedName, NetworkManager.this, uuid, skinBlob);
+					world.players.add(player);
 					Main.getInstance().onlinePlayers.add(player);
 					try {
 						sendPacket(new PacketOutLoginSucces(player.uuid.toString(), player.getPlayerName()));
