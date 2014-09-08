@@ -47,14 +47,18 @@ import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
+import org.enderstone.server.packet.play.PacketOutJoinGame;
+import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerListHeaderFooter;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
+import org.enderstone.server.packet.play.PacketOutRespawn;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.Action;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionAddPlayer;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionRemovePlayer;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
+import org.enderstone.server.packet.play.PacketOutSpawnPosition;
 import org.enderstone.server.packet.play.PacketOutTabComplete;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.permissions.Operator;
@@ -62,6 +66,7 @@ import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
+import org.enderstone.server.regions.RegionSet;
 
 public class EnderPlayer extends Entity implements CommandSender {
 
@@ -102,8 +107,13 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	public ChunkInformer chunkInformer = new ChunkInformer() {
 
-		List<EnderChunk> cache = new ArrayList<>();
+		private List<EnderChunk> cache = new ArrayList<>();
 
+		@Override
+		public List<EnderChunk> getCache(){
+			return cache;
+		}
+		
 		@Override
 		public void sendChunk(EnderChunk chunk) {
 			cache.add(chunk);
@@ -181,6 +191,20 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return new ProfileProperty("textures", textureValue, true, textureSignature);
 	}
 
+	public void switchWorld(EnderWorld toWorld) {
+		this.getNetworkManager().sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
+		EnderWorld currentWorld = this.getWorld();
+		EnderLogger.warn("Switching player " + this.getPlayerName() + " from world " + currentWorld.worldName + " to " + toWorld.worldName + ".");
+		if(currentWorld.players.containsKey(this)){
+			currentWorld.players.remove(this);
+		}
+		this.getLocation().cloneFrom(toWorld.getSpawn());
+		this.chunkInformer.getCache().clear();
+		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 10);
+		networkManager.player.getInventoryHandler().updateInventory();
+		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(toWorld.getSpawn().getX(), toWorld.getSpawn().getY(), toWorld.getSpawn().getZ(), 0F, 0F, (byte) 1));
+	}
+	
 	public ProfileProperty[] getProfileProperties() {
 		ProfileProperty[] list = new ProfileProperty[1];
 		list[0] = getTextureProperty();

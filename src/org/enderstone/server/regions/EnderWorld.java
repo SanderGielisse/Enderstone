@@ -37,7 +37,6 @@ import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.regions.generators.MultiChunkBlockPopulator;
-import org.enderstone.server.regions.generators.TimTest;
 import org.enderstone.server.util.IntegerArrayComparator;
 
 /**
@@ -49,16 +48,17 @@ public class EnderWorld {
 	private Long seed = null;
 	private final RegionSet loadedChunks = new RegionSet();
 	public final Map<EnderPlayer, RegionSet> players = new LinkedHashMap<>();
-	private final ChunkGenerator generator = new TimTest();
+	private final ChunkGenerator generator;
 	private final Random random = new Random();
 	private long time = random.nextInt();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
 	public final Set<Entity> entities = new HashSet<>();
-	private Location spawnLocation = new Location(this, 0, 80, 0, 0f, 0f);
+	private Location spawnLocation;
 	public final String worldName;
 
-	public EnderWorld(String worldName) {
+	public EnderWorld(String worldName, ChunkGenerator gen) {
 		this.worldName = worldName;
+		this.generator = gen;
 	}
 
 	public EnderChunk getOrCreateChunk(int x, int z) {
@@ -275,6 +275,8 @@ public class EnderWorld {
 		public void done();
 
 		public int maxChunks();
+		
+		public List<EnderChunk> getCache();
 	}
 
 	public void broadcastSound(String soundName, float volume, byte pitch, Location loc, EnderPlayer exceptOne) {
@@ -308,11 +310,10 @@ public class EnderWorld {
 	}
 
 	public Location getSpawn() {
+		if(this.spawnLocation == null){
+			this.spawnLocation = new Location(this, 0, 60, 0, 0F, 0F);
+		}
 		return this.spawnLocation;
-	}
-
-	public void setSpawn(Location spawnLocation) {
-		this.spawnLocation = spawnLocation;
 	}
 
 	public void serverTick()

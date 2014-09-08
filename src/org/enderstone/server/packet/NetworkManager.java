@@ -102,7 +102,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			Packet p;
 			while ((p = packets.poll()) != null) {
 				ctx.write(p);
-				//EnderLogger.debug("Out: "+p.toString());
+				// EnderLogger.debug("Out: "+p.toString());
 				p.onSend(this);
 			}
 			ctx.flush();
@@ -226,9 +226,9 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 				@Override
 				public void run() {
-					EnderWorld world = (EnderWorld) Main.getInstance().worlds.toArray()[0];
-					
-					EnderLogger.debug("Player spawning in world: " + world.worldName);
+					EnderWorld world = Main.getInstance().worlds.get(0);
+
+					EnderLogger.debug("Player " + wantedName + " spawning in world: " + world.worldName);
 					player = new EnderPlayer(world, wantedName, NetworkManager.this, uuid, skinBlob);
 					Main.getInstance().onlinePlayers.add(player);
 					try {
@@ -244,6 +244,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						loc.setPitch(spawn.getPitch());
 
 						world.doChunkUpdatesForPlayer(player, player.chunkInformer, 1);
+						player.teleport(world.getSpawn());
 						player.onSpawn();
 						sendPacket(new PacketOutSpawnPosition(spawn));
 
@@ -260,7 +261,6 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						sendPacket(new PacketOutPlayerAbilities((byte) i, 0.1F, 0.1F));
 						sendPacket(new PacketOutPlayerPositionLook(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), (byte) 0b00000));
 						sendPacket(new PacketOutUpdateHealth(player.getHealth(), player.food, player.foodSaturation));
-
 					} catch (Exception e) {
 						EnderLogger.exception(e);
 					} finally {

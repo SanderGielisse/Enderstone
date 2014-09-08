@@ -135,4 +135,13 @@ public class Location implements Cloneable {
 	public String toString() {
 		return "Location{" + "world=" + world.toString() + ", x=" + x + ", y=" + y + ", z=" + z + ", yaw=" + yaw + ", pitch=" + pitch + '}';
 	}
+
+	public void cloneFrom(Location spawn) {
+		this.world = spawn.world;
+		this.x = spawn.x;
+		this.y = spawn.y;
+		this.z = spawn.z;
+		this.yaw = spawn.yaw;
+		this.pitch = spawn.pitch;
+	}
 }

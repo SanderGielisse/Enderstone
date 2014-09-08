@@ -29,29 +29,30 @@ public class PacketOutWindowItems extends Packet{
 	private ItemStack[] slotData;
 
 	public PacketOutWindowItems(byte windowId, ItemStack[] slotData) {
-		this(windowId, slotData, (short)slotData.length);
+		this(windowId, slotData, (short) slotData.length);
 	}
 
 	public PacketOutWindowItems(byte windowId, ItemStack[] slotData, short count) {
 		this.windowId = windowId;
 		this.slotData = slotData;
+		this.count = count;
 	}
-	
+
 	@Override
 	public void read(PacketDataWrapper wrapper) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
-	
+
 	@Override
 	public void write(PacketDataWrapper wrapper) throws IOException {
 		wrapper.writeByte(windowId);
 		wrapper.writeShort(count);
 		
-		for(int i = 0; i < count; i++){
+		for (int i = 0; i < count; i++) {
 			wrapper.writeItemStack(slotData[i]);
 		}
 	}
-	
+
 	@Override
 	public int getSize() throws IOException {
 		int stackSize = 0;

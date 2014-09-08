@@ -18,7 +18,6 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
-import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.GameMode;
 import org.enderstone.server.packet.NetworkManager;
@@ -57,7 +56,7 @@ public class PacketInClientStatus extends Packet {
 
 				@Override
 				public void run() {
-					networkManager.player.teleport(new Location(networkManager.player.getWorld(), 0, 80, 0, 0F, 0F));
+					networkManager.player.teleport(networkManager.player.getWorld().getSpawn());
 					networkManager.player.getInventoryHandler().updateInventory();
 					networkManager.player.heal();
 				}
