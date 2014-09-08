@@ -409,7 +409,7 @@ public class InventoryHandler {
 	}
 
 	public void updateInventory() {
-		this.player.networkManager.sendPacket(new PacketOutWindowItems((byte) 0, equimentInventory.getRawItems().toArray(new ItemStack[equimentInventory.getSize()])));
+		this.player.networkManager.sendPacket(new PacketOutWindowItems(playerWindowId, equimentInventory.getRawItems().toArray(new ItemStack[equimentInventory.getSize()])));
 	}
 
 	public void decreaseItemInHand(int i) {
