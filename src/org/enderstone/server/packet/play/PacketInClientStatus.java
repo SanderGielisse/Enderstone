@@ -51,18 +51,18 @@ public class PacketInClientStatus extends Packet {
 
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
-		networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
-		Main.getInstance().sendToMainThread(new Runnable() {
+		if (getActionId() == 0 && networkManager.player.isDead()) {
+			networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
+			Main.getInstance().sendToMainThread(new Runnable() {
 
-			@Override
-			public void run() {
-				if (getActionId() == 0) {
+				@Override
+				public void run() {
 					networkManager.player.teleport(new Location(networkManager.player.getWorld(), 0, 80, 0, 0F, 0F));
 					networkManager.player.getInventoryHandler().updateInventory();
 					networkManager.player.heal();
 				}
-			}
-		});
+			});
+		}
 	}
 
 	public int getActionId() {
