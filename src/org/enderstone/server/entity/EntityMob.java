@@ -20,7 +20,6 @@ package org.enderstone.server.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;

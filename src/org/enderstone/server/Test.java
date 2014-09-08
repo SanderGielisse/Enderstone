@@ -17,14 +17,9 @@
  */
 package org.enderstone.server;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import java.io.IOException;
 import java.util.Arrays;
 import org.enderstone.server.chat.AdvancedMessage;
-import org.enderstone.server.entity.DataWatcher;
-import org.enderstone.server.inventory.ItemStack;
-import org.enderstone.server.packet.Packet;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.util.IntegerArrayComparator;
 

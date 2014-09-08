@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.enderstone.server.regions.BlockId;
-import org.enderstone.server.regions.BlockPopulator;
 import org.enderstone.server.regions.ChunkGenerator;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.generators.util.SimplexOctaveGenerator;

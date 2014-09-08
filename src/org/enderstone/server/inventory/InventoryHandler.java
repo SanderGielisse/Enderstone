@@ -17,7 +17,6 @@
  */
 package org.enderstone.server.inventory;
 
-import java.util.Collections;
 import java.util.List;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;

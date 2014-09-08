@@ -23,15 +23,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.enderstone.server.regions.BlockId;
-import org.jnbt.ByteTag;
 import org.jnbt.CompoundTag;
 import org.jnbt.NBTInputStream;
 import org.jnbt.NBTOutputStream;
-import org.jnbt.ShortTag;
-import org.jnbt.StringTag;
 import org.jnbt.Tag;
 
 /**
