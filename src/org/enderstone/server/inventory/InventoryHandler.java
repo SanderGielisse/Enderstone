@@ -352,6 +352,7 @@ public class InventoryHandler {
 			assert this.activeInventory == this.equimentInventory;
 			this.updateInventory();
 		}
+		drop(this.itemOnCursor, true, 0);
 	}
 
 	public void recievePacket(PacketInCreativeInventoryAction packet) {
