@@ -378,7 +378,7 @@ public class Main implements Runnable {
 					p.networkManager.forcePacketFlush();
 					continue;
 				}
-				p.getWorld().doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.getRenderDistance() - 1, MAX_VIEW_DISTANCE));
+				p.getWorld().doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.renderDistance - 1, MAX_VIEW_DISTANCE));
 				p.updatePlayers(onlinePlayers);
 			}
 			for (EnderWorld world : worlds) {

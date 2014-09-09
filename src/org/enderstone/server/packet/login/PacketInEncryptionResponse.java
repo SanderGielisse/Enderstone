@@ -88,6 +88,7 @@ public class PacketInEncryptionResponse extends Packet {
 			networkManager.skinBlob = new PlayerTextureStore(json.optJSONArray("properties"));
 			networkManager.setupEncryption(key);
 			networkManager.spawnPlayer();
+			networkManager.player.onRespawn();
 		} catch (IOException ex) {
 			networkManager.disconnect("internal exception: " + ex.toString(), false);
 			EnderLogger.exception(ex);

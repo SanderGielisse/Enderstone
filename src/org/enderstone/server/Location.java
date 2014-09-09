@@ -37,7 +37,7 @@ public class Location implements Cloneable {
 		this.pitch = pitch;
 	}
 
-	public EnderWorld getWorldName() {
+	public EnderWorld getWorld() {
 		return world;
 	}
 

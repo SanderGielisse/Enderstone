@@ -21,37 +21,34 @@ import java.io.IOException;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 
-public class PacketOutPlayerAbilities extends Packet {
+public class PacketOutChangeGameState extends Packet {
+	
+	private byte reason;
+	private float value;
 
-	private byte flags;
-	private float flySpeed;
-	private float walkSpeed;
-
-	public PacketOutPlayerAbilities(byte flags, float flySpeed, float walkSpeed) {
-		this.flags = flags;
-		this.flySpeed = flySpeed;
-		this.walkSpeed = walkSpeed;
+	public PacketOutChangeGameState(byte reason, float value) {
+		this.reason = reason;
+		this.value = value;
 	}
 
 	@Override
-	public void read(PacketDataWrapper wrapper) throws IOException {
+	public void read(PacketDataWrapper buf) throws IOException {
 		throw new RuntimeException("Packet " + this.getClass().getSimpleName() + " with ID 0x" + Integer.toHexString(getId()) + " cannot be read.");
 	}
 
 	@Override
-	public void write(PacketDataWrapper wrapper) throws IOException {
-		wrapper.writeByte(flags);
-		wrapper.writeFloat(flySpeed);
-		wrapper.writeFloat(walkSpeed);
+	public void write(PacketDataWrapper buf) throws IOException {
+		buf.writeByte(reason);
+		buf.writeFloat(value);
 	}
 
 	@Override
 	public int getSize() throws IOException {
-		return 1 + (getFloatSize() * 2) + getVarIntSize(getId());
+		return 1 + getFloatSize() + getVarIntSize(getId());
 	}
 
 	@Override
 	public byte getId() {
-		return 0x39;
+		return 0x2B;
 	}
 }

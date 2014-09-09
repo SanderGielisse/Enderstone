@@ -93,6 +93,7 @@ public class PacketInLoginStart extends Packet {
 			networkManager.uuid = uuid;
 			networkManager.skinBlob = texture;
 			networkManager.spawnPlayer();
+			networkManager.player.onRespawn();
 		}
 	}
 
