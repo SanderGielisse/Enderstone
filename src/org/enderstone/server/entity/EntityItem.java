@@ -18,8 +18,9 @@
 package org.enderstone.server.entity;
 
 import java.util.Set;
-import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Location;
+import org.enderstone.server.api.entity.Item;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutCollectItem;
@@ -28,7 +29,7 @@ import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutSpawnObject;
 import org.enderstone.server.regions.EnderWorld;
 
-public class EntityItem extends Entity {
+public class EntityItem extends EnderEntity implements Item {
 
 	private final EnderWorld world;
 	private final ItemStack itemstack;
@@ -59,7 +60,7 @@ public class EntityItem extends Entity {
 	}
 
 	@Override
-	public void teleport(Entity entity) {
+	public void teleport(EnderEntity entity) {
 	}
 
 	@Override

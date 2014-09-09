@@ -18,14 +18,15 @@
 package org.enderstone.server.entity;
 
 import java.util.Set;
-import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Location;
+import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutAnimation;
 import org.enderstone.server.packet.play.PacketOutEntityStatus;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 
-public abstract class Entity {
+public abstract class EnderEntity implements Entity{
 
 	private static int entityCount = 0;
 
@@ -35,7 +36,7 @@ public abstract class Entity {
 	private float maxHealth = Float.NaN;
 	private DataWatcher dataWatcher = new DataWatcher();
 
-	public Entity(Location location) {
+	public EnderEntity(Location location) {
 		this.entityId = entityCount++;
 		this.location = location;
 	}
@@ -52,7 +53,7 @@ public abstract class Entity {
 
 	public abstract void teleport(Location loc);
 
-	public abstract void teleport(Entity entity);
+	public abstract void teleport(EnderEntity entity);
 
 	public abstract void onRightClick(EnderPlayer attacker);
 
@@ -170,7 +171,7 @@ public abstract class Entity {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Entity other = (Entity) obj;
+		EnderEntity other = (EnderEntity) obj;
 		if (entityId != other.entityId)
 			return false;
 		return true;

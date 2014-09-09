@@ -18,6 +18,7 @@
 package org.enderstone.server.regions;
 
 import java.util.Objects;
+import org.enderstone.server.api.Block;
 
 /**
  *

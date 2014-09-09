@@ -55,7 +55,7 @@ import org.enderstone.server.commands.vanila.StopCommand;
 import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.entity.Entity;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
@@ -445,9 +445,9 @@ public class Main implements Runnable {
 		return null;
 	}
 
-	public Entity getEntityById(int targetId) {
+	public EnderEntity getEntityById(int targetId) {
 		for (EnderWorld w : this.worlds) {
-			for (Entity e : w.entities) {
+			for (EnderEntity e : w.entities) {
 				if (e.getEntityId() == targetId) {
 					return e;
 				}

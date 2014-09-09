@@ -15,31 +15,8 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.regions;
+package org.enderstone.server.api.entity;
 
-/**
- *
- * @author ferrybig
- */
-public interface Block {
+public interface Entity {
 
-	public int getX();
-
-	public int getY();
-
-	public int getZ();
-
-	public EnderWorld getWorld();
-
-	public EnderChunk getChunk();
-
-	public BlockId getBlock();
-
-	public byte getData();
-
-	public void setBlock(BlockId id, byte data);
-
-	public Block getReadOnlyCopy();
-	
-	public boolean isEditable();
 }

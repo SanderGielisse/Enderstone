@@ -22,8 +22,9 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.enderstone.server.EnderLogger;
-import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Chunk;
+import org.enderstone.server.api.Location;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketOutBlockChange;
 
@@ -31,7 +32,7 @@ import org.enderstone.server.packet.play.PacketOutBlockChange;
  *
  * @author Fernando
  */
-public class EnderChunk {
+public class EnderChunk implements Chunk{
 
 	protected final static int CHUNK_SECTION_SIZE = 16;
 	protected final static int MAX_CHUNK_SECTIONS = 16;
