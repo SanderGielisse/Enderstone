@@ -17,7 +17,7 @@
  */
 package org.enderstone.server.entity;
 
-import org.enderstone.server.api.entity.GameMode;
+import org.enderstone.server.api.GameMode;
 
 public class PlayerSettings {
 	public String displayName = null;

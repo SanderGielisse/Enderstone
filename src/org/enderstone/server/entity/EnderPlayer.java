@@ -29,8 +29,9 @@ import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
-import org.enderstone.server.api.entity.ChatPosition;
-import org.enderstone.server.api.entity.GameMode;
+import org.enderstone.server.api.ChatPosition;
+import org.enderstone.server.api.GameMode;
+import org.enderstone.server.api.Particle;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.chat.ChatColor;
 import org.enderstone.server.chat.Message;
@@ -51,6 +52,7 @@ import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
+import org.enderstone.server.packet.play.PacketOutPlayParticle;
 import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerListHeaderFooter;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
@@ -418,10 +420,6 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 		}
 	}
 
-	public void playSound(String soundName, float volume, byte pitch) {
-		networkManager.sendPacket(new PacketOutSoundEffect(soundName, getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), volume, pitch));
-	}
-
 	public void debug(String message, PlayerDebugger level) {
 		if (level == null)
 			level = PlayerDebugger.OTHER;
@@ -482,6 +480,25 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (!ep.equals(this)) {
 				ep.getNetworkManager().sendPacket(packet);
+			}
+		}
+	}
+	
+	private int latestHeal = 0;
+	private int latestFood = 0;
+	
+	@Override
+	public void serverTick() {
+		if (!this.isDead() && latestFood++ % (30 * 20) == 0) { //TODO do this how it goes in default Minecraft
+			if ((this.getFood() - 1) >= 0) {
+				this.setFood((short) (this.getFood() - 1));
+			} else {
+				this.damage(1F);
+			}
+		}
+		if (!this.isDead() && latestHeal++ % (15 * 20) == 0) { //TODO do this how it goes in default Minecraft
+			if ((this.getHealth() + 0.5F) <= this.getMaxHealth() && this.getFood() > 0) {
+				this.setHealth(this.getHealth() + 0.5F);
 			}
 		}
 	}
@@ -571,6 +588,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 		return 20;
 	}
 
+	@Override
 	public boolean hasPermission(String permission) {
 		for (Operator operator : Main.getInstance().operators) {
 			if (operator.getUUID().equals(this.uuid)) {
@@ -619,11 +637,11 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 		return this.clientSettings.food;
 	}
 
-	public void setFood(int foodLevel) {
+	public void setFood(short foodLevel) {
 		if (foodLevel < 0 || foodLevel > 20) {
 			throw new IllegalArgumentException(foodLevel + " is not a valid food level value");
 		}
-		this.clientSettings.food = (short) foodLevel;
+		this.clientSettings.food = foodLevel;
 		this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(getHealth(), this.clientSettings.food, 0));
 	}
 
@@ -684,8 +702,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 
 	@Override
 	public void setFoodLevel(int foodLevel) {
-		this.clientSettings.food = foodLevel;
-		this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(this.getHealth(), this.clientSettings.food, this.clientSettings.foodSaturation));
+		this.setFood((short) foodLevel);
 	}
 
 	@Override
@@ -789,8 +806,8 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	}
 
 	@Override
-	public void playParticle(String particleName, Location location) {
-		// TODO Auto-generated method stub
+	public void playParticle(Particle particle, Location location, float xOffset, float yOffset, float zOffset, float data, int amount) {
+		this.networkManager.sendPacket(new PacketOutPlayParticle(particle.getId(), location, xOffset, yOffset, zOffset, data, amount));
 	}
 
 	@Override
@@ -813,7 +830,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 
 	@Override
 	public void closeInventory() {
-		this.inventoryHandler.getPlayerInventory().close(); // TODO test this
+		this.inventoryHandler.openInventory(null);
 	}
 
 	@Override

@@ -18,6 +18,9 @@
 package org.enderstone.server.api.entity;
 
 import org.enderstone.server.Location;
+import org.enderstone.server.api.ChatPosition;
+import org.enderstone.server.api.GameMode;
+import org.enderstone.server.api.Particle;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.entity.Entity;
 import org.enderstone.server.inventory.InventoryHandler;
@@ -83,7 +86,7 @@ public interface Player {
 	
 	public void playSound(String soundName, int volume, int pitch);
 	
-	public void playParticle(String particleName, Location location);
+	public void playParticle(Particle particle, Location location, float xOffset, float yOffset, float zOffset, float data, int amount);
 	
 	public EnderWorld getWorld();
 	
@@ -102,4 +105,6 @@ public interface Player {
 	public InventoryHandler getInventory();
 	
 	public ItemStack getItemInHand();
+
+	boolean hasPermission(String permission);
 }

@@ -15,15 +15,14 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.api.entity;
+package org.enderstone.server.api;
 
-public enum ChatPosition {
-	NORMAL_CHAT(0), ABOVE_HEALTH_BAR(1), MIDDLE_SCREEN(2); // TODO NOT sure if
-															// ID matches name
+public enum GameMode {
+	SURVIVAL(0), CREATIVE(1), ADVENTURE(2);
 
-	private final int id;
+	private int id;
 
-	private ChatPosition(int id) {
+	private GameMode(int id) {
 		this.id = id;
 	}
 

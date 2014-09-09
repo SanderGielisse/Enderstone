@@ -340,32 +340,12 @@ public class Main implements Runnable {
 
 	private int latestKeepAlive = 0;
 	private int latestChunkUpdate = 0;
-	private int latestHeal = 0;
-	private int latestFood = 0;
 
 	private void serverTick(long tick) {
+		for (EnderPlayer ep : onlinePlayers) {
+			ep.serverTick();
+		}
 
-		if (latestFood++ % (20 * 20) == 0) { // every 20 seconds
-			for (EnderPlayer ep : onlinePlayers) {
-				if (!ep.isDead()) {
-					if ((ep.getFood() - 1) >= 0) {
-						ep.setFood(ep.getFood() - 1);
-					} else {
-						ep.damage(1F);
-					}
-				}
-			}
-		}
-		if (latestHeal++ % (20 * 10) == 0) { // every 10 seconds
-			for (EnderPlayer ep : onlinePlayers) {
-				if (!ep.isDead()) {
-					if ((ep.getHealth() + 0.5F) <= ep.getMaxHealth() && ep.getFood() > 0) {
-						ep.setHealth(ep.getHealth() + 0.5F);
-					}
-				}
-			}
-		}
-		
 		if ((latestKeepAlive++ & 0b0011_1111) == 0) { // faster than % 64 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));

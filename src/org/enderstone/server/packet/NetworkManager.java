@@ -42,7 +42,7 @@ import javax.crypto.spec.IvParameterSpec;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
-import org.enderstone.server.api.entity.GameMode;
+import org.enderstone.server.api.GameMode;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
