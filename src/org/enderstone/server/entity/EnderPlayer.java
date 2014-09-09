@@ -78,28 +78,44 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	private final InventoryHandler inventoryHandler = new InventoryHandler(this);
 	public final PlayerSettings clientSettings = new PlayerSettings();
 	public final NetworkManager networkManager;
+	public final EnumSet<PlayerDebugger> debugOutputs = EnumSet.noneOf(PlayerDebugger.class);
+
+	public volatile boolean isOnline = true;
+	public int keepAliveID = 0;
+
 	public final String playerName;
-	public HashSet<String> visiblePlayers = new HashSet<>();
-	public HashSet<Entity> canSeeEntity = new HashSet<>();
+	public final HashSet<String> visiblePlayers = new HashSet<>();
+	public final HashSet<Entity> canSeeEntity = new HashSet<>();
+	public final UUID uuid;
+	private final String textureValue;
+	private final String textureSignature;
+
+	/**
+	 * Two fields used to determine the amount of fall damage
+	 */
+	public boolean isOnGround = true;
+	public double yLocation;
+
 	/**
 	 * If this is above 0, then the server is waiting for a correction on the
 	 * last teleport the server sended
 	 */
 	public int waitingForValidMoveAfterTeleport = 0;
-	public final UUID uuid;
-	public volatile boolean isOnline = true;	
-	public volatile boolean isOnGround = true;
-	public double yLocation;
-	
-	private final String textureValue;
-	private final String textureSignature;
-	public int keepAliveID = 0;
-	public final EnumSet<PlayerDebugger> debugOutputs = EnumSet.noneOf(PlayerDebugger.class);
 
+	/**
+	 * 
+	 * The loadedChunks regionSet is a kinda "HashMap" for chunks, but a bit
+	 * faster.
+	 * 
+	 * The chunkInformer is a small interface which converts our "chunk data"
+	 * into sendable packets. This interface is currently also being used for
+	 * caching the sending chunks.
+	 */
+	private final RegionSet loadedChunks = new RegionSet();
 	public ChunkInformer chunkInformer = new ChunkInformer() {
 
 		private List<EnderChunk> cache = new ArrayList<>();
-		
+
 		@Override
 		public void sendChunk(EnderChunk chunk) {
 			cache.add(chunk);
@@ -129,7 +145,6 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 			return MAX_CHUNKS_EVERY_UPDATE;
 		}
 	};
-	private final RegionSet loadedChunks = new RegionSet();
 
 	public EnderPlayer(EnderWorld world, String userName, NetworkManager networkManager, UUID uuid, PlayerTextureStore textures) {
 		super(world.getSpawn().clone());
@@ -138,7 +153,6 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 		this.uuid = uuid;
 		this.textureValue = textures.getSkin().value;
 		this.textureSignature = textures.getSkin().signature;
-		EnderLogger.info(userName + " logged in with uuid " + uuid);
 	}
 
 	@Override
@@ -181,10 +195,8 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	public void switchWorld(EnderWorld toWorld) {
 		this.getNetworkManager().sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
 		EnderWorld currentWorld = this.getWorld();
-		EnderLogger.warn("Switching player " + this.getPlayerName() + " from world " + currentWorld.worldName + " to " + toWorld.worldName + ".");
-		if (currentWorld.players.contains(this)) {
-			currentWorld.players.remove(this);
-		}
+		boolean succes = currentWorld.players.remove(this);
+		assert succes;
 		toWorld.players.add(this);
 		this.getLocation().cloneFrom(toWorld.getSpawn());
 		this.loadedChunks.clear();
@@ -192,8 +204,9 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 		networkManager.player.getInventoryHandler().updateInventory();
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(toWorld.getSpawn().getX(), toWorld.getSpawn().getY(), toWorld.getSpawn().getZ(), 0F, 0F, (byte) 1));
 		this.onRespawn();
+		EnderLogger.info("Switched player " + this.getPlayerName() + " from world " + currentWorld.worldName + " to " + toWorld.worldName + ".");
 	}
-	
+
 	public ProfileProperty[] getProfileProperties() {
 		ProfileProperty[] list = new ProfileProperty[1];
 		list[0] = getTextureProperty();
@@ -202,6 +215,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 
 	@Override
 	public void onSpawn() {
+		EnderLogger.info(this.getPlayerName() + " logged in from " + networkManager.ctx.channel().remoteAddress().toString() + " with uuid " + uuid);
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_PICKAXE.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_SPADE.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 64, (short) 0));
@@ -286,7 +300,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 			for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 				for (String name : ep.visiblePlayers) {
 					if (name.equals(this.getPlayerName()) && !this.getPlayerName().equals(ep.getPlayerName())) {
-						ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[]{this.getEntityId()}));
+						ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));
 					}
 				}
 			}
@@ -316,35 +330,35 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 			this.networkManager.sendPacket(new PacketOutEntityDestroy(toDespawn.toArray(new Integer[0])));
 		}
 	}
-	
+
 	private int latestCheck = 0;
 	private final List<Entity> toRemove = new ArrayList<>();
-	
-	public void checkCollision(){
-		if(latestCheck++ % 3 == 0){
-			//check if item entities nearby
-			
-			for(Entity e : Main.getInstance().getWorld(this).entities){
-				if(e.getLocation().isInRange(2, this.getLocation(), true)){
+
+	public void checkCollision() {
+		if (latestCheck++ % 3 == 0) {
+			// check if item entities nearby
+
+			for (Entity e : Main.getInstance().getWorld(this).entities) {
+				if (e.getLocation().isInRange(2, this.getLocation(), true)) {
 					boolean remove = e.onCollision(this);
-					if(remove){
+					if (remove) {
 						toRemove.add(e);
 					}
 				}
 			}
-			for(Entity e : toRemove){
+			for (Entity e : toRemove) {
 				Main.getInstance().getWorld(this).removeEntity(e);
 				Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
 			}
 			toRemove.clear();
 		}
 	}
-	
-	private int moveUpdates = 0;	
-	
+
+	private int moveUpdates = 0;
+
 	@Override
 	public void broadcastLocation(Location newLocation) {
-		if(this.isDead()){
+		if (this.isDead()) {
 			return;
 		}
 		checkCollision();
@@ -381,10 +395,10 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 
 	@Override
 	public void broadcastRotation(float pitch, float yaw) {
-		if(isDead()){
+		if (isDead()) {
 			return;
 		}
-		
+
 		Iterator<String> players = this.visiblePlayers.iterator();
 
 		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F), (byte) Utill.calcYaw(pitch * 256.0F / 360.0F), false);
@@ -407,11 +421,12 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	public void playSound(String soundName, float volume, byte pitch) {
 		networkManager.sendPacket(new PacketOutSoundEffect(soundName, getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), volume, pitch));
 	}
-	
-	public void debug(String message, PlayerDebugger level)
-	{
-		if(level == null) level = PlayerDebugger.OTHER;
-		if(debugOutputs.contains(level)) sendRawMessage(new SimpleMessage(message));
+
+	public void debug(String message, PlayerDebugger level) {
+		if (level == null)
+			level = PlayerDebugger.OTHER;
+		if (debugOutputs.contains(level))
+			sendRawMessage(new SimpleMessage(message));
 	}
 
 	@Override
@@ -438,10 +453,11 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 		return false;
 	}
 
-	public void onRespawn() { //this will also be called when a player switches world
+	public void onRespawn() { // this will also be called when a player switches
+								// world
 		this.updateAbilities();
 		this.networkManager.sendPacket(new PacketOutChangeGameState((byte) 3, this.clientSettings.gameMode.getId()));
-		//TODO send player equipment
+		// TODO send player equipment
 	}
 
 	@Override
@@ -554,10 +570,10 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	protected float getBaseMaxHealth() {
 		return 20;
 	}
-	
-	public boolean hasPermission(String permission){
-		for(Operator operator : Main.getInstance().operators){
-			if(operator.getUUID().equals(this.uuid)){
+
+	public boolean hasPermission(String permission) {
+		for (Operator operator : Main.getInstance().operators) {
+			if (operator.getUUID().equals(this.uuid)) {
 				return true;
 			}
 		}
@@ -584,7 +600,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 		}
 		this.isOnGround = onGround;
 	}
-	
+
 	public void sendBlockUpdate(Location loc, short blockId, byte dataValue) {
 		this.getNetworkManager().sendPacket(new PacketOutBlockChange(loc, blockId, dataValue));
 	}
@@ -602,16 +618,16 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	public int getFood() {
 		return this.clientSettings.food;
 	}
-	
-	public void setFood(int foodLevel){
-		if(foodLevel < 0 || foodLevel > 20){
+
+	public void setFood(int foodLevel) {
+		if (foodLevel < 0 || foodLevel > 20) {
 			throw new IllegalArgumentException(foodLevel + " is not a valid food level value");
 		}
 		this.clientSettings.food = (short) foodLevel;
 		this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(getHealth(), this.clientSettings.food, 0));
 	}
-	
-	public EnderWorld getWorld(){
+
+	public EnderWorld getWorld() {
 		return Main.getInstance().getWorld(this);
 	}
 
@@ -624,15 +640,15 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	public void kick(String reason) {
 		this.getNetworkManager().disconnect(new SimpleMessage(reason), false);
 	}
-	
+
 	/**
 	 * @return the inventoryHandler
 	 */
 	public InventoryHandler getInventoryHandler() {
 		return inventoryHandler;
 	}
-	
-	public void updateAbilities(){
+
+	public void updateAbilities() {
 		int i = 0;
 		if (this.clientSettings.isCreative)
 			i = (byte) (i | 0x1);
@@ -642,21 +658,20 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 			i = (byte) (i | 0x4);
 		if (this.clientSettings.godMode)
 			i = (byte) (i | 0x8);
-		
+
 		float fly = this.clientSettings.flySpeed;
 		float walk = this.clientSettings.walkSpeed;
 		this.networkManager.sendPacket(new PacketOutPlayerAbilities((byte) i, fly, walk));
 	}
-	
-	public enum PlayerDebugger
-	{
-		INVENTORY, PACKET, OTHER, 
+
+	public enum PlayerDebugger {
+		INVENTORY, PACKET, OTHER,
 	}
 
 	public RegionSet getLoadedChunks() {
 		return this.loadedChunks;
 	}
-	
+
 	@Override
 	public void sendMessage(Message message, ChatPosition position) {
 		this.getNetworkManager().sendPacket(new PacketOutChatMessage(message, (byte) position.getId()));
@@ -724,19 +739,26 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 
 	@Override
 	public int getExperienceLevel() {
-		return this.clientSettings.experience; //TODO convert this to a level
+		return this.clientSettings.experience; // TODO convert this to a level
 	}
 
 	@Override
 	public void setExperience(int experience) {
 		this.clientSettings.experience = experience;
-		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); //TODO calculate this correctly
+		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO
+																																		// calculate
+																																		// this
+																																		// correctly
 	}
 
 	@Override
 	public void setExperienceLevel(int experienceLevel) {
-		this.clientSettings.experience = experienceLevel;  //TODO convert this to a level
-		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); //TODO calculate this correctly
+		this.clientSettings.experience = experienceLevel; // TODO convert this
+															// to a level
+		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO
+																																		// calculate
+																																		// this
+																																		// correctly
 	}
 
 	@Override
@@ -758,7 +780,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	public void setSneaking(boolean sneaking) {
 		clientSettings.isSneaking = sneaking;
 		this.updateDataWatcher();
-		//TODO broadcast the new setting
+		// TODO broadcast the new setting
 	}
 
 	@Override
@@ -778,7 +800,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 
 	@Override
 	public String getDisplayName() {
-		if(clientSettings.displayName == null){
+		if (clientSettings.displayName == null) {
 			clientSettings.displayName = getPlayerName();
 		}
 		return clientSettings.displayName;
@@ -791,18 +813,18 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 
 	@Override
 	public void closeInventory() {
-		this.inventoryHandler.getPlayerInventory().close(); //TODO test this
+		this.inventoryHandler.getPlayerInventory().close(); // TODO test this
 	}
 
 	@Override
 	public GameMode getGameMode() {
 		return this.clientSettings.gameMode;
 	}
-	
+
 	public void setGameMode(GameMode mode) {
 		this.clientSettings.gameMode = mode;
-		byte reason = 3; //gamemode change
-		int value = mode.getId(); //gamemode id
+		byte reason = 3; // gamemode change
+		int value = mode.getId(); // gamemode id
 		this.networkManager.sendPacket(new PacketOutChangeGameState(reason, value));
 	}
 
