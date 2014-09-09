@@ -19,16 +19,24 @@ package org.enderstone.server.regions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import org.enderstone.server.EnderLogger;
-import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Block;
+import org.enderstone.server.api.Chunk;
+import org.enderstone.server.api.Location;
+import org.enderstone.server.api.World;
+import org.enderstone.server.api.entity.Entity;
+import org.enderstone.server.api.entity.Item;
+import org.enderstone.server.api.entity.Mob;
+import org.enderstone.server.api.entity.Player;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.entity.Entity;
 import org.enderstone.server.entity.EntityItem;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
@@ -37,11 +45,7 @@ import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.regions.generators.MultiChunkBlockPopulator;
 import org.enderstone.server.util.IntegerArrayComparator;
 
-/**
- *
- * @author Fernando
- */
-public class EnderWorld {
+public class EnderWorld implements World{
 
 	private Long seed = null;
 	private final RegionSet loadedChunks = new RegionSet();
@@ -49,7 +53,7 @@ public class EnderWorld {
 	private final Random random = new Random();
 	private long time = random.nextInt();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
-	public final Set<Entity> entities = new HashSet<>();
+	public final Set<EnderEntity> entities = new HashSet<>();
 	public final Set<EnderPlayer> players = new HashSet<>();
 	private Location spawnLocation;
 	public final String worldName;
@@ -239,13 +243,6 @@ public class EnderWorld {
 			}
 		}
 	}
-	
-	public Entity dropItem(ItemStack item, EnderWorld world, Location loc, int noPickupDelay)
-	{
-		Entity entity;
-		this.addEntity(entity = new EntityItem(world, loc.clone(), item, noPickupDelay));
-		return entity;
-	}
 
 	public long getSeed() {
 		if (seed == null) {
@@ -281,11 +278,11 @@ public class EnderWorld {
 		}
 	}
 
-	public void addEntity(Entity e) {
+	public void addEntity(EnderEntity e) {
 		this.entities.add(e);
 	}
 	
-	public void removeEntity(Entity e){
+	public void removeEntity(EnderEntity e){
 		if(this.entities.contains(e)){
 			this.entities.remove(e);
 			this.broadcastPacket(new PacketOutEntityDestroy(new Integer[] {e.getEntityId()}), e.getLocation());
@@ -293,7 +290,7 @@ public class EnderWorld {
 	}
 
 	public void updateEntities(Set<EnderPlayer> onlinePlayers) {
-		for (Entity e : this.entities) {
+		for (EnderEntity e : this.entities) {
 			e.updatePlayers(onlinePlayers);
 		}
 	}
@@ -309,9 +306,8 @@ public class EnderWorld {
 		return this.spawnLocation;
 	}
 
-	public void serverTick()
-	{
-		for(Entity e : this.entities){
+	public void serverTick() {
+		for (EnderEntity e : this.entities) {
 			e.serverTick();
 		}
 		this.time += 1;
@@ -323,5 +319,63 @@ public class EnderWorld {
 				ep.getNetworkManager().sendPacket(packet);
 			}
 		}
+	}
+
+	@Override
+	public Collection<? extends Chunk> getLoadedChunks() {
+		return this.loadedChunks;
+	}
+
+	@Override
+	public Item dropItem(Location location, ItemStack itemStack, int noPickupDelay) {
+		EnderEntity entity;
+		this.addEntity(entity = new EntityItem(this, location.clone(), itemStack, noPickupDelay));
+		return (Item) entity;
+	}
+
+	@Override
+	public void strikeLightning(Location location) {
+		// TODO Auto-generated method stub	
+	}
+
+	@Override
+	public Collection<? extends Entity> getEntities() {
+		return this.entities;
+	}
+
+	@Override
+	public Collection<? extends Player> getPlayers() {
+		return this.players;
+	}
+
+	@Override
+	public Collection<? extends Mob> getMobs() {
+		List<Mob> mobs = new ArrayList<>();
+		for(Entity e : this.getEntities()){
+			if(e instanceof Mob){
+				mobs.add((Mob) e);
+			}
+		}
+		return mobs;
+	}
+
+	@Override
+	public String getName() {
+		return this.worldName;
+	}
+
+	@Override
+	public Block getBlock(Location location) {
+		return this.getBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+	}
+
+	@Override
+	public Chunk getChunkAt(int x, int z) {
+		return getOrCreateChunk(x, z);
+	}
+	
+	@Override
+	public void playSound(Location location, String soundName, float volume, int pitch) {
+		this.broadcastPacket(new PacketOutSoundEffect(soundName, location.getBlockX(), location.getBlockY(), location.getBlockZ(), volume, (byte) pitch), location);
 	}
 }

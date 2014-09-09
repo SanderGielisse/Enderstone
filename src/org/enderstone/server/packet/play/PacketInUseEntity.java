@@ -20,7 +20,7 @@ package org.enderstone.server.packet.play;
 import java.io.IOException;
 import org.enderstone.server.Main;
 import org.enderstone.server.chat.SimpleMessage;
-import org.enderstone.server.entity.Entity;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
@@ -66,7 +66,7 @@ public class PacketInUseEntity extends Packet {
 			@Override
 			public void run() {				
 				if (mouseClick == 1) { // left click
-					Entity e = Main.getInstance().getEntityById(targetId);
+					EnderEntity e = Main.getInstance().getEntityById(targetId);
 					if (e == null) {
 						networkManager.sendPacket(new PacketOutPlayerDisconnect(new SimpleMessage("Invalid target id, probably a server bug, please report!")));
 						return;
@@ -76,7 +76,7 @@ public class PacketInUseEntity extends Packet {
 					}
 					e.onLeftClick(networkManager.player);
 				} else if (mouseClick == 0) { // right click
-					Entity e = Main.getInstance().getEntityById(targetId);
+					EnderEntity e = Main.getInstance().getEntityById(targetId);
 					if (e == null) {
 						networkManager.sendPacket(new PacketOutPlayerDisconnect(new SimpleMessage("Invalid target id, probably a server bug, please report!")));
 						return;

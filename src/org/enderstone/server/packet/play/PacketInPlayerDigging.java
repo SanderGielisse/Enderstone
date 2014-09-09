@@ -18,8 +18,8 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
-import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Location;
 import org.enderstone.server.entity.EntityItem;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;

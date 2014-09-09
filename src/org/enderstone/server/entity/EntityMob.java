@@ -20,9 +20,9 @@ package org.enderstone.server.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
+import org.enderstone.server.api.Location;
 import org.enderstone.server.entity.drops.EntityDrop;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
@@ -34,7 +34,7 @@ import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutSpawnMob;
 import org.enderstone.server.regions.EnderWorld;
 
-public class EntityMob extends Entity {
+public class EntityMob extends EnderEntity {
 
 	private byte appearanceId;
 	private EnderWorld world;
@@ -69,7 +69,7 @@ public class EntityMob extends Entity {
 	}
 
 	@Override
-	public void teleport(Entity entity) {
+	public void teleport(EnderEntity entity) {
 		teleport(entity.getLocation());
 	}
 

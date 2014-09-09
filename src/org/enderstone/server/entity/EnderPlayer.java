@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.enderstone.server.EnderLogger;
-import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
 import org.enderstone.server.api.ChatPosition;
 import org.enderstone.server.api.GameMode;
+import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.chat.ChatColor;
@@ -73,7 +73,7 @@ import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 import org.enderstone.server.regions.RegionSet;
 
-public class EnderPlayer extends Entity implements CommandSender, Player {
+public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	private static final int MAX_CHUNKS_EVERY_UPDATE = 16;
 
@@ -87,7 +87,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 
 	public final String playerName;
 	public final HashSet<String> visiblePlayers = new HashSet<>();
-	public final HashSet<Entity> canSeeEntity = new HashSet<>();
+	public final HashSet<EnderEntity> canSeeEntity = new HashSet<>();
 	public final UUID uuid;
 	private final String textureValue;
 	private final String textureSignature;
@@ -334,13 +334,13 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	}
 
 	private int latestCheck = 0;
-	private final List<Entity> toRemove = new ArrayList<>();
+	private final List<EnderEntity> toRemove = new ArrayList<>();
 
 	public void checkCollision() {
 		if (latestCheck++ % 3 == 0) {
 			// check if item entities nearby
 
-			for (Entity e : Main.getInstance().getWorld(this).entities) {
+			for (EnderEntity e : Main.getInstance().getWorld(this).entities) {
 				if (e.getLocation().isInRange(2, this.getLocation(), true)) {
 					boolean remove = e.onCollision(this);
 					if (remove) {
@@ -348,7 +348,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 					}
 				}
 			}
-			for (Entity e : toRemove) {
+			for (EnderEntity e : toRemove) {
 				Main.getInstance().getWorld(this).removeEntity(e);
 				Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
 			}
@@ -464,7 +464,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	}
 
 	@Override
-	public void teleport(Entity entity) {
+	public void teleport(EnderEntity entity) {
 		this.teleport(entity.getLocation());
 	}
 
@@ -562,7 +562,7 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 		for (ItemStack inv : this.getInventoryHandler().getPlayerInventory().getRawItems()) {
 			if (inv != null) {
 				EnderWorld world = Main.getInstance().getWorld(this);
-				world.dropItem(inv, world, getLocation(), 1);
+				world.dropItem(getLocation(), inv, 1);
 			}
 		}
 		Collections.fill(this.getInventoryHandler().getPlayerInventory().getRawItems(), null);
@@ -762,20 +762,14 @@ public class EnderPlayer extends Entity implements CommandSender, Player {
 	@Override
 	public void setExperience(int experience) {
 		this.clientSettings.experience = experience;
-		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO
-																																		// calculate
-																																		// this
-																																		// correctly
+		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO calculate this correctly
 	}
 
 	@Override
 	public void setExperienceLevel(int experienceLevel) {
 		this.clientSettings.experience = experienceLevel; // TODO convert this
 															// to a level
-		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO
-																																		// calculate
-																																		// this
-																																		// correctly
+		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO calculate this correctly
 	}
 
 	@Override

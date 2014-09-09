@@ -17,12 +17,12 @@
  */
 package org.enderstone.server.api.entity;
 
-import org.enderstone.server.Location;
 import org.enderstone.server.api.ChatPosition;
 import org.enderstone.server.api.GameMode;
+import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
 import org.enderstone.server.chat.Message;
-import org.enderstone.server.entity.Entity;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.regions.BlockId;
@@ -48,7 +48,7 @@ public interface Player {
 	
 	public void teleport(Location loc);
 	
-	public void teleport(Entity e);
+	public void teleport(EnderEntity e);
 	
 	public void kick(String reason);
 	
