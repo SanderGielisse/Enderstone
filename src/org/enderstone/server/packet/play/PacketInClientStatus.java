@@ -19,7 +19,7 @@ package org.enderstone.server.packet.play;
 
 import java.io.IOException;
 import org.enderstone.server.Main;
-import org.enderstone.server.entity.GameMode;
+import org.enderstone.server.api.entity.GameMode;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
@@ -51,6 +51,7 @@ public class PacketInClientStatus extends Packet {
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
 		if (getActionId() == 0 && networkManager.player.isDead()) {
+			//respawn
 			networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
 			Main.getInstance().sendToMainThread(new Runnable() {
 
@@ -59,6 +60,7 @@ public class PacketInClientStatus extends Packet {
 					networkManager.player.teleport(networkManager.player.getWorld().getSpawn());
 					networkManager.player.getInventoryHandler().updateInventory();
 					networkManager.player.heal();
+					networkManager.player.onRespawn();
 				}
 			});
 		}

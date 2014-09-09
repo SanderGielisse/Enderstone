@@ -64,11 +64,11 @@ public class PacketInClientSettings extends Packet {
 			public void run() {
 				EnderPlayer player;
 				if((player=networkManager.player) == null) return;
-				player.clientSettings.setChatColors(chatColors);
-				player.clientSettings.setChatFlags(chatFlags);
-				player.clientSettings.setLocale(locale);
-				player.clientSettings.setRenderDistance(renderDistance);
-				player.clientSettings.setDisplayedSkinParts(displayedSkinParts);
+				player.clientSettings.chatColors = chatColors;
+				player.clientSettings.chatFlags = chatFlags;
+				player.clientSettings.locale = locale;
+				player.clientSettings.renderDistance = renderDistance;
+				player.clientSettings.displayedSkinParts = displayedSkinParts;
 			}
 		});
 	}

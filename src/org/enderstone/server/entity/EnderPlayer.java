@@ -29,6 +29,9 @@ import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
+import org.enderstone.server.api.entity.ChatPosition;
+import org.enderstone.server.api.entity.GameMode;
+import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.chat.ChatColor;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.chat.SimpleMessage;
@@ -40,6 +43,7 @@ import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
 import org.enderstone.server.packet.play.PacketOutBlockChange;
+import org.enderstone.server.packet.play.PacketOutChangeGameState;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
 import org.enderstone.server.packet.play.PacketOutChunkData;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
@@ -47,13 +51,15 @@ import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
+import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerListHeaderFooter;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
-import org.enderstone.server.packet.play.PacketOutRespawn;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.Action;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionAddPlayer;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionRemovePlayer;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
+import org.enderstone.server.packet.play.PacketOutRespawn;
+import org.enderstone.server.packet.play.PacketOutSetExperience;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
 import org.enderstone.server.packet.play.PacketOutTabComplete;
@@ -65,12 +71,12 @@ import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.EnderWorld.ChunkInformer;
 import org.enderstone.server.regions.RegionSet;
 
-public class EnderPlayer extends Entity implements CommandSender {
+public class EnderPlayer extends Entity implements CommandSender, Player {
 
 	private static final int MAX_CHUNKS_EVERY_UPDATE = 16;
 
 	private final InventoryHandler inventoryHandler = new InventoryHandler(this);
-	public final ClientSettings clientSettings = new ClientSettings();
+	public final PlayerSettings clientSettings = new PlayerSettings();
 	public final NetworkManager networkManager;
 	public final String playerName;
 	public HashSet<String> visiblePlayers = new HashSet<>();
@@ -81,21 +87,9 @@ public class EnderPlayer extends Entity implements CommandSender {
 	 */
 	public int waitingForValidMoveAfterTeleport = 0;
 	public final UUID uuid;
-	public volatile boolean isOnline = true;
-	public boolean isCreative = false;
-	public boolean godMode = false;
-	public boolean canFly = false;
-	public boolean isFlying = false;
-	public boolean isOnFire = false;
-	public boolean isSneaking = false;
-	public boolean isSprinting = false;
-	public boolean isEating = false;
-	private boolean isInvisible = false;
-
+	public volatile boolean isOnline = true;	
 	public volatile boolean isOnGround = true;
 	public double yLocation;
-	public short food = 20;
-	public float foodSaturation = 0;
 	
 	private final String textureValue;
 	private final String textureSignature;
@@ -188,13 +182,16 @@ public class EnderPlayer extends Entity implements CommandSender {
 		this.getNetworkManager().sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) GameMode.SURVIVAL.getId(), "default"));
 		EnderWorld currentWorld = this.getWorld();
 		EnderLogger.warn("Switching player " + this.getPlayerName() + " from world " + currentWorld.worldName + " to " + toWorld.worldName + ".");
-		assert currentWorld.players.remove(this);
+		if (currentWorld.players.contains(this)) {
+			currentWorld.players.remove(this);
+		}
 		toWorld.players.add(this);
 		this.getLocation().cloneFrom(toWorld.getSpawn());
 		this.loadedChunks.clear();
 		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 3);
 		networkManager.player.getInventoryHandler().updateInventory();
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(toWorld.getSpawn().getX(), toWorld.getSpawn().getY(), toWorld.getSpawn().getZ(), 0F, 0F, (byte) 1));
+		this.onRespawn();
 	}
 	
 	public ProfileProperty[] getProfileProperties() {
@@ -225,15 +222,15 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public void updateDataWatcher() {
 		int meaning = 0;
 
-		if (isOnFire)
+		if (this.clientSettings.isOnFire)
 			meaning = (byte) (meaning | 0x01);
-		if (isSneaking)
+		if (this.clientSettings.isSneaking)
 			meaning = (byte) (meaning | 0x02);
-		if (isSprinting)
+		if (this.clientSettings.isSprinting)
 			meaning = (byte) (meaning | 0x08);
-		if (isEating)
+		if (this.clientSettings.isEating)
 			meaning = (byte) (meaning | 0x10);
-		if (isInvisible)
+		if (this.clientSettings.isInvisible)
 			meaning = (byte) (meaning | 0x20);
 
 		this.getDataWatcher().watch(0, (byte) meaning);
@@ -441,6 +438,12 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return false;
 	}
 
+	public void onRespawn() { //this will also be called when a player switches world
+		this.updateAbilities();
+		this.networkManager.sendPacket(new PacketOutChangeGameState((byte) 3, this.clientSettings.gameMode.getId()));
+		//TODO send player equipment
+	}
+
 	@Override
 	public String getName() {
 		return this.getPlayerName();
@@ -455,11 +458,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 	public void teleport(Location newLocation) {
 		this.waitingForValidMoveAfterTeleport = 1;
 		Location oldLocation = this.getLocation();
-		oldLocation.setX(newLocation.getX());
-		oldLocation.setY(newLocation.getY());
-		oldLocation.setZ(newLocation.getZ());
-		oldLocation.setPitch(newLocation.getPitch());
-		oldLocation.setYaw(newLocation.getYaw());
+		oldLocation.cloneFrom(newLocation);
 
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(newLocation.getX(), newLocation.getY(), newLocation.getZ(), newLocation.getYaw(), newLocation.getPitch(), (byte) 0b00000));
 
@@ -508,18 +507,18 @@ public class EnderPlayer extends Entity implements CommandSender {
 		if (damage <= 0) {
 			throw new IllegalArgumentException("Damage cannot be smaller or equal to zero.");
 		}
-		if (this.godMode)
+		if (this.clientSettings.godMode)
 			return;
 		super.damage(damage);
 	}
 
 	@Override
 	protected void onHealthUpdate(float health, float oldHealth) {
-		networkManager.sendPacket(new PacketOutUpdateHealth(health, food, foodSaturation));
+		networkManager.sendPacket(new PacketOutUpdateHealth(health, clientSettings.food, clientSettings.foodSaturation));
 		if (health > 0) {
 			return;
 		}
-		this.food = 20;
+		this.clientSettings.food = 20;
 		Packet packet = new PacketOutEntityDestroy(new Integer[] { this.getEntityId() });
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (ep.visiblePlayers.contains(this.getPlayerName())) {
@@ -567,7 +566,7 @@ public class EnderPlayer extends Entity implements CommandSender {
 
 	public void setOnGround(boolean onGround) {
 		if (this.isOnGround == false && onGround == true) {
-			if (this.canFly)
+			if (this.clientSettings.isFlying)
 				return; // Flying players don't get damage in vanilla
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
@@ -601,15 +600,15 @@ public class EnderPlayer extends Entity implements CommandSender {
 	}
 
 	public int getFood() {
-		return this.food;
+		return this.clientSettings.food;
 	}
 	
 	public void setFood(int foodLevel){
 		if(foodLevel < 0 || foodLevel > 20){
 			throw new IllegalArgumentException(foodLevel + " is not a valid food level value");
 		}
-		this.food = (short) foodLevel;
-		this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(getHealth(), food, 0));
+		this.clientSettings.food = (short) foodLevel;
+		this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(getHealth(), this.clientSettings.food, 0));
 	}
 	
 	public EnderWorld getWorld(){
@@ -621,79 +620,199 @@ public class EnderPlayer extends Entity implements CommandSender {
 		return this.isOnline;
 	}
 
+	@Override
 	public void kick(String reason) {
 		this.getNetworkManager().disconnect(new SimpleMessage(reason), false);
 	}
-
+	
 	/**
 	 * @return the inventoryHandler
 	 */
 	public InventoryHandler getInventoryHandler() {
 		return inventoryHandler;
 	}
-
-	public RegionSet getLoadedChunks() {
-		return this.loadedChunks;
-	}
-
-	/**
-	 * Class used to store the client side settings from the user, the reason I
-	 * included setters and getters is that we can add a event or simulair to
-	 * the code later on
-	 *
-	 * @author ferrybig
-	 */
-	public final class ClientSettings {
-
-		private String locale = "en_US";
-		private byte renderDistance = 3;
-		private byte chatFlags = 0;
-		private boolean chatColors = true;
-		private int displayedSkinParts = 0;
-
-		public String getLocale() {
-			return locale;
-		}
-
-		public void setLocale(String locale) {
-			this.locale = locale;
-		}
-
-		public byte getRenderDistance() {
-			return renderDistance;
-		}
-
-		public void setRenderDistance(byte renderDistance) {
-			this.renderDistance = renderDistance;
-		}
-
-		public byte getChatFlags() {
-			return chatFlags;
-		}
-
-		public void setChatFlags(byte chatFlags) {
-			this.chatFlags = chatFlags;
-		}
-
-		public boolean isChatColors() {
-			return chatColors;
-		}
-
-		public void setChatColors(boolean chatColors) {
-			this.chatColors = chatColors;
-		}
-
-		public int getDisplayedSkinParts() {
-			return displayedSkinParts;
-		}
-
-		public void setDisplayedSkinParts(int displayedSkinParts) {
-			this.displayedSkinParts = displayedSkinParts;
-		}
+	
+	public void updateAbilities(){
+		int i = 0;
+		if (this.clientSettings.isCreative)
+			i = (byte) (i | 0x1);
+		if (this.clientSettings.isFlying)
+			i = (byte) (i | 0x2);
+		if (this.clientSettings.allowFlight)
+			i = (byte) (i | 0x4);
+		if (this.clientSettings.godMode)
+			i = (byte) (i | 0x8);
+		
+		float fly = this.clientSettings.flySpeed;
+		float walk = this.clientSettings.walkSpeed;
+		this.networkManager.sendPacket(new PacketOutPlayerAbilities((byte) i, fly, walk));
 	}
 	
 	public enum PlayerDebugger
 	{
 		INVENTORY, PACKET, OTHER, 
+	}
+
+	public RegionSet getLoadedChunks() {
+		return this.loadedChunks;
+	}
+	
+	@Override
+	public void sendMessage(Message message, ChatPosition position) {
+		this.getNetworkManager().sendPacket(new PacketOutChatMessage(message, (byte) position.getId()));
+	}
+
+	@Override
+	public int getFoodLevel() {
+		return clientSettings.food;
+	}
+
+	@Override
+	public void setFoodLevel(int foodLevel) {
+		this.clientSettings.food = foodLevel;
+		this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(this.getHealth(), this.clientSettings.food, this.clientSettings.foodSaturation));
+	}
+
+	@Override
+	public boolean getAllowFlight() {
+		return this.clientSettings.allowFlight;
+	}
+
+	@Override
+	public void setAllowFlight(boolean allowFlight) {
+		this.clientSettings.allowFlight = allowFlight;
+		this.updateAbilities();
+	}
+
+	@Override
+	public boolean isFlying() {
+		return this.clientSettings.isFlying;
+	}
+
+	@Override
+	public void setFlying(boolean flying) {
+		this.clientSettings.isFlying = flying;
+		this.updateAbilities();
+	}
+
+	@Override
+	public float getFlySpeed() {
+		return this.clientSettings.flySpeed;
+	}
+
+	@Override
+	public void setFlySpeed(float speed) {
+		this.clientSettings.flySpeed = speed;
+		this.updateAbilities();
+	}
+
+	@Override
+	public float getWalkSpeed() {
+		return this.clientSettings.walkSpeed;
+	}
+
+	@Override
+	public void setWalkSpeed(float speed) {
+		this.clientSettings.walkSpeed = speed;
+		this.updateAbilities();
+	}
+
+	@Override
+	public int getExperience() {
+		return this.clientSettings.experience;
+	}
+
+	@Override
+	public int getExperienceLevel() {
+		return this.clientSettings.experience; //TODO convert this to a level
+	}
+
+	@Override
+	public void setExperience(int experience) {
+		this.clientSettings.experience = experience;
+		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); //TODO calculate this correctly
+	}
+
+	@Override
+	public void setExperienceLevel(int experienceLevel) {
+		this.clientSettings.experience = experienceLevel;  //TODO convert this to a level
+		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); //TODO calculate this correctly
+	}
+
+	@Override
+	public boolean canSprint() {
+		return this.clientSettings.food <= 3;
+	}
+
+	@Override
+	public boolean isOnGround() {
+		return this.isOnGround;
+	}
+
+	@Override
+	public boolean isSneaking() {
+		return clientSettings.isSneaking;
+	}
+
+	@Override
+	public void setSneaking(boolean sneaking) {
+		clientSettings.isSneaking = sneaking;
+		this.updateDataWatcher();
+		//TODO broadcast the new setting
+	}
+
+	@Override
+	public void playSound(String soundName, int volume, int pitch) {
+		this.networkManager.sendPacket(new PacketOutSoundEffect(soundName, getLocation().getBlockX(), getLocation().getBlockY(), getLocation().getBlockZ(), pitch, (byte) volume));
+	}
+
+	@Override
+	public void playParticle(String particleName, Location location) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void sendBlockUpdate(Location loc, BlockId blockId, byte dataValue) {
+		this.networkManager.sendPacket(new PacketOutBlockChange(loc, blockId, dataValue));
+	}
+
+	@Override
+	public String getDisplayName() {
+		if(clientSettings.displayName == null){
+			clientSettings.displayName = getPlayerName();
+		}
+		return clientSettings.displayName;
+	}
+
+	@Override
+	public void setDisplayName(String displayName) {
+		clientSettings.displayName = displayName;
+	}
+
+	@Override
+	public void closeInventory() {
+		this.inventoryHandler.getPlayerInventory().close(); //TODO test this
+	}
+
+	@Override
+	public GameMode getGameMode() {
+		return this.clientSettings.gameMode;
+	}
+	
+	public void setGameMode(GameMode mode) {
+		this.clientSettings.gameMode = mode;
+		byte reason = 3; //gamemode change
+		int value = mode.getId(); //gamemode id
+		this.networkManager.sendPacket(new PacketOutChangeGameState(reason, value));
+	}
+
+	@Override
+	public InventoryHandler getInventory() {
+		return this.getInventoryHandler();
+	}
+
+	@Override
+	public ItemStack getItemInHand() {
+		return this.getInventoryHandler().getItemInHand();
 	}
 }

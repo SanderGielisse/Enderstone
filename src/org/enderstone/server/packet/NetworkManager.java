@@ -42,10 +42,10 @@ import javax.crypto.spec.IvParameterSpec;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Location;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.entity.GameMode;
 import org.enderstone.server.chat.Message;
 import org.enderstone.server.chat.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.entity.GameMode;
 import org.enderstone.server.entity.PlayerTextureStore;
 import org.enderstone.server.packet.codec.DiscardingReader;
 import org.enderstone.server.packet.codec.MinecraftCompressionCodex;
@@ -247,21 +247,10 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						world.doChunkUpdatesForPlayer(player, player.chunkInformer, 1);
 						player.teleport(world.getSpawn());
 						player.onSpawn();
+						player.onRespawn();
 						sendPacket(new PacketOutSpawnPosition(spawn));
-
-						int i = 0;
-						if (player.isCreative)
-							i = (byte) (i | 0x1);
-						if (player.isFlying)
-							i = (byte) (i | 0x2);
-						if (player.canFly)
-							i = (byte) (i | 0x4);
-						if (player.godMode)
-							i = (byte) (i | 0x8);
-
-						sendPacket(new PacketOutPlayerAbilities((byte) i, 0.1F, 0.1F));
 						sendPacket(new PacketOutPlayerPositionLook(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), (byte) 0b00000));
-						sendPacket(new PacketOutUpdateHealth(player.getHealth(), player.food, player.foodSaturation));
+						sendPacket(new PacketOutUpdateHealth(player.getHealth(), player.clientSettings.food, player.clientSettings.foodSaturation));
 					} catch (Exception e) {
 						EnderLogger.exception(e);
 					} finally {
