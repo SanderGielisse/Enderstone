@@ -144,4 +144,12 @@ public class Location implements Cloneable {
 		this.yaw = spawn.yaw;
 		this.pitch = spawn.pitch;
 	}
+	
+	public int getChunkX() {
+		return (getBlockX() >> 4);
+	}
+
+	public int getChunkZ() {
+		return (getBlockX() >> 4);
+	}
 }

@@ -21,10 +21,6 @@ import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
 
-/**
- *
- * @author ferrybig
- */
 public interface Block {
 
 	public int getX();

@@ -17,6 +17,26 @@
  */
 package org.enderstone.server.api.entity;
 
+import org.enderstone.server.api.Location;
+import org.enderstone.server.entity.EnderEntity;
+import org.enderstone.server.regions.EnderWorld;
+
 public interface Entity {
+
+	public void teleport(Location loc);
+
+	public void teleport(EnderEntity e);
+
+	public Location getLocation();
+
+	public float getHealth();
+
+	public void setHealth(float health);
+
+	public float getMaxHealth();
+
+	public void setMaxHealth(float maxhealth);
+
+	public EnderWorld getWorld();
 
 }

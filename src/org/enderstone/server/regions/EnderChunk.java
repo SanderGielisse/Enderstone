@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Chunk;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.World;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.play.PacketOutBlockChange;
 
@@ -314,5 +316,20 @@ public class EnderChunk implements Chunk{
 		LOADED, LOADED_SAVE,
 		UNLOADED, UNLOADED_SAVE,
 		SAVING, GONE
+	}
+
+	@Override
+	public Block getBlockAt(int x, int y, int z) {
+		return new EnderBlock(x + (16 * this.x), y, z + (16 * this.z), this.world); //TODO test this
+	}
+
+	@Override
+	public Block getBlockAt(Location location) {
+		return this.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+	}
+
+	@Override
+	public World getWorld() {
+		return this.world;
 	}
 }

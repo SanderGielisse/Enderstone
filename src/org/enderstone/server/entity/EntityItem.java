@@ -153,6 +153,7 @@ public class EntityItem extends EnderEntity implements Item {
 			pickupDelay--;
 		}
 
+		//TODO rewrite this, not even close to working properly :p
 		if (gravityCheck++ % 20 == 0) {
 			Location loc = getLocation().clone();
 			loc.add(0, -1, 0);
@@ -170,5 +171,15 @@ public class EntityItem extends EnderEntity implements Item {
 				this.getLocation().setPitch(loc.getPitch());
 			}
 		}
+	}
+
+	@Override
+	public EnderWorld getWorld() {
+		return this.world;
+	}
+
+	@Override
+	public ItemStack getItemStack() {
+		return this.itemstack;
 	}
 }

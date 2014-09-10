@@ -19,4 +19,13 @@ package org.enderstone.server.api;
 
 public interface Chunk {
 
+	public Block getBlockAt(int x, int y, int z);
+
+	public Block getBlockAt(Location location);
+	
+	public int getX();
+	
+	public int getZ();
+	
+	public World getWorld();
 }

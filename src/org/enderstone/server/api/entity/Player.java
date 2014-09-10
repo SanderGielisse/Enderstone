@@ -34,21 +34,9 @@ public interface Player {
 	
 	public String getPlayerName();
 	
-	public float getHealth();
-	
-	public void setHealth(float health);
-	
-	public float getMaxHealth();
-	
-	public void setMaxHealth(float maxhealth);
-	
 	public int getFoodLevel();
 	
 	public void setFoodLevel(int foodLevel);
-	
-	public void teleport(Location loc);
-	
-	public void teleport(EnderEntity e);
 	
 	public void kick(String reason);
 	
@@ -87,8 +75,6 @@ public interface Player {
 	public void playSound(String soundName, int volume, int pitch);
 	
 	public void playParticle(Particle particle, Location location, float xOffset, float yOffset, float zOffset, float data, int amount);
-	
-	public EnderWorld getWorld();
 	
 	public void sendBlockUpdate(Location loc, BlockId blockId, byte dataValue);
 	

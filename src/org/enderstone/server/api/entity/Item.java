@@ -17,6 +17,10 @@
  */
 package org.enderstone.server.api.entity;
 
-public interface Item extends Entity{
+import org.enderstone.server.inventory.ItemStack;
 
+public interface Item extends Entity{
+	
+	public ItemStack getItemStack();
+	
 }

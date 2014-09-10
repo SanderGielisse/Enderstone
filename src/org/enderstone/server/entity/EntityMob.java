@@ -189,4 +189,9 @@ public class EntityMob extends EnderEntity {
 			}
 		}
 	}
+
+	@Override
+	public EnderWorld getWorld() {
+		return this.world;
+	}
 }
