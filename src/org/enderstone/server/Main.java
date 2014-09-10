@@ -43,7 +43,7 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
-import org.enderstone.server.chat.Message;
+import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.enderstone.DebugCommand;
 import org.enderstone.server.commands.enderstone.PingCommand;

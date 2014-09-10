@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.enderstone.server.chat.SimpleMessage;
+import org.enderstone.server.api.messages.SimpleMessage;
 
 /**
  *

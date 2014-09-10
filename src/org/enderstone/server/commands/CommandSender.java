@@ -17,7 +17,7 @@
  */
 package org.enderstone.server.commands;
 
-import org.enderstone.server.chat.Message;
+import org.enderstone.server.api.messages.Message;
 
 /**
  *

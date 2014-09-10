@@ -19,7 +19,7 @@
 package org.enderstone.server.inventory;
 
 import java.util.List;
-import org.enderstone.server.chat.SimpleMessage;
+import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.util.MergedList;
 

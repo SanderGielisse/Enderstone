@@ -19,11 +19,11 @@ package org.enderstone.server.commands.vanila;
 
 import java.util.List;
 import org.enderstone.server.Main;
-import org.enderstone.server.chat.AdvancedMessage;
-import org.enderstone.server.chat.ChatColor;
-import org.enderstone.server.chat.AdvancedMessagePart.ClickEventType;
-import org.enderstone.server.chat.AdvancedMessagePart.HoverEventType;
-import org.enderstone.server.chat.SimpleMessage;
+import org.enderstone.server.api.messages.AdvancedMessage;
+import org.enderstone.server.api.messages.ChatColor;
+import org.enderstone.server.api.messages.AdvancedMessagePart.ClickEventType;
+import org.enderstone.server.api.messages.AdvancedMessagePart.HoverEventType;
+import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;

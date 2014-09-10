@@ -19,7 +19,7 @@ package org.enderstone.server.commands.enderstone;
 
 import java.util.Arrays;
 import org.enderstone.server.Main;
-import org.enderstone.server.chat.SimpleMessage;
+import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;

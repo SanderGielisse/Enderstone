@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.enderstone.server.chat;
+package org.enderstone.server.api.messages;
 
 /**
  *

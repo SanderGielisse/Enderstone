@@ -15,49 +15,42 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.chat;
+package org.enderstone.server.api.messages;
 
-import org.json.JSONObject;
+public enum ChatColor {
 
-/**
- *
- * @author Fernando
- */
-public class SimpleMessage implements Message {
-
-	private final String text;
-	private final ThreadLocal<JSONObject> buildCache = new ThreadLocal<JSONObject>() {
-
-		@Override
-		protected JSONObject initialValue() {
-			return new JSONObject();
-		}
-	};
-
-	public SimpleMessage(String text) {
-		this.text = text;
-	}
-
-	@Override
-	public String toPlainText() {
-		return text;
-	}
-
-	@Override
-	public String toMessageJson() {
-		JSONObject json = buildCache.get();
-		json.put("text", text);
-		return json.toString();
-	}
-
-	@Override
-	public String toAsciiText() {
-		return toPlainText();
-	}
+	RESET("§r"),
 	
-	public AdvancedMessagePart color(ChatColor ... colors)
-	{
-		return new AdvancedMessage(text).combineColor(colors);
+	BOLD("§l"), 
+	STRIKETHROUGH("§m"),
+	UNDERLINE("§n"), 
+	ITALIC("§o"), 
+	
+	BLACK("§0"), 
+	DARK_BLUE("§1"),
+	DARK_GREEN("§2"), 
+	DARK_AQUA("§3"), 
+	DARK_RED("§4"), 
+	DARK_PURPLE("§5"), 
+	GOLD("§6"), 
+	GRAY("§7"),
+	DARK_GRAY("§8"),
+	BLUE("§9"),
+	GREEN("§a"), 
+	AQUA("§b"), 
+	RED("§c"), 
+	LIGHT_PURPLE("§d"), 
+	YELLOW("§e"), 
+	WHITE("§f");
+
+	private String data;
+
+	private ChatColor(String data) {
+		this.data = data;
 	}
 
+	@Override
+	public String toString() {
+		return data;
+	}
 }

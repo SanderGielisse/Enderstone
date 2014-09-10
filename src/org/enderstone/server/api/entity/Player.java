@@ -21,7 +21,7 @@ import org.enderstone.server.api.ChatPosition;
 import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
-import org.enderstone.server.chat.Message;
+import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.ItemStack;

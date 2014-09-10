@@ -19,7 +19,7 @@
 package org.enderstone.server.inventory;
 
 import java.util.List;
-import org.enderstone.server.chat.Message;
+import org.enderstone.server.api.messages.Message;
 
 /**
  *

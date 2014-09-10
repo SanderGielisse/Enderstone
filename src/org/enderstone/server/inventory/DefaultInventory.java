@@ -20,9 +20,9 @@ package org.enderstone.server.inventory;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.enderstone.server.chat.CachedMessage;
-import org.enderstone.server.chat.Message;
-import org.enderstone.server.chat.SimpleMessage;
+import org.enderstone.server.api.messages.CachedMessage;
+import org.enderstone.server.api.messages.Message;
+import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.util.FixedSizeList;
 
 public abstract class DefaultInventory implements Inventory {
