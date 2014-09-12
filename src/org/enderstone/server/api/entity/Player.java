@@ -93,4 +93,12 @@ public interface Player {
 	public ItemStack getItemInHand();
 
 	boolean hasPermission(String permission);
+	
+	public void awardAchievment(String name);
+	
+	public void updateStatistic(String name, int value);
+	
+	public void forceChat(String rawMessage);
+	
+	public boolean isInAir();
 }

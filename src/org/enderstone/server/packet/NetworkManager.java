@@ -53,7 +53,6 @@ import org.enderstone.server.packet.codec.MinecraftDecompressionCodex;
 import org.enderstone.server.packet.codec.MinecraftServerCodex;
 import org.enderstone.server.packet.login.PacketOutLoginSucces;
 import org.enderstone.server.packet.play.PacketOutJoinGame;
-import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSpawnPosition;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;

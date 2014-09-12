@@ -50,12 +50,14 @@ import org.enderstone.server.packet.play.PacketOutChunkData;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
+import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutPlayParticle;
 import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerListHeaderFooter;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
+import org.enderstone.server.packet.play.PacketOutStatistics;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.Action;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionAddPlayer;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionRemovePlayer;
@@ -84,6 +86,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public volatile boolean isOnline = true;
 	public int keepAliveID = 0;
+	private int entitySubId;
 
 	public final String playerName;
 	public final HashSet<String> visiblePlayers = new HashSet<>();
@@ -150,6 +153,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public EnderPlayer(EnderWorld world, String userName, NetworkManager networkManager, UUID uuid, PlayerTextureStore textures) {
 		super(world.getSpawn().clone());
+		this.entitySubId = super.getEntityId();
 		this.networkManager = networkManager;
 		this.playerName = userName;
 		this.uuid = uuid;
@@ -160,7 +164,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
+		int result = super.hashCode();
+		result = prime * result + entitySubId;
+		result = prime * result + ((textureSignature == null) ? 0 : textureSignature.hashCode());
+		result = prime * result + ((textureValue == null) ? 0 : textureValue.hashCode());
 		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
 		return result;
 	}
@@ -169,11 +176,23 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		EnderPlayer other = (EnderPlayer) obj;
+		if (entitySubId != other.entitySubId)
+			return false;
+		if (textureSignature == null) {
+			if (other.textureSignature != null)
+				return false;
+		} else if (!textureSignature.equals(other.textureSignature))
+			return false;
+		if (textureValue == null) {
+			if (other.textureValue != null)
+				return false;
+		} else if (!textureValue.equals(other.textureValue))
+			return false;
 		if (uuid == null) {
 			if (other.uuid != null)
 				return false;
@@ -292,7 +311,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public void onDisconnect() {
 		this.isOnline = false;
-		Main.getInstance().getWorld(this).players.remove(this);
+		if (Main.getInstance().getWorld(this).players.contains(this)) {
+			Main.getInstance().getWorld(this).players.remove(this);
+		}
 
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
 			p.getNetworkManager().sendPacket(new PacketOutPlayerListItem(new Action[] { new ActionRemovePlayer(this.uuid) }));
@@ -339,7 +360,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public void checkCollision() {
 		if (latestCheck++ % 3 == 0) {
 			// check if item entities nearby
-
 			for (EnderEntity e : Main.getInstance().getWorld(this).entities) {
 				if (e.getLocation().isInRange(2, this.getLocation(), true)) {
 					boolean remove = e.onCollision(this);
@@ -451,8 +471,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		return false;
 	}
 
-	public void onRespawn() { // this will also be called when a player switches
-								// world
+	public void onRespawn() { // this will also be called when a player switches world
 		this.updateAbilities();
 		this.networkManager.sendPacket(new PacketOutChangeGameState((byte) 3, this.clientSettings.gameMode.getId()));
 		// TODO send player equipment
@@ -471,8 +490,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public void teleport(Location newLocation) {
 		this.waitingForValidMoveAfterTeleport = 1;
-		Location oldLocation = this.getLocation();
-		oldLocation.cloneFrom(newLocation);
+		this.getLocation().cloneFrom(newLocation);
 
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(newLocation.getX(), newLocation.getY(), newLocation.getZ(), newLocation.getYaw(), newLocation.getPitch(), (byte) 0b00000));
 
@@ -791,7 +809,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public void setSneaking(boolean sneaking) {
 		clientSettings.isSneaking = sneaking;
 		this.updateDataWatcher();
-		// TODO broadcast the new setting
+		this.getWorld().broadcastPacket(new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher()), this.getLocation());
 	}
 
 	@Override
@@ -847,5 +865,25 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public ItemStack getItemInHand() {
 		return this.getInventoryHandler().getItemInHand();
+	}
+
+	@Override
+	public void awardAchievment(String name) {
+		this.getNetworkManager().sendPacket(new PacketOutStatistics(name, 1));
+	}
+
+	@Override
+	public void updateStatistic(String name, int value) {
+		this.getNetworkManager().sendPacket(new PacketOutStatistics(name, value));
+	}
+
+	@Override
+	public void forceChat(String rawMessage) {
+		this.onPlayerChat(rawMessage);
+	}
+
+	@Override
+	public boolean isInAir() {
+		return !isOnGround;
 	}
 }

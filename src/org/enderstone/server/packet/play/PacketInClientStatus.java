@@ -52,13 +52,13 @@ public class PacketInClientStatus extends Packet {
 	public void onRecieve(final NetworkManager networkManager) {
 		if (getActionId() == 0) {
 			//respawn
-			networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) networkManager.player.clientSettings.gameMode.getId(), "default"));
 			Main.getInstance().sendToMainThread(new Runnable() {
 
 				@Override
 				public void run() {
 					if (networkManager.player.isDead()) {
-						networkManager.player.teleport(networkManager.player.getWorld().getSpawn());
+						networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) networkManager.player.clientSettings.gameMode.getId(), "default"));
+						networkManager.player.teleport(networkManager.player.getWorld().getSpawn().clone());
 						networkManager.player.getInventoryHandler().updateInventory();
 						networkManager.player.heal();
 						networkManager.player.onRespawn();
