@@ -472,7 +472,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public void updateClientSettings() { // this will also be called when a player switches world
 		this.networkManager.sendPacket(new PacketOutChangeGameState((byte) 3, this.clientSettings.gameMode.getId()));
 		this.updateAbilities(); // do this after sending the gamemode
-		// TODO send player equipment
+		this.inventoryHandler.updateInventory();
 	}
 
 	@Override
