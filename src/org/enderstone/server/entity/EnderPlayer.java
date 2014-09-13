@@ -505,14 +505,16 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void serverTick() {
+		boolean didFoodUpdate = false;
 		if (!this.isDead() && latestFood++ % (30 * 20) == 0) { // TODO do this how it goes in default Minecraft
+			didFoodUpdate = true;
 			if ((this.getFood() - 1) >= 0) {
 				this.setFood((short) (this.getFood() - 1));
 			} else {
 				this.damage(1F);
 			}
 		}
-		if (!this.isDead() && latestHeal++ % (15 * 20) == 0) { // TODO do this how it goes in default Minecraft
+		if (!this.isDead() && latestHeal++ % (15 * 20) == 0 && !didFoodUpdate) { // TODO do this how it goes in default Minecraft
 			if ((this.getHealth() + 0.5F) <= this.getMaxHealth() && this.getFood() > 0) {
 				this.setHealth(this.getHealth() + 0.5F);
 			}
@@ -564,9 +566,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	protected void onHealthUpdate(float health, float oldHealth) {
 		networkManager.sendPacket(new PacketOutUpdateHealth(health, clientSettings.food, clientSettings.foodSaturation));
-		if (health > 0) {
+		if (health >= 0) {
 			return;
 		}
+		//player is dead
 		this.clientSettings.food = 20;
 		Packet packet = new PacketOutEntityDestroy(new Integer[] { this.getEntityId() });
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
