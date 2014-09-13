@@ -32,8 +32,7 @@ public class DefaultCraftingRecepies {
 
 	static {
 		List<SimpleRecipe>[] tmp = (List<SimpleRecipe>[]) new List<?>[3 * 3];
-		
-		
+
 		r(tmp, BlockId.BUTTON,
 				new BlockId[]{BlockId.STONE}
 		);
@@ -46,11 +45,13 @@ public class DefaultCraftingRecepies {
 				new BlockId[]{BlockId.GRASS, BlockId.DIRT},
 				new BlockId[]{BlockId.GRASS, BlockId.GRASS}
 		);
-		
-		
+		r(tmp, BlockId.DIAMOND, 9,
+				new BlockId[]{BlockId.DIAMOND_BLOCK}
+		);
+
 		List<CraftingListener> listener = new ArrayList<>();
 		for (final List<SimpleRecipe> r : tmp) {
-			if(r == null) continue;
+			if (r == null) continue;
 			final SimpleRecipe t = r.get(0);
 			listener.add(new CraftingListener() {
 
@@ -61,10 +62,9 @@ public class DefaultCraftingRecepies {
 
 				@Override
 				public ItemStack checkRecipe(List<ItemStack> items, int xSize, int zSize, boolean decreaseItems) {
-					for(SimpleRecipe recipe : r)
-					{
+					for (SimpleRecipe recipe : r) {
 						ItemStack result = recipe.checkRecipe(items, xSize, zSize, decreaseItems);
-						if(result != null) return result;
+						if (result != null) return result;
 					}
 					return null;
 				}
@@ -82,7 +82,17 @@ public class DefaultCraftingRecepies {
 		rr.add(r);
 	}
 
+	private static void r(List<SimpleRecipe>[] tmp, BlockId result, int amount, BlockId[] ... items)
+	{
+		r(tmp, new ItemStack(result, (byte) amount), items);
+	}
+
 	private static void r(List<SimpleRecipe>[] tmp, BlockId result, BlockId[] ... items)
+	{
+		r(tmp, result, 1, items);
+	}
+
+	private static void r(List<SimpleRecipe>[] tmp, ItemStack result, BlockId[] ... items)
 	{
 		ItemStack[][] items1 = new ItemStack[items.length][];
 		for (int i = 0; i < items.length; i++) {
@@ -91,6 +101,6 @@ public class DefaultCraftingRecepies {
 				items1[i][j] = new ItemStack(items[i][j]);
 			}
 		}
-		r(tmp, new ItemStack(result), items1);
+		r(tmp, result, items1);
 	}
 }
