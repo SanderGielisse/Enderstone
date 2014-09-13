@@ -33,10 +33,9 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 	private final int startScanSlot;
 	private final int endScanSlot;
 	private final List<ItemStack> cache;
-	private final CraftingListener[] listeners;
-	private CraftingListener lastListener;
+	private final List<CraftingListener> listeners;
 
-	public CraftingInventoryListener(int xSize, int zSize, int outputSlot, int startScanSlot, CraftingListener... listeners) {
+	public CraftingInventoryListener(int xSize, int zSize, int outputSlot, int startScanSlot, List<CraftingListener> listeners) {
 		this.xSize = xSize;
 		this.zSize = zSize;
 		this.outputSlot = outputSlot;
