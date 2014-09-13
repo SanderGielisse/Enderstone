@@ -22,11 +22,12 @@ package org.enderstone.server.inventory;
  *
  * @author Fernando
  */
-public interface Inventory extends AutoCloseable, HalfInventory {
+public interface InventoryListener {
 
-	public void addListener(InventoryListener listener);
-	
-	public void removeListener(InventoryListener listener);
+	public void onSlotChange(Inventory inv, int slot, ItemStack oldStack, ItemStack newStack);
 
-	
+	public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue);
+
+	public void closeInventory(Inventory inv);
+    
 }

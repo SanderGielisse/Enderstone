@@ -18,27 +18,30 @@
 package org.enderstone.server.inventory;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.enderstone.server.api.messages.CachedMessage;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.util.FixedSizeList;
+import org.enderstone.server.util.MergedList;
 
-public abstract class DefaultInventory implements Inventory {
+public abstract class DefaultHalfInventory implements HalfInventory {
 
 	protected final int size;
 	protected final InventoryType type;
 	protected final List<ItemStack> items;
-	private final List<InventoryListener> listeners;
 	protected final CachedMessage inventoryTitle;
-	private boolean closed = false;
+	private final List<HalfInventoryListener> listeners;
+	private boolean closed;
 
-	protected DefaultInventory(InventoryType type, final int size, InventoryListener... listeners) {
+	protected DefaultHalfInventory(InventoryType type, final int size, HalfInventoryListener... listeners) {
 		this(type, size, new SimpleMessage(type.toString()), listeners);
 	}
 
-	protected DefaultInventory(InventoryType type, final int size, Message inventoryTitle, InventoryListener... listeners) {
+	protected DefaultHalfInventory(InventoryType type, final int size, Message inventoryTitle, HalfInventoryListener... listeners) {
 		if (size > 255)
 			throw new IllegalArgumentException("Minecraft protocol limitation! size must be < 256 (" + size + ")");
 		this.type = type;
@@ -56,17 +59,6 @@ public abstract class DefaultInventory implements Inventory {
 	@Override
 	public ItemStack getRawItem(int slotNumber) {
 		return this.items.get(slotNumber);
-	}
-
-	@Override
-	public void addListener(InventoryListener listener) {
-		if (this.closed) throw new IllegalStateException("Inventory closed");
-		this.listeners.add(listener);
-	}
-
-	@Override
-	public void removeListener(InventoryListener listener) {
-		this.listeners.remove(listener);
 	}
 
 	@Override
@@ -89,31 +81,26 @@ public abstract class DefaultInventory implements Inventory {
 		return this.type;
 	}
 
-	protected void callSlotChance(int slot, ItemStack oldStack, ItemStack newStack) {
-		for (InventoryListener l : DefaultInventory.this.listeners) {
-			l.onSlotChange(DefaultInventory.this, slot, oldStack, newStack);
-		}
-	}
-
-	protected void callPropertyChance(int slot, short property, short oldValue, short newValue) {
-		for (InventoryListener l : DefaultInventory.this.listeners) {
-			l.onPropertyChange(this, property, oldValue, newValue);
-		}
-	}
-
-	@Override
-	public final void close() {
-		if(closed) return;
-		this.close0();
-		this.closed = true;
-		for (InventoryListener l : this.listeners) {
-			l.closeInventory(this);
-		}
-	}
-
 	@Override
 	public void clearInventory() {
 		for (int i = 0; i < getSize(); i++) this.setRawItem(i, null);
+	}
+
+	@Override
+	public void close() {
+		if(closed) return;
+		this.close0();
+		this.closed = true;
+		Iterator<FullInventory> inv = fullInventories.iterator();
+		FullInventory next;
+		while (inv.hasNext()) {
+			if ((next = inv.next()).isClosed())
+				inv.remove();
+			else
+				for (InventoryListener l : next.listeners)
+					l.closeInventory(next);
+		}
+		for(HalfInventoryListener l : this.listeners) l.closeInventory(this);
 	}
 
 	protected abstract void close0();
@@ -146,7 +133,33 @@ public abstract class DefaultInventory implements Inventory {
 
 	@Override
 	public String toString() {
-		return "Inventory{" + "size=" + size + ", type=" + type + ", items=" + items + ", listeners=" + listeners + '}';
+		return "Inventory{" + "size=" + size + ", type=" + type + ", items=" + items + ", listeners=" + fullInventories + '}';
+	}
+
+	protected void callSlotChance(int slot, ItemStack oldStack, ItemStack newStack) {
+		Iterator<FullInventory> inv = fullInventories.iterator();
+		FullInventory next;
+		while (inv.hasNext()) {
+			if ((next = inv.next()).isClosed())
+				inv.remove();
+			else
+				for (InventoryListener l : next.listeners)
+					l.onSlotChange(next, slot, oldStack, newStack);
+		}
+		for(HalfInventoryListener l : this.listeners) l.onSlotChange(this, slot, oldStack, newStack);
+	}
+
+	protected void callPropertyChance(int slot, short property, short oldValue, short newValue) {
+		Iterator<FullInventory> inv = fullInventories.iterator();
+		FullInventory next;
+		while (inv.hasNext()) {
+			if ((next = inv.next()).isClosed())
+				inv.remove();
+			else
+				for (InventoryListener l : next.listeners)
+					l.onPropertyChange(next, property, oldValue, newValue);
+		}
+		for(HalfInventoryListener l : this.listeners) l.onPropertyChange(this, property, oldValue, newValue);
 	}
 
 	private class InventoryWrapper extends AbstractList<ItemStack> {
@@ -181,7 +194,7 @@ public abstract class DefaultInventory implements Inventory {
 		public ItemStack set(int index, ItemStack newStack) {
 			ItemStack oldValue = this.main.set(index, newStack);
 			if(!(oldValue == null ? newStack == null : oldValue.equals(newStack)))
-				DefaultInventory.this.callSlotChance(index + offset, oldValue, newStack);
+				DefaultHalfInventory.this.callSlotChance(index + offset, oldValue, newStack);
 			return oldValue;
 		}
 
@@ -203,7 +216,100 @@ public abstract class DefaultInventory implements Inventory {
 
 	@Override
 	public Inventory openFully(PlayerInventory inventory) {
-		return this;
+		FullInventory tmp = new FullInventory(inventory, this.combineItems(inventory));
+		this.fullInventories.add(tmp);
+		return tmp;
+	}
+
+	protected abstract MergedList<ItemStack> combineItems(PlayerInventory inventory);
+
+	protected final List<FullInventory> fullInventories = new ArrayList<>();
+
+	protected class FullInventory implements Inventory {
+
+		private final List<ItemStack> items;
+		private boolean closed = false;
+
+		public FullInventory(PlayerInventory inventory, MergedList items) {
+			this.items = items;
+			this.listeners = new CopyOnWriteArrayList<>();
+		}
+
+		private final List<InventoryListener> listeners;
+
+		@Override
+		public void close() {
+			for (InventoryListener l : this.listeners) {
+				l.closeInventory(this);
+			}
+			this.closed = true;
+		}
+
+		@Override
+		public List<ItemStack> getRawItems() {
+			return items;
+		}
+
+		@Override
+		public int getSize() {
+			return items.size();
+		}
+
+		@Override
+		public InventoryType getType() {
+			return DefaultHalfInventory.this.getType();
+		}
+
+		@Override
+		public void setRawItem(int slotNumber, ItemStack stack) {
+			this.items.set(slotNumber, stack);
+		}
+
+		@Override
+		public Message getTitle() {
+			return DefaultHalfInventory.this.getTitle();
+		}
+
+		@Override
+		public Inventory openFully(PlayerInventory inventory) {
+			return this;
+		}
+
+		@Override
+		public boolean isClosed() {
+			return closed;
+		}
+
+		@Override
+		public ItemStack getRawItem(int slotNumber) {
+			return items.get(slotNumber);
+		}
+
+		@Override
+		public void addListener(InventoryListener listener) {
+			if (this.closed) throw new IllegalStateException("Inventory closed");
+			this.listeners.add(listener);
+		}
+
+		@Override
+		public void removeListener(InventoryListener listener) {
+			this.listeners.remove(listener);
+		}
+
+		@Override
+		public void addListener(HalfInventoryListener listener) {
+			this.addListener(HalfInventoryListeners.toInventoryListener(listener));
+		}
+
+		@Override
+		public void removeListener(HalfInventoryListener listener) {
+			this.removeListener(HalfInventoryListeners.toInventoryListener(listener));
+		}
+
+		@Override
+		public void clearInventory() {
+			for (int i = 0; i < getSize(); i++) this.setRawItem(i, null);
+		}
 	}
 
 	@Override
@@ -213,11 +319,11 @@ public abstract class DefaultInventory implements Inventory {
 
 	@Override
 	public void addListener(HalfInventoryListener listener) {
-		this.addListener(HalfInventoryListeners.toInventoryListener(listener));
+		this.listeners.add(listener);
 	}
 
 	@Override
 	public void removeListener(HalfInventoryListener listener) {
-		this.removeListener(HalfInventoryListeners.toInventoryListener(listener));
+		this.listeners.remove(listener);
 	}
 }
