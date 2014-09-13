@@ -91,7 +91,9 @@ public class SimpleRecipe implements CraftingListener {
 			}
 		}
 		for (int i = 0; i < xSize * zSize; i++) {
-			if (!items.get(i).materialTypeMatches(neededItems.get(i))) return null;
+			ItemStack c1 = items.get(i);
+			ItemStack c2 = neededItems.get(i);
+			if (!(c1 == null ? c2 == null : c2.materialTypeMatches(c1))) return null;
 		}
 		return result;
 	}
