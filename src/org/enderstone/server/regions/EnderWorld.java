@@ -302,7 +302,7 @@ public class EnderWorld implements World{
 
 	public Location getSpawn() {
 		if(this.spawnLocation == null){
-			this.spawnLocation = new Location(this, 0, getChunkAt(0, 0).getHighestBlockAt(0, 0), 0, 0F, 0F);
+			this.spawnLocation = new Location(this, 0.5, getChunkAt(0, 0).getHighestBlockAt(0, 0) + 1, 0.5, 0F, 0F);
 		}
 		return this.spawnLocation;
 	}
