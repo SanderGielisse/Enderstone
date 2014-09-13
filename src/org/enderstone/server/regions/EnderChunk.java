@@ -295,7 +295,7 @@ public class EnderChunk implements Chunk{
 		return chunkmap;
 	}
 
-	public int getHighestBlock(int x, int z) {
+	public int getHighestBlockAt(int x, int z) {
 		for (int i = 255; i > 0; i--) {
 			BlockId bl = this.getBlock(x, i, z);
 			if (!bl.equals(BlockId.AIR)) {

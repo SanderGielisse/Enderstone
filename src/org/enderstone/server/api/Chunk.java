@@ -22,10 +22,12 @@ public interface Chunk {
 	public Block getBlockAt(int x, int y, int z);
 
 	public Block getBlockAt(Location location);
-	
+
 	public int getX();
-	
+
 	public int getZ();
-	
+
 	public World getWorld();
+
+	public int getHighestBlockAt(int x, int z);
 }
