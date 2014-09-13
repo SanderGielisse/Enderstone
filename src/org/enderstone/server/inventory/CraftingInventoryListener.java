@@ -59,7 +59,7 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 		int zEnd = Integer.MIN_VALUE;
 		for (int x = 0; x < xSize; x++) {
 			for (int z = 0; z < zSize; z++) {
-				ItemStack tmp = this.cache.get(x + 3 * z);
+				ItemStack tmp = this.cache.get(x + xSize * z);
 				if (tmp != null) {
 					if (x < xStart) xStart = x;
 					if (x > xEnd) xEnd = x;
