@@ -29,7 +29,6 @@ public class PacketOutUpdateHealth extends Packet {
 	private float foodSaturation;
 
 	public PacketOutUpdateHealth(float health, int food, float foodSaturation) {
-		EnderLogger.debug("Health update: " + health);
 		this.health = health;
 		this.food = food;
 		this.foodSaturation = foodSaturation;
