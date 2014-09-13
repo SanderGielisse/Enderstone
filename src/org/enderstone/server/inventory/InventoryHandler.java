@@ -384,13 +384,14 @@ public class InventoryHandler {
 		itemOnCursor.set(0, null);
 		if (activeInventory != equimentInventory) {
 			activeInventory.removeListener(listener);
+			activeInventory.close();
 			activeInventory = equimentInventory;
 		}
 		activeInventory = inventory;
-		if (inv == equimentInventory) {
+		if (inventory == equimentInventory) {
 			this.player.networkManager.sendPacket(new PacketOutCloseWindow(this.nextWindowId));
 			return;
-		} else if (inv.getType() == InventoryType.PLAYER_INVENTORY) {
+		} else if (inventory.getType() == InventoryType.PLAYER_INVENTORY) {
 			throw new IllegalArgumentException("Opening of other player inventories is not supported!");
 		}
 		this.activeInventory.addListener(listener);
@@ -398,10 +399,10 @@ public class InventoryHandler {
 			this.nextWindowId = 1;
 		}
 		// TODO add support for horse chests
-		this.player.networkManager.sendPacket(new PacketOutOpenWindow(this.nextWindowId, inv.getType(), inv.getTitle(), (byte) inv.getSize(), 0));
+		this.player.networkManager.sendPacket(new PacketOutOpenWindow(this.nextWindowId, inventory.getType(), inventory.getTitle(), (byte) inventory.getSize(), 0));
 		boolean isNonEmpty = false;
-		int size = inv.getSize();
-		List<ItemStack> items = inv.getRawItems();
+		int size = inventory.getSize();
+		List<ItemStack> items = inventory.getRawItems();
 		for (int i = 0; i < size && !isNonEmpty; i++)
 			if (items.get(i) != null)
 				isNonEmpty = true;

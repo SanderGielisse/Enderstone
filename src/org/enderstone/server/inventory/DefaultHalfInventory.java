@@ -308,4 +308,18 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 		}
 	}
 
+	@Override
+	public boolean isClosed() {
+		return this.closed;
+	}
+
+	@Override
+	public void addListener(HalfInventoryListener listener) {
+		this.listeners.add(listener);
+	}
+
+	@Override
+	public void removeListener(HalfInventoryListener listener) {
+		this.listeners.remove(listener);
+	}
 }

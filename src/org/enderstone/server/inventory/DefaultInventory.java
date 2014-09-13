@@ -103,6 +103,7 @@ public abstract class DefaultInventory implements Inventory {
 
 	@Override
 	public final void close() {
+		if(closed) return;
 		this.close0();
 		this.closed = true;
 		for (InventoryListener l : this.listeners) {
