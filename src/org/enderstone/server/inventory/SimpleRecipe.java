@@ -81,6 +81,7 @@ public class SimpleRecipe implements CraftingListener {
 		if(decreaseItems) {
 			for(int i = 0; i < xSize * zSize; i++) {
 				ItemStack tmp = items.get(i);
+				if(tmp == null) continue;
 				if(tmp.getAmount() < 2) {
 					tmp = null;
 				} else {
