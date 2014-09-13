@@ -180,7 +180,7 @@ public abstract class DefaultInventory implements Inventory {
 		@Override
 		public ItemStack set(int index, ItemStack newStack) {
 			ItemStack oldValue = this.main.set(index, newStack);
-			if(!oldValue.equals(newStack))
+			if(!(oldValue == null ? newStack == null : oldValue.equals(newStack)))
 				DefaultInventory.this.callSlotChance(index + offset, oldValue, newStack);
 			return oldValue;
 		}
