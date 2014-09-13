@@ -24,7 +24,7 @@ package org.enderstone.server.inventory;
  */
 public enum InventoryType {
 	CHEST("minecraft:chest"),
-	CRAFTING_TABLE("minecraft:crafting_table"),
+	CRAFTING_TABLE("minecraft:crafting_table",0),
 	FURNACE("minecraft:furnace"),
 	DISPENSER("minecraft:dispenser"),
 	ENCHANTING_TABLE("minecraft:enchanting_table"),
@@ -37,9 +37,16 @@ public enum InventoryType {
 	ENTITY_HORSE("EntityHorse"),
 	PLAYER_INVENTORY(null);
 	private final String inventoryType;
+	private final int packetSize;
 
 	private InventoryType(String inventoryType) {
 		this.inventoryType = inventoryType;
+		this.packetSize = -1;
+	}
+
+	private InventoryType(String inventoryType, int packetSize) {
+		this.inventoryType = inventoryType;
+		this.packetSize = packetSize;
 	}
 
 	@Override
@@ -51,4 +58,7 @@ public enum InventoryType {
 		return inventoryType;
 	}
 
+	public int getPacketSize() {
+		return packetSize;
+	}
 }
