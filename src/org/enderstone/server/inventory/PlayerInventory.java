@@ -27,7 +27,7 @@ import org.enderstone.server.util.MergedList;
  *
  * @author Fernando
  */
-public class PlayerInventory extends DefaultInventory{
+public class PlayerInventory extends DefaultInventory {
 
 	private final EnderPlayer player;
 

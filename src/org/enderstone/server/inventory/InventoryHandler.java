@@ -22,7 +22,6 @@ import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.inventory.Inventory.InventoryListener;
 import org.enderstone.server.packet.play.PacketInClickWindow;
 import org.enderstone.server.packet.play.PacketInCloseWindow;
 import org.enderstone.server.packet.play.PacketInConfirmTransaction;
@@ -49,7 +48,7 @@ public class InventoryHandler {
 	private final InventoryListener listener = new InventoryListener() {
 
 		@Override
-		public void onSlotChange(DefaultInventory inv, int slot, ItemStack oldStack, ItemStack newStack) {
+		public void onSlotChange(Inventory inv, int slot, ItemStack oldStack, ItemStack newStack) {
 			if (inv != activeInventory && inv != equimentInventory) {
 				inv.removeListener(this);
 				EnderLogger.warn("Removing stale inventory listener from: " + inv);
@@ -62,7 +61,7 @@ public class InventoryHandler {
 		}
 
 		@Override
-		public void onPropertyChange(DefaultInventory inv, short property, short oldValue, short newValue) {
+		public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue) {
 			if (inv != activeInventory && inv != equimentInventory) {
 				inv.removeListener(this);
 				EnderLogger.warn("Removing stale inventory listener from: " + inv);
@@ -74,7 +73,7 @@ public class InventoryHandler {
 		}
 
 		@Override
-		public void closeInventory(DefaultInventory inv) {
+		public void closeInventory(Inventory inv) {
 			if (inv != activeInventory && inv != equimentInventory) {
 				inv.removeListener(this);
 				EnderLogger.warn("Removing stale inventory listener from: " + inv);
@@ -90,7 +89,7 @@ public class InventoryHandler {
 	private final byte playerWindowId = 0;
 	private byte nextWindowId = 1;
 	private int selectedHotbarSlot = 0;
-	private List<ItemStack> itemOnCursor = new FixedSizeList<>(new ItemStack[1]);
+	private final List<ItemStack> itemOnCursor = new FixedSizeList<>(new ItemStack[1]);
 
 	private byte getWindowId(Inventory inv) {
 		if (inv == this.equimentInventory)
@@ -349,8 +348,8 @@ public class InventoryHandler {
 			this.activeInventory = this.equimentInventory;
 		} else {
 			assert this.activeInventory == this.equimentInventory;
-			this.updateInventory();
 		}
+		this.updateInventory();
 		drop(this.itemOnCursor, true, 0);
 	}
 
@@ -377,19 +376,21 @@ public class InventoryHandler {
 		return this.equimentInventory;
 	}
 
-	public void openInventory(Inventory inv) {
-		if (inv == null) inv = equimentInventory;
+	public void openInventory(HalfInventory inv) {
+		Inventory inventory;
+		if (inv == null) inventory = equimentInventory;
+		else inventory = inv.openFully(equimentInventory);
 		this.drop(this.itemOnCursor, true, 0);
 		itemOnCursor.set(0, null);
 		if (activeInventory != equimentInventory) {
 			activeInventory.removeListener(listener);
 			activeInventory = equimentInventory;
 		}
-		activeInventory = inv;
+		activeInventory = inventory;
 		if (inv == equimentInventory) {
 			this.player.networkManager.sendPacket(new PacketOutCloseWindow(this.nextWindowId));
 			return;
-		} else if (inv.getType() == Inventory.InventoryType.PLAYER_INVENTORY) {
+		} else if (inv.getType() == InventoryType.PLAYER_INVENTORY) {
 			throw new IllegalArgumentException("Opening of other player inventories is not supported!");
 		}
 		this.activeInventory.addListener(listener);

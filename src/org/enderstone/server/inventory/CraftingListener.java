@@ -18,15 +18,23 @@
 
 package org.enderstone.server.inventory;
 
+import java.util.List;
+
 /**
  *
  * @author Fernando
  */
-public interface Inventory extends AutoCloseable, HalfInventory {
-
-	public void addListener(InventoryListener listener);
+public interface CraftingListener {
+	public boolean acceptRecipe(int xSize, int zSize);
 	
-	public void removeListener(InventoryListener listener);
-
+	/**
+	 * a item can be extrackted from the <code>List&lt;ItemStack&gt;</code> by doing (items.get(x * xSize + z);
+	 * @param items
+	 * @param xSize
+	 * @param zSize
+	 * @param decreaseItems
+	 * @return 
+	 */
+	public ItemStack checkRecipe(List<ItemStack> items, int xSize, int zSize, boolean decreaseItems);
 	
 }

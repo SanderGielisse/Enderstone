@@ -22,11 +22,33 @@ package org.enderstone.server.inventory;
  *
  * @author Fernando
  */
-public interface Inventory extends AutoCloseable, HalfInventory {
+public enum InventoryType {
+	CHEST("minecraft:chest"),
+	CRAFTING_TABLE("minecraft:crafting_table"),
+	FURNACE("minecraft:furnace"),
+	DISPENSER("minecraft:dispenser"),
+	ENCHANTING_TABLE("minecraft:enchanting_table"),
+	BREWING_STAND("minecraft:brewing_stand"),
+	VILLAGER("minecraft:villager"),
+	BEACON("minecraft:beacon"),
+	ANVIL("minecraft:anvil"),
+	HOPPER("minecraft:hopper"),
+	DROPPER("minecraft:dropper"),
+	ENTITY_HORSE("EntityHorse"),
+	PLAYER_INVENTORY(null);
+	private final String inventoryType;
 
-	public void addListener(InventoryListener listener);
-	
-	public void removeListener(InventoryListener listener);
+	private InventoryType(String inventoryType) {
+		this.inventoryType = inventoryType;
+	}
 
-	
+	@Override
+	public String toString() {
+		return "InventoryType." + this.name() + "{" + "inventoryType=" + inventoryType + '}';
+	}
+
+	public String getInventoryType() {
+		return inventoryType;
+	}
+
 }

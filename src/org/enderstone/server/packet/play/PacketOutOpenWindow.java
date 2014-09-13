@@ -19,7 +19,7 @@ package org.enderstone.server.packet.play;
 
 import java.io.IOException;
 import org.enderstone.server.api.messages.Message;
-import org.enderstone.server.inventory.Inventory.InventoryType;
+import org.enderstone.server.inventory.InventoryType;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 

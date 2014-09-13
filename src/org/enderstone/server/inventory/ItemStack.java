@@ -40,6 +40,22 @@ public class ItemStack implements Cloneable {
 	private short damage;
 	private CompoundTag compoundTag;
 
+	public ItemStack(BlockId blockId) {
+		this(blockId, (byte)1, (short)0);
+	}
+	
+	public ItemStack(BlockId blockId, byte amount) {
+		this(blockId, amount, (short)0);
+	}
+	
+	public ItemStack(BlockId blockId, short damage) {
+		this(blockId, (byte)1, damage);
+	}
+	
+	public ItemStack(BlockId blockId, byte amount, short damage) {
+		this(blockId.getId(), amount, damage);
+	}
+	
 	public ItemStack(short blockId, byte amount, short damage) {
 		this(blockId, amount, damage, null);
 	}
