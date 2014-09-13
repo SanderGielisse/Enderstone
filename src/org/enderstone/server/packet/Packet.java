@@ -22,7 +22,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map.Entry;
-import org.enderstone.server.Vector;
+import org.enderstone.server.api.Vector;
 import org.enderstone.server.entity.DataWatcher;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.codec.DecodeException;

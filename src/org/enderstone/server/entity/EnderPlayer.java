@@ -32,6 +32,7 @@ import org.enderstone.server.api.ChatPosition;
 import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
+import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.api.messages.ChatColor;
 import org.enderstone.server.api.messages.Message;
@@ -649,7 +650,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		this.damage(1F);
+		this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation())));
 	}
 
 	public int getFood() {

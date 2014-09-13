@@ -26,8 +26,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map.Entry;
 import java.util.UUID;
 import org.enderstone.server.EnderLogger;
-import org.enderstone.server.Vector;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.Vector;
 import org.enderstone.server.entity.DataWatcher;
 import org.enderstone.server.inventory.ItemStack;
 import org.jnbt.CompoundTag;
@@ -296,9 +296,9 @@ public class PacketDataWrapper {
 				int i = (6 << 5 | watch.getKey() & 0x1F) & 0xFF;
 				this.writeByte(i);
 				Vector vector = (Vector) watch.getValue();
-				this.writeInt(vector.getX());
-				this.writeInt(vector.getY());
-				this.writeInt(vector.getZ());
+				this.writeInt((int) vector.getX());
+				this.writeInt((int) vector.getY());
+				this.writeInt((int) vector.getZ());
 			} else {
 				throw new UnsupportedEncodingException("Type " + watch.getValue().getClass() + " cannot be part of a datawatcher.");
 			}

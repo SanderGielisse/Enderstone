@@ -20,10 +20,12 @@ package org.enderstone.server.entity;
 import java.util.Set;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutAnimation;
 import org.enderstone.server.packet.play.PacketOutEntityStatus;
+import org.enderstone.server.packet.play.PacketOutEntityVelocity;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 
 public abstract class EnderEntity implements Entity{
@@ -76,6 +78,11 @@ public abstract class EnderEntity implements Entity{
 				p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
 			}
 		}
+	}
+	
+	public void damage(float damage, Vector knockback){
+		this.damage(damage);
+		this.getWorld().broadcastPacket(new PacketOutEntityVelocity(getEntityId(), knockback), this.getLocation());
 	}
 
 	public final boolean isDead() {

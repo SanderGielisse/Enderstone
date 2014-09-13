@@ -23,6 +23,7 @@ import java.util.Set;
 import org.enderstone.server.Main;
 import org.enderstone.server.Utill;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.Vector;
 import org.enderstone.server.entity.drops.EntityDrop;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
@@ -79,7 +80,7 @@ public class EntityMob extends EnderEntity {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		damage(1F);
+		this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation())));
 	}
 
 	@Override

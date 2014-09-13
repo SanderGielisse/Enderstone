@@ -15,41 +15,52 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server;
+package org.enderstone.server.api;
 
 public class Vector {
 
-	private int x;
-	private int y;
-	private int z;
+	private double x;
+	private double y;
+	private double z;
 
-	public Vector(int x, int y, int z) {
+	public Vector(double x, double y, double z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 
-	public int getX() {
+	public double getX() {
 		return x;
 	}
 
-	public void setX(int x) {
+	public void setX(double x) {
 		this.x = x;
 	}
 
-	public int getY() {
+	public double getY() {
 		return y;
 	}
 
-	public void setY(int y) {
+	public void setY(double y) {
 		this.y = y;
 	}
 
-	public int getZ() {
+	public double getZ() {
 		return z;
 	}
 
-	public void setZ(int z) {
+	public void setZ(double z) {
 		this.z = z;
+	}
+
+	public static Vector substract(Location fromLocation, Location toLocation) {
+		return new Vector(toLocation.getX() - fromLocation.getX(), toLocation.getY() - fromLocation.getY(), toLocation.getZ() - fromLocation.getZ());
+	}
+	
+	public Vector normalize(double distance){
+		this.x = x / distance;
+		this.y = y / distance;
+		this.z = z / distance;
+		return this;
 	}
 }

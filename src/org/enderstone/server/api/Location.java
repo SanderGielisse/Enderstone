@@ -27,7 +27,7 @@ public class Location implements Cloneable {
 	private double z;
 	private float yaw;
 	private float pitch;
-	
+
 	public Location(EnderWorld world, double x, double y, double z, float yaw, float pitch) {
 		this.world = world;
 		this.x = x;
@@ -122,6 +122,13 @@ public class Location implements Cloneable {
 		}
 	}
 
+	public double distance(Location otherLocation) {
+		double tempX = Math.abs(otherLocation.getX() - this.getX());
+		double tempY = Math.abs(otherLocation.getY() - this.getY());
+		double tempZ = Math.abs(otherLocation.getZ() - this.getZ());
+		return Math.sqrt(tempX * tempX + tempY * tempY + tempZ * tempZ);
+	}
+
 	@Override
 	public Location clone() {
 		try {
@@ -144,7 +151,7 @@ public class Location implements Cloneable {
 		this.yaw = spawn.yaw;
 		this.pitch = spawn.pitch;
 	}
-	
+
 	public int getChunkX() {
 		return (getBlockX() >> 4);
 	}
