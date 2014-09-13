@@ -34,6 +34,7 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 	private final int endScanSlot;
 	private final List<ItemStack> cache;
 	private final List<CraftingListener> listeners;
+	private boolean noCraft;
 
 	public CraftingInventoryListener(int xSize, int zSize, int outputSlot, int startScanSlot, List<CraftingListener> listeners) {
 		this.xSize = xSize;
@@ -74,7 +75,7 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 			assert zEnd == Integer.MIN_VALUE;
 			ItemStack oldOut = inventory.getRawItem(outputSlot);
 			if (oldOut != null) {
-				inventory.setRawItem(outputSlot, null);
+				setOutputSlot(inventory, null);
 			}
 		} else {
 			assert xEnd != Integer.MIN_VALUE;
@@ -83,20 +84,21 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 			int recipeSizeX = xEnd - xStart + 1;
 			int recipeSizeZ = zEnd - zStart + 1;
 			List<ItemStack> assembledRecipe = null;
-			if(this.xSize == recipeSizeX && this.zSize == recipeSizeZ)
-				assembledRecipe = cache;
 			ItemStack result = null;
 			for (CraftingListener listener : this.listeners) {
 				if (listener.acceptRecipe(recipeSizeX, recipeSizeZ)) {
 					if (assembledRecipe == null) {
 						MergedList.Builder<ItemStack> builder = new MergedList.Builder<>();
-						for (int i = 0; i < recipeSizeZ; i++) {
-							builder = builder.addList(recipeSizeZ * i, cache, xStart + recipeSizeZ * i, recipeSizeX);
+						for (int i = zStart; i <= zEnd; i++) {
+							builder = builder.addList(recipeSizeZ * (i - zStart), cache, xStart + (zSize * i), recipeSizeX);
 						}
 						assembledRecipe = builder.build();
 					}
-					result = listener.checkRecipe(assembledRecipe, recipeSizeX, recipeSizeZ, removeItems);
-					if (result != null) break;
+					ItemStack oldResult = null;
+					if(removeItems)
+						oldResult = listener.checkRecipe(assembledRecipe, recipeSizeX, recipeSizeZ, true);
+					result = listener.checkRecipe(assembledRecipe, recipeSizeX, recipeSizeZ, false);
+					if (result != null || oldResult != null) break;
 				}
 			}
 			if (removeItems) {
@@ -104,7 +106,16 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 					inventory.setRawItem(this.startScanSlot + i, cache.get(i));
 				}
 			}
+			setOutputSlot(inventory, result);
+		}
+	}
+
+	private void setOutputSlot(HalfInventory inventory, ItemStack result) {
+		try {
+			noCraft = true;
 			inventory.setRawItem(this.outputSlot, result);
+		} finally {
+			noCraft = false;
 		}
 	}
 
@@ -114,7 +125,7 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 			this.rescanSlot(slot, newStack == null ? null : newStack.clone());
 			this.recalculateRecipes(inv, false);
 		}
-		if (slot == outputSlot && newStack == null) {
+		if (slot == outputSlot && newStack == null && !noCraft) {
 			this.recalculateRecipes(inv, true);
 		}
 	}
