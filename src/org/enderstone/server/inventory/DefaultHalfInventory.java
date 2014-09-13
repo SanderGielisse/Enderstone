@@ -88,6 +88,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 
 	@Override
 	public void close() {
+		if(closed) return;
 		this.close0();
 		this.closed = true;
 		Iterator<FullInventory> inv = fullInventories.iterator();
