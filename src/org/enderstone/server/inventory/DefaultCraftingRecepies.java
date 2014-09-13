@@ -76,7 +76,7 @@ public class DefaultCraftingRecepies {
 	private static void r(List<SimpleRecipe>[] tmp, ItemStack result, ItemStack[] ... items)
 	{
 		SimpleRecipe r = new SimpleRecipe(result, items);
-		int hash = r.getxSize() * 3 + r.getzSize();
+		int hash = (r.getxSize() - 1) * 3 + (r.getzSize() - 1);
 		List<SimpleRecipe> rr = tmp[hash];
 		if (rr == null) tmp[hash] = rr = new ArrayList<>();
 		rr.add(r);
