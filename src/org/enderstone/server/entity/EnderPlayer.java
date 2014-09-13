@@ -103,19 +103,15 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public double yLocation;
 
 	/**
-	 * If this is above 0, then the server is waiting for a correction on the
-	 * last teleport the server sended
+	 * If this is above 0, then the server is waiting for a correction on the last teleport the server sended
 	 */
 	public int waitingForValidMoveAfterTeleport = 0;
 
 	/**
 	 * 
-	 * The loadedChunks regionSet is a kinda "HashMap" for chunks, but a bit
-	 * faster.
+	 * The loadedChunks regionSet is a kinda "HashMap" for chunks, but a bit faster.
 	 * 
-	 * The chunkInformer is a small interface which converts our "chunk data"
-	 * into sendable packets. This interface is currently also being used for
-	 * caching the sending chunks.
+	 * The chunkInformer is a small interface which converts our "chunk data" into sendable packets. This interface is currently also being used for caching the sending chunks.
 	 */
 	private final RegionSet loadedChunks = new RegionSet();
 	public ChunkInformer chunkInformer = new ChunkInformer() {
@@ -246,7 +242,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.updateDataWatcher();
 
 		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(this.clientSettings.tabListHeader, this.clientSettings.tabListFooter));
-		
+
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(this.uuid, this.getPlayerName(), getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") });
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			player.getNetworkManager().sendPacket(packet);
@@ -475,7 +471,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public void updateClientSettings() { // this will also be called when a player switches world
 		this.networkManager.sendPacket(new PacketOutChangeGameState((byte) 3, this.clientSettings.gameMode.getId()));
-		this.updateAbilities(); //do this after sending the gamemode
+		this.updateAbilities(); // do this after sending the gamemode
 		// TODO send player equipment
 	}
 
@@ -503,20 +499,20 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			}
 		}
 	}
-	
+
 	private int latestHeal = 0;
 	private int latestFood = 0;
-	
+
 	@Override
 	public void serverTick() {
-		if (!this.isDead() && latestFood++ % (30 * 20) == 0) { //TODO do this how it goes in default Minecraft
+		if (!this.isDead() && latestFood++ % (30 * 20) == 0) { // TODO do this how it goes in default Minecraft
 			if ((this.getFood() - 1) >= 0) {
 				this.setFood((short) (this.getFood() - 1));
 			} else {
 				this.damage(1F);
 			}
 		}
-		if (!this.isDead() && latestHeal++ % (15 * 20) == 0) { //TODO do this how it goes in default Minecraft
+		if (!this.isDead() && latestHeal++ % (15 * 20) == 0) { // TODO do this how it goes in default Minecraft
 			if ((this.getHealth() + 0.5F) <= this.getMaxHealth() && this.getFood() > 0) {
 				this.setHealth(this.getHealth() + 0.5F);
 			}
@@ -915,5 +911,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public Message getTabListFooter() {
 		return this.clientSettings.tabListFooter;
+	}
+
+	@Override
+	public boolean isSprinting() {
+		return this.clientSettings.isSprinting;
 	}
 }

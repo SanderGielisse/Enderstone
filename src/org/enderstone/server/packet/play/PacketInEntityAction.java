@@ -18,6 +18,8 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+import org.enderstone.server.Main;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 
@@ -59,5 +61,33 @@ public class PacketInEntityAction extends Packet {
 
 	public int getJumpBoost() {
 		return jumpBoost;
+	}
+	
+	@Override
+	public void onRecieve(final NetworkManager networkManager) {
+		// actionId list:
+		// 0: Crouch
+		// 1: Uncrouch
+		// 2: Leave Bed
+		// 3: Start Sprint
+		// 4: End Sprint
+		// 5: Horse Jump
+		// 6: Open Inventory
+		
+		Main.getInstance().sendToMainThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				if(getActionId() == 0){
+					networkManager.player.setSneaking(true);
+				}else if(getActionId() == 1){
+					networkManager.player.setSneaking(false);
+				}else if(getActionId() == 3){
+					networkManager.player.clientSettings.isSprinting = true;
+				}else if(getActionId() == 4){
+					networkManager.player.clientSettings.isSprinting = false;
+				}
+			}
+		});
 	}
 }

@@ -22,11 +22,9 @@ import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
 import org.enderstone.server.api.messages.Message;
-import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.regions.BlockId;
-import org.enderstone.server.regions.EnderWorld;
 
 public interface Player {
 
@@ -65,6 +63,8 @@ public interface Player {
 	public void setExperienceLevel(int experienceLevel);
 
 	public boolean canSprint();
+
+	public boolean isSprinting();
 
 	public boolean isOnGround();
 
