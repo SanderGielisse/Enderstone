@@ -18,6 +18,8 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+import org.enderstone.server.Main;
+import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 
@@ -40,5 +42,19 @@ public class PacketInAnimation extends Packet {
 	@Override
 	public byte getId() {
 		return 0x0A;
+	}
+
+	@Override
+	public void onRecieve(final NetworkManager networkManager) {
+		// arm animation
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			private final byte armSwingId = 0;
+
+			@Override
+			public void run() {
+				networkManager.player.getWorld().broadcastPacket(new PacketOutAnimation(networkManager.player.getEntityId(), armSwingId), networkManager.player.getLocation(), networkManager.player);
+			}
+		});
 	}
 }

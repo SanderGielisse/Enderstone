@@ -320,6 +320,14 @@ public class EnderWorld implements World{
 			}
 		}
 	}
+	
+	public void broadcastPacket(Packet packet, Location loc, EnderPlayer skipPlayer){
+		for(EnderPlayer ep : Main.getInstance().onlinePlayers){
+			if(ep.getLocation().isInRange(35, loc, true) && !ep.equals(skipPlayer)){
+				ep.getNetworkManager().sendPacket(packet);
+			}
+		}
+	}
 
 	@Override
 	public Collection<? extends Chunk> getLoadedChunks() {
