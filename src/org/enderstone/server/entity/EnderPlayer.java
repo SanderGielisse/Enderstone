@@ -224,7 +224,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 3);
 		networkManager.player.getInventoryHandler().updateInventory();
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(toWorld.getSpawn().getX(), toWorld.getSpawn().getY(), toWorld.getSpawn().getZ(), 0F, 0F, (byte) 1));
-		this.onRespawn();
+		this.updateClientSettings();
 		EnderLogger.info("Switched player " + this.getPlayerName() + " from world " + currentWorld.worldName + " to " + toWorld.worldName + ".");
 	}
 
@@ -244,7 +244,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.CHEST.getId(), (byte) 1, (short) 0));
 		this.updateDataWatcher();
 
-		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(ChatColor.GOLD + "" + ChatColor.BOLD + "Enderstone Test Server", ChatColor.RED + "" + ChatColor.BOLD + "This server is running an Enderstone build"));
+		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(this.clientSettings.tabListHeader, this.clientSettings.tabListFooter));
+		
 		PacketOutPlayerListItem packet = new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(this.uuid, this.getPlayerName(), getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") });
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			player.getNetworkManager().sendPacket(packet);
@@ -471,9 +472,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		return false;
 	}
 
-	public void onRespawn() { // this will also be called when a player switches world
-		this.updateAbilities();
+	public void updateClientSettings() { // this will also be called when a player switches world
 		this.networkManager.sendPacket(new PacketOutChangeGameState((byte) 3, this.clientSettings.gameMode.getId()));
+		this.updateAbilities(); //do this after sending the gamemode
 		// TODO send player equipment
 	}
 
@@ -785,8 +786,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setExperienceLevel(int experienceLevel) {
-		this.clientSettings.experience = experienceLevel; // TODO convert this
-															// to a level
+		this.clientSettings.experience = experienceLevel; // TODO convert this to a level
 		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO calculate this correctly
 	}
 
@@ -885,5 +885,34 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public boolean isInAir() {
 		return !isOnGround;
+	}
+
+	@Override
+	public void setTabListHeader(Message header) {
+		this.clientSettings.tabListHeader = header;
+		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(header, this.clientSettings.tabListFooter));
+	}
+
+	@Override
+	public void setTabListFooter(Message footer) {
+		this.clientSettings.tabListFooter = footer;
+		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(this.clientSettings.tabListHeader, footer));
+	}
+
+	@Override
+	public void setTabListHeaderAndFooter(Message header, Message footer) {
+		this.clientSettings.tabListHeader = header;
+		this.clientSettings.tabListFooter = footer;
+		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(header, footer));
+	}
+
+	@Override
+	public Message getTabListHeader() {
+		return this.clientSettings.tabListHeader;
+	}
+
+	@Override
+	public Message getTabListFooter() {
+		return this.clientSettings.tabListFooter;
 	}
 }

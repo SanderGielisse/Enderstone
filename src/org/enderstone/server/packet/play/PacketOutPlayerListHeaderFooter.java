@@ -18,6 +18,7 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
@@ -26,13 +27,21 @@ public class PacketOutPlayerListHeaderFooter extends Packet {
 
 	private String header;
 	private String footer;
-	
+
+	private Message messageHeader;
+	private Message messageFooter;
+
 	private String jsonHeader;
 	private String jsonFooter;
 
 	public PacketOutPlayerListHeaderFooter(String header, String footer) {
 		this.header = header;
 		this.footer = footer;
+	}
+
+	public PacketOutPlayerListHeaderFooter(Message messageHeader, Message messageFooter) {
+		this.messageHeader = messageHeader;
+		this.messageFooter = messageFooter;
 	}
 
 	@Override
@@ -42,11 +51,19 @@ public class PacketOutPlayerListHeaderFooter extends Packet {
 
 	@Override
 	public void write(PacketDataWrapper wrapper) throws IOException {
-		if(jsonHeader == null){
-			jsonHeader = new SimpleMessage(header).toMessageJson();
+		if (jsonHeader == null) {
+			if (messageHeader == null) {
+				jsonHeader = new SimpleMessage(header).toMessageJson();
+			} else {
+				jsonHeader = messageHeader.toMessageJson();
+			}
 		}
-		if(jsonFooter == null){
-			jsonFooter = new SimpleMessage(footer).toMessageJson();
+		if (jsonFooter == null) {
+			if (messageFooter == null) {
+				jsonFooter = new SimpleMessage(footer).toMessageJson();
+			} else {
+				jsonFooter = messageFooter.toMessageJson();
+			}
 		}
 		wrapper.writeString(jsonHeader);
 		wrapper.writeString(jsonFooter);
@@ -54,11 +71,19 @@ public class PacketOutPlayerListHeaderFooter extends Packet {
 
 	@Override
 	public int getSize() throws IOException {
-		if(jsonHeader == null){
-			jsonHeader = new SimpleMessage(header).toMessageJson();
+		if (jsonHeader == null) {
+			if (messageHeader == null) {
+				jsonHeader = new SimpleMessage(header).toMessageJson();
+			} else {
+				jsonHeader = messageHeader.toMessageJson();
+			}
 		}
-		if(jsonFooter == null){
-			jsonFooter = new SimpleMessage(footer).toMessageJson();
+		if (jsonFooter == null) {
+			if (messageFooter == null) {
+				jsonFooter = new SimpleMessage(footer).toMessageJson();
+			} else {
+				jsonFooter = messageFooter.toMessageJson();
+			}
 		}
 		return getStringSize(jsonFooter) + getStringSize(jsonHeader) + getVarIntSize(getId());
 	}

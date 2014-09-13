@@ -61,7 +61,7 @@ public class PacketInClientStatus extends Packet {
 						networkManager.player.teleport(networkManager.player.getWorld().getSpawn().clone());
 						networkManager.player.getInventoryHandler().updateInventory();
 						networkManager.player.heal();
-						networkManager.player.onRespawn();
+						networkManager.player.updateClientSettings();
 					}
 				}
 			});

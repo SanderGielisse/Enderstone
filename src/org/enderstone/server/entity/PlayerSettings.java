@@ -18,6 +18,9 @@
 package org.enderstone.server.entity;
 
 import org.enderstone.server.api.GameMode;
+import org.enderstone.server.api.messages.AdvancedMessage;
+import org.enderstone.server.api.messages.ChatColor;
+import org.enderstone.server.api.messages.Message;
 
 public class PlayerSettings {
 	public String displayName = null;
@@ -29,16 +32,18 @@ public class PlayerSettings {
 	public GameMode gameMode = GameMode.SURVIVAL;
 	public boolean isCreative = false;
 	public boolean godMode = false;
-	public boolean allowFlight = false;
-	public boolean isFlying = false;
+	public boolean allowFlight = true;
+	public boolean isFlying = true;
 	public boolean isOnFire = false;
 	public boolean isSneaking = false;
 	public boolean isSprinting = false;
 	public boolean isEating = false;
 	public boolean isInvisible = false;
-	public float flySpeed = 0.1F;
+	public float flySpeed = 0.05F;
 	public float walkSpeed = 0.1F;
 	public int food = 20;
 	public float foodSaturation = 0;
 	public int experience = 0;
+	public Message tabListHeader = new AdvancedMessage("Player Tab-List").setColor(ChatColor.GOLD).setBold(true).build();
+	public Message tabListFooter = new AdvancedMessage("This server is proudly powered by Enderstone").setColor(ChatColor.RED).setItalic(true).build();
 }

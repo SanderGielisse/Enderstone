@@ -233,7 +233,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 					Main.getInstance().onlinePlayers.add(player);
 					try {
 						sendPacket(new PacketOutLoginSucces(player.uuid.toString(), player.getPlayerName()));
-						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) GameMode.SURVIVAL.getId(), (byte) 0, (byte) 1, (byte) 60, "default", false));
+						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) player.clientSettings.gameMode.getId(), (byte) 0, (byte) 1, (byte) 60, "default", false));
 						sendPacket(new PacketOutUpdateTime(0, world.getTime()));
 						Location spawn = world.getSpawn();
 						Location loc = player.getLocation();
@@ -243,10 +243,10 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						loc.setYaw(spawn.getYaw());
 						loc.setPitch(spawn.getPitch());
 
-						world.doChunkUpdatesForPlayer(player, player.chunkInformer, 1);
+						world.doChunkUpdatesForPlayer(player, player.chunkInformer, 3);
 						player.teleport(world.getSpawn());
 						player.onSpawn();
-						player.onRespawn();
+						player.updateClientSettings();
 						sendPacket(new PacketOutSpawnPosition(spawn));
 						sendPacket(new PacketOutPlayerPositionLook(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), (byte) 0b00000));
 						sendPacket(new PacketOutUpdateHealth(player.getHealth(), player.clientSettings.food, player.clientSettings.foodSaturation));
