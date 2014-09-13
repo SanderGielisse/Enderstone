@@ -67,7 +67,7 @@ public class EnderWorld implements World{
 		return getOrCreateChunk(x, z, true);
 	}
 
-	private EnderChunk getOrCreateChunk(int x, int z, boolean checkChunkPopulation) {
+	private EnderChunk getOrCreateChunk(int x, int z, boolean checkChunkPopulation) {		
 		EnderChunk c = this.getOrCreateChunk0(x, z);
 		return checkChunkPopulation ? checkChunkPopulation(c) : c;
 	}
@@ -223,6 +223,7 @@ public class EnderWorld implements World{
 						informer.removeChunk(i);
 					}
 					Arrays.sort(chunkLoad, 0, index, new IntegerArrayComparator(px, pz));
+					
 					if (maxSize < chunkLoad.length) chunkLoad[maxSize] = null;
 					index = 0;
 					for (int[] load : chunkLoad) {

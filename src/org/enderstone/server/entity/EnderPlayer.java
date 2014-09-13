@@ -120,6 +120,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 		@Override
 		public void sendChunk(EnderChunk chunk) {
+			EnderLogger.debug("ADDED to cache: " + chunk.getX() + ":" + chunk.getZ());
 			cache.add(chunk);
 		}
 
@@ -130,6 +131,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 		@Override
 		public void done() {
+			EnderLogger.debug("DONE");
+			
 			int size = cache.size();
 			if (size == 0)
 				return;
@@ -137,6 +140,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			for (int i = 0; i < size; i++) {
 				EnderChunk c = cache.get(i);
 				packets[i] = c.getCompressedChunk().toPacket(c.getX(), c.getZ());
+				EnderLogger.debug("Sending chunk: " + c.getX() + ":" + c.getZ());
 			}
 			cache.clear();
 			networkManager.sendPacket(packets);
@@ -268,7 +272,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 		this.getDataWatcher().watch(0, (byte) meaning);
 		this.getDataWatcher().watch(1, (short) 0);
-		this.getDataWatcher().watch(6, 1F);
+		this.getDataWatcher().watch(6, getHealth());
 		this.getDataWatcher().watch(8, (byte) 0);
 	}
 

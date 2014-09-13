@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.enderstone.server.api.messages.AdvancedMessage;
 import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.RegionSet;
 import org.enderstone.server.util.IntegerArrayComparator;
 
 public class Test {
@@ -46,6 +47,11 @@ public class Test {
 			Arrays.sort(test, 0, size, new IntegerArrayComparator(0, 0));
 			for (int i = 0; i < size; i++)
 				System.out.println(test[i][0] + "," + test[i][1]);
+		}
+		{
+			System.out.println("Test 4: ");
+			//System.out.println("LN 1: " + RegionSet.calculateRegionPos(-11));
+			//System.out.println("LN 2: " + RegionSet.calculateRegionPos(21));
 		}
 	}
 }

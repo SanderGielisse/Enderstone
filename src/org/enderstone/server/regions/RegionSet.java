@@ -79,6 +79,7 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 	public boolean add(EnderChunk c) {
 		int x = c.getX();
 		int z = c.getZ();
+		
 		int rX = calculateRegionPos(x);
 		int rZ = calculateRegionPos(z);
 		Node prev;
@@ -256,7 +257,11 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 		if (n != null) {
 			do {
 				if (n.regionX == rX && n.regionZ == rZ) {
-					return n.regionChunks[calculateChunkPos(x) + calculateChunkPos(z) * 32];
+					EnderChunk chunkF =  n.regionChunks[calculateChunkPos(x) + calculateChunkPos(z) * 32];
+					if(chunkF != null && (chunkF.getX() != x || chunkF.getZ() != z)){
+						throw new Error("chunkF.getX() != x " + chunkF.getX() + ":"+  x +" AND chunkF.getZ() != z " + chunkF.getZ() +":"+ z);
+					}
+					return chunkF;
 				}
 			} while ((n = n.next) != null);
 		}
@@ -276,10 +281,7 @@ public class RegionSet extends AbstractSet<EnderChunk> {
 	}
 
 	protected static int calculateRegionPos(int raw) {
-		raw /= 32;
-		if (raw < 0) {
-			raw += 32;
-		}
+		raw = raw >> 5;
 		return raw;
 	}
 }
