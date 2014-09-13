@@ -83,6 +83,8 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 			int recipeSizeX = xEnd - xStart + 1;
 			int recipeSizeZ = zEnd - zStart + 1;
 			List<ItemStack> assembledRecipe = null;
+			if(this.xSize == recipeSizeX && this.zSize == recipeSizeZ)
+				assembledRecipe = cache;
 			ItemStack result = null;
 			for (CraftingListener listener : this.listeners) {
 				if (listener.acceptRecipe(recipeSizeX, recipeSizeZ)) {
@@ -93,7 +95,7 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 						}
 						assembledRecipe = builder.build();
 					}
-					result = listener.checkRecipe(cache, xSize, zSize, removeItems);
+					result = listener.checkRecipe(assembledRecipe, recipeSizeX, recipeSizeZ, removeItems);
 					if (result != null) break;
 				}
 			}
