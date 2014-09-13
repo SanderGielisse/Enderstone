@@ -28,12 +28,14 @@ public interface CraftingListener {
 	public boolean acceptRecipe(int xSize, int zSize);
 	
 	/**
-	 * a item can be extrackted from the <code>List&lt;ItemStack&gt;</code> by doing (items.get(x * xSize + z);
-	 * @param items
-	 * @param xSize
-	 * @param zSize
-	 * @param decreaseItems
-	 * @return 
+	 * Checks this Crafting listener for items that can be crafted, items can be extracted using items.get(x + z * xSize).
+	 * <p>
+	 * This method should return a ItemStack to indicate the crafting was done correctly
+	 * @param items The input items
+	 * @param xSize The inout x grid size
+	 * @param zSize The input z grid size
+	 * @param decreaseItems If true, then the Crafting listener should handle the items, so that the correct item updates are fired against the incoming item list
+	 * @return An Itemstack comtaining the result if the incoming item grid was used to process a recipe
 	 */
 	public ItemStack checkRecipe(List<ItemStack> items, int xSize, int zSize, boolean decreaseItems);
 	

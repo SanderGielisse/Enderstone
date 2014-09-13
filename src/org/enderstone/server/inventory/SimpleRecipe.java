@@ -78,6 +78,11 @@ public class SimpleRecipe implements CraftingListener {
 
 	@Override
 	public ItemStack checkRecipe(List<ItemStack> items, int xSize, int zSize, boolean decreaseItems) {
+		for (int i = 0; i < xSize * zSize; i++) {
+			ItemStack c1 = items.get(i);
+			ItemStack c2 = neededItems.get(i);
+			if (!(c1 == null ? c2 == null : c2.materialTypeMatches(c1))) return null;
+		}
 		if(decreaseItems) {
 			for(int i = 0; i < xSize * zSize; i++) {
 				ItemStack tmp = items.get(i);
@@ -89,11 +94,6 @@ public class SimpleRecipe implements CraftingListener {
 				}
 				items.set(i, tmp);
 			}
-		}
-		for (int i = 0; i < xSize * zSize; i++) {
-			ItemStack c1 = items.get(i);
-			ItemStack c2 = neededItems.get(i);
-			if (!(c1 == null ? c2 == null : c2.materialTypeMatches(c1))) return null;
 		}
 		return result;
 	}
