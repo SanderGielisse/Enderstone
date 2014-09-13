@@ -167,6 +167,7 @@ public class InventoryHandler {
 			player.sendMessage(new SimpleMessage("Invalid inventory interaction!"));
 			return false;
 		}
+		if(slot == -1) return true;
 		if (slot != -999 && (slot >= this.activeInventory.getSize() || slot < 0)) {
 			player.networkManager.disconnect("You hacked the inventory?? " + slot, false);
 			return false;
@@ -378,8 +379,10 @@ public class InventoryHandler {
 
 	public void openInventory(HalfInventory inv) {
 		Inventory inventory;
-		if (inv == null) inventory = equimentInventory;
-		else inventory = inv.openFully(equimentInventory);
+		if (inv == null) 
+			inventory = equimentInventory;
+		else 
+			inventory = inv.openFully(equimentInventory);
 		this.drop(this.itemOnCursor, true, 0);
 		itemOnCursor.set(0, null);
 		if (activeInventory != equimentInventory) {
@@ -388,29 +391,46 @@ public class InventoryHandler {
 			activeInventory = equimentInventory;
 		}
 		activeInventory = inventory;
-		if (inventory == equimentInventory) {
+		if (inventory == this.equimentInventory) {
 			this.player.networkManager.sendPacket(new PacketOutCloseWindow(this.nextWindowId));
 			return;
-		} else if (inventory.getType() == InventoryType.PLAYER_INVENTORY) {
+		}
+		if (inventory.getType() == InventoryType.PLAYER_INVENTORY) {
 			throw new IllegalArgumentException("Opening of other player inventories is not supported!");
 		}
+		assert inv != null;
+		assert inv != equimentInventory;
+		assert inventory != null;
+		assert inventory != equimentInventory;
 		this.activeInventory.addListener(listener);
 		if (++this.nextWindowId < 0) {
 			this.nextWindowId = 1;
 		}
 		// TODO add support for horse chests
-		this.player.networkManager.sendPacket(new PacketOutOpenWindow(this.nextWindowId, inventory.getType(), inventory.getTitle(), (byte) inventory.getSize(), 0));
+		player.debug(nextWindowId + "\n  size:"+inventory.getSize()+"",EnderPlayer.PlayerDebugger.INVENTORY);
+		this.player.networkManager.sendPacket(
+				new PacketOutOpenWindow(
+						this.nextWindowId, 
+						inventory.getType(), 
+						inventory.getTitle(), 
+						(byte) (inventory.getType().getPacketSize() == -1 ? inv.getSize() : inventory.getType().getPacketSize()),
+						0)
+		);
 		boolean isNonEmpty = false;
-		int size = inventory.getSize();
+		int size = inv.getSize();
 		List<ItemStack> items = inventory.getRawItems();
 		for (int i = 0; i < size && !isNonEmpty; i++)
 			if (items.get(i) != null)
 				isNonEmpty = true;
-		if (isNonEmpty) updateInventory();
+		if (isNonEmpty) updateRemoteInventory();
 	}
 
 	public void updateInventory() {
 		this.player.networkManager.sendPacket(new PacketOutWindowItems(playerWindowId, equimentInventory.getRawItems().toArray(new ItemStack[equimentInventory.getSize()])));
+	}
+	
+	public void updateRemoteInventory() {
+		this.player.networkManager.sendPacket(new PacketOutWindowItems(nextWindowId, activeInventory.getRawItems().toArray(new ItemStack[activeInventory.getSize()])));
 	}
 
 	public void decreaseItemInHand(int i) {
