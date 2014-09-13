@@ -100,6 +100,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 				for (InventoryListener l : next.listeners)
 					l.closeInventory(next);
 		}
+		for(HalfInventoryListener l : this.listeners) l.closeInventory(this);
 	}
 
 	protected abstract void close0();
@@ -145,6 +146,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 				for (InventoryListener l : next.listeners)
 					l.onSlotChange(next, slot, oldStack, newStack);
 		}
+		for(HalfInventoryListener l : this.listeners) l.onSlotChange(this, slot, oldStack, newStack);
 	}
 
 	protected void callPropertyChance(int slot, short property, short oldValue, short newValue) {
@@ -157,6 +159,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 				for (InventoryListener l : next.listeners)
 					l.onPropertyChange(next, property, oldValue, newValue);
 		}
+		for(HalfInventoryListener l : this.listeners) l.onPropertyChange(this, property, oldValue, newValue);
 	}
 
 	private class InventoryWrapper extends AbstractList<ItemStack> {
