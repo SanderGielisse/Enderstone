@@ -65,7 +65,7 @@ import org.enderstone.server.permissions.OperatorLoader;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.generators.FlatLandGenerator;
 import org.enderstone.server.regions.generators.FlyingIslandsGenerator;
-import org.enderstone.server.regions.generators.TimTest;
+import org.enderstone.server.regions.generators.SimpleGenerator;
 import org.enderstone.server.uuid.UUIDFactory;
 
 public class Main implements Runnable {
@@ -198,8 +198,8 @@ public class Main implements Runnable {
 				EnderLogger.info("[ServerThread] Main Server Thread initialized and started!");
 				EnderLogger.info("[ServerThread] " + NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + port + "!");
 
-				worlds.add(new EnderWorld("world1", new FlyingIslandsGenerator()));
-				worlds.add(new EnderWorld("world2", new TimTest()));
+				worlds.add(new EnderWorld("world1", new SimpleGenerator()));
+				worlds.add(new EnderWorld("world2", new FlyingIslandsGenerator()));
 				
 				try {
 					while (Main.this.isRunning) {

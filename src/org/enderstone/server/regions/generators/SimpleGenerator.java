@@ -20,6 +20,8 @@ package org.enderstone.server.regions.generators;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import org.enderstone.server.EnderLogger;
+import org.enderstone.server.Main;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.BlockPopulator;
 import org.enderstone.server.regions.ChunkGenerator;
@@ -27,7 +29,7 @@ import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.generators.util.SimplexOctaveGenerator;
 
-public class TimTest implements ChunkGenerator {
+public class SimpleGenerator implements ChunkGenerator {
 
 	@Override
 	public BlockId[][] generateExtBlockSections(EnderWorld world, Random random, int i, int o) {
@@ -98,15 +100,31 @@ public class TimTest implements ChunkGenerator {
 				setBlock(15, 1, source);
 				setBlock(14, 0, source);
 
-				int x = random.nextInt(15), z = random.nextInt(15);
+				int x = random.nextInt(5) + 3, z = random.nextInt(5) + 3;
 				try {
-					source.setBlock(x, source.getHighestBlockAt(x, z), z, BlockId.LOG, (byte) 1);
+					generateTree(source, x, source.getHighestBlockAt(x, z), z);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 		return pops;
+	}
+
+	private void generateTree(EnderChunk chunk, int x, int y, int z) {
+		int height = Main.random.nextInt(3) + 5;
+		
+		for(int i = 0; i < height; i++){
+			chunk.setBlock(x, -1 + i + y, z, BlockId.LOG, (byte) 0);
+		}
+		
+		for(int leafY = height - 2; leafY < height + 1; leafY++){
+			for(int leafX = -1; leafX < 2; leafX++){
+				for(int leafZ = -1; leafZ < 2; leafZ++){
+					chunk.setBlock(leafX + x, leafY + y, leafZ + z, BlockId.LEAVES, (byte) 0);
+				}
+			}
+		}
 	}
 
 	private void setBlock(int x, int y, int z, BlockId[][] chunk, BlockId material) {
