@@ -109,7 +109,7 @@ public class CraftingInventoryListener implements HalfInventoryListener {
 	@Override
 	public void onSlotChange(HalfInventory inv, int slot, ItemStack oldStack, ItemStack newStack) {
 		if (slot >= startScanSlot && slot < endScanSlot) {
-			this.rescanSlot(slot, newStack.clone());
+			this.rescanSlot(slot, newStack == null ? null : newStack.clone());
 			this.recalculateRecipes(inv, false);
 		}
 		if (slot == outputSlot && newStack == null) {
