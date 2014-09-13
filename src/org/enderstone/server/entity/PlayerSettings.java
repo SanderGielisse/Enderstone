@@ -32,8 +32,8 @@ public class PlayerSettings {
 	public GameMode gameMode = GameMode.SURVIVAL;
 	public boolean isCreative = false;
 	public boolean godMode = false;
-	public boolean allowFlight = true;
-	public boolean isFlying = true;
+	public boolean allowFlight = false;
+	public boolean isFlying = false;
 	public boolean isOnFire = false;
 	public boolean isSneaking = false;
 	public boolean isSprinting = false;

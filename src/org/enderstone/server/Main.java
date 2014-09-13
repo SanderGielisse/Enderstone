@@ -97,6 +97,7 @@ public class Main implements Runnable {
 	public String FAVICON = null;
 	public int port;
 	public volatile boolean isRunning = true;
+	private long tick = 0;
 	public final CommandMap commands;
 
 	{
@@ -191,7 +192,6 @@ public class Main implements Runnable {
 		EnderLogger.info("Initializing main Server Thread...");
 		(mainThread = new Thread(new Runnable() {
 			long lastTick = System.currentTimeMillis();
-			long tick = 0;
 
 			@Override
 			public void run() {
@@ -299,6 +299,10 @@ public class Main implements Runnable {
 		}catch(Exception e){
 			return false;
 		}
+	}
+	
+	public long getCurrentServerTick(){
+		return this.tick;
 	}
 
 	public void saveConfigToDisk(boolean defaultt) {

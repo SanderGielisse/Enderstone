@@ -28,7 +28,7 @@ import org.enderstone.server.packet.play.PacketOutEntityStatus;
 import org.enderstone.server.packet.play.PacketOutEntityVelocity;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 
-public abstract class EnderEntity implements Entity{
+public abstract class EnderEntity implements Entity {
 
 	private static int entityCount = 0;
 
@@ -37,6 +37,7 @@ public abstract class EnderEntity implements Entity{
 	private float health = Float.NaN;
 	private float maxHealth = Float.NaN;
 	private DataWatcher dataWatcher = new DataWatcher();
+	private long latestDamage = 0;
 
 	public EnderEntity(Location location) {
 		this.entityId = entityCount++;
@@ -61,11 +62,11 @@ public abstract class EnderEntity implements Entity{
 
 	public abstract void onLeftClick(EnderPlayer attacker);
 
-	public boolean onCollision(EnderPlayer withPlayer){
+	public boolean onCollision(EnderPlayer withPlayer) {
 		return false;
 	}
-	
-	public void damage(float damage) {		
+
+	public void damage(float damage) {
 		if (Float.isNaN(this.health))
 			initHealth();
 		if (health == 0)
@@ -79,8 +80,14 @@ public abstract class EnderEntity implements Entity{
 			}
 		}
 	}
-	
-	public void damage(float damage, Vector knockback){
+
+	public void damage(float damage, Vector knockback) {
+		//damage delay
+		if ((Main.getInstance().getCurrentServerTick() - this.latestDamage) < 4) {
+			return;
+		}
+		this.latestDamage = Main.getInstance().getCurrentServerTick();
+		
 		this.damage(damage);
 		this.getWorld().broadcastPacket(new PacketOutEntityVelocity(getEntityId(), knockback), this.getLocation());
 	}

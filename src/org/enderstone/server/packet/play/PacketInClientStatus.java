@@ -58,6 +58,7 @@ public class PacketInClientStatus extends Packet {
 				public void run() {
 					if (networkManager.player.isDead()) {
 						networkManager.sendPacket(new PacketOutRespawn(0, (byte) 0, (byte) networkManager.player.clientSettings.gameMode.getId(), "default"));
+						networkManager.forcePacketFlush(); //fix for having to click the "respawn" button twice
 						networkManager.player.teleport(networkManager.player.getWorld().getSpawn().clone());
 						networkManager.player.getInventoryHandler().updateInventory();
 						networkManager.player.heal();
