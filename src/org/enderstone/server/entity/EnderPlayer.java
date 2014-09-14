@@ -327,7 +327,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		return toSend.toArray(new Packet[toSend.size()]);
 	}
 	
-	//TODO call this when item in hand, or one of the equipment parts changes
 	public void broadcastEquipment(EquipmentUpdateType type){
 		List<Packet> toSend = new ArrayList<>();
 		List<ItemStack> handler = this.getInventoryHandler().getPlayerInventory().getArmor();
