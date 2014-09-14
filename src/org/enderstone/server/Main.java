@@ -55,8 +55,8 @@ import org.enderstone.server.commands.vanila.KillCommand;
 import org.enderstone.server.commands.vanila.StopCommand;
 import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
-import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.EnderEntity;
+import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
@@ -67,6 +67,7 @@ import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.generators.FlatLandGenerator;
 import org.enderstone.server.regions.generators.FlyingIslandsGenerator;
 import org.enderstone.server.regions.generators.SimpleGenerator;
+import org.enderstone.server.util.NettyThreadFactory;
 import org.enderstone.server.uuid.UUIDFactory;
 
 public class Main implements Runnable {
@@ -77,6 +78,8 @@ public class Main implements Runnable {
 	public static final int EXCEPTED_SLEEP_TIME = 1000 / 20;
 	public static final int CANT_KEEP_UP_TIMEOUT = -10000;
 	public static final int MAX_VIEW_DISTANCE = 10;
+	public static final int MAX_NETTY_BOSS_THREADS = 4;
+	public static final int MAX_NETTY_WORKER_THREADS = 8;
 	public static final int MAX_SLEEP = 100;
 	public static final int DEFAULT_PROTOCOL = 47;
 	public static final Set<Integer> PROTOCOL = Collections.unmodifiableSet(new HashSet<Integer>() {
@@ -158,8 +161,9 @@ public class Main implements Runnable {
 			EnderLogger.exception(e);
 		}
 		
-		ThreadGroup nettyListeners = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Netty Listeners");
-		EnderLogger.info("Starting Netty listeners... [" + this.port + "]");
+		EnderLogger.info("Server ready... Starting required threads now!");
+		
+		final ThreadGroup nettyListeners = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Netty Listeners");
 		for (final int nettyPort : new int[]{this.port}) {
 
 			Thread t;
@@ -167,9 +171,10 @@ public class Main implements Runnable {
 
 				@Override
 				public void run() {
-					EnderLogger.info("[Netty] Started Netty Server at port " + nettyPort + "...");
-					EventLoopGroup bossGroup = new NioEventLoopGroup();
-					EventLoopGroup workerGroup = new NioEventLoopGroup();
+					EnderLogger.info("Started Netty Server at port " + nettyPort + "...");
+					ThreadGroup group = new ThreadGroup(nettyListeners, "Listener-"+nettyPort);
+					EventLoopGroup bossGroup = new NioEventLoopGroup(MAX_NETTY_BOSS_THREADS, new NettyThreadFactory(group, "boss"));
+					EventLoopGroup workerGroup = new NioEventLoopGroup(MAX_NETTY_WORKER_THREADS, new NettyThreadFactory(group, "worker"));
 
 					try {
 						ServerBootstrap bootstrap = new ServerBootstrap();
@@ -181,24 +186,23 @@ public class Main implements Runnable {
 					} catch (InterruptedException e) {
 						Thread.currentThread().interrupt();
 					} finally {
+						EnderLogger.info("Stopped Netty Server at port " + nettyPort + "...");
 						scheduleShutdown();
 						bossGroup.shutdownGracefully();
 						workerGroup.shutdownGracefully();
 					}
-					EnderLogger.info("[Netty] Stopped Netty Server at port " + nettyPort + "...");
 				}
-			}, "Netty listener-" + nettyPort)).start();
+			}, "Listener-" + nettyPort)).start();
 			this.listenThreads.add(t);
 		}
 
-		EnderLogger.info("Initializing main Server Thread...");
 		(mainThread = new Thread(new Runnable() {
 			long lastTick = System.currentTimeMillis();
 
 			@Override
 			public void run() {
-				EnderLogger.info("[ServerThread] Main Server Thread initialized and started!");
-				EnderLogger.info("[ServerThread] " + NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + port + "!");
+				EnderLogger.info("Main Server Thread initialized and started!");
+				EnderLogger.info("" + NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + port + "!");
 
 				worlds.add(new EnderWorld("world1", new SimpleGenerator()));
 				worlds.add(new EnderWorld("world2", new FlyingIslandsGenerator()));
@@ -211,15 +215,15 @@ public class Main implements Runnable {
 					Main.this.isRunning = false;
 					Thread.currentThread().interrupt();
 				} catch (RuntimeException ex) {
-					EnderLogger.error("[ServerThread] CRASH REPORT! (this should not happen!)");
-					EnderLogger.error("[ServerThread] Main thread has shutdown, this shouldn't happen!");
+					EnderLogger.error("CRASH REPORT! (this should not happen!)");
+					EnderLogger.error("Main thread has shutdown, this shouldn't happen!");
 					EnderLogger.exception(ex);
-					EnderLogger.error("[ServerThread] Server is inside tick " + tick);
-					EnderLogger.error("[ServerThread] Last tick was in " + new Date(lastTick).toString());
+					EnderLogger.error("Server is inside tick " + tick);
+					EnderLogger.error("Last tick was in " + new Date(lastTick).toString());
 				} finally {
 					Main.this.isRunning = false;
 					Main.getInstance().directShutdown();
-					EnderLogger.info("[ServerThread] Main Server Thread stopped!");
+					EnderLogger.info("Main Server Thread stopped!");
 				}
 			}
 
@@ -262,7 +266,7 @@ public class Main implements Runnable {
 			public void warn(String warn) {
 				EnderLogger.warn("[ServerThread] [tick-" + tick + "] " + warn);
 			}
-		}, "Enderstone server thread.")).start();
+		}, "ServerThread")).start();
 
 		ThreadGroup shutdownHooks = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Shutdown hooks");
 		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHooks, new Runnable() {

@@ -1,4 +1,4 @@
-/* 
+/*
  * Enderstone
  * Copyright (C) 2014 Sander Gielisse and Fernando van Loenhout
  *
@@ -15,18 +15,33 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.api;
+package org.enderstone.server.util;
 
-public enum GameMode {
-	SURVIVAL(0), CREATIVE(1), ADVENTURE(2), SPECTATOR(3);
+import java.util.concurrent.ThreadFactory;
 
-	private int id;
+/**
+ *
+ * @author Fernando
+ */
+public class NettyThreadFactory implements ThreadFactory {
 
-	private GameMode(int id) {
-		this.id = id;
+	private final ThreadGroup group;
+	private final String fullName;
+	private int nextNumber = 0;
+
+	public NettyThreadFactory(ThreadGroup parent, String name) {
+		group = new ThreadGroup(parent, name);
+		fullName = parent.getName() + "\\" + name;
 	}
 
-	public int getId() {
-		return id;
+	@Override
+	public Thread newThread(Runnable r) {
+		synchronized (this) {
+			Thread t = new Thread(group, r, fullName + "\\" + nextNumber++);
+			t.setPriority(Thread.NORM_PRIORITY - 1);
+			t.setDaemon(true);
+			return t;
+		}
 	}
+
 }
