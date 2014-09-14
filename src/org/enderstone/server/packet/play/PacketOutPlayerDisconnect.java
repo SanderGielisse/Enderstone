@@ -39,19 +39,24 @@ public class PacketOutPlayerDisconnect extends Packet {
 	@Override
 	public void write(PacketDataWrapper wrapper) throws IOException {		
 		if (this.plainText == null)
-			this.plainText = message.toPlainText();
+			this.plainText = message.toMessageJson();
 		wrapper.writeString(plainText);
 	}
 
 	@Override
 	public int getSize() throws IOException {
 		if (this.plainText == null)
-			this.plainText = message.toPlainText();
+			this.plainText = message.toMessageJson();
 		return getStringSize(plainText) + getVarIntSize(getId());
 	}
 
 	@Override
 	public byte getId() {
 		return 0x40;
+	}
+
+	@Override
+	public String toString() {
+		return "PacketOutPlayerDisconnect [plainText=" + plainText + ", message=" + message + "]";
 	}
 }

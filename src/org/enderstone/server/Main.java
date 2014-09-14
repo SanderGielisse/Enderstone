@@ -349,8 +349,8 @@ public class Main implements Runnable {
 		return null;
 	}
 
-	private int latestKeepAlive = 0;
-	private int latestChunkUpdate = 0;
+	private long latestKeepAlive = 0;
+	private long latestChunkUpdate = 0;
 
 	private void serverTick(long tick) {
 		for (EnderPlayer ep : onlinePlayers) {

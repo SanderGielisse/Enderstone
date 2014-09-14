@@ -38,6 +38,7 @@ import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.EntityItem;
+import org.enderstone.server.entity.EntityMob;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
@@ -102,6 +103,10 @@ public class EnderWorld implements World{
 			}
 		}
 		loadedChunks.add(r = new EnderChunk(this, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>()));
+		
+		//temporarily mob test
+		this.addEntity(new EntityMob((byte) (Main.random.nextInt(10) + 50), this, new Location(this, x << 4, r.getHighestBlockAt(0, 0), z << 4, (float) 0, (float) 0)));
+		
 		return r;
 	}
 

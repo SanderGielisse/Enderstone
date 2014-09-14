@@ -68,7 +68,6 @@ public class PacketInUseEntity extends Packet {
 				if (mouseClick == 1) { // left click
 					EnderEntity e = Main.getInstance().getEntityById(targetId);
 					if (e == null) {
-						networkManager.sendPacket(new PacketOutPlayerDisconnect(new SimpleMessage("Invalid target id, probably a server bug, please report!")));
 						return;
 					}
 					if (e.isDead()) {
@@ -78,7 +77,6 @@ public class PacketInUseEntity extends Packet {
 				} else if (mouseClick == 0) { // right click
 					EnderEntity e = Main.getInstance().getEntityById(targetId);
 					if (e == null) {
-						networkManager.sendPacket(new PacketOutPlayerDisconnect(new SimpleMessage("Invalid target id, probably a server bug, please report!")));
 						return;
 					}
 					if (e.isDead()) {

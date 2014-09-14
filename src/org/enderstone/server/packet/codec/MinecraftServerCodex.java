@@ -57,6 +57,7 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf buf) throws IOException {
 		packet.writeFully(new PacketDataWrapper(manager, buf));
+		EnderLogger.debug("---> " + packet.toString());
 	}
 
 	@Override

@@ -30,7 +30,7 @@ public class MinecraftServerInitializer extends ChannelInitializer<SocketChannel
 	protected void initChannel(SocketChannel channel) throws Exception {
 		ChannelPipeline line = channel.pipeline();
 		NetworkManager manager = new NetworkManager();
-		line.addLast("packet_r_timeout",new ReadTimeoutHandler(30, TimeUnit.SECONDS));
+		line.addLast("packet_r_timeout", new ReadTimeoutHandler(30, TimeUnit.SECONDS));
 		line.addLast("packet_rw_converter", manager.createCodex());
 		line.addLast("packet_rw_reader", manager);
 	}
