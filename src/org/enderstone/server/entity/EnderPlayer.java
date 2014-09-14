@@ -332,19 +332,19 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		List<Packet> toSend = new ArrayList<>();
 		List<ItemStack> handler = this.getInventoryHandler().getPlayerInventory().getArmor();
 		
-		if(this.getInventoryHandler().getItemInHand() != null && (type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)){
+		if((type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)){
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); //helmet
 		}
-		if(handler.get(0) != null && (type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)){
+		if((type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)){
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.get(0))); //helmet
 		}
-		if(handler.get(1) != null && (type == EquipmentUpdateType.CHESTPLATE_CHANGE || type == EquipmentUpdateType.ALL)){
+		if((type == EquipmentUpdateType.CHESTPLATE_CHANGE || type == EquipmentUpdateType.ALL)){
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 3, handler.get(0))); //chestplate
 		}
-		if(handler.get(2) != null && (type == EquipmentUpdateType.LEGGINGS_CHANGE || type == EquipmentUpdateType.ALL)){
+		if((type == EquipmentUpdateType.LEGGINGS_CHANGE || type == EquipmentUpdateType.ALL)){
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 2, handler.get(0))); //leggins
 		}
-		if(handler.get(3) != null && (type == EquipmentUpdateType.BOOTS_CHANGE || type == EquipmentUpdateType.ALL)){
+		if((type == EquipmentUpdateType.BOOTS_CHANGE || type == EquipmentUpdateType.ALL)){
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 1, handler.get(0))); //boots
 		}
 		Iterator<String> visible = this.visiblePlayers.iterator();
