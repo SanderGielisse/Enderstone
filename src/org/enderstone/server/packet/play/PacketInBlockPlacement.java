@@ -18,6 +18,7 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.entity.EnderPlayer;
@@ -75,6 +76,17 @@ public class PacketInBlockPlacement extends Packet {
 				int z = getLocation().getBlockZ();
 
 				byte direct = getDirection();
+
+				//called when started eating, pulling bow etc.
+				if (x == -1 && z == -1 && direct == -1) {
+					if (getHeldItem().getBlockId() == BlockId.COOKED_BEEF.getId()) {
+						networkManager.player.clientSettings.isEatingTicks = 1;
+						networkManager.player.updateDataWatcher();
+						networkManager.player.getWorld().broadcastPacket(new PacketOutEntityMetadata(networkManager.player.getEntityId(), networkManager.player.getDataWatcher()), networkManager.player.getLocation());
+					}
+					return;
+				}
+				
 				if (direct == 0) {
 					y--;
 				} else if (direct == 1) {
@@ -104,10 +116,12 @@ public class PacketInBlockPlacement extends Packet {
 						}
 						return;
 					}
+					
 					if (BlockId.byId(getHeldItem().getBlockId()).isValidBlock()) {
 						Main.getInstance().getWorld(pl).setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
 						pl.getInventoryHandler().decreaseItemInHand(1);
 						Main.getInstance().getWorld(networkManager.player).broadcastSound("dig.grass", 1F, (byte) 63, loc, null);
+						return;
 					}
 				}
 			}

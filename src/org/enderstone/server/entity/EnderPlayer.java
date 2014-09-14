@@ -87,20 +87,22 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	private final InventoryHandler inventoryHandler = new InventoryHandler(this);
 	{
 		inventoryHandler.getPlayerInventory().addListener(new InventoryListener() {
-			
+
 			@Override
 			public void onSlotChange(Inventory inv, int slot, ItemStack oldStack, ItemStack newStack) {
-				if(slot == 5){
+				if (slot > 35 && slot < 45) {
+					broadcastEquipment(EquipmentUpdateType.ITEM_IN_HAND_CHANGE);
+				} else if (slot == 5) {
 					broadcastEquipment(EquipmentUpdateType.HELMET_CHANGE);
-				} else if(slot == 6){
+				} else if (slot == 6) {
 					broadcastEquipment(EquipmentUpdateType.CHESTPLATE_CHANGE);
-				} else if(slot == 7){
+				} else if (slot == 7) {
 					broadcastEquipment(EquipmentUpdateType.LEGGINGS_CHANGE);
-				} else if(slot == 8){
+				} else if (slot == 8) {
 					broadcastEquipment(EquipmentUpdateType.BOOTS_CHANGE);
 				}
 			}
-			
+
 			@Override
 			public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue) {
 			}
@@ -120,7 +122,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public final String playerName;
 	public final HashSet<String> visiblePlayers = new HashSet<>();
-	public final HashSet<EnderEntity> canSeeEntity = new HashSet<>(); //TODO find out if entity will be removed here when it despawns
+	public final HashSet<EnderEntity> canSeeEntity = new HashSet<>();
 	public final UUID uuid;
 	private final String textureValue;
 	private final String textureSignature;
@@ -268,6 +270,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 64, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.WORKBENCH.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.CHEST.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COOKED_BEEF, (byte) 10));
 		
 		this.inventoryHandler.getPlayerInventory().setRawItem(5, new ItemStack(BlockId.DIAMOND_HELMET, (byte) 1));
 		
@@ -293,7 +296,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			meaning = (byte) (meaning | 0x02);
 		if (this.clientSettings.isSprinting)
 			meaning = (byte) (meaning | 0x08);
-		if (this.clientSettings.isEating)
+		if (this.clientSettings.isEatingTicks > 0)
 			meaning = (byte) (meaning | 0x10);
 		if (this.clientSettings.isInvisible)
 			meaning = (byte) (meaning | 0x20);
@@ -331,8 +334,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		List<Packet> toSend = new ArrayList<>();
 		List<ItemStack> handler = this.getInventoryHandler().getPlayerInventory().getArmor();
 		
-		if((type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); //helmet
+		if((type == EquipmentUpdateType.ITEM_IN_HAND_CHANGE || type == EquipmentUpdateType.ALL)){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); //item in hand
 		}
 		if((type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)){
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.get(0))); //helmet
@@ -597,19 +600,45 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public void serverTick() {
 		super.serverTick();
+		
+		if (getFoodLevel() == 20) {
+			this.clientSettings.isEatingTicks = 0;
+			this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(this.getHealth(), this.getFoodLevel(), this.clientSettings.foodSaturation));
+		} else {
+			if (this.clientSettings.isEatingTicks > 0) {
+				this.clientSettings.isEatingTicks++;
+				if (this.clientSettings.isEatingTicks % 30 == 0) {
+					this.clientSettings.isEatingTicks = 0;
+					if (this.getInventoryHandler().getItemInHand() != null) {
+						this.getInventoryHandler().decreaseItemInHand(1);
+						if (this.getFoodLevel() <= 17) {
+							this.setFoodLevel(this.getFoodLevel() + 3);
+						} else {
+							this.clientSettings.foodSaturation = 5;
+							this.setFoodLevel(20);
+						}
+					}
+				}
+			}
+		}
+		
 		boolean didFoodUpdate = false;
 		if (!this.isDead() && latestFood++ % (30 * 20) == 0) { // TODO do this how it goes in default Minecraft
 			didFoodUpdate = true;
-			if ((this.getFood() - 1) >= 0) {
-				this.setFood((short) (this.getFood() - 1));
+			if (this.clientSettings.foodSaturation > 0) {
+				this.clientSettings.foodSaturation--;
 			} else {
-				if(this.damage(1F)){
-					Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " starved to death."));
+				if ((this.getFoodLevel() - 1) >= 0) {
+					this.setFood((short) (this.getFoodLevel() - 1));
+				} else {
+					if (this.damage(1F)) {
+						Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " starved to death."));
+					}
 				}
 			}
 		}
 		if (!this.isDead() && latestHeal++ % (15 * 20) == 0 && !didFoodUpdate) { // TODO do this how it goes in default Minecraft
-			if ((this.getHealth() + 0.5F) <= this.getMaxHealth() && this.getFood() > 0) {
+			if ((this.getHealth() + 0.5F) <= this.getMaxHealth() && this.getFoodLevel() > 0) {
 				this.setHealth(this.getHealth() + 0.5F);
 			}
 		}
@@ -744,10 +773,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		if(this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2))){
 			Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " was killed by " + attacker.getPlayerName()));
 		}
-	}
-
-	public int getFood() {
-		return this.clientSettings.food;
 	}
 
 	public void setFood(short foodLevel) {
@@ -886,7 +911,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public boolean canSprint() {
-		return this.clientSettings.food <= 3;
+		return this.clientSettings.food >= 6;
 	}
 
 	@Override
@@ -1018,5 +1043,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public boolean isOnFire() {
 		return getFireTicks() > 0;
+	}
+
+	@Override
+	public boolean isEating() {
+		return this.clientSettings.isEatingTicks > 0;
 	}
 }

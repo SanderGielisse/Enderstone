@@ -140,7 +140,7 @@ public class Location implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "Location{" + "world=" + world.toString() + ", x=" + x + ", y=" + y + ", z=" + z + ", yaw=" + yaw + ", pitch=" + pitch + '}';
+		return "Location{" + "world=" + world + ", x=" + x + ", y=" + y + ", z=" + z + ", yaw=" + yaw + ", pitch=" + pitch + '}';
 	}
 
 	public void cloneFrom(Location spawn) {
