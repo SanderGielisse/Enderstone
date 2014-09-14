@@ -24,6 +24,7 @@ import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutAnimation;
+import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutEntityStatus;
 import org.enderstone.server.packet.play.PacketOutEntityVelocity;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
@@ -38,6 +39,7 @@ public abstract class EnderEntity implements Entity {
 	private float maxHealth = Float.NaN;
 	private DataWatcher dataWatcher = new DataWatcher();
 	private long latestDamage = 0;
+	private int fireTicks = 0;
 
 	public EnderEntity(Location location) {
 		this.entityId = entityCount++;
@@ -192,5 +194,25 @@ public abstract class EnderEntity implements Entity {
 	}
 
 	public void serverTick() {
+		if(fireTicks == 0){
+			return;
+		}
+		this.fireTicks--;
+		if(fireTicks % 20 == 0){
+			damage(1F);
+		}
+		if(this.fireTicks == 0){
+			this.setFireTicks(0);
+		}
+	}
+
+	public int getFireTicks() {
+		return fireTicks;
+	}
+
+	public void setFireTicks(int fireTicks) {
+		this.fireTicks = fireTicks;
+		this.updateDataWatcher();
+		this.getLocation().getWorld().broadcastPacket(new PacketOutEntityMetadata(getEntityId(), dataWatcher), this.getLocation());
 	}
 }

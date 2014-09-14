@@ -34,7 +34,6 @@ public class PlayerSettings {
 	public boolean godMode = false;
 	public boolean allowFlight = false;
 	public boolean isFlying = false;
-	public boolean isOnFire = false;
 	public boolean isSneaking = false;
 	public boolean isSprinting = false;
 	public boolean isEating = false;

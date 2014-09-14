@@ -39,4 +39,7 @@ public interface Entity {
 
 	public EnderWorld getWorld();
 
+	public int getFireTicks();
+
+	public void setFireTicks(int fireTicks);
 }

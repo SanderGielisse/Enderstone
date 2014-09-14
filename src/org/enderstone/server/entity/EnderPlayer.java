@@ -262,7 +262,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void onSpawn() {
-		EnderLogger.info(this.getPlayerName() + " logged in from " + networkManager.ctx.channel().remoteAddress().toString() + " with uuid " + uuid);
+		EnderLogger.info(this.getPlayerName() + " logged in from " + networkManager.ctx.channel().remoteAddress().toString() + " with uuid " + uuid);		
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_PICKAXE.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_SPADE.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 64, (short) 0));
@@ -287,7 +287,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public void updateDataWatcher() {
 		int meaning = 0;
 
-		if (this.clientSettings.isOnFire)
+		if (this.getFireTicks() > 0)
 			meaning = (byte) (meaning | 0x01);
 		if (this.clientSettings.isSneaking)
 			meaning = (byte) (meaning | 0x02);
@@ -596,6 +596,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void serverTick() {
+		super.serverTick();
 		boolean didFoodUpdate = false;
 		if (!this.isDead() && latestFood++ % (30 * 20) == 0) { // TODO do this how it goes in default Minecraft
 			didFoodUpdate = true;

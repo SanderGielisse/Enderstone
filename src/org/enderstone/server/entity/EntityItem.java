@@ -150,6 +150,7 @@ public class EntityItem extends EnderEntity implements Item {
 	
 	@Override
 	public void serverTick() {
+		super.serverTick();
 		if (pickupDelay > 0) {
 			pickupDelay--;
 		}
