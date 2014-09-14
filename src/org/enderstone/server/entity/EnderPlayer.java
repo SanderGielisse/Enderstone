@@ -39,7 +39,9 @@ import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
+import org.enderstone.server.inventory.Inventory;
 import org.enderstone.server.inventory.InventoryHandler;
+import org.enderstone.server.inventory.InventoryListener;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.inventory.PlayerInventory;
 import org.enderstone.server.packet.NetworkManager;
@@ -83,6 +85,31 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	private static final int MAX_CHUNKS_EVERY_UPDATE = 16;
 
 	private final InventoryHandler inventoryHandler = new InventoryHandler(this);
+	{
+		inventoryHandler.getPlayerInventory().addListener(new InventoryListener() {
+			
+			@Override
+			public void onSlotChange(Inventory inv, int slot, ItemStack oldStack, ItemStack newStack) {
+				if(slot == 5){
+					broadcastEquipment(EquipmentUpdateType.HELMET_CHANGE);
+				} else if(slot == 6){
+					broadcastEquipment(EquipmentUpdateType.CHESTPLATE_CHANGE);
+				} else if(slot == 7){
+					broadcastEquipment(EquipmentUpdateType.LEGGINGS_CHANGE);
+				} else if(slot == 8){
+					broadcastEquipment(EquipmentUpdateType.BOOTS_CHANGE);
+				}
+			}
+			
+			@Override
+			public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue) {
+			}
+			
+			@Override
+			public void closeInventory(Inventory inv) {
+			}
+		});
+	}
 	public final PlayerSettings clientSettings = new PlayerSettings();
 	public final NetworkManager networkManager;
 	public final EnumSet<PlayerDebugger> debugOutputs = EnumSet.noneOf(PlayerDebugger.class);
