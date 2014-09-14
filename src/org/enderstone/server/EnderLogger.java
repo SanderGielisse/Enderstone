@@ -38,7 +38,7 @@ public class EnderLogger {
 			public String format(LogRecord record) {
 				StringBuilder sb = new StringBuilder();
 				SimpleDateFormat dt1 = new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss] ");
-				sb.append(dt1.format(new Date())).append(record.getLevel().getLocalizedName()).append(": ").append(formatMessage(record)).append(System.lineSeparator());
+				sb.append(dt1.format(new Date())).append('[').append(Thread.currentThread().getName()).append('/').append(record.getLevel().getLocalizedName()).append("] ").append(formatMessage(record)).append(System.lineSeparator());
 				Throwable exception = record.getThrown();
 				if (exception != null) {
 					try {
