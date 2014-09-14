@@ -270,7 +270,11 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 64, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.WORKBENCH.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.CHEST.getId(), (byte) 1, (short) 0));
+		
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COOKED_BEEF, (byte) 10));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COOKED_CHICKEN, (byte) 10));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_CHICKEN, (byte) 10));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_RABBIT, (byte) 10));
 		
 		this.inventoryHandler.getPlayerInventory().setRawItem(5, new ItemStack(BlockId.DIAMOND_HELMET, (byte) 1));
 		
@@ -610,11 +614,18 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				if (this.clientSettings.isEatingTicks % 30 == 0) {
 					this.clientSettings.isEatingTicks = 0;
 					if (this.getInventoryHandler().getItemInHand() != null) {
+						FoodType type = FoodType.fromBlockId(this.getInventoryHandler().getItemInHand().getBlockId());
 						this.getInventoryHandler().decreaseItemInHand(1);
-						if (this.getFoodLevel() <= 17) {
-							this.setFoodLevel(this.getFoodLevel() + 3);
-						} else {
+						
+						if(this.clientSettings.foodSaturation + type.getSaturation() > 5){
 							this.clientSettings.foodSaturation = 5;
+						}else{
+							this.clientSettings.foodSaturation = this.clientSettings.foodSaturation + type.getSaturation();
+						}
+						
+						if (this.getFoodLevel() <= (20 - type.getFood())) {
+							this.setFoodLevel(this.getFoodLevel() + type.getFood());
+						} else {
 							this.setFoodLevel(20);
 						}
 					}

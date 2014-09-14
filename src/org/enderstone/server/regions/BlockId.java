@@ -285,7 +285,7 @@ public enum BlockId {
 	GOLD_LEGGINGS(316, false),
 	GOLD_BOOTS(317, false),
 	FLINT(318, false),
-	PORK(319, false),
+	RAW_PORK(319, false),
 	GRILLED_PORK(320, false),
 	PAINTING(321, false),
 	GOLDEN_APPLE(322, false),
