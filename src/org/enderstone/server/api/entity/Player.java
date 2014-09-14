@@ -113,4 +113,6 @@ public interface Player {
 	public Message getTabListFooter();
 	
 	public boolean isOnFire();
+	
+	public boolean isEating();
 }

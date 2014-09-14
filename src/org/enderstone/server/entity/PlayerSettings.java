@@ -36,12 +36,12 @@ public class PlayerSettings {
 	public boolean isFlying = false;
 	public boolean isSneaking = false;
 	public boolean isSprinting = false;
-	public boolean isEating = false;
+	public int isEatingTicks = 0;
 	public boolean isInvisible = false;
 	public float flySpeed = 0.05F;
 	public float walkSpeed = 0.1F;
-	public int food = 20;
-	public float foodSaturation = 0;
+	public int food = 10;
+	public float foodSaturation = 5;
 	public int experience = 0;
 	public Message tabListHeader = new AdvancedMessage("Player Tab-List").setColor(ChatColor.GOLD).setBold(true).build();
 	public Message tabListFooter = new AdvancedMessage("This server is proudly powered by Enderstone").setColor(ChatColor.RED).setItalic(true).build();

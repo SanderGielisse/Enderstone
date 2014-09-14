@@ -18,6 +18,7 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.entity.EntityItem;
@@ -88,6 +89,10 @@ public class PacketInPlayerDigging extends Packet {
 					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
 				} else if (getStatus() == 4) {
 					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
+				} else if (getStatus() == 5){
+					networkManager.player.clientSettings.isEatingTicks = 0;
+					networkManager.player.updateDataWatcher();
+					networkManager.player.getWorld().broadcastPacket(new PacketOutEntityMetadata(networkManager.player.getEntityId(), networkManager.player.getDataWatcher()), networkManager.player.getLocation());
 				}
 			}
 		});
