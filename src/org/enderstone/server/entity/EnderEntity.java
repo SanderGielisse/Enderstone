@@ -52,7 +52,7 @@ public abstract class EnderEntity implements Entity {
 		return location;
 	}
 
-	public abstract Packet getSpawnPacket();
+	public abstract Packet[] getSpawnPackets();
 
 	public abstract void teleport(Location loc);
 

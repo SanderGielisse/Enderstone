@@ -41,6 +41,7 @@ import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.inventory.PlayerInventory;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
@@ -49,6 +50,7 @@ import org.enderstone.server.packet.play.PacketOutChangeGameState;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
 import org.enderstone.server.packet.play.PacketOutChunkData;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
+import org.enderstone.server.packet.play.PacketOutEntityEquipment;
 import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityMetadata;
@@ -91,7 +93,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public final String playerName;
 	public final HashSet<String> visiblePlayers = new HashSet<>();
-	public final HashSet<EnderEntity> canSeeEntity = new HashSet<>();
+	public final HashSet<EnderEntity> canSeeEntity = new HashSet<>(); //TODO find out if entity will be removed here when it despawns
 	public final UUID uuid;
 	private final String textureValue;
 	private final String textureSignature;
@@ -239,6 +241,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 64, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.WORKBENCH.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.CHEST.getId(), (byte) 1, (short) 0));
+		
+		this.inventoryHandler.getPlayerInventory().setRawItem(5, new ItemStack(BlockId.DIAMOND_HELMET, (byte) 1));
+		
 		this.updateDataWatcher();
 
 		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(this.clientSettings.tabListHeader, this.clientSettings.tabListFooter));
@@ -273,8 +278,60 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	@Override
-	public Packet getSpawnPacket() {
-		return new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, (int) (this.getLocation().getX() * 32.0D), (int) (this.getLocation().getY() * 32.0D), (int) (this.getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (short) 0, this.getDataWatcher());
+	public Packet[] getSpawnPackets() {
+		List<Packet> toSend = new ArrayList<>();
+		PlayerInventory handler = this.getInventoryHandler().getPlayerInventory();
+		toSend.add(new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, (int) (this.getLocation().getX() * 32.0D), (int) (this.getLocation().getY() * 32.0D), (int) (this.getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (short) 0, this.getDataWatcher()));
+		if(this.getInventoryHandler().getItemInHand() != null){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); //helmet
+		}
+		if(handler.getArmor().get(0) != null){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.getArmor().get(0))); //helmet
+		}
+		if(handler.getArmor().get(1) != null){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 3, handler.getArmor().get(0))); //chestplate
+		}
+		if(handler.getArmor().get(2) != null){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 2, handler.getArmor().get(0))); //leggins
+		}
+		if(handler.getArmor().get(3) != null){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 1, handler.getArmor().get(0))); //boots
+		}
+		return toSend.toArray(new Packet[toSend.size()]);
+	}
+	
+	//TODO call this when item in hand, or one of the equipment parts changes
+	public void broadcastEquipment(EquipmentUpdateType type){
+		List<Packet> toSend = new ArrayList<>();
+		List<ItemStack> handler = this.getInventoryHandler().getPlayerInventory().getArmor();
+		
+		if(this.getInventoryHandler().getItemInHand() != null && (type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); //helmet
+		}
+		if(handler.get(0) != null && (type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.get(0))); //helmet
+		}
+		if(handler.get(1) != null && (type == EquipmentUpdateType.CHESTPLATE_CHANGE || type == EquipmentUpdateType.ALL)){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 3, handler.get(0))); //chestplate
+		}
+		if(handler.get(2) != null && (type == EquipmentUpdateType.LEGGINGS_CHANGE || type == EquipmentUpdateType.ALL)){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 2, handler.get(0))); //leggins
+		}
+		if(handler.get(3) != null && (type == EquipmentUpdateType.BOOTS_CHANGE || type == EquipmentUpdateType.ALL)){
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 1, handler.get(0))); //boots
+		}
+		Iterator<String> visible = this.visiblePlayers.iterator();
+		while(visible.hasNext()){
+			String name = visible.next();
+			EnderPlayer ep = Main.getInstance().getPlayer(name);
+			if(ep == null){
+				visible.remove();
+				continue;
+			}
+			for(Packet pack : toSend){
+				ep.getNetworkManager().sendPacket(pack);
+			}
+		}
 	}
 
 	public void onPlayerChat(final String message) {
@@ -340,11 +397,19 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		for (EnderPlayer pl : onlinePlayers) {
 			if (!pl.getPlayerName().equals(this.getPlayerName()) && !this.visiblePlayers.contains(pl.getPlayerName()) && pl.getLocation().isInRange(50, this.getLocation(), true) && (!pl.isDead())) {
 				this.visiblePlayers.add(pl.getPlayerName());
-				this.networkManager.sendPacket(pl.getSpawnPacket());
+				this.networkManager.sendPacket(pl.getSpawnPackets());
 			}
 			if (!pl.getPlayerName().equals(this.getPlayerName()) && this.visiblePlayers.contains(pl.getPlayerName()) && !pl.getLocation().isInRange(50, this.getLocation(), true)) {
 				this.visiblePlayers.remove(pl.getPlayerName());
 				toDespawn.add(pl.getEntityId());
+			}
+		}
+		
+		Iterator<String> it = this.visiblePlayers.iterator();
+		while(it.hasNext()){
+			String name = it.next();
+			if(Main.getInstance().getPlayer(name) == null){
+				it.remove();
 			}
 		}
 		if (!toDespawn.isEmpty()) {

@@ -50,9 +50,12 @@ public class EntityItem extends EnderEntity implements Item {
 	}
 
 	@Override
-	public Packet getSpawnPacket() {
+	public Packet[] getSpawnPackets() {
 		Location loc = this.getLocation();
-		return new PacketOutSpawnObject(getEntityId(), (byte) 2, (int) ((loc.getX()) * 32.0D), (int) ((loc.getY() + 0.25) * 32.0D), (int) ((loc.getZ()) * 32.0D), (byte) 0, (byte) 0, 1, (short) 0, (short) 0, (short) 0);
+		return new Packet[]{
+				new PacketOutSpawnObject(getEntityId(), (byte) 2, (int) ((loc.getX()) * 32.0D), (int) ((loc.getY() + 0.25) * 32.0D), (int) ((loc.getZ()) * 32.0D), (byte) 0, (byte) 0, 1, (short) 0, (short) 0, (short) 0),
+				new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher())
+		};
 	}
 
 	@Override
@@ -93,13 +96,11 @@ public class EntityItem extends EnderEntity implements Item {
 
 	@Override
 	public void updatePlayers(Set<EnderPlayer> onlinePlayers) {
-		Packet spawnPacket = this.getSpawnPacket();
-		Packet packet = new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher());
+		Packet[] spawnPackets = this.getSpawnPackets();
 		for (EnderPlayer pl : onlinePlayers) {
 			if (pl.getLocation().isInRange(40, getLocation(), true) && !pl.canSeeEntity.contains(this)) {
 				pl.canSeeEntity.add(this);
-				pl.getNetworkManager().sendPacket(spawnPacket);
-				pl.getNetworkManager().sendPacket(packet);
+				pl.getNetworkManager().sendPacket(spawnPackets);
 			} else if (!pl.getLocation().isInRange(40, this.getLocation(), true) && pl.canSeeEntity.contains(this)) {
 				pl.canSeeEntity.remove(this);
 				pl.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));

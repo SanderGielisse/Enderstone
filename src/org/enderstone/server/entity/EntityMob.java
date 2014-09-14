@@ -54,8 +54,11 @@ public class EntityMob extends EnderEntity {
 	}
 
 	@Override
-	public Packet getSpawnPacket() {
-		return new PacketOutSpawnMob(this.getEntityId(), this.appearanceId, (int) (getLocation().getX() * 32.0D), (int) (getLocation().getY() * 32.0D), (int) (getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (byte) 0, (short) 0, (short) 0, (short) 0, this.getDataWatcher());
+	public Packet[] getSpawnPackets() {
+		return new Packet[] {
+				new PacketOutSpawnMob(this.getEntityId(), this.appearanceId, (int) (getLocation().getX() * 32.0D), (int) (getLocation().getY() * 32.0D), (int) (getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (byte) 0, (short) 0, (short) 0, (short) 0, this.getDataWatcher())
+
+		};
 	}
 
 	@Override
@@ -108,7 +111,7 @@ public class EntityMob extends EnderEntity {
 		for (EnderPlayer ep : onlinePlayers) {
 			if (ep.getLocation().isInRange(40, this.getLocation(), false) && !ep.canSeeEntity.contains(this)) {
 				ep.canSeeEntity.add(this);
-				ep.getNetworkManager().sendPacket(this.getSpawnPacket());
+				ep.getNetworkManager().sendPacket(this.getSpawnPackets());
 			} else if (!ep.getLocation().isInRange(40, this.getLocation(), false) && ep.canSeeEntity.contains(this)) {
 				ep.canSeeEntity.remove(this);
 				ep.getNetworkManager().sendPacket(new PacketOutEntityDestroy(new Integer[] { this.getEntityId() }));

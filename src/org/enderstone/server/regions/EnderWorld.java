@@ -288,6 +288,15 @@ public class EnderWorld implements World{
 			this.entities.remove(e);
 			this.broadcastPacket(new PacketOutEntityDestroy(new Integer[] {e.getEntityId()}), e.getLocation());
 		}
+		for(EnderPlayer ep : Main.getInstance().onlinePlayers){
+			Iterator<EnderEntity> it = ep.canSeeEntity.iterator();
+			while(it.hasNext()){
+				EnderEntity et = it.next();
+				if(et.equals(this)){
+					it.remove();
+				}
+			}
+		}
 	}
 
 	public void updateEntities(Set<EnderPlayer> onlinePlayers) {
