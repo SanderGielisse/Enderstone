@@ -34,7 +34,7 @@ public class QuitCommand extends SimpleCommand{
 
 	@Override
 	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
-		((EnderPlayer)sender).networkManager.disconnect("Goodbye");
+		((EnderPlayer)sender).networkManager.disconnect("Goodbye", false);
 		return COMMAND_SUCCES;
 	}
 	

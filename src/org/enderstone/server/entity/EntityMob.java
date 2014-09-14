@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.enderstone.server.Main;
-import org.enderstone.server.Utill;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.entity.drops.EntityDrop;
@@ -57,7 +56,6 @@ public class EntityMob extends EnderEntity {
 	public Packet[] getSpawnPackets() {
 		return new Packet[] {
 				new PacketOutSpawnMob(this.getEntityId(), this.appearanceId, (int) (getLocation().getX() * 32.0D), (int) (getLocation().getY() * 32.0D), (int) (getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (byte) 0, (short) 0, (short) 0, (short) 0, this.getDataWatcher())
-
 		};
 	}
 
@@ -83,7 +81,7 @@ public class EntityMob extends EnderEntity {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation())));
+		this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2));
 	}
 
 	@Override
@@ -149,8 +147,8 @@ public class EntityMob extends EnderEntity {
 
 	@Override
 	public void broadcastRotation(float pitch, float yaw) {
-		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F), (byte) Utill.calcYaw(pitch * 256.0F / 360.0F), false);
-		Packet pack2 = new PacketOutEntityHeadLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F));
+		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) calcYaw(yaw * 256.0F / 360.0F), (byte) calcYaw(pitch * 256.0F / 360.0F), false);
+		Packet pack2 = new PacketOutEntityHeadLook(this.getEntityId(), (byte) calcYaw(yaw * 256.0F / 360.0F));
 
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (ep.canSeeEntity.contains(this)) {

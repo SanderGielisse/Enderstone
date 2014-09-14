@@ -18,6 +18,7 @@
 package org.enderstone.server.api.entity;
 
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.Vector;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.regions.EnderWorld;
 
@@ -31,7 +32,7 @@ public interface Entity {
 
 	public float getHealth();
 
-	public void setHealth(float health);
+	public boolean setHealth(float health);
 
 	public float getMaxHealth();
 
@@ -42,4 +43,8 @@ public interface Entity {
 	public int getFireTicks();
 
 	public void setFireTicks(int fireTicks);
+	
+	public boolean damage(float damage);
+	
+	public boolean damage(float damage, Vector knockback);
 }

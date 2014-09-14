@@ -66,6 +66,7 @@ public class CraftingInventory extends DefaultHalfInventory {
 		return inv;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected MergedList<ItemStack> combineItems(PlayerInventory inventory) {
 		return new MergedList.Builder<ItemStack>().addList(0, this.items, 0, 10).addList(10, inventory.getRawItems(), 9, 36).build();

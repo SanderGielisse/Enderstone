@@ -68,12 +68,11 @@ public abstract class EnderEntity implements Entity {
 		return false;
 	}
 
-	public void damage(float damage) {
+	public boolean damage(float damage) {
 		if (Float.isNaN(this.health))
 			initHealth();
 		if (health == 0)
-			return;
-		this.setHealth(Math.max(health - damage, 0));
+			return false;
 		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
 			if (p.getLocation().isInRange(25, getLocation(), true)) {
 				p.getNetworkManager().sendPacket(new PacketOutEntityStatus(getEntityId(), PacketOutEntityStatus.Status.LIVING_ENTITY_HURT));
@@ -81,17 +80,19 @@ public abstract class EnderEntity implements Entity {
 				p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
 			}
 		}
+		return this.setHealth(Math.max(health - damage, 0));
 	}
 
-	public void damage(float damage, Vector knockback) {
+	public boolean damage(float damage, Vector knockback) {
 		//damage delay
-		if ((Main.getInstance().getCurrentServerTick() - this.latestDamage) < 4) {
-			return;
+		if ((Main.getInstance().getCurrentServerTick() - this.latestDamage) < 10) {
+			return false;
 		}
 		this.latestDamage = Main.getInstance().getCurrentServerTick();
 		
-		this.damage(damage);
+		boolean death = this.damage(damage);
 		this.getWorld().broadcastPacket(new PacketOutEntityVelocity(getEntityId(), knockback), this.getLocation());
+		return death;
 	}
 
 	public final boolean isDead() {
@@ -130,16 +131,17 @@ public abstract class EnderEntity implements Entity {
 		this.maxHealth = health;
 	}
 
-	public final void setHealth(float health) {
+	public final boolean setHealth(float health) {
 		if (Float.isNaN(this.health))
 			initHealth();
 		if (health == this.health)
-			return;
+			return false;
 		if (health > this.maxHealth)
 			throw new IllegalArgumentException("Health value too large");
 		float lastHealth = this.health;
 		this.health = health;
 		onHealthUpdate(this.health, lastHealth);
+		return this.health <= 0;
 	}
 
 	protected abstract String getDamageSound();
@@ -214,5 +216,10 @@ public abstract class EnderEntity implements Entity {
 		this.fireTicks = fireTicks;
 		this.updateDataWatcher();
 		this.getLocation().getWorld().broadcastPacket(new PacketOutEntityMetadata(getEntityId(), dataWatcher), this.getLocation());
+	}
+	
+	protected static byte calcYaw(float f) {
+		int i = (int) f;
+		return (byte) (f < i ? i - 1 : i);
 	}
 }

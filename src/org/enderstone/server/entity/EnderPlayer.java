@@ -27,13 +27,13 @@ import java.util.Set;
 import java.util.UUID;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
-import org.enderstone.server.Utill;
 import org.enderstone.server.api.ChatPosition;
 import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Player;
+import org.enderstone.server.api.messages.AdvancedMessage;
 import org.enderstone.server.api.messages.ChatColor;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
@@ -62,7 +62,6 @@ import org.enderstone.server.packet.play.PacketOutPlayParticle;
 import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
 import org.enderstone.server.packet.play.PacketOutPlayerListHeaderFooter;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem;
-import org.enderstone.server.packet.play.PacketOutStatistics;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.Action;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionAddPlayer;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionRemovePlayer;
@@ -71,6 +70,7 @@ import org.enderstone.server.packet.play.PacketOutRespawn;
 import org.enderstone.server.packet.play.PacketOutSetExperience;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnPlayer;
+import org.enderstone.server.packet.play.PacketOutStatistics;
 import org.enderstone.server.packet.play.PacketOutTabComplete;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.permissions.Operator;
@@ -280,7 +280,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			player.getNetworkManager().sendPacket(packet);
 			this.getNetworkManager().sendPacket(new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(player.uuid, player.getPlayerName(), player.getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") }));
 		}
-		Main.getInstance().broadcastMessage(new SimpleMessage(ChatColor.YELLOW + this.getPlayerName() + " joined the game!"));
+		Main.getInstance().broadcastMessage(new AdvancedMessage(this.getPlayerName() + " joined the game!").setColor(ChatColor.YELLOW).build());
 	}
 
 	@Override
@@ -384,7 +384,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 				@Override
 				public void run() {
-					Utill.broadcastMessage("<" + getPlayerName() + "> " + message);
+					Main.getInstance().broadcastMessage(new SimpleMessage("<" + getPlayerName() + "> " + message));
 				}
 			});
 		}
@@ -409,7 +409,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				}
 			}
 		}
-		Main.getInstance().broadcastMessage(new SimpleMessage(ChatColor.YELLOW + playerName + " left the game!"));
+		Main.getInstance().broadcastMessage(new AdvancedMessage(playerName + " left the game!").setColor(ChatColor.YELLOW).build());
 	}
 
 	@Override
@@ -512,8 +512,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 		Iterator<String> players = this.visiblePlayers.iterator();
 
-		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F), (byte) Utill.calcYaw(pitch * 256.0F / 360.0F), false);
-		Packet pack2 = new PacketOutEntityHeadLook(this.getEntityId(), (byte) Utill.calcYaw(yaw * 256.0F / 360.0F));
+		Packet pack1 = new PacketOutEntityLook(this.getEntityId(), (byte) calcYaw(yaw * 256.0F / 360.0F), (byte) calcYaw(pitch * 256.0F / 360.0F), false);
+		Packet pack2 = new PacketOutEntityHeadLook(this.getEntityId(), (byte) calcYaw(yaw * 256.0F / 360.0F));
 
 		while (players.hasNext()) {
 			EnderPlayer ep = Main.getInstance().getPlayer(players.next());
@@ -603,7 +603,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			if ((this.getFood() - 1) >= 0) {
 				this.setFood((short) (this.getFood() - 1));
 			} else {
-				this.damage(1F);
+				if(this.damage(1F)){
+					Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " starved to death."));
+				}
 			}
 		}
 		if (!this.isDead() && latestHeal++ % (15 * 20) == 0 && !didFoodUpdate) { // TODO do this how it goes in default Minecraft
@@ -646,13 +648,13 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	@Override
-	public void damage(float damage) {
+	public boolean damage(float damage) {
 		if (damage <= 0) {
 			throw new IllegalArgumentException("Damage cannot be smaller or equal to zero.");
 		}
 		if (this.clientSettings.godMode)
-			return;
-		super.damage(damage);
+			return false;
+		return super.damage(damage);
 	}
 
 	@Override
@@ -716,12 +718,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
 			if (change > 0) {
-				damage((float) change);
-				if (change > 5) {
-					// can't find correct sound name
-				} else {
-					Main.getInstance().getWorld(this).broadcastSound("damage.fallsmall", 1F, (byte) 63, getLocation(), null);
+				if(damage((float) change)){
+					Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " fell from a high place."));
 				}
+				Main.getInstance().getWorld(this).broadcastSound("damage.fallsmall", 1F, (byte) 63, getLocation(), null);
 			}
 		} else if (this.isOnGround == true && onGround == false) {
 			// save Y location
@@ -741,7 +741,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation())));
+		if(this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2))){
+			Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " was killed by " + attacker.getPlayerName()));
+		}
 	}
 
 	public int getFood() {
@@ -1011,5 +1013,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public boolean isSprinting() {
 		return this.clientSettings.isSprinting;
+	}
+
+	@Override
+	public boolean isOnFire() {
+		return getFireTicks() > 0;
 	}
 }

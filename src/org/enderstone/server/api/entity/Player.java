@@ -111,4 +111,6 @@ public interface Player {
 	public Message getTabListHeader();
 
 	public Message getTabListFooter();
+	
+	public boolean isOnFire();
 }
