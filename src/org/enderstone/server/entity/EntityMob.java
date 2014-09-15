@@ -31,6 +31,7 @@ import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
+import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnMob;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
@@ -201,5 +202,16 @@ public class EntityMob extends EnderEntity {
 	@Override
 	public EnderWorld getWorld() {
 		return this.world;
+	}
+	
+	private long latestSound = 0;
+	
+	@Override
+	public void serverTick() {
+		//added some temporarily mob sounds, just for fun :D
+		if(latestSound++ % (20 * (20 + Main.random.nextInt(15))) == 0){
+			world.broadcastPacket(new PacketOutSoundEffect("mob.spider.say", this.getLocation()), this.getLocation());
+		}
+		super.serverTick();
 	}
 }
