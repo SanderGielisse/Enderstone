@@ -18,7 +18,6 @@
 package org.enderstone.server.entity;
 
 import java.util.Set;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
@@ -164,12 +163,17 @@ public class EntityItem extends EnderEntity implements Item {
 			pickupDelay--;
 		}
 
-		if((!canGoDown() && this.getVelocity().motY < 0) || (!this.canGoUp() && this.getVelocity().motY > 0)){
+		if((!canGoDown() && this.getVelocity().motY < 0)){
+			return;
+		}
+		
+		if((!this.canGoUp() && this.getVelocity().motY > 0)){
+			this.getVelocity().motY = -0.1D;
 			return;
 		}
 
 		if(getVelocity().motY >= getVelocity().getY() * 1.5){
-			this.getVelocity().motY = -0.1D;
+			this.getVelocity().motY = -0.5D;
 		}
 		
 		this.getVelocity().motX *= 0.95D;

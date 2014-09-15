@@ -95,8 +95,14 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		encryptionSettings.verifyToken = new byte[16];
 		Main.random.nextBytes(encryptionSettings.verifyToken);
 	}
+	
+	private volatile long latestFlush = 0;
 
 	public void forcePacketFlush() {
+		if((System.currentTimeMillis() - latestFlush) < 100){
+			return;
+		}
+		latestFlush = System.currentTimeMillis();
 		synchronized (packets) {
 			Packet p;
 			while ((p = packets.poll()) != null) {
