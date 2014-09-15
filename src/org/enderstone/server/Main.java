@@ -64,7 +64,6 @@ import org.enderstone.server.packet.play.PacketOutUpdateTime;
 import org.enderstone.server.permissions.Operator;
 import org.enderstone.server.permissions.OperatorLoader;
 import org.enderstone.server.regions.EnderWorld;
-import org.enderstone.server.regions.generators.FlatLandGenerator;
 import org.enderstone.server.regions.generators.FlyingIslandsGenerator;
 import org.enderstone.server.regions.generators.SimpleGenerator;
 import org.enderstone.server.util.NettyThreadFactory;
@@ -89,7 +88,7 @@ public class Main implements Runnable {
 			this.add(47); // 1.8
 		}
 	});
-	public static final String[] AUTHORS = new String[]{"bigteddy98", "ferrybig", "timbayens"};
+	public static final String[] AUTHORS = new String[]{"BigTeddy98 (Sander)", "ferrybig (Fernando)"};
 	public static final Random random = new Random();
 	public volatile Thread mainThread;
 	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();

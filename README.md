@@ -2,8 +2,8 @@ Enderstone Server Software
 
 GLOBAL INFORMATION
 =========
-Enderstone is a project started by BigTeddy98 (Sander), Ferrybig (Fernando) and TimBayens (Tim).
-We are trying to make an open-source Minecraft server with a custom API, without using any Mojang Minecraft Server code.
+Enderstone is a project started by BigTeddy98 (Sander) and Ferrybig (Fernando).
+We are making an open-source Minecraft server with a custom API, without using any Mojang Minecraft Server code.
 
 The project is currently using protocol version 47, which means that only Minecraft 1.8 clients will be able to connect.
 
