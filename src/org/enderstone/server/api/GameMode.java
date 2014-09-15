@@ -20,7 +20,7 @@ package org.enderstone.server.api;
 public enum GameMode {
 	SURVIVAL(0), CREATIVE(1), ADVENTURE(2), SPECTATOR(3);
 
-	private int id;
+	private final int id;
 
 	private GameMode(int id) {
 		this.id = id;
