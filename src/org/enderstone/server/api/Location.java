@@ -161,8 +161,8 @@ public class Location implements Cloneable {
 	}
 
 	public void applyVector(Vector velocity) {
-		this.x += velocity.getX();
-		this.y += velocity.getY();
-		this.z += velocity.getZ();
+		this.x += velocity.motX;
+		this.y += velocity.motY;
+		this.z += velocity.motZ;
 	}
 }

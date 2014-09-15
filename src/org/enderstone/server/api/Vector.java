@@ -22,11 +22,18 @@ public class Vector {
 	private double x;
 	private double y;
 	private double z;
+	
+	public double motX;
+	public double motY;
+	public double motZ;
 
 	public Vector(double x, double y, double z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		this.motX = x;
+		this.motY = y;
+		this.motZ = z;
 	}
 
 	public double getX() {

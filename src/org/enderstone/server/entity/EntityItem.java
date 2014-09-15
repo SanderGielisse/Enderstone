@@ -164,28 +164,25 @@ public class EntityItem extends EnderEntity implements Item {
 			pickupDelay--;
 		}
 
-		if((!canGoDown() && this.getVelocity().getY() < 0) || (!this.canGoUp() && this.getVelocity().getY() > 0)){
+		if((!canGoDown() && this.getVelocity().motY < 0) || (!this.canGoUp() && this.getVelocity().motY > 0)){
 			return;
 		}
 
-		if(getVelocity().getY() == 2D){
-			this.getVelocity().setY(-0.1D);
+		if(getVelocity().motY >= getVelocity().getY() * 1.5){
+			this.getVelocity().motY = -0.1D;
 		}
 		
-		this.getVelocity().setX(this.getVelocity().getX() * 0.95D);
-		this.getVelocity().setY(this.getVelocity().getY() * 1.3D);
-		this.getVelocity().setZ(this.getVelocity().getZ() * 0.95D);
+		this.getVelocity().motX *= 0.95D;
+		this.getVelocity().motY *= 1.1D;
+		this.getVelocity().motZ *= 0.95D;
 		
-		if(getVelocity().getY() > 2){
-			this.getVelocity().setY(2);
+		if(getVelocity().motY > getVelocity().getY() * 1.5){
+			this.getVelocity().motY = getVelocity().getY() * 1.5;
 		}
-		if(getVelocity().getY() < -1){
-			this.getVelocity().setY(-1);
+		if(getVelocity().motY < -1){
+			this.getVelocity().motY = -1;
 		}
-		
-		Location newLoc = this.getLocation().clone();
-		newLoc.applyVector(this.getVelocity());
-		this.getLocation().cloneFrom(newLoc);
+		this.getLocation().applyVector(getVelocity());
 	}
 
 	private boolean canGoUp() {
