@@ -18,15 +18,19 @@
 package org.enderstone.server.entity;
 
 import java.util.Set;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Item;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutCollectItem;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutEntityMetadata;
+import org.enderstone.server.packet.play.PacketOutEntityVelocity;
 import org.enderstone.server.packet.play.PacketOutSpawnObject;
+import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
 
 public class EntityItem extends EnderEntity implements Item {
@@ -34,12 +38,14 @@ public class EntityItem extends EnderEntity implements Item {
 	private final EnderWorld world;
 	private final ItemStack itemstack;
 	private int pickupDelay;
+	private Vector vector;
 	
-	public EntityItem(EnderWorld world, Location location, ItemStack stack, int pickupDelay) {
+	public EntityItem(EnderWorld world, Location location, ItemStack stack, int pickupDelay, Vector vector) {
 		super(location);
 		this.itemstack = stack;
 		this.pickupDelay = pickupDelay;
 		this.world = world;
+		this.vector = vector;
 		onSpawn(); // must be called from main thread
 	}
 
@@ -53,8 +59,9 @@ public class EntityItem extends EnderEntity implements Item {
 	public Packet[] getSpawnPackets() {
 		Location loc = this.getLocation();
 		return new Packet[]{
-				new PacketOutSpawnObject(getEntityId(), (byte) 2, (int) ((loc.getX()) * 32.0D), (int) ((loc.getY() + 0.25) * 32.0D), (int) ((loc.getZ()) * 32.0D), (byte) 0, (byte) 0, 1, (short) 0, (short) 0, (short) 0),
-				new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher())
+				new PacketOutSpawnObject(getEntityId(), (byte) 2, (int) ((loc.getX()) * 32.0D), (int) ((loc.getY() + 0.25) * 32.0D), (int) ((loc.getZ()) * 32.0D), (byte) 0, (byte) 0, 1, (short) getVelocity().getX(), (short) getVelocity().getY(), (short) getVelocity().getZ()),
+				new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher()),
+				new PacketOutEntityVelocity(getEntityId(), getVelocity()),
 		};
 	}
 
@@ -146,7 +153,9 @@ public class EntityItem extends EnderEntity implements Item {
 		return false;
 	}
 	
-	private int gravityCheck;
+	public Vector getVelocity(){
+		return this.vector;
+	}
 	
 	@Override
 	public void serverTick() {
@@ -155,24 +164,41 @@ public class EntityItem extends EnderEntity implements Item {
 			pickupDelay--;
 		}
 
-		//TODO rewrite this, not even close to working properly :p
-		if (gravityCheck++ % 20 == 0) {
-			Location loc = getLocation().clone();
-			loc.add(0, -1, 0);
-
-			if (world.getBlockIdAt(loc).getId() == 0) {
-				while (world.getBlockIdAt(loc.add(0, -1, 0)).getId() == 0) { //TODO make it able to fall through blocks such as torches etc.
-					if (loc.getBlockY() < 0) {
-						break;
-					}
-				}
-				this.getLocation().setX(loc.getX());
-				this.getLocation().setY(loc.getY());
-				this.getLocation().setZ(loc.getZ());
-				this.getLocation().setYaw(loc.getYaw());
-				this.getLocation().setPitch(loc.getPitch());
-			}
+		if((!canGoDown() && this.getVelocity().getY() < 0) || (!this.canGoUp() && this.getVelocity().getY() > 0)){
+			return;
 		}
+
+		if(getVelocity().getY() == 2D){
+			this.getVelocity().setY(-0.1D);
+		}
+		
+		this.getVelocity().setX(this.getVelocity().getX() * 0.95D);
+		this.getVelocity().setY(this.getVelocity().getY() * 1.3D);
+		this.getVelocity().setZ(this.getVelocity().getZ() * 0.95D);
+		
+		if(getVelocity().getY() > 2){
+			this.getVelocity().setY(2);
+		}
+		if(getVelocity().getY() < -1){
+			this.getVelocity().setY(-1);
+		}
+		
+		Location newLoc = this.getLocation().clone();
+		newLoc.applyVector(this.getVelocity());
+		this.getLocation().cloneFrom(newLoc);
+	}
+
+	private boolean canGoUp() {
+		return world.getBlock(this.getLocation().clone().add(0D, 1D, 0D)).getBlock() == BlockId.AIR;
+	}
+	
+	public boolean canGoDown(){
+		return world.getBlock(this.getLocation().clone().add(0.25D, 0, 0D)).getBlock() == BlockId.AIR &&
+				world.getBlock(this.getLocation().clone().add(-0.25D, 0, 0D)).getBlock() == BlockId.AIR && 
+						world.getBlock(this.getLocation().clone().add(0D, 0, 0.25D)).getBlock() == BlockId.AIR && 
+							world.getBlock(this.getLocation().clone().add(0D, 0, -0.25D)).getBlock() == BlockId.AIR &&
+									world.getBlock(this.getLocation().clone().add(0, -1D, 0)).getBlock() == BlockId.AIR;
+		//TODO make it able to fall through torches etc.
 	}
 
 	@Override

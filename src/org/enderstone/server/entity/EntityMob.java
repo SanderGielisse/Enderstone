@@ -32,6 +32,7 @@ import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutSpawnMob;
+import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
 
 public class EntityMob extends EnderEntity {
@@ -81,7 +82,7 @@ public class EntityMob extends EnderEntity {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2));
+		this.damage(5F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2));
 	}
 
 	@Override
@@ -172,7 +173,12 @@ public class EntityMob extends EnderEntity {
 
 	public List<EntityDrop> getDrops() {
 		List<EntityDrop> drops = new ArrayList<EntityDrop>();
-		drops.add(new EntityDrop(new ItemStack((short) 2, (byte) 1, (byte) 0), 100));
+		drops.add(new EntityDrop(new ItemStack(BlockId.DIAMOND_BLOCK), 1));
+		drops.add(new EntityDrop(new ItemStack(BlockId.COOKED_BEEF), 20));
+		drops.add(new EntityDrop(new ItemStack(BlockId.COOKED_CHICKEN), 20));
+		drops.add(new EntityDrop(new ItemStack(BlockId.COOKED_FISH), 20));
+		drops.add(new EntityDrop(new ItemStack(BlockId.COOKED_MUTTON), 20));
+		drops.add(new EntityDrop(new ItemStack(BlockId.COOKED_RABBIT), 20));
 		return drops;
 	}
 
@@ -186,7 +192,7 @@ public class EntityMob extends EnderEntity {
 			List<EntityDrop> drops = this.getDrops();
 			for (EntityDrop drop : drops) {
 				if (Main.random.nextInt(100) <= drop.getDropChance()) {
-					world.addEntity(new EntityItem(world, getLocation(), drop.getStack().clone(), 5));
+					world.addEntity(new EntityItem(world, getLocation(), drop.getStack().clone(), 5, new Vector(0, 0.1D, 0)));
 				}
 			}
 		}

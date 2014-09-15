@@ -21,6 +21,7 @@ import java.io.IOException;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.Vector;
 import org.enderstone.server.entity.EntityItem;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
@@ -84,7 +85,7 @@ public class PacketInPlayerDigging extends Packet {
 					Location loca = loc.clone();
 					loca.setX(loca.getX() + 0.5);
 					loca.setZ(loca.getZ() + 0.5);
-					world.addEntity(new EntityItem(world,loca, new ItemStack(blockId, (byte) 1, (short) world.getBlockDataAt(x, y, z)), 1));
+					world.addEntity(new EntityItem(world,loca, new ItemStack(blockId, (byte) 1, (short) world.getBlockDataAt(x, y, z)), 1, new Vector(0, 0.1D, 0)));
 				} else if (getStatus() == 3) {
 					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
 				} else if (getStatus() == 4) {

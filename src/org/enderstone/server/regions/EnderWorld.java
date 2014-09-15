@@ -30,6 +30,7 @@ import org.enderstone.server.Main;
 import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Chunk;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.World;
 import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.api.entity.Item;
@@ -105,7 +106,7 @@ public class EnderWorld implements World{
 		loadedChunks.add(r = new EnderChunk(this, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>()));
 		
 		//temporarily mob test
-		this.addEntity(new EntityMob((byte) (Main.random.nextInt(10) + 50), this, new Location(this, x << 4, r.getHighestBlockAt(0, 0), z << 4, (float) 0, (float) 0)));
+		this.addEntity(new EntityMob((byte) 52, this, new Location(this, (x << 4) + 0.5F, r.getHighestBlockAt(0, 0) + 1F, (z << 4) + 0.5F, (float) 0, (float) 0)));
 		
 		return r;
 	}
@@ -352,7 +353,7 @@ public class EnderWorld implements World{
 	@Override
 	public Item dropItem(Location location, ItemStack itemStack, int noPickupDelay) {
 		EnderEntity entity;
-		this.addEntity(entity = new EntityItem(this, location.clone(), itemStack, noPickupDelay));
+		this.addEntity(entity = new EntityItem(this, location.clone().add(0, 1D, 0), itemStack, noPickupDelay, new Vector(0, 0.1D, 0)));
 		return (Item) entity;
 	}
 

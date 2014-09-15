@@ -159,4 +159,10 @@ public class Location implements Cloneable {
 	public int getChunkZ() {
 		return (getBlockX() >> 4);
 	}
+
+	public void applyVector(Vector velocity) {
+		this.x += velocity.getX();
+		this.y += velocity.getY();
+		this.z += velocity.getZ();
+	}
 }
