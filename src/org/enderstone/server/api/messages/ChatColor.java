@@ -43,7 +43,7 @@ public enum ChatColor {
 	YELLOW("§e"), 
 	WHITE("§f");
 
-	private String data;
+	private final String data;
 
 	private ChatColor(String data) {
 		this.data = data;
