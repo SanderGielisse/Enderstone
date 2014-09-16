@@ -99,15 +99,14 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	private volatile long latestFlush = 0;
 
 	public void forcePacketFlush() {
-		if((System.currentTimeMillis() - latestFlush) < 100){
-			return;
-		}
-		latestFlush = System.currentTimeMillis();
+		//if((System.currentTimeMillis() - latestFlush) < 100){
+		//	return;
+		//}
+		//latestFlush = System.currentTimeMillis();
 		synchronized (packets) {
 			Packet p;
 			while ((p = packets.poll()) != null) {
 				ctx.write(p);
-				// EnderLogger.debug("Out: "+p.toString());
 				p.onSend(this);
 			}
 			ctx.flush();
@@ -173,6 +172,9 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			for (Packet packet : packets) {
 				this.packets.offer(packet);
 			}
+		}
+		if(this.player != null && this.player.isDead()){
+			this.forcePacketFlush();
 		}
 	}
 

@@ -39,7 +39,7 @@ import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.EntityItem;
-import org.enderstone.server.entity.EntityMob;
+import org.enderstone.server.entity.EntitySpider;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
@@ -106,7 +106,7 @@ public class EnderWorld implements World{
 		loadedChunks.add(r = new EnderChunk(this, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>()));
 		
 		//temporarily mob test
-		this.addEntity(new EntityMob((byte) 52, this, new Location(this, (x << 4) + 0.5F, r.getHighestBlockAt(0, 0) + 1F, (z << 4) + 0.5F, (float) 0, (float) 0)));
+		this.addEntity(new EntitySpider(this, new Location(this, (x << 4) + 0.5F, r.getHighestBlockAt(0, 0) + 1F, (z << 4) + 0.5F, (float) 0, (float) 0)));
 		
 		return r;
 	}
@@ -292,13 +292,13 @@ public class EnderWorld implements World{
 	public void removeEntity(EnderEntity e){
 		if(this.entities.contains(e)){
 			this.entities.remove(e);
-			this.broadcastPacket(new PacketOutEntityDestroy(new Integer[] {e.getEntityId()}), e.getLocation());
 		}
+		this.broadcastPacket(new PacketOutEntityDestroy(new Integer[] {e.getEntityId()}), e.getLocation());
 		for(EnderPlayer ep : Main.getInstance().onlinePlayers){
 			Iterator<EnderEntity> it = ep.canSeeEntity.iterator();
 			while(it.hasNext()){
 				EnderEntity et = it.next();
-				if(et.equals(this)){
+				if(et.equals(e)){
 					it.remove();
 				}
 			}

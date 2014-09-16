@@ -30,18 +30,20 @@ import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
+import org.enderstone.server.packet.play.PacketOutEntityStatus;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnMob;
+import org.enderstone.server.packet.play.PacketOutEntityStatus.Status;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
 
-public class EntityMob extends EnderEntity {
+public abstract class EntityMob extends EnderEntity {
 
 	private byte appearanceId;
 	private EnderWorld world;
 
-	public EntityMob(byte appearanceId, EnderWorld world, Location location) {
+	EntityMob(byte appearanceId, EnderWorld world, Location location) {
 		super(location);
 		this.world = world;
 		this.appearanceId = appearanceId;
@@ -84,16 +86,6 @@ public class EntityMob extends EnderEntity {
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
 		this.damage(5F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2));
-	}
-
-	@Override
-	protected String getDamageSound() {
-		return "game.hostile.hurt";
-	}
-
-	@Override
-	protected String getDeadSound() {
-		return "game.hostile.die";
 	}
 
 	@Override
@@ -186,6 +178,7 @@ public class EntityMob extends EnderEntity {
 	@Override
 	protected void onHealthUpdate(float newHealth, float lastHealth) {
 		if (newHealth <= 0) {
+			this.getWorld().broadcastPacket(new PacketOutEntityStatus(this.getEntityId(), Status.LIVING_ENTITY_DEAD), this.getLocation());
 			// entity died, remove it
 			world.removeEntity(this);
 
@@ -209,8 +202,10 @@ public class EntityMob extends EnderEntity {
 	@Override
 	public void serverTick() {
 		//added some temporarily mob sounds, just for fun :D
-		if(latestSound++ % (20 * (20 + Main.random.nextInt(15))) == 0){
-			world.broadcastPacket(new PacketOutSoundEffect("mob.spider.say", this.getLocation()), this.getLocation());
+		if (latestSound++ % (20 * 10) == 0) {
+			if (Main.random.nextBoolean()) {
+				world.broadcastPacket(new PacketOutSoundEffect(this.getRandomSound(), this.getLocation()), this.getLocation());
+			}
 		}
 		super.serverTick();
 	}

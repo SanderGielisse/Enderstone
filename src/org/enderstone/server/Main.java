@@ -365,7 +365,6 @@ public class Main implements Runnable {
 		if ((latestChunkUpdate++ & 0b0001_1111) == 0) { // faster than % 31 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				if (p.isDead()) {
-					p.networkManager.forcePacketFlush();
 					continue;
 				}
 				p.getWorld().doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.renderDistance - 1, MAX_VIEW_DISTANCE));

@@ -56,6 +56,11 @@ public class PacketOutEntityStatus extends Packet {
 		return 0x1A;
 	}
 
+	@Override
+	public String toString() {
+		return "PacketOutEntityStatus [entityId=" + entityId + ", entityStatus=" + entityStatus.toString() + "]";
+	}
+
 	public enum Status {
 
 		LIVING_ENTITY_UNKNOWN(0),
