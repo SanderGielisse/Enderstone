@@ -18,10 +18,13 @@
 package org.enderstone.server.api.messages;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.enderstone.server.api.messages.AdvancedMessagePart.Type;
+import org.enderstone.server.util.MergedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -29,231 +32,77 @@ import org.json.JSONObject;
  *
  * @author Fernando
  */
-public final class AdvancedMessage implements Message, AdvancedMessagePart {
+public final class AdvancedMessage implements Message {
 
+	/**
+	 * Generates a empty AdvancedMessage
+	 */
 	public AdvancedMessage() {
+		base = new MessagePart();
 	}
 	
 	public AdvancedMessage(String firstMessageText) {
 		this();
-		this.getLatest().setText(firstMessageText);
+		this.getBase().setText(firstMessageText);
 	}
 
 	protected final List<MessagePart> messageParts = new ArrayList<>();
+	protected final MessagePart base;
 	private MessagePart working = null;
 	int index = -1;
 
-	private MessagePart getLatest() {
+	private MessagePart getLatestPiece() {
 		if (working == null && index == -1) {
 			return (MessagePart) addPart("", Type.PLAIN);
 		}
 		return working;
 	}
+	
+	public AdvancedMessagePart getLatest() {
+		return working == null ? base : working;
+	}
+	
+	public AdvancedMessagePart getBase() {
+		return base;
+	}
+	
+	public List<? extends AdvancedMessagePart> getAllPieces() {
+		return new MergedList.Builder<AdvancedMessagePart>()
+				.addList(0, Collections.singletonList(getBase()))
+				.addList(1, Collections.<AdvancedMessagePart>unmodifiableList(messageParts))
+				.build();
+	}
 
 	@Override
 	public String toPlainText() {
-		MessagePart head;
-		if(index == -1)
-		{
-			head = (MessagePart) addPart("", Type.PLAIN);
-		}
-		else
-		{
-			head = messageParts.get(0);
-		}
-		Iterator<MessagePart> parts = messageParts.listIterator(1);
+		Iterator<MessagePart> parts = messageParts.listIterator(0);
 		StringBuilder b = new StringBuilder();
-		head.buildPlain(parts, b);
+		base.buildPlain(parts, b);
 		return b.toString();
 	}
 
 	@Override
 	public String toMessageJson() {
-		MessagePart head;
-		if(index == -1)
-		{
-			head = (MessagePart) addPart("", Type.PLAIN);
-		}
-		else
-		{
-			head = messageParts.get(0);
-		}
-		Iterator<MessagePart> parts = messageParts.listIterator(1);
-		return head.buildMessage(parts).toString();
+		Iterator<MessagePart> parts = messageParts.listIterator(0);
+		return base.buildMessage(parts).toString();
 	}
 
 	@Override
 	public String toAsciiText() {
-		MessagePart head;
-		if(index == -1)
-		{
-			head = (MessagePart) addPart("", Type.PLAIN);
-		}
-		else
-		{
-			head = messageParts.get(0);
-		}
-		Iterator<MessagePart> parts = messageParts.listIterator(1);
+		Iterator<MessagePart> parts = messageParts.listIterator(0);
 		StringBuilder b = new StringBuilder();
-		head.buildAscii(parts, b);
+		base.buildAscii(parts, b);
 		return b.toString();
 	}
 
-	@Override
 	public AdvancedMessagePart addPart(String text) {
 		return this.addPart(text, Type.PLAIN);
 	}
 
-	@Override
 	public AdvancedMessagePart addPart(String text, Type type) {
 		messageParts.add(working = new MessagePart(text, type));
 		index++;
 		return working;
-	}
-
-	@Override
-	public AdvancedMessage build() {
-		return this;
-	}
-
-	@Override
-	public AdvancedMessagePart setObjective(String objective) {
-		return getLatest().setObjective(objective);
-	}
-
-	@Override
-	public String getObjective() {
-		return getLatest().getObjective();
-	}
-
-	@Override
-	public AdvancedMessagePart setText(String text) {
-		return getLatest().setText(text);
-	}
-
-	@Override
-	public String getText() {
-		return getLatest().getText();
-	}
-
-	@Override
-	public AdvancedMessagePart setColor(ChatColor color) {
-		return getLatest().setColor(color);
-	}
-
-	@Override
-	public AdvancedMessagePart combineColor(ChatColor... colors) {
-		return getLatest().combineColor(colors);
-	}
-
-	@Override
-	public ChatColor getColor() {
-		return getLatest().getColor();
-	}
-
-	@Override
-	public AdvancedMessagePart setBold(boolean bold) {
-		return getLatest().setBold(bold);
-	}
-
-	@Override
-	public boolean getBold() {
-		return getLatest().getBold();
-	}
-
-	@Override
-	public AdvancedMessagePart setItalic(boolean italic) {
-		return getLatest().setItalic(italic);
-	}
-
-	@Override
-	public boolean getItalic() {
-		return getLatest().getItalic();
-	}
-
-	@Override
-	public AdvancedMessagePart setUnderline(boolean underline) {
-		return getLatest().setUnderline(underline);
-	}
-
-	@Override
-	public boolean getUnderline() {
-		return getLatest().getUnderline();
-	}
-
-	@Override
-	public AdvancedMessagePart setObfuscated(boolean obfuscated) {
-		return getLatest().setObfuscated(obfuscated);
-	}
-
-	@Override
-	public boolean getObfuscated() {
-		return getLatest().getObfuscated();
-	}
-
-	@Override
-	public AdvancedMessagePart setClickEvent(ClickEventType type, String value) {
-		return getLatest().setClickEvent(type, value);
-	}
-
-	@Override
-	public ClickEventType getClickEventType() {
-		return getLatest().getClickEventType();
-	}
-
-	@Override
-	public String getClickEventValue() {
-		return getLatest().getClickEventValue();
-	}
-
-	@Override
-	public AdvancedMessagePart setHoverEvent(HoverEventType type, String value) {
-		return getLatest().setHoverEvent(type, value);
-	}
-
-	@Override
-	public HoverEventType getHoverEventType() {
-		return getLatest().getHoverEventType();
-	}
-
-	@Override
-	public String getHoverEventValue() {
-		return getLatest().getHoverEventValue();
-	}
-
-	@Override
-	public int getPartIndex() {
-		return this.index < 0 ? 0 : index;
-	}
-
-	@Override
-	public AdvancedMessagePart setType(Type type) {
-		return getLatest().setType(type);
-	}
-
-	@Override
-	public Type getType() {
-		return getLatest().getType();
-	}
-
-	@Override
-	public AdvancedMessagePart setStrikethrough(boolean strikethrough) {
-		return getLatest().setStrikethrough(strikethrough);
-	}
-
-	@Override
-	public boolean getStrikethrough() {
-		return getLatest().getStrikethrough();
-	}
-
-	@Override
-	public AdvancedMessagePart setTranslatingWith(String[] parts) {
-		return getLatest().setTranslatingWith(parts);
-	}
-
-	@Override
-	public String[] getTranslatingWith() {
-		return getLatest().getTranslatingWith();
 	}
 
 	private class MessagePart implements AdvancedMessagePart {
@@ -272,6 +121,10 @@ public final class AdvancedMessage implements Message, AdvancedMessagePart {
 		private String hoverEventValue;
 		private ChatColor color;
 		private String[] with;
+		
+		public MessagePart() {
+			this("",Type.PLAIN);
+		}
 
 		public MessagePart(String text, Type type) {
 			this.text = text;
@@ -493,7 +346,7 @@ public final class AdvancedMessage implements Message, AdvancedMessagePart {
 
 		@Override
 		public int getPartIndex() {
-			return AdvancedMessage.this.getPartIndex();
+			return AdvancedMessage.this.messageParts.indexOf(this);
 		}
 
 		@Override

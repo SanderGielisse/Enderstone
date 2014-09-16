@@ -43,6 +43,6 @@ public class PlayerSettings {
 	public int food = 10;
 	public float foodSaturation = 5;
 	public int experience = 0;
-	public Message tabListHeader = new AdvancedMessage("Player Tab-List").setColor(ChatColor.GOLD).setBold(true).build();
-	public Message tabListFooter = new AdvancedMessage("This server is proudly powered by Enderstone").setColor(ChatColor.RED).setItalic(true).build();
+	public Message tabListHeader = new AdvancedMessage().getBase().setText("Player Tab-List").setColor(ChatColor.GOLD).setBold(true).build();
+	public Message tabListFooter = new AdvancedMessage().getBase().setText("This server is proudly powered by Enderstone").setColor(ChatColor.RED).setItalic(true).build();
 }

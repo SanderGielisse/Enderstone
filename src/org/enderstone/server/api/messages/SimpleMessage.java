@@ -57,7 +57,7 @@ public class SimpleMessage implements Message {
 	
 	public AdvancedMessagePart color(ChatColor ... colors)
 	{
-		return new AdvancedMessage(text).combineColor(colors);
+		return new AdvancedMessage().getBase().setText(text).combineColor(colors);
 	}
 
 }
