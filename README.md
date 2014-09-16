@@ -24,11 +24,11 @@ CREDITS AND LIBRARY LICENSES
 The 6 classes in the org.enderstone.server.regions.generators.util package are made by Bukkit. These classes are licensed under the same license as the Enderstone project, the GNU GENERAL PUBLIC LICENSE.
 The only changes we made to these classes are the package names. The credits of course still go to the Bukkit team, as specified in the header of the class.
 
-We use the JNBT library to read and write our NBT data. When you use source located in the org.jnbt package, you accept to the license of JNBT, which can be found in the JNBT_LICENSE.TXT file.
+We use the JNBT library to read and write our NBT data. When you use source located in the org.jnbt package, you accept the license of JNBT, which can be found in the JNBT_LICENSE.TXT file.
 All credits of the JNBT library (located in the org.jnbt package) go to them.
 
 
 MINECRAFT EULA
 =========
 The Enderstone server software uses the Minecraft protocol to make it able for Minecraft clients to connect. This means you are NOT able to evade the Minecraft EULA by using Enderstone.
-By running this, or any modified version of our project, you accept to the Minecraft EULA, which can be found here: https://account.mojang.com/documents/minecraft_eula
+By running this, or any modified version of our project, you accept the Minecraft EULA, which can be found here: https://account.mojang.com/documents/minecraft_eula
