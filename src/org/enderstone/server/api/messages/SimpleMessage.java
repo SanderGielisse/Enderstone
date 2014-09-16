@@ -17,6 +17,7 @@
  */
 package org.enderstone.server.api.messages;
 
+import org.enderstone.server.api.messages.AdvancedMessage.AdvancedMessagePart;
 import org.json.JSONObject;
 
 /**
@@ -55,9 +56,9 @@ public class SimpleMessage implements Message {
 		return toPlainText();
 	}
 	
-	public AdvancedMessagePart color(ChatColor ... colors)
+	public AdvancedMessage color(ChatColor ... colors)
 	{
-		return new AdvancedMessage().getBase().setText(text).combineColor(colors);
+		return new AdvancedMessage().getBase().setText(text).combineColor(colors).build();
 	}
 
 }
