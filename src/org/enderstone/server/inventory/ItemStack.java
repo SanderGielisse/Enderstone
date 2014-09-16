@@ -57,10 +57,12 @@ public class ItemStack implements Cloneable {
 	}
 	
 	public ItemStack(short blockId, byte amount, short damage) {
-		this(blockId, amount, damage, null);
+		this.blockId = blockId;
+		this.amount = amount;
+		this.damage = damage;
 	}
 
-	public ItemStack(short blockId, byte amount, short damage, CompoundTag compoundTag) {
+	public ItemStack(short blockId, byte amount, short damage, boolean generateNBTIfNotExist, CompoundTag compoundTag) {
 		this.blockId = blockId;
 		this.amount = amount;
 		this.damage = damage;

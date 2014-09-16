@@ -57,6 +57,8 @@ import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
+import org.enderstone.server.packet.play.PacketOutEntityStatus;
+import org.enderstone.server.packet.play.PacketOutEntityStatus.Status;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutPlayParticle;
 import org.enderstone.server.packet.play.PacketOutPlayerAbilities;
@@ -700,18 +702,20 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	protected void onHealthUpdate(float health, float oldHealth) {
 		networkManager.sendPacket(new PacketOutUpdateHealth(health, clientSettings.food, clientSettings.foodSaturation));
-		if (health >= 0) {
+		if (health > 0) {
 			return;
 		}
+		broadcastEmptyArmour();
 		//player is dead
 		this.clientSettings.food = 20;
-		Packet packet = new PacketOutEntityDestroy(new Integer[] { this.getEntityId() });
+		Packet packet = new PacketOutEntityStatus(this.getEntityId(), Status.LIVING_ENTITY_DEAD);
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
 			if (ep.visiblePlayers.contains(this.getPlayerName())) {
 				ep.visiblePlayers.remove(this.getPlayerName());
 				ep.getNetworkManager().sendPacket(packet);
 			}
 		}
+		this.canSeeEntity.clear();
 		for (ItemStack inv : this.getInventoryHandler().getPlayerInventory().getRawItems()) {
 			if (inv != null) {
 				EnderWorld world = Main.getInstance().getWorld(this);
@@ -719,6 +723,28 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			}
 		}
 		Collections.fill(this.getInventoryHandler().getPlayerInventory().getRawItems(), null);
+	}
+
+	private void broadcastEmptyArmour() {
+		//broadcast the players armour empty, otherwise the client will regenrate "fake" on-ground items.
+		List<Packet> tmp = new ArrayList<>();
+		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, null));
+		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 1, null));
+		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 2, null));
+		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 3, null));
+		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, null));
+		
+		Iterator<String> it = this.visiblePlayers.iterator();
+		
+		while(it.hasNext()){
+			String name = it.next();
+			EnderPlayer ep = Main.getInstance().getPlayer(name);
+			if(ep == null){
+				it.remove();
+				continue;
+			}
+			ep.getNetworkManager().sendPacket(tmp.toArray(new Packet[tmp.size()]));
+		}
 	}
 
 	@Override
@@ -1059,5 +1085,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public boolean isEating() {
 		return this.clientSettings.isEatingTicks > 0;
+	}
+
+	@Override
+	protected String getRandomSound() {
+		return "";
 	}
 }
