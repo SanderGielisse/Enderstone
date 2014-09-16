@@ -467,7 +467,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				}
 			}
 			for (EnderEntity e : toRemove) {
-				Main.getInstance().getWorld(this).removeEntity(e);
+				Main.getInstance().getWorld(this).removeEntity(e, true);
 				Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
 			}
 			toRemove.clear();

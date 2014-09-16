@@ -289,17 +289,19 @@ public class EnderWorld implements World{
 		this.entities.add(e);
 	}
 	
-	public void removeEntity(EnderEntity e){
+	public void removeEntity(EnderEntity e, boolean broadcastRemove){
 		if(this.entities.contains(e)){
 			this.entities.remove(e);
 		}
-		this.broadcastPacket(new PacketOutEntityDestroy(new Integer[] {e.getEntityId()}), e.getLocation());
-		for(EnderPlayer ep : Main.getInstance().onlinePlayers){
-			Iterator<EnderEntity> it = ep.canSeeEntity.iterator();
-			while(it.hasNext()){
-				EnderEntity et = it.next();
-				if(et.equals(e)){
-					it.remove();
+		if (broadcastRemove) {
+			this.broadcastPacket(new PacketOutEntityDestroy(new Integer[] { e.getEntityId() }), e.getLocation());
+			for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
+				Iterator<EnderEntity> it = ep.canSeeEntity.iterator();
+				while (it.hasNext()) {
+					EnderEntity et = it.next();
+					if (et.equals(e)) {
+						it.remove();
+					}
 				}
 			}
 		}

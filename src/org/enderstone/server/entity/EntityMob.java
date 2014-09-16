@@ -180,7 +180,7 @@ public abstract class EntityMob extends EnderEntity {
 		if (newHealth <= 0) {
 			this.getWorld().broadcastPacket(new PacketOutEntityStatus(this.getEntityId(), Status.LIVING_ENTITY_DEAD), this.getLocation());
 			// entity died, remove it
-			world.removeEntity(this);
+			world.removeEntity(this, false);
 
 			// do entity drops
 			List<EntityDrop> drops = this.getDrops();
