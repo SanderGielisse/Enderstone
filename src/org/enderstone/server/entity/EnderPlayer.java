@@ -287,7 +287,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			player.getNetworkManager().sendPacket(packet);
 			this.getNetworkManager().sendPacket(new PacketOutPlayerListItem(new Action[] { new ActionAddPlayer(player.uuid, player.getPlayerName(), player.getProfileProperties(), GameMode.SURVIVAL.getId(), 1, false, "") }));
 		}
-		Main.getInstance().broadcastMessage(new AdvancedMessage(this.getPlayerName() + " joined the game!").setColor(ChatColor.YELLOW).build());
+		Main.getInstance().broadcastMessage(new AdvancedMessage().getBase().setText(this.getPlayerName() + " joined the game!").setColor(ChatColor.YELLOW).build());
 	}
 
 	@Override
@@ -416,7 +416,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				}
 			}
 		}
-		Main.getInstance().broadcastMessage(new AdvancedMessage(playerName + " left the game!").setColor(ChatColor.YELLOW).build());
+		Main.getInstance().broadcastMessage(new AdvancedMessage().getBase().setText(playerName + " left the game!").setColor(ChatColor.YELLOW).build());
 	}
 
 	@Override
