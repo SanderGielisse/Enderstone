@@ -110,6 +110,7 @@ public abstract class EnderEntity implements Entity {
 	}
 
 	protected void onHealthUpdate(float newHealth, float lastHealth) {
+		
 	}
 
 	public float getHealth() {
@@ -147,6 +148,8 @@ public abstract class EnderEntity implements Entity {
 	protected abstract String getDamageSound();
 
 	protected abstract String getDeadSound();
+	
+	protected abstract String getRandomSound();
 
 	protected abstract float getBaseHealth();
 
