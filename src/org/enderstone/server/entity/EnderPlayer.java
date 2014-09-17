@@ -58,6 +58,7 @@ import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityStatus;
+import org.enderstone.server.packet.play.PacketOutTitle;
 import org.enderstone.server.packet.play.PacketOutEntityStatus.Status;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutPlayParticle;
@@ -67,6 +68,8 @@ import org.enderstone.server.packet.play.PacketOutPlayerListItem;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.Action;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionAddPlayer;
 import org.enderstone.server.packet.play.PacketOutPlayerListItem.ActionRemovePlayer;
+import org.enderstone.server.packet.play.PacketOutTitle.ActionDisplayTitle;
+import org.enderstone.server.packet.play.PacketOutTitle.ActionSubtitle;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutRespawn;
 import org.enderstone.server.packet.play.PacketOutSetExperience;
@@ -1090,5 +1093,18 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	protected String getRandomSound() {
 		return "";
+	}
+
+	@Override
+	public void setSprinting(boolean sprinting) {
+		this.clientSettings.isSprinting = sprinting;
+		this.updateDataWatcher();
+		this.getWorld().broadcastPacket(new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher()), this.getLocation());
+	}
+
+	@Override
+	public void displayWelcomeTitle(Message title, Message subtitle) {
+		this.networkManager.sendPacket(new PacketOutTitle(new ActionDisplayTitle(title)));
+		this.networkManager.sendPacket(new PacketOutTitle(new ActionSubtitle(subtitle)));
 	}
 }

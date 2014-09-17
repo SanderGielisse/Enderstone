@@ -262,10 +262,6 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						sendPacket(new PacketOutSpawnPosition(spawn));
 						sendPacket(new PacketOutPlayerPositionLook(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), (byte) 0b00000));
 						sendPacket(new PacketOutUpdateHealth(player.getHealth(), player.clientSettings.food, player.clientSettings.foodSaturation));
-						
-						//TODO make this editable with the API
-						sendPacket(new PacketOutTitle(new ActionDisplayTitle(new AdvancedMessage("Welcome to Enderstone").getBase().setColor(ChatColor.GOLD).build())));
-						sendPacket(new PacketOutTitle(new ActionSubtitle(new AdvancedMessage("This is an Enderstone test server").getBase().setColor(ChatColor.RED).build())));
 					} catch (Exception e) {
 						EnderLogger.exception(e);
 					} finally {

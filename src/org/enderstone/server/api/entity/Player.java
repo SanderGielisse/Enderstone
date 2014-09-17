@@ -115,4 +115,8 @@ public interface Player {
 	public boolean isOnFire();
 	
 	public boolean isEating();
+	
+	public void setSprinting(boolean sprinting);
+	
+	public void displayWelcomeTitle(Message title, Message subtitle);
 }

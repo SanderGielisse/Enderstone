@@ -83,9 +83,9 @@ public class PacketInEntityAction extends Packet {
 				}else if(getActionId() == 1){
 					networkManager.player.setSneaking(false);
 				}else if(getActionId() == 3){
-					networkManager.player.clientSettings.isSprinting = true;
+					networkManager.player.setSprinting(true);
 				}else if(getActionId() == 4){
-					networkManager.player.clientSettings.isSprinting = false;
+					networkManager.player.setSprinting(false);
 				}
 			}
 		});
