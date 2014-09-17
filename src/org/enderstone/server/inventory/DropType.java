@@ -17,40 +17,10 @@
  */
 package org.enderstone.server.inventory;
 
-import java.util.List;
-import org.enderstone.server.api.messages.Message;
-
 /**
  *
  * @author Fernando
  */
-public interface HalfInventory extends AutoCloseable{
-
-	public ItemStack getRawItem(int slotNumber);
-
-	public List<ItemStack> getRawItems();
-
-	public int getSize();
-
-	public InventoryType getType();
-
-	public void setRawItem(int slotNumber, ItemStack stack);
-
-	public Message getTitle();
-
-	public Inventory openFully(PlayerInventory inventory);
-	
-	public void addListener(HalfInventoryListener listener);
-	
-	public void removeListener(HalfInventoryListener listener);
-	
-	public boolean isClosed();
-	
-	public void clearInventory();
-	
-	@Override
-	public void close();
-	
-	public DropType getSlotDropType(int slot);
-
+public enum DropType {
+	ALL_ALLOWED, ONLY_IN, ONLY_OUT, ARMOR_ONLY
 }

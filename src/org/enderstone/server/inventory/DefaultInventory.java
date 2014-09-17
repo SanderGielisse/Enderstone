@@ -47,6 +47,11 @@ public abstract class DefaultInventory implements Inventory {
 		this.inventoryTitle = CachedMessage.wrap(inventoryTitle);
 		this.listeners = new CopyOnWriteArrayList<>(listeners);
 	}
+	
+	@Override
+	public DropType getSlotDropType(int slot) {
+		return DropType.ALL_ALLOWED;
+	}
 
 	@Override
 	public void setRawItem(int slotNumber, ItemStack stack) {
