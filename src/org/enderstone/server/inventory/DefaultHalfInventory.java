@@ -88,7 +88,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 
 	@Override
 	public void close() {
-		if(closed) return;
+		if (closed) return;
 		this.close0();
 		this.closed = true;
 		Iterator<FullInventory> inv = fullInventories.iterator();
@@ -100,7 +100,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 				for (InventoryListener l : next.listeners)
 					l.closeInventory(next);
 		}
-		for(HalfInventoryListener l : this.listeners) l.closeInventory(this);
+		for (HalfInventoryListener l : this.listeners) l.closeInventory(this);
 	}
 
 	protected abstract void close0();
@@ -146,7 +146,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 				for (InventoryListener l : next.listeners)
 					l.onSlotChange(next, slot, oldStack, newStack);
 		}
-		for(HalfInventoryListener l : this.listeners) l.onSlotChange(this, slot, oldStack, newStack);
+		for (HalfInventoryListener l : this.listeners) l.onSlotChange(this, slot, oldStack, newStack);
 	}
 
 	protected void callPropertyChance(int slot, short property, short oldValue, short newValue) {
@@ -159,7 +159,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 				for (InventoryListener l : next.listeners)
 					l.onPropertyChange(next, property, oldValue, newValue);
 		}
-		for(HalfInventoryListener l : this.listeners) l.onPropertyChange(this, property, oldValue, newValue);
+		for (HalfInventoryListener l : this.listeners) l.onPropertyChange(this, property, oldValue, newValue);
 	}
 
 	private class InventoryWrapper extends AbstractList<ItemStack> {
@@ -193,7 +193,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 		@Override
 		public ItemStack set(int index, ItemStack newStack) {
 			ItemStack oldValue = this.main.set(index, newStack);
-			if(!(oldValue == null ? newStack == null : oldValue.equals(newStack)))
+			if (!(oldValue == null ? newStack == null : oldValue.equals(newStack)))
 				DefaultHalfInventory.this.callSlotChance(index + offset, oldValue, newStack);
 			return oldValue;
 		}
@@ -219,6 +219,11 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 		FullInventory tmp = new FullInventory(inventory, this.combineItems(inventory));
 		this.fullInventories.add(tmp);
 		return tmp;
+	}
+
+	@Override
+	public DropType getSlotDropType(int slot) {
+		return DropType.ALL_ALLOWED;
 	}
 
 	protected abstract MergedList<ItemStack> combineItems(PlayerInventory inventory);
@@ -310,6 +315,12 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 		public void clearInventory() {
 			for (int i = 0; i < getSize(); i++) this.setRawItem(i, null);
 		}
+
+		@Override
+		public DropType getSlotDropType(int slot) {
+			return DefaultHalfInventory.this.getSlotDropType(slot);
+		}
+
 	}
 
 	@Override
