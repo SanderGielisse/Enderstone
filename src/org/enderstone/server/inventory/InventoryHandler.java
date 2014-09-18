@@ -153,6 +153,7 @@ public class InventoryHandler {
 		//player.sendMessage(new SimpleMessage(packet.toString()));
 		boolean correctTransaction = handleInventoryClick(packet);
 		player.debug("Cursor: "+this.itemOnCursor.get(0),EnderPlayer.PlayerDebugger.INVENTORY);
+		if(!correctTransaction) player.sendMessage(new SimpleMessage("Unable to process inventory action: "+packet.toString()));
 		player.networkManager.sendPacket(new PacketOutConfirmTransaction(packet.getWindowId(), packet.getActionNumber(), correctTransaction));
 	}
 
