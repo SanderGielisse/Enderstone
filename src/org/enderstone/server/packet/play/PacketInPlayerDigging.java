@@ -18,7 +18,6 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;

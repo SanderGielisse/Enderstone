@@ -20,7 +20,6 @@ package org.enderstone.server.regions.generators;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.BlockPopulator;

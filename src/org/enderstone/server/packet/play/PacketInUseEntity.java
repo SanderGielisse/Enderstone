@@ -19,7 +19,6 @@ package org.enderstone.server.packet.play;
 
 import java.io.IOException;
 import org.enderstone.server.Main;
-import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;

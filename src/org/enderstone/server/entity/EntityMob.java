@@ -31,10 +31,10 @@ import org.enderstone.server.packet.play.PacketOutEntityHeadLook;
 import org.enderstone.server.packet.play.PacketOutEntityLook;
 import org.enderstone.server.packet.play.PacketOutEntityRelativeMove;
 import org.enderstone.server.packet.play.PacketOutEntityStatus;
+import org.enderstone.server.packet.play.PacketOutEntityStatus.Status;
 import org.enderstone.server.packet.play.PacketOutEntityTeleport;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.packet.play.PacketOutSpawnMob;
-import org.enderstone.server.packet.play.PacketOutEntityStatus.Status;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
 

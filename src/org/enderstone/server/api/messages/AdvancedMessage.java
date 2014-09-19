@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-
 import org.enderstone.server.api.messages.AdvancedMessage.AdvancedMessagePart.Type;
 import org.enderstone.server.util.MergedList;
 import org.json.JSONArray;

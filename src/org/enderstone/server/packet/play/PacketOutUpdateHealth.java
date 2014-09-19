@@ -18,7 +18,6 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 

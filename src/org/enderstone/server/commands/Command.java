@@ -20,7 +20,6 @@ package org.enderstone.server.commands;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.EnderPlayer;
 

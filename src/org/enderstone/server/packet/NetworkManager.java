@@ -41,10 +41,7 @@ import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
-import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.Location;
-import org.enderstone.server.api.messages.AdvancedMessage;
-import org.enderstone.server.api.messages.ChatColor;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
@@ -57,11 +54,9 @@ import org.enderstone.server.packet.login.PacketOutLoginSucces;
 import org.enderstone.server.packet.play.PacketOutJoinGame;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSpawnPosition;
-import org.enderstone.server.packet.play.PacketOutTitle;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.packet.play.PacketOutUpdateTime;
 import org.enderstone.server.regions.EnderWorld;
-import org.enderstone.server.packet.play.PacketOutTitle.*;
 
 public class NetworkManager extends ChannelHandlerAdapter {
 

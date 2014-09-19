@@ -17,7 +17,6 @@
  */
 package org.enderstone.server.api.messages;
 
-import org.enderstone.server.api.messages.AdvancedMessage.AdvancedMessagePart;
 import org.json.JSONObject;
 
 /**

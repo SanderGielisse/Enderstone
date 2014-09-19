@@ -21,7 +21,6 @@ import java.util.Arrays;
 import org.enderstone.server.api.messages.AdvancedMessage;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.regions.BlockId;
-import org.enderstone.server.util.FixedSizeList;
 import org.enderstone.server.util.IntegerArrayComparator;
 import org.junit.Assert;
 
