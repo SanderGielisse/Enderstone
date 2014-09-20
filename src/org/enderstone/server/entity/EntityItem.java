@@ -199,12 +199,11 @@ public class EntityItem extends EnderEntity implements Item {
 	}
 	
 	public boolean canGoDown(){
-		return world.getBlock(this.getLocation().clone().add(0.25D, 0, 0D)).getBlock() == BlockId.AIR &&
-				world.getBlock(this.getLocation().clone().add(-0.25D, 0, 0D)).getBlock() == BlockId.AIR && 
-						world.getBlock(this.getLocation().clone().add(0D, 0, 0.25D)).getBlock() == BlockId.AIR && 
-							world.getBlock(this.getLocation().clone().add(0D, 0, -0.25D)).getBlock() == BlockId.AIR &&
-									world.getBlock(this.getLocation().clone().add(0, -1D, 0)).getBlock() == BlockId.AIR;
-		//TODO make it able to fall through torches etc.
+		return world.getBlock(this.getLocation().clone().add(0.25D, 0, 0D)).getBlock().doesInstantBreak() &&
+				world.getBlock(this.getLocation().clone().add(-0.25D, 0, 0D)).getBlock().doesInstantBreak() && 
+						world.getBlock(this.getLocation().clone().add(0D, 0, 0.25D)).getBlock().doesInstantBreak() && 
+							world.getBlock(this.getLocation().clone().add(0D, 0, -0.25D)).getBlock().doesInstantBreak() &&
+									world.getBlock(this.getLocation().clone().add(0, -1D, 0)).getBlock().doesInstantBreak();
 	}
 
 	@Override
