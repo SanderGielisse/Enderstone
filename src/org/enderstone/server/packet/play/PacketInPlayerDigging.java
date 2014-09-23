@@ -86,13 +86,14 @@ public class PacketInPlayerDigging extends Packet {
 						if (definition.canBreak(networkManager.player, world, x, y, z)) {
 
 							world.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
+
+							world.broadcastSound(definition.getBreakSound(), 1F, (byte) 63, loc, networkManager.player);
+							Location loca = loc.clone();
+							loca.setX(loca.getX() + 0.5);
+							loca.setZ(loca.getZ() + 0.5);
+							world.addEntity(new EntityItem(world,loca, definition.getDrop(networkManager.player, world, x, y, z), 1, new Vector(0, 0.1D, 0)));
 						}
 					}
-					world.broadcastSound(definition.getBreakSound(), 1F, (byte) 63, loc, networkManager.player);
-					Location loca = loc.clone();
-					loca.setX(loca.getX() + 0.5);
-					loca.setZ(loca.getZ() + 0.5);
-					world.addEntity(new EntityItem(world,loca, definition.getDrop(networkManager.player, world, x, y, z), 1, new Vector(0, 0.1D, 0)));
 				} else if (getStatus() == 3) {
 					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
 				} else if (getStatus() == 4) {
