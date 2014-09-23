@@ -20,6 +20,8 @@ package org.enderstone.server.packet.play;
 import java.io.IOException;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.blocks.BlockDefinition;
+import org.enderstone.server.blocks.BlockDefinitions;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.FoodType;
 import org.enderstone.server.inventory.ItemStack;
@@ -118,10 +120,16 @@ public class PacketInBlockPlacement extends Packet {
 					}
 					
 					if (BlockId.byId(getHeldItem().getBlockId()).isValidBlock()) {
-						Main.getInstance().getWorld(pl).setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
-						pl.getInventoryHandler().decreaseItemInHand(1);
-						Main.getInstance().getWorld(networkManager.player).broadcastSound("dig.grass", 1F, (byte) 63, loc, null);
-						return;
+
+						BlockDefinition definition = BlockDefinitions.getBlock(networkManager.player.getWorld().getBlockIdAt(x, y, z));
+
+						if (definition.canPlace(networkManager.player, networkManager.player.getWorld(), x, y, z)) {
+
+							Main.getInstance().getWorld(pl).setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
+							pl.getInventoryHandler().decreaseItemInHand(1);
+							Main.getInstance().getWorld(networkManager.player).broadcastSound(definition.getPlaceSound(), 1F, (byte) 63, loc, null);
+							return;
+						}
 					}
 				}
 			}
