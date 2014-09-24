@@ -25,7 +25,7 @@ public class BlockDefinitionDirt extends BlockDefinition {
 	@Override
 	public String getPlaceSound() {
 
-		return "place.dirt";
+		return "step.dirt";
 	}
 
 	@Override

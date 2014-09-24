@@ -25,7 +25,7 @@ public class BlockDefinitionCoalOre extends BlockDefinition {
 	@Override
 	public String getPlaceSound() {
 
-		return "place.stone";
+		return "step.stone";
 	}
 
 	@Override

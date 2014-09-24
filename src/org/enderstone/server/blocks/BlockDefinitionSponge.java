@@ -20,7 +20,7 @@ public class BlockDefinitionSponge extends BlockDefinition {
 	@Override
 	public String getPlaceSound() {
 
-		return "place.leaf";
+		return "step.leaf";
 	}
 
 	@Override

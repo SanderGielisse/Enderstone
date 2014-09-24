@@ -20,7 +20,7 @@ public class BlockDefinitionSand extends BlockDefinition {
 	@Override
 	public String getPlaceSound() {
 
-		return "place.sand";
+		return "step.sand";
 	}
 
 	@Override

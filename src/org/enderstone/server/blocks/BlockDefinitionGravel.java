@@ -20,12 +20,12 @@ public class BlockDefinitionGravel extends BlockDefinition {
 	@Override
 	public String getPlaceSound() {
 
-		return "place.sand";
+		return "step.gravel";
 	}
 
 	@Override
 	public String getBreakSound() {
 
-		return "dig.sand";
+		return "dig.gravel";
 	}
 }

@@ -20,7 +20,7 @@ public class BlockDefinitionGlass extends BlockDefinition {
 	@Override
 	public String getPlaceSound() {
 
-		return "place.glass";
+		return "step.glass";
 	}
 
 	@Override

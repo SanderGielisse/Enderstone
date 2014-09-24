@@ -20,7 +20,7 @@ public class BlockDefinitionCobbleStone extends BlockDefinition {
 	@Override
 	public String getPlaceSound() {
 
-		return "place.stone";
+		return "step.stone";
 	}
 
 	@Override

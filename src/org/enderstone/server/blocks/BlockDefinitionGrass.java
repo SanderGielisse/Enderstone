@@ -25,7 +25,7 @@ public class BlockDefinitionGrass extends BlockDefinition {
 	@Override
 	public String getPlaceSound() {
 
-		return "place.grass";
+		return "step.grass";
 	}
 
 	@Override

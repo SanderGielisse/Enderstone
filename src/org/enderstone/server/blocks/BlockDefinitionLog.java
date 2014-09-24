@@ -20,7 +20,7 @@ public class BlockDefinitionLog extends BlockDefinition {
 	@Override
 	public String getPlaceSound() {
 
-		return "place.wood";
+		return "step.wood";
 	}
 
 	@Override
