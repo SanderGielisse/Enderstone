@@ -29,7 +29,6 @@ public class BlockDefinition {
 		return type;
 	}
 
-	public boolean canPlace(Player player, World world, int x, int y, int z) { return (world.getBlock(x, y, z).getBlock() == BlockId.AIR); };
 	public boolean canBreak(Player player, World world, int x, int y, int z) { return true; };
 
 	public int getMaxStackSize() { return 64; };

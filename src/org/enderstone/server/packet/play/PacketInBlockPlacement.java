@@ -121,15 +121,13 @@ public class PacketInBlockPlacement extends Packet {
 					
 					if (BlockId.byId(getHeldItem().getBlockId()).isValidBlock()) {
 
+						Main.getInstance().getWorld(pl).setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
+
 						BlockDefinition definition = BlockDefinitions.getBlock(networkManager.player.getWorld().getBlockIdAt(x, y, z));
 
-						if (definition.canPlace(networkManager.player, networkManager.player.getWorld(), x, y, z)) {
-
-							Main.getInstance().getWorld(pl).setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
-							pl.getInventoryHandler().decreaseItemInHand(1);
-							Main.getInstance().getWorld(networkManager.player).broadcastSound(definition.getPlaceSound(), 1F, (byte) 63, loc, null);
-							return;
-						}
+						pl.getInventoryHandler().decreaseItemInHand(1);
+						Main.getInstance().getWorld(networkManager.player).broadcastSound(definition.getPlaceSound(), 1F, (byte) 63, loc, null);
+						return;
 					}
 				}
 			}
