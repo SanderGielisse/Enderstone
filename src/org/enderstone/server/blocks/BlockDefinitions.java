@@ -30,11 +30,21 @@ public class BlockDefinitions {
 	@Deprecated
 	public static BlockDefinition getBlock(BlockId id) {
 
-		return blocks.get((int) id.getId());
+		return getBlock(BlockType.valueOf(id.getName().toUpperCase()));
 	}
 
 	public static BlockDefinition getBlock(BlockType type) {
 
-		return blocks.get(type.getId());
+		BlockDefinition definition = blocks.get(type.getId());
+
+		if (definition != null) {
+
+			return definition;
+		}
+
+		else {
+
+			return new BlockDefinition(type);
+		}
 	}
 }
