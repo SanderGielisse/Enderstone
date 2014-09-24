@@ -21,6 +21,7 @@ public enum ChatColor {
 
 	RESET("\u00A7r"),
 
+	MAGIC("\u00A7k"),
 	BOLD("\u00A7l"),
 	STRIKETHROUGH("\u00A7m"),
 	UNDERLINE("\u00A7n"), 
