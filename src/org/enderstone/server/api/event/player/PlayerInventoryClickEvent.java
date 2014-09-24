@@ -28,6 +28,7 @@ public class PlayerInventoryClickEvent extends Event implements Cancellable {
 	private final Player player;
 	private final InventoryHandler inventory;
 
+	//TODO implement this
 	public PlayerInventoryClickEvent(Player player, InventoryHandler inventory) {
 		this.player = player;
 		this.inventory = inventory;

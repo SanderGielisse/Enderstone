@@ -28,6 +28,7 @@ public class PlayerInteractEvent extends Event implements Cancellable {
 	private final Player player;
 	private final InteractType type;
 
+	//TODO implement this
 	public PlayerInteractEvent(Player player, InteractType type) {
 		this.player = player;
 		this.type = type;

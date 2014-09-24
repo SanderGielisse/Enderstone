@@ -26,6 +26,7 @@ public class PlayerRespawnEvent extends Event implements Cancellable {
 	private boolean cancelled = false;
 	private final Player player;
 
+	//TODO implement this
 	public PlayerRespawnEvent(Player player) {
 		this.player = player;
 	}

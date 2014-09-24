@@ -20,14 +20,15 @@ package org.enderstone.server.api.event.player;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
+import org.enderstone.server.api.messages.Message;
 
 public class PlayerKickEvent extends Event implements Cancellable {
 
-	private boolean cancelled = false;
+	private boolean cancelled;
 	private final Player player;
-	private final String reason;
+	private Message reason = null;
 
-	public PlayerKickEvent(Player player, String reason) {
+	public PlayerKickEvent(Player player, Message reason) {
 		this.player = player;
 		this.reason = reason;
 	}
@@ -36,8 +37,12 @@ public class PlayerKickEvent extends Event implements Cancellable {
 		return player;
 	}
 
-	public String getReason() {
+	public Message getReason() {
 		return reason;
+	}
+
+	public void setReason(Message reason) {
+		this.reason = reason;
 	}
 
 	@Override

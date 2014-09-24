@@ -20,6 +20,7 @@ package org.enderstone.server.packet.play;
 import java.io.IOException;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.event.player.PlayerMoveEvent;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
@@ -71,12 +72,22 @@ public class PacketInPlayerPositionLook extends Packet {
 							getFeetY() < loc.getY() ? loc.getY() - getFeetY() : getFeetY() - loc.getY()),
 							getZ() < loc.getZ() ? loc.getZ() - getZ() : getZ() - loc.getZ())> 0.1) {
 						if (networkManager.player.waitingForValidMoveAfterTeleport++ > 100) {
-							networkManager.player.teleport(loc);
+							networkManager.player.teleportInternally(loc);
 						}
 						return;
 					}
 					networkManager.player.waitingForValidMoveAfterTeleport = 0;
 				}
+				Location newLoc = loc.clone();
+				newLoc.setX(getX());
+				newLoc.setY(getFeetY());
+				newLoc.setZ(getZ());
+				newLoc.setPitch(getPitch());
+				newLoc.setYaw(getYaw());
+				if(Main.getInstance().callEvent(new PlayerMoveEvent(networkManager.player, loc, newLoc))){
+					return;
+				}
+				
 				networkManager.player.broadcastLocation(new Location(networkManager.player.getWorld(), getX(), getFeetY(), getZ(), getYaw(), getPitch()));
 				networkManager.player.broadcastRotation(getPitch(), getYaw());
 				loc.setX(getX());

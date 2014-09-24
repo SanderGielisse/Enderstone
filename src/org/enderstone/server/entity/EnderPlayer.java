@@ -33,6 +33,15 @@ import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Player;
+import org.enderstone.server.api.event.Event;
+import org.enderstone.server.api.event.player.PlayerChatEvent;
+import org.enderstone.server.api.event.player.PlayerCommandEvent;
+import org.enderstone.server.api.event.player.PlayerExpChangeEvent;
+import org.enderstone.server.api.event.player.PlayerGamemodeChangeEvent;
+import org.enderstone.server.api.event.player.PlayerKickEvent;
+import org.enderstone.server.api.event.player.PlayerTeleportEvent;
+import org.enderstone.server.api.event.player.PlayerToggleSneakEvent;
+import org.enderstone.server.api.event.player.PlayerToggleSprintEvent;
 import org.enderstone.server.api.messages.AdvancedMessage;
 import org.enderstone.server.api.messages.ChatColor;
 import org.enderstone.server.api.messages.Message;
@@ -111,7 +120,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			@Override
 			public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue) {
 			}
-			
+
 			@Override
 			public void closeInventory(Inventory inv) {
 			}
@@ -165,7 +174,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 
 		@Override
-		public void done() {			
+		public void done() {
 			int size = cache.size();
 			if (size == 0)
 				return;
@@ -269,20 +278,20 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void onSpawn() {
-		EnderLogger.info(this.getPlayerName() + " logged in from " + networkManager.ctx.channel().remoteAddress().toString() + " with uuid " + uuid);		
+		EnderLogger.info(this.getPlayerName() + " logged in from " + networkManager.ctx.channel().remoteAddress().toString() + " with uuid " + uuid);
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_PICKAXE.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_SPADE.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 64, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.WORKBENCH.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.CHEST.getId(), (byte) 1, (short) 0));
-		
+
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COOKED_BEEF, (byte) 10));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COOKED_CHICKEN, (byte) 10));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_CHICKEN, (byte) 10));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_RABBIT, (byte) 10));
-		
+
 		this.inventoryHandler.getPlayerInventory().setRawItem(5, new ItemStack(BlockId.DIAMOND_HELMET, (byte) 1));
-		
+
 		this.updateDataWatcher();
 
 		this.getNetworkManager().sendPacket(new PacketOutPlayerListHeaderFooter(this.clientSettings.tabListHeader, this.clientSettings.tabListFooter));
@@ -321,52 +330,52 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		List<Packet> toSend = new ArrayList<>();
 		PlayerInventory handler = this.getInventoryHandler().getPlayerInventory();
 		toSend.add(new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, (int) (this.getLocation().getX() * 32.0D), (int) (this.getLocation().getY() * 32.0D), (int) (this.getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (short) 0, this.getDataWatcher()));
-		if(this.getInventoryHandler().getItemInHand() != null){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); //helmet
+		if (this.getInventoryHandler().getItemInHand() != null) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); // helmet
 		}
-		if(handler.getArmor().get(0) != null){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.getArmor().get(0))); //helmet
+		if (handler.getArmor().get(0) != null) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.getArmor().get(0))); // helmet
 		}
-		if(handler.getArmor().get(1) != null){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 3, handler.getArmor().get(0))); //chestplate
+		if (handler.getArmor().get(1) != null) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 3, handler.getArmor().get(0))); // chestplate
 		}
-		if(handler.getArmor().get(2) != null){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 2, handler.getArmor().get(0))); //leggins
+		if (handler.getArmor().get(2) != null) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 2, handler.getArmor().get(0))); // leggins
 		}
-		if(handler.getArmor().get(3) != null){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 1, handler.getArmor().get(0))); //boots
+		if (handler.getArmor().get(3) != null) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 1, handler.getArmor().get(0))); // boots
 		}
 		return toSend.toArray(new Packet[toSend.size()]);
 	}
-	
-	public void broadcastEquipment(EquipmentUpdateType type){
+
+	public void broadcastEquipment(EquipmentUpdateType type) {
 		List<Packet> toSend = new ArrayList<>();
 		List<ItemStack> handler = this.getInventoryHandler().getPlayerInventory().getArmor();
-		
-		if((type == EquipmentUpdateType.ITEM_IN_HAND_CHANGE || type == EquipmentUpdateType.ALL)){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); //item in hand
+
+		if ((type == EquipmentUpdateType.ITEM_IN_HAND_CHANGE || type == EquipmentUpdateType.ALL)) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); // item in hand
 		}
-		if((type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.get(0))); //helmet
+		if ((type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.get(0))); // helmet
 		}
-		if((type == EquipmentUpdateType.CHESTPLATE_CHANGE || type == EquipmentUpdateType.ALL)){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 3, handler.get(0))); //chestplate
+		if ((type == EquipmentUpdateType.CHESTPLATE_CHANGE || type == EquipmentUpdateType.ALL)) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 3, handler.get(0))); // chestplate
 		}
-		if((type == EquipmentUpdateType.LEGGINGS_CHANGE || type == EquipmentUpdateType.ALL)){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 2, handler.get(0))); //leggins
+		if ((type == EquipmentUpdateType.LEGGINGS_CHANGE || type == EquipmentUpdateType.ALL)) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 2, handler.get(0))); // leggins
 		}
-		if((type == EquipmentUpdateType.BOOTS_CHANGE || type == EquipmentUpdateType.ALL)){
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 1, handler.get(0))); //boots
+		if ((type == EquipmentUpdateType.BOOTS_CHANGE || type == EquipmentUpdateType.ALL)) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 1, handler.get(0))); // boots
 		}
 		Iterator<String> visible = this.visiblePlayers.iterator();
-		while(visible.hasNext()){
+		while (visible.hasNext()) {
 			String name = visible.next();
 			EnderPlayer ep = Main.getInstance().getPlayer(name);
-			if(ep == null){
+			if (ep == null) {
 				visible.remove();
 				continue;
 			}
-			for(Packet pack : toSend){
+			for (Packet pack : toSend) {
 				ep.getNetworkManager().sendPacket(pack);
 			}
 		}
@@ -387,8 +396,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 				@Override
 				public void run() {
-
-					Main.getInstance().commands.executeCommand(null, split[0], EnderPlayer.this, args);
+					if (!Main.getInstance().callEvent(new PlayerCommandEvent(EnderPlayer.this, split[0], args))) {
+						Main.getInstance().commands.executeCommand(null, split[0], EnderPlayer.this, args);
+					}
 				}
 			});
 		} else {
@@ -396,7 +406,12 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 				@Override
 				public void run() {
-					Main.getInstance().broadcastMessage(new SimpleMessage("<" + getPlayerName() + "> " + message));
+					PlayerChatEvent e = new PlayerChatEvent(EnderPlayer.this, message);
+					Main.getInstance().callEvent(e);
+					// example format: <%name> %message
+					if (!e.isCancelled()) {
+						Main.getInstance().broadcastMessage(new SimpleMessage(e.getFormat().replace("%name", getPlayerName()).replace("%message", e.getMessage())));
+					}
 				}
 			});
 		}
@@ -442,11 +457,11 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				toDespawn.add(pl.getEntityId());
 			}
 		}
-		
+
 		Iterator<String> it = this.visiblePlayers.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			String name = it.next();
-			if(Main.getInstance().getPlayer(name) == null){
+			if (Main.getInstance().getPlayer(name) == null) {
 				it.remove();
 			}
 		}
@@ -484,6 +499,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		if (this.isDead()) {
 			return;
 		}
+		
+		
+		
 		checkCollision();
 
 		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
@@ -590,6 +608,13 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void teleport(Location newLocation) {
+		if(Main.getInstance().callEvent(new PlayerTeleportEvent(this, this.getLocation(), newLocation))){
+			return;
+		}
+		this.teleportInternally(newLocation);
+	}
+	
+	public void teleportInternally(Location newLocation){
 		this.waitingForValidMoveAfterTeleport = 1;
 		this.getLocation().cloneFrom(newLocation);
 
@@ -609,7 +634,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public void serverTick() {
 		super.serverTick();
-		
+
 		if (getFoodLevel() == 20) {
 			this.clientSettings.isEatingTicks = 0;
 			this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(this.getHealth(), this.getFoodLevel(), this.clientSettings.foodSaturation));
@@ -621,13 +646,13 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 					if (this.getInventoryHandler().getItemInHand() != null) {
 						FoodType type = FoodType.fromBlockId(this.getInventoryHandler().getItemInHand().getBlockId());
 						this.getInventoryHandler().decreaseItemInHand(1);
-						
-						if(this.clientSettings.foodSaturation + type.getSaturation() > 5){
+
+						if (this.clientSettings.foodSaturation + type.getSaturation() > 5) {
 							this.clientSettings.foodSaturation = 5;
-						}else{
+						} else {
 							this.clientSettings.foodSaturation = this.clientSettings.foodSaturation + type.getSaturation();
 						}
-						
+
 						if (this.getFoodLevel() <= (20 - type.getFood())) {
 							this.setFoodLevel(this.getFoodLevel() + type.getFood());
 						} else {
@@ -637,7 +662,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				}
 			}
 		}
-		
+
 		boolean didFoodUpdate = false;
 		if (!this.isDead() && latestFood++ % (30 * 20) == 0) { // TODO do this how it goes in default Minecraft
 			didFoodUpdate = true;
@@ -709,7 +734,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			return;
 		}
 		broadcastEmptyArmour();
-		//player is dead
+		// player is dead
 		this.clientSettings.food = 20;
 		Packet packet = new PacketOutEntityStatus(this.getEntityId(), Status.LIVING_ENTITY_DEAD);
 		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
@@ -729,20 +754,20 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	private void broadcastEmptyArmour() {
-		//broadcast the players armour empty, otherwise the client will regenrate "fake" on-ground items.
+		// broadcast the players armour empty, otherwise the client will regenrate "fake" on-ground items.
 		List<Packet> tmp = new ArrayList<>();
 		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, null));
 		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 1, null));
 		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 2, null));
 		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 3, null));
 		tmp.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, null));
-		
+
 		Iterator<String> it = this.visiblePlayers.iterator();
-		
-		while(it.hasNext()){
+
+		while (it.hasNext()) {
 			String name = it.next();
 			EnderPlayer ep = Main.getInstance().getPlayer(name);
-			if(ep == null){
+			if (ep == null) {
 				it.remove();
 				continue;
 			}
@@ -787,7 +812,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
 			if (change > 0) {
-				if(damage((float) change)){
+				if (damage((float) change)) {
 					Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " fell from a high place."));
 				}
 				Main.getInstance().getWorld(this).broadcastSound("damage.fallsmall", 1F, (byte) 63, getLocation(), null);
@@ -810,7 +835,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		if(this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2))){
+		if (this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2))) {
 			Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " was killed by " + attacker.getPlayerName()));
 		}
 	}
@@ -833,8 +858,16 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	@Override
-	public void kick(String reason) {
-		this.getNetworkManager().disconnect(new SimpleMessage(reason), false);
+	public void kick(Message reason) {
+		PlayerKickEvent e = new PlayerKickEvent(this, reason);
+		if(e.isCancelled()){
+			return;
+		}
+		if (e.getReason() == null) {
+			this.getNetworkManager().disconnect(reason, false);
+		}else{
+			this.getNetworkManager().disconnect(e.getReason(), false);
+		}
 	}
 
 	/**
@@ -939,12 +972,20 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setExperience(int experience) {
+		if (Main.getInstance().callEvent(new PlayerExpChangeEvent(this, this.getExperience(), experience))) {
+			return;
+		}
+
 		this.clientSettings.experience = experience;
-		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO calculate this correctly
+		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO convert this to a level
 	}
 
 	@Override
 	public void setExperienceLevel(int experienceLevel) {
+		if (Main.getInstance().callEvent(new PlayerExpChangeEvent(this, this.getExperience(), experienceLevel))) { // TODO convert this to a level
+			return;
+		}
+
 		this.clientSettings.experience = experienceLevel; // TODO convert this to a level
 		this.networkManager.sendPacket(new PacketOutSetExperience(0F, this.clientSettings.experience, this.clientSettings.experience)); // TODO calculate this correctly
 	}
@@ -966,6 +1007,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setSneaking(boolean sneaking) {
+		if(Main.getInstance().callEvent(new PlayerToggleSneakEvent(this))){
+			return;
+		}
 		clientSettings.isSneaking = sneaking;
 		this.updateDataWatcher();
 		this.getWorld().broadcastPacket(new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher()), this.getLocation());
@@ -1010,6 +1054,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	public void setGameMode(GameMode mode) {
+		if (Main.getInstance().callEvent(new PlayerGamemodeChangeEvent(this, this.getGameMode(), mode))) {
+			return;
+		}
+
 		this.clientSettings.gameMode = mode;
 		byte reason = 3; // gamemode change
 		int value = mode.getId(); // gamemode id
@@ -1097,6 +1145,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setSprinting(boolean sprinting) {
+		if(Main.getInstance().callEvent(new PlayerToggleSprintEvent(this))){
+			return;
+		}
 		this.clientSettings.isSprinting = sprinting;
 		this.updateDataWatcher();
 		this.getWorld().broadcastPacket(new PacketOutEntityMetadata(this.getEntityId(), this.getDataWatcher()), this.getLocation());

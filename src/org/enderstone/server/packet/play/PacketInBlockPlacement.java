@@ -20,6 +20,7 @@ package org.enderstone.server.packet.play;
 import java.io.IOException;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.event.player.PlayerEatEvent;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.FoodType;
 import org.enderstone.server.inventory.ItemStack;
@@ -80,6 +81,9 @@ public class PacketInBlockPlacement extends Packet {
 				//called when started eating, pulling bow etc.
 				if (x == -1 && z == -1 && direct == -1) {
 					if (FoodType.fromBlockId(getHeldItem().getBlockId()) != null) {
+						if(Main.getInstance().callEvent(new PlayerEatEvent(networkManager.player))){
+							return;
+						}
 						networkManager.player.clientSettings.isEatingTicks = 1;
 						networkManager.player.updateDataWatcher();
 						networkManager.player.getWorld().broadcastPacket(new PacketOutEntityMetadata(networkManager.player.getEntityId(), networkManager.player.getDataWatcher()), networkManager.player.getLocation());

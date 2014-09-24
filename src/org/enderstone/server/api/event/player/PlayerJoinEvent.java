@@ -18,12 +18,12 @@
 package org.enderstone.server.api.event.player;
 
 import org.enderstone.server.api.entity.Player;
-import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
+import org.enderstone.server.api.messages.Message;
 
-public class PlayerJoinEvent extends Event implements Cancellable {
+public class PlayerJoinEvent extends Event {
 
-	private boolean cancelled = false;
+	private Message disconnectMessage = null;
 	private final Player player;
 
 	public PlayerJoinEvent(Player player) {
@@ -34,13 +34,11 @@ public class PlayerJoinEvent extends Event implements Cancellable {
 		return player;
 	}
 
-	@Override
-	public boolean isCancelled() {
-		return this.cancelled;
+	public Message getDisconnectMessage() {
+		return disconnectMessage;
 	}
 
-	@Override
-	public void setCancelled(boolean cancelled) {
-		this.cancelled = cancelled;
+	public void setDisconnectMessage(Message disconnectMessage) {
+		this.disconnectMessage = disconnectMessage;
 	}
 }

@@ -43,6 +43,8 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
+import org.enderstone.server.api.event.Cancellable;
+import org.enderstone.server.api.event.Event;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.enderstone.CraftingDebugCommand;
@@ -88,7 +90,7 @@ public class Main implements Runnable {
 			this.add(47); // 1.8
 		}
 	});
-	public static final String[] AUTHORS = new String[]{"BigTeddy98 (Sander)", "ferrybig (Fernando)"};
+	public static final String[] AUTHORS = new String[] { "BigTeddy98 (Sander)", "ferrybig (Fernando)" };
 	public static final Random random = new Random();
 	public volatile Thread mainThread;
 	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();
@@ -159,11 +161,11 @@ public class Main implements Runnable {
 			EnderLogger.warn("Error while reading server-icon.png!");
 			EnderLogger.exception(e);
 		}
-		
+
 		EnderLogger.info("Server ready... Starting required threads now!");
-		
+
 		final ThreadGroup nettyListeners = new ThreadGroup(Thread.currentThread().getThreadGroup(), "Netty Listeners");
-		for (final int nettyPort : new int[]{this.port}) {
+		for (final int nettyPort : new int[] { this.port }) {
 
 			Thread t;
 			(t = new Thread(nettyListeners, new Runnable() {
@@ -171,7 +173,7 @@ public class Main implements Runnable {
 				@Override
 				public void run() {
 					EnderLogger.info("Started Netty Server at port " + nettyPort + "...");
-					ThreadGroup group = new ThreadGroup(nettyListeners, "Listener-"+nettyPort);
+					ThreadGroup group = new ThreadGroup(nettyListeners, "Listener-" + nettyPort);
 					EventLoopGroup bossGroup = new NioEventLoopGroup(MAX_NETTY_BOSS_THREADS, new NettyThreadFactory(group, "boss"));
 					EventLoopGroup workerGroup = new NioEventLoopGroup(MAX_NETTY_WORKER_THREADS, new NettyThreadFactory(group, "worker"));
 
@@ -205,7 +207,7 @@ public class Main implements Runnable {
 
 				worlds.add(new EnderWorld("world1", new SimpleGenerator()));
 				worlds.add(new EnderWorld("world2", new FlyingIslandsGenerator()));
-				
+
 				try {
 					while (Main.this.isRunning) {
 						mainServerTick();
@@ -301,12 +303,12 @@ public class Main implements Runnable {
 				EnderLogger.warn("Your server-icon.png needs to be 64*64!");
 				return false;
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 			return false;
 		}
 	}
-	
-	public long getCurrentServerTick(){
+
+	public long getCurrentServerTick() {
 		return this.tick;
 	}
 
@@ -375,12 +377,12 @@ public class Main implements Runnable {
 			}
 		}
 
-		if ((tick & 0b0011_1111) == 0){ // faster than % 64 == 0
+		if ((tick & 0b0011_1111) == 0) { // faster than % 64 == 0
 			for (EnderPlayer p : onlinePlayers) {
 				p.getNetworkManager().sendPacket(new PacketOutUpdateTime(tick, this.getWorld(p).getTime()));
 			}
 		}
-		for(EnderWorld world : worlds){
+		for (EnderWorld world : worlds) {
 			world.serverTick();
 		}
 	}
@@ -405,12 +407,12 @@ public class Main implements Runnable {
 	 * Any mainthread-shutdown logic belongs to this method
 	 */
 	private void directShutdown() {
-		if(this.operators.isEmpty()){
+		if (this.operators.isEmpty()) {
 			this.operators.add(new Operator("sander2798", UUID.fromString("6743a814-9d41-4d33-af9e-e143bc2d462c")));
 			this.operators.add(new Operator("ferrybig", UUID.fromString("a3cf4b48-220f-4604-83dd-314bab52b022")));
 		}
 		new OperatorLoader().write(operators);
-		
+
 		if (this.mainThread != null) {
 			this.mainThread.interrupt();
 		}
@@ -445,10 +447,10 @@ public class Main implements Runnable {
 	public static boolean isCurrentThreadMainThread() {
 		return Main.getInstance().mainThread == Thread.currentThread();
 	}
-	
-	public EnderWorld getWorld(EnderPlayer player){
-		for(EnderWorld world : this.worlds){
-			if(world.players.contains(player)){
+
+	public EnderWorld getWorld(EnderPlayer player) {
+		for (EnderWorld world : this.worlds) {
+			if (world.players.contains(player)) {
 				return world;
 			}
 		}
@@ -466,8 +468,16 @@ public class Main implements Runnable {
 		for (EnderPlayer ep : this.onlinePlayers) {
 			if (ep.getEntityId() == targetId) {
 				return ep;
-			}
+			} 
 		}
 		return null;
+	}
+
+	public boolean callEvent(Event e) {
+		//TODO - call events
+		if(e instanceof Cancellable){
+			((Cancellable) e).isCancelled();
+		}
+		return false;
 	}
 }

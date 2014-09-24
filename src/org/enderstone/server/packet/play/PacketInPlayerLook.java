@@ -20,6 +20,7 @@ package org.enderstone.server.packet.play;
 import java.io.IOException;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.event.player.PlayerMoveEvent;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
@@ -57,13 +58,24 @@ public class PacketInPlayerLook extends Packet {
 		Main.getInstance().sendToMainThread(new Runnable() {
 
 			@Override
-			public void run() {
+			public void run() {				
 				Location loc = networkManager.player.getLocation();
+				
+				if(getYaw() == loc.getYaw() || getPitch() == loc.getPitch()){
+					return; // don't ask me why, but clients seem to send this sometimes
+				}
 
 				if (networkManager.player.waitingForValidMoveAfterTeleport > 0) {
 					return;
 				}
-
+				
+				Location newLoc = loc.clone();
+				newLoc.setPitch(getPitch());
+				newLoc.setYaw(getYaw());
+				if(Main.getInstance().callEvent(new PlayerMoveEvent(networkManager.player, loc, newLoc))){
+					return;
+				}
+				
 				try {
 					networkManager.player.broadcastRotation(getPitch(), getYaw());
 				} catch (Exception e) {

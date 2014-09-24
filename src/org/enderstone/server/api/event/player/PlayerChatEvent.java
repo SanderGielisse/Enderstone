@@ -25,7 +25,8 @@ public class PlayerChatEvent extends Event implements Cancellable {
 
 	private boolean cancelled = false;
 	private final Player player;
-	private final String message;
+	private String message;
+	private String format = "<%name> %message"; // example default
 
 	public PlayerChatEvent(Player player, String message) {
 		this.player = player;
@@ -38,6 +39,18 @@ public class PlayerChatEvent extends Event implements Cancellable {
 
 	public String getMessage() {
 		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
 	}
 
 	@Override

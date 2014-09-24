@@ -91,6 +91,10 @@ public class InventoryHandler {
 	private int selectedHotbarSlot = 0;
 	private final List<ItemStack> itemOnCursor = new FixedSizeList<>(new ItemStack[1]);
 
+	public short getHeldItemSlot(){
+		return (short) this.selectedHotbarSlot;
+	}
+	
 	private byte getWindowId(Inventory inv) {
 		if (inv == this.equimentInventory)
 			return playerWindowId;

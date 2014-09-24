@@ -24,6 +24,7 @@ public class PlayerQuitEvent extends Event {
 
 	private final Player player;
 
+	//TODO implement this
 	public PlayerQuitEvent(Player player) {
 		this.player = player;
 	}
