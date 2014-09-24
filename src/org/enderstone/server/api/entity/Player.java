@@ -36,7 +36,7 @@ public interface Player {
 
 	public void setFoodLevel(int foodLevel);
 
-	public void kick(String reason);
+	public void kick(Message reason);
 
 	public boolean getAllowFlight();
 

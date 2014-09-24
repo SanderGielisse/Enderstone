@@ -19,8 +19,10 @@ package org.enderstone.server.packet.play;
 
 import java.io.IOException;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
+import org.enderstone.server.api.event.player.PlayerBreakBlockEvent;
 import org.enderstone.server.blocks.BlockDefinition;
 import org.enderstone.server.blocks.BlockDefinitions;
 import org.enderstone.server.entity.EntityItem;
@@ -81,6 +83,12 @@ public class PacketInPlayerDigging extends Packet {
 						onRecieve(networkManager);
 					}
 				} else if (getStatus() == 2) {
+					Block b =  world.getBlock(loc);
+					if(Main.getInstance().callEvent(new PlayerBreakBlockEvent(networkManager.player, b))){
+						//tell the client it was cancelled by replacing the block
+						networkManager.player.getNetworkManager().sendPacket(new PacketOutBlockChange(loc, b.getBlock().getId(), b.getData()));
+						return;
+					}
 					if (networkManager.player.getLocation().isInRange(6, loc, true)) {
 
 						if (definition.canBreak(networkManager.player, world, x, y, z)) {
@@ -88,6 +96,7 @@ public class PacketInPlayerDigging extends Packet {
 							world.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
 
 							world.broadcastSound(definition.getBreakSound(), 1F, (byte) 63, loc, networkManager.player);
+
 							Location loca = loc.clone();
 							loca.setX(loca.getX() + 0.5);
 							loca.setZ(loca.getZ() + 0.5);

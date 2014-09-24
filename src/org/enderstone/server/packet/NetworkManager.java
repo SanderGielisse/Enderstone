@@ -42,6 +42,7 @@ import javax.crypto.spec.IvParameterSpec;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.event.player.PlayerJoinEvent;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
@@ -95,13 +96,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		Main.random.nextBytes(encryptionSettings.verifyToken);
 	}
 	
-	private volatile long latestFlush = 0;
-
 	public void forcePacketFlush() {
-		//if((System.currentTimeMillis() - latestFlush) < 100){
-		//	return;
-		//}
-		//latestFlush = System.currentTimeMillis();
 		synchronized (packets) {
 			Packet p;
 			while ((p = packets.poll()) != null) {
@@ -222,18 +217,15 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			return;
 		}
 		if (this.skinBlob == null)
-			this.skinBlob = PlayerTextureStore.DEFAULT_STORE; // Null oject
-																// design
-																// pattern
+			this.skinBlob = PlayerTextureStore.DEFAULT_STORE; // Null oject design pattern
 
 		final Object lock = new Object();
 		synchronized (lock) {
 			Main.getInstance().sendToMainThread(new Runnable() {
 
 				@Override
-				public void run() {
+				public void run() {					
 					EnderWorld world = Main.getInstance().worlds.get(0);
-
 					EnderLogger.info("Player " + wantedName + " spawning in world: " + world.worldName);
 					player = new EnderPlayer(world, wantedName, NetworkManager.this, uuid, skinBlob);
 					world.players.add(player);
@@ -242,20 +234,22 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						sendPacket(new PacketOutLoginSucces(player.uuid.toString(), player.getPlayerName()));
 						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) player.clientSettings.gameMode.getId(), (byte) 0, (byte) 1, (byte) 60, "default", false));
 						sendPacket(new PacketOutUpdateTime(0, world.getTime()));
-						Location spawn = world.getSpawn();
 						Location loc = player.getLocation();
-						loc.setX(spawn.getX());
-						loc.setY(spawn.getY());
-						loc.setZ(spawn.getZ());
-						loc.setYaw(spawn.getYaw());
-						loc.setPitch(spawn.getPitch());
+						loc.cloneFrom(world.getSpawn());
+						
+						PlayerJoinEvent e = new PlayerJoinEvent(player);
+						Main.getInstance().callEvent(e);
+						if(e.getDisconnectMessage() != null){
+							disconnect(e.getDisconnectMessage().toAsciiText(), false);
+							return;
+						}
 
 						world.doChunkUpdatesForPlayer(player, player.chunkInformer, 3);
-						player.teleport(world.getSpawn());
+						player.teleportInternally(world.getSpawn());
 						player.onSpawn();
 						player.updateClientSettings();
-						sendPacket(new PacketOutSpawnPosition(spawn));
-						sendPacket(new PacketOutPlayerPositionLook(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), (byte) 0b00000));
+						sendPacket(new PacketOutSpawnPosition(world.getSpawn()));
+						sendPacket(new PacketOutPlayerPositionLook(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), (byte) 0b00000)); // all absolute locations
 						sendPacket(new PacketOutUpdateHealth(player.getHealth(), player.clientSettings.food, player.clientSettings.foodSaturation));
 					} catch (Exception e) {
 						EnderLogger.exception(e);
@@ -264,7 +258,6 @@ public class NetworkManager extends ChannelHandlerAdapter {
 							lock.notifyAll();
 						}
 					}
-
 				}
 			});
 			try {
@@ -321,6 +314,16 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	 */
 	public void disconnect(Message message, boolean byError) {
 		try {
+			Main.getInstance().sendToMainThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					if(Main.getInstance().onlinePlayers.contains(player)){
+						Main.getInstance().onlinePlayers.remove(player);
+					}
+				}
+			});
+			
 			this.ctx.channel().pipeline().addFirst("packet_r_disconnected", new DiscardingReader());
 			Level level = byError ? Level.WARNING : Level.INFO;
 			if (this.player == null)
