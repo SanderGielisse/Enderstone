@@ -123,7 +123,7 @@ public class Main implements Runnable {
 
 	public final Set<EnderPlayer> onlinePlayers = new HashSet<>();
 	public final List<EnderWorld> worlds = new ArrayList<>();
-	private final List<Runnable> sendToMainThread = Collections.synchronizedList(new ArrayList<Runnable>());
+	private final List<Runnable> sendToMainThread = new ArrayList<Runnable>(); //don't forget to synchronize
 
 	public static Main getInstance() {
 		return instance;

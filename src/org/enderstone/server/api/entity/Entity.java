@@ -47,4 +47,6 @@ public interface Entity {
 	public boolean damage(float damage);
 	
 	public boolean damage(float damage, Vector knockback);
+	
+	public void remove();
 }

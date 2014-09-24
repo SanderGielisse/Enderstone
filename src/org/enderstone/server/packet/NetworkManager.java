@@ -57,6 +57,7 @@ import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSpawnPosition;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.packet.play.PacketOutUpdateTime;
+import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
 
 public class NetworkManager extends ChannelHandlerAdapter {
@@ -228,6 +229,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 					EnderWorld world = Main.getInstance().worlds.get(0);
 					EnderLogger.info("Player " + wantedName + " spawning in world: " + world.worldName);
 					player = new EnderPlayer(world, wantedName, NetworkManager.this, uuid, skinBlob);
+					world.getBlock(world.getSpawn()).setBlock(BlockId.FIRE, (byte) 0);
 					world.players.add(player);
 					Main.getInstance().onlinePlayers.add(player);
 					try {
@@ -240,7 +242,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						PlayerJoinEvent e = new PlayerJoinEvent(player);
 						Main.getInstance().callEvent(e);
 						if(e.getDisconnectMessage() != null){
-							disconnect(e.getDisconnectMessage().toAsciiText(), false);
+							disconnect(e.getDisconnectMessage().toPlainText(), false);
 							return;
 						}
 

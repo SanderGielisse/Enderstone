@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Location;
+import org.enderstone.server.entity.EntitySpider;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.BlockPopulator;
 import org.enderstone.server.regions.ChunkGenerator;
@@ -98,6 +100,9 @@ public class SimpleGenerator implements ChunkGenerator {
 
 				setBlock(15, 1, source);
 				setBlock(14, 0, source);
+				
+				//temporirily mob spawn
+				world.addEntity(new EntitySpider(world, new Location(world, source.getX() * 16, source.getHighestBlockAt(0, 0) + 1, source.getZ() * 16, 0F, 0F)));
 
 				int x = random.nextInt(5) + 3, z = random.nextInt(5) + 3;
 				try {

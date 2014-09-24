@@ -104,10 +104,6 @@ public class EnderWorld implements World{
 			}
 		}
 		loadedChunks.add(r = new EnderChunk(this, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>()));
-		
-		//temporarily mob test
-		this.addEntity(new EntitySpider(this, new Location(this, (x << 4) + 0.5F, r.getHighestBlockAt(0, 0) + 1F, (z << 4) + 0.5F, (float) 0, (float) 0)));
-		
 		return r;
 	}
 
@@ -325,8 +321,15 @@ public class EnderWorld implements World{
 	}
 
 	public void serverTick() {
-		for (EnderEntity e : this.entities) {
+		Iterator<EnderEntity> it = this.entities.iterator();
+		while(it.hasNext()){
+			EnderEntity e = it.next();
 			e.serverTick();
+			if (e.shouldBeRemoved()) {
+				System.out.println("Killed: " + e.toString());
+				e.getWorld().broadcastPacket(new PacketOutEntityDestroy(new Integer[] { e.getEntityId() }), e.getLocation());
+				it.remove();
+			}
 		}
 		this.time += 1;
 	}

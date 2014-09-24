@@ -97,12 +97,12 @@ public class EntityItem extends EnderEntity implements Item {
 
 	@Override
 	protected float getBaseHealth() {
-		return 1;
+		return 20;
 	}
 
 	@Override
 	protected float getBaseMaxHealth() {
-		return 1;
+		return 20;
 	}
 
 	@Override
@@ -136,8 +136,13 @@ public class EntityItem extends EnderEntity implements Item {
 	}
 
 	@Override
-	public void updateDataWatcher() {
-		this.getDataWatcher().watch(0, (byte) 0);
+	public void updateDataWatcher() {		
+		int meaning = 0;
+
+		if (this.getFireTicks() > 0)
+			meaning = (byte) (meaning | 0x01);
+		
+		this.getDataWatcher().watch(0, (byte) meaning);
 		this.getDataWatcher().watch(1, (short) 300);
 		this.getDataWatcher().watch(10, this.itemstack);
 	}

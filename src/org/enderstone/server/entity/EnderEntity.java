@@ -19,15 +19,19 @@ package org.enderstone.server.entity;
 
 import java.util.Set;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Entity;
+import org.enderstone.server.api.messages.AdvancedMessage;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutAnimation;
 import org.enderstone.server.packet.play.PacketOutEntityMetadata;
 import org.enderstone.server.packet.play.PacketOutEntityStatus;
 import org.enderstone.server.packet.play.PacketOutEntityVelocity;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
+import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.EnderWorld;
 
 public abstract class EnderEntity implements Entity {
 
@@ -40,6 +44,7 @@ public abstract class EnderEntity implements Entity {
 	private DataWatcher dataWatcher = new DataWatcher();
 	private long latestDamage = 0;
 	private int fireTicks = 0;
+	private boolean shouldBeRemoved = false;
 
 	public EnderEntity(Location location) {
 		this.entityId = entityCount++;
@@ -144,6 +149,11 @@ public abstract class EnderEntity implements Entity {
 		onHealthUpdate(this.health, lastHealth);
 		return this.health <= 0;
 	}
+	
+	@Override
+	public void remove() {
+		this.shouldBeRemoved = true;
+	}
 
 	protected abstract String getDamageSound();
 
@@ -197,14 +207,30 @@ public abstract class EnderEntity implements Entity {
 			return false;
 		return true;
 	}
-
+	
 	public void serverTick() {
+		if(shouldBeRemoved || this.isDead()){
+			return;
+		}
+		BlockId id = this.getWorld().getBlock(this.getLocation()).getBlock();
+		if (id == BlockId.FIRE || id == BlockId.LAVA_FLOWING || id == BlockId.LAVA) {
+			if (getFireTicks() == 0) {
+				setFireTicks(61); // 3 seconds burn after leaving lava/fire
+			}
+		}
+
 		if(fireTicks == 0){
 			return;
 		}
 		this.fireTicks--;
 		if(fireTicks % 20 == 0){
-			damage(1F);
+			if (damage(1F)) {
+				if (!(this instanceof EnderPlayer)) {
+					remove();
+				}else{
+					Main.getInstance().broadcastMessage(new AdvancedMessage(((EnderPlayer) this).getPlayerName() + " burned to death."));
+				}
+			}
 		}
 		if(this.fireTicks == 0){
 			this.setFireTicks(0);
@@ -216,6 +242,10 @@ public abstract class EnderEntity implements Entity {
 	}
 
 	public void setFireTicks(int fireTicks) {
+		if(fireTicks > 0 && this.fireTicks > 0){
+			this.fireTicks = fireTicks;
+			return;
+		}
 		this.fireTicks = fireTicks;
 		this.updateDataWatcher();
 		this.getLocation().getWorld().broadcastPacket(new PacketOutEntityMetadata(getEntityId(), dataWatcher), this.getLocation());
@@ -224,5 +254,9 @@ public abstract class EnderEntity implements Entity {
 	protected static byte calcYaw(float f) {
 		int i = (int) f;
 		return (byte) (f < i ? i - 1 : i);
+	}
+	
+	public boolean shouldBeRemoved(){
+		return this.shouldBeRemoved;
 	}
 }

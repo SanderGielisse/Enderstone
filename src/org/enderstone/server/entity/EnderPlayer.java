@@ -33,7 +33,6 @@ import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Player;
-import org.enderstone.server.api.event.Event;
 import org.enderstone.server.api.event.player.PlayerChatEvent;
 import org.enderstone.server.api.event.player.PlayerCommandEvent;
 import org.enderstone.server.api.event.player.PlayerExpChangeEvent;
@@ -285,7 +284,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.WORKBENCH.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.CHEST.getId(), (byte) 1, (short) 0));
 
-		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COOKED_BEEF, (byte) 10));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COOKED_CHICKEN, (byte) 10));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_CHICKEN, (byte) 10));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_RABBIT, (byte) 10));
@@ -499,8 +497,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		if (this.isDead()) {
 			return;
 		}
-		
-		
 		
 		checkCollision();
 
