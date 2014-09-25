@@ -29,20 +29,42 @@ public class PlayerGamemodeChangeEvent extends Event implements Cancellable {
 	private final GameMode oldGamemode;
 	private final GameMode newGamemode;
 
+	/**
+	 * PlayerGamemodeChangeEvent is called when a player's gamemode changes.
+	 * 
+	 * @param player the player whose gamemode was changed
+	 * @param oldGamemode the previous gamemode the player was in
+	 * @param newGamemode the current gamemode the player is in
+	 */
 	public PlayerGamemodeChangeEvent(Player player, GameMode oldGamemode, GameMode newGamemode) {
 		this.player = player;
 		this.oldGamemode = oldGamemode;
 		this.newGamemode = newGamemode;
 	}
 
+	/**
+	 * Get the player whose gamemode was changed.
+	 * 
+	 * @return The player whose gamemode was changed
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Get the previous gamemode the player was in.
+	 * 
+	 * @return The previous gamemode the player was in
+	 */
 	public GameMode getOldGamemode() {
 		return oldGamemode;
 	}
 
+	/**
+	 * Get the current gamemode the player is in.
+	 * 
+	 * @return The current gamemode that player is in.
+	 */
 	public GameMode getNewGamemode() {
 		return newGamemode;
 	}

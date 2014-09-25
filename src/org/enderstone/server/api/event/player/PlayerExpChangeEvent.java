@@ -28,20 +28,42 @@ public class PlayerExpChangeEvent extends Event implements Cancellable {
 	private final float oldExp;
 	private final float newExp;
 
+	/**
+	 * PlayerExpChangeEvent is called when a player's exp amount changes.
+	 * 
+	 * @param player the player whose exp changed
+	 * @param oldExp the old amount of exp
+	 * @param newExp the new amount of exp
+	 */
 	public PlayerExpChangeEvent(Player player, float oldExp, float newExp) {
 		this.player = player;
 		this.oldExp = oldExp;
 		this.newExp = newExp;
 	}
 
+	/**
+	 * Get the player whose exp changed.
+	 * 
+	 * @return The player whose exp changed
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Get the old amount of exp.
+	 * 
+	 * @return The old amount of exp
+	 */
 	public float getOldExp() {
 		return oldExp;
 	}
 
+	/**
+	 * Get the new amount of exp.
+	 * 
+	 * @return The new amount of exp
+	 */
 	public float getNewExp() {
 		return newExp;
 	}

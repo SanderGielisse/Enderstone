@@ -29,15 +29,31 @@ public class PlayerInteractEvent extends Event implements Cancellable {
 	private final InteractType type;
 
 	//TODO implement this
+	/**
+	 * PlayerInteractEvent is called when a player interacts with the world.
+	 * 
+	 * @param player the player that interacted with the world
+	 * @param inventory the type of interaction which took place
+	 */
 	public PlayerInteractEvent(Player player, InteractType type) {
 		this.player = player;
 		this.type = type;
 	}
 
+	/**
+	 * Get the player that interacted with the world.
+	 * 
+	 * @return The player that interacted with the world
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Get the type of interaction which took place.
+	 * 
+	 * @return 
+	 */
 	public InteractType getType() {
 		return type;
 	}

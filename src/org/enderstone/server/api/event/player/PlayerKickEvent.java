@@ -28,19 +28,40 @@ public class PlayerKickEvent extends Event implements Cancellable {
 	private final Player player;
 	private Message reason = null;
 
+	/**
+	 * PlayerKickEvent is called when a player gets kicked from the server.
+	 * 
+	 * @param player the player that was kicked
+	 * @param reason the reason the player was kicked
+	 */
 	public PlayerKickEvent(Player player, Message reason) {
 		this.player = player;
 		this.reason = reason;
 	}
 
+	/**
+	 * Get the player that was kicked.
+	 * 
+	 * @return The player that was kicked
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Get the reason the player was kicked.
+	 * 
+	 * @return The reason the player was kicked
+	 */
 	public Message getReason() {
 		return reason;
 	}
 
+	/**
+	 * Set the reason the player was kicked.
+	 * 
+	 * @param reason The reason the player was kicked
+	 */
 	public void setReason(Message reason) {
 		this.reason = reason;
 	}

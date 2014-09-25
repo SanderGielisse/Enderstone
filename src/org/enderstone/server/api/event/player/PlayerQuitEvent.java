@@ -25,10 +25,20 @@ public class PlayerQuitEvent extends Event {
 	private final Player player;
 
 	//TODO implement this
+	/**
+	 * PlayerQuitEvent is called when a player quits the server.
+	 * 
+	 * @param player the player that quit the server
+	 */
 	public PlayerQuitEvent(Player player) {
 		this.player = player;
 	}
 
+	/**
+	 * Get the player that quit the server.
+	 * 
+	 * @return The player that quit the server
+	 */
 	public Player getPlayer() {
 		return player;
 	}

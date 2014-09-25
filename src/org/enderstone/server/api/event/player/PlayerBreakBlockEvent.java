@@ -28,9 +28,33 @@ public class PlayerBreakBlockEvent extends Event implements Cancellable {
 	private final EnderPlayer player;
 	private final Block block;
 
+	/**
+	 * PlayerBreakBlockEvent is called when a player breaks a block.
+	 * 
+	 * @param player player that broke the block
+	 * @param block the block that was broken
+	 */
 	public PlayerBreakBlockEvent(EnderPlayer player, Block block) {
 		this.player = player;
 		this.block = block;
+	}
+
+	/**
+	 * Get the player that broke the block.
+	 * 
+	 * @return The player that broke the block
+	 */
+	public EnderPlayer getPlayer() {
+		return player;
+	}
+
+	/**
+	 * Get the block that was broken.
+	 * 
+	 * @return The block that was broken
+	 */
+	public Block getBlock() {
+		return block;
 	}
 
 	@Override
@@ -41,13 +65,5 @@ public class PlayerBreakBlockEvent extends Event implements Cancellable {
 	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
-	}
-
-	public EnderPlayer getPlayer() {
-		return player;
-	}
-
-	public Block getBlock() {
-		return block;
 	}
 }

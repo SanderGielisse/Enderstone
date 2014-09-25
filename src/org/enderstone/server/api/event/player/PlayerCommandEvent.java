@@ -28,20 +28,42 @@ public class PlayerCommandEvent extends Event implements Cancellable {
 	private final String command;
 	private final String[] arguments;
 
+	/**
+	 * PlayerCommandEvent is called when a player uses a command.
+	 * 
+	 * @param player the player that used the command
+	 * @param command the command that was used
+	 * @param arguments the arguments of the command
+	 */
 	public PlayerCommandEvent(Player player, String command, String[] arguments) {
 		this.player = player;
 		this.command = command;
 		this.arguments = arguments;
 	}
 
+	/**
+	 * Get the player that used the command.
+	 * 
+	 * @return The player that used the command
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Get the command that was used.
+	 * 
+	 * @return The command that was used
+	 */
 	public String getCommand() {
 		return command;
 	}
 
+	/**
+	 * Get the arguments of the command.
+	 * 
+	 * @return The arguments of the command
+	 */
 	public String[] getArguments() {
 		return arguments;
 	}
