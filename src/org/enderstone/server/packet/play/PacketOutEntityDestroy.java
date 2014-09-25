@@ -18,6 +18,7 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+import java.util.Arrays;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 
@@ -57,5 +58,10 @@ public class PacketOutEntityDestroy extends Packet {
 	@Override
 	public byte getId() {
 		return 0x13;
+	}
+
+	@Override
+	public String toString() {
+		return "PacketOutEntityDestroy [length=" + length + ", ids=" + Arrays.toString(ids) + "]";
 	}
 }

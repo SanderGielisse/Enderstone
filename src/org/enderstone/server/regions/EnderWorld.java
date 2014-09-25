@@ -332,8 +332,10 @@ public class EnderWorld implements World{
 		while(it.hasNext()){
 			EnderEntity e = it.next();
 			if (e.shouldBeRemoved()) {
-				e.getWorld().broadcastPacket(new PacketOutEntityDestroy(new Integer[] { e.getEntityId() }), e.getLocation());
 				it.remove();
+				if(e.shouldBroadcastDespawn()){
+					e.getWorld().broadcastPacket(new PacketOutEntityDestroy(new Integer[] { e.getEntityId() }), e.getLocation());
+				}
 			}
 			e.serverTick();
 		}
@@ -370,7 +372,7 @@ public class EnderWorld implements World{
 
 	@Override
 	public void strikeLightning(Location location) {
-		// TODO Auto-generated method stub	
+		// TODO
 	}
 
 	@Override

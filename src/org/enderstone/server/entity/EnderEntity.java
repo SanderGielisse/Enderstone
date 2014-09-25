@@ -19,7 +19,6 @@ package org.enderstone.server.entity;
 
 import java.util.Set;
 import org.enderstone.server.Main;
-import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Entity;
@@ -31,7 +30,6 @@ import org.enderstone.server.packet.play.PacketOutEntityStatus;
 import org.enderstone.server.packet.play.PacketOutEntityVelocity;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.regions.BlockId;
-import org.enderstone.server.regions.EnderWorld;
 
 public abstract class EnderEntity implements Entity {
 
@@ -44,8 +42,10 @@ public abstract class EnderEntity implements Entity {
 	private DataWatcher dataWatcher = new DataWatcher();
 	private long latestDamage = 0;
 	private int fireTicks = 0;
+	
 	private boolean shouldBeRemoved = false;
-
+	private boolean broadcastDespawn = true;
+	
 	public EnderEntity(Location location) {
 		this.entityId = entityCount++;
 		this.location = location;
@@ -153,6 +153,12 @@ public abstract class EnderEntity implements Entity {
 	@Override
 	public void remove() {
 		this.shouldBeRemoved = true;
+		this.broadcastDespawn = true;
+	}
+	
+	public void removeInternally(boolean broadcastDespawn){
+		this.shouldBeRemoved = true;
+		this.broadcastDespawn = broadcastDespawn;
 	}
 
 	protected abstract String getDamageSound();
@@ -218,6 +224,11 @@ public abstract class EnderEntity implements Entity {
 				setFireTicks(101); // 5 seconds burn after leaving lava/fire
 			}
 		}
+		if(id == BlockId.WATER || id == BlockId.WATER_FLOWING){
+			if(this.getFireTicks() > 0){
+				this.setFireTicks(0);
+			}
+		}
 
 		if(fireTicks == 0){
 			return;
@@ -225,9 +236,7 @@ public abstract class EnderEntity implements Entity {
 		this.fireTicks--;
 		if(fireTicks % 20 == 0){
 			if (damage(1F)) {
-				if (!(this instanceof EnderPlayer)) {
-					remove();
-				}else{
+				if ((this instanceof EnderPlayer)) {
 					Main.getInstance().broadcastMessage(new AdvancedMessage(((EnderPlayer) this).getPlayerName() + " burned to death."));
 				}
 			}
@@ -242,8 +251,11 @@ public abstract class EnderEntity implements Entity {
 	}
 
 	public void setFireTicks(int fireTicks) {
-		if(fireTicks > 0 && this.fireTicks > 0){
+		if(this.fireTicks > 0 && fireTicks > 0){
 			this.fireTicks = fireTicks;
+			return;
+		}
+		if(this.getFireTicks() == 0 && fireTicks == 0){
 			return;
 		}
 		this.fireTicks = fireTicks;
@@ -258,5 +270,9 @@ public abstract class EnderEntity implements Entity {
 	
 	public boolean shouldBeRemoved(){
 		return this.shouldBeRemoved;
+	}
+	
+	public boolean shouldBroadcastDespawn(){
+		return this.broadcastDespawn;
 	}
 }

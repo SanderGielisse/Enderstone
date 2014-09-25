@@ -183,6 +183,7 @@ public abstract class EntityMob extends EnderEntity {
 	protected void onHealthUpdate(float newHealth, float lastHealth) {
 		if (newHealth <= 0) {
 			this.getWorld().broadcastPacket(new PacketOutEntityStatus(this.getEntityId(), Status.LIVING_ENTITY_DEAD), this.getLocation());
+			this.removeInternally(false);
 			// do entity drops
 			List<EntityDrop> drops = this.getDrops();
 			for (EntityDrop drop : drops) {

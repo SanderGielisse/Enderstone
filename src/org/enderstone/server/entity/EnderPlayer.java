@@ -469,24 +469,22 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	private int latestCheck = 0;
-	private final List<EnderEntity> toRemove = new ArrayList<>();
 
 	public void checkCollision() {
 		if (latestCheck++ % 3 == 0) {
 			// check if item entities nearby
-			for (EnderEntity e : Main.getInstance().getWorld(this).entities) {
+			Iterator<EnderEntity> it = Main.getInstance().getWorld(this).entities.iterator();
+			while(it.hasNext()){
+				EnderEntity e = it.next();
 				if (e.getLocation().isInRange(2, this.getLocation(), true)) {
 					boolean remove = e.onCollision(this);
 					if (remove) {
-						toRemove.add(e);
+						it.remove();
+						Main.getInstance().getWorld(this).removeEntity(e, true);
+						Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
 					}
 				}
 			}
-			for (EnderEntity e : toRemove) {
-				Main.getInstance().getWorld(this).removeEntity(e, true);
-				Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
-			}
-			toRemove.clear();
 		}
 	}
 

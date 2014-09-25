@@ -220,4 +220,11 @@ public class EntityItem extends EnderEntity implements Item {
 	public ItemStack getItemStack() {
 		return this.itemstack;
 	}
+	
+	@Override
+	protected void onHealthUpdate(float newHealth, float lastHealth) {
+		if(newHealth <= 0){
+			this.removeInternally(true);
+		}
+	}
 }
