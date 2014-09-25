@@ -321,6 +321,22 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 			return DefaultHalfInventory.this.getSlotDropType(slot);
 		}
 
+		@Override // TODO Look at the slot and see if the clicked inventory is part of this inventory or not
+		public List<Integer> getShiftClickLocations(int slot) {
+			List<Integer> list = new ArrayList<>();
+			for (int i = 0; i < getSize(); i++) {
+				list.add(i);
+			}
+			return list;
+		}
+
+		@Override
+		public void onItemClick(boolean leftMouse, int mode, int slot, boolean shiftClick, List<ItemStack> cursor) {
+			throw new UnsupportedOperationException("Not supported yet."); // TODO IMPLEMENT THIS
+		}
+		
+		
+
 	}
 
 	@Override
@@ -337,4 +353,14 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 	public void removeListener(HalfInventoryListener listener) {
 		this.listeners.remove(listener);
 	}
+
+	@Override // TODO Look at the slot and see if the clicked inventory is part of this inventory or not
+	public List<Integer> getShiftClickLocations(int slot) {
+		List<Integer> list = new ArrayList<>();
+		for (int i = 0; i < getSize(); i++) {
+			list.add(i);
+		}
+		return list;
+	}
+
 }

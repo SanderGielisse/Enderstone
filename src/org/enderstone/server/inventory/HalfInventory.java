@@ -52,5 +52,7 @@ public interface HalfInventory extends AutoCloseable{
 	public void close();
 	
 	public DropType getSlotDropType(int slot);
+	
+	public List<Integer> getShiftClickLocations(int slot);
 
 }
