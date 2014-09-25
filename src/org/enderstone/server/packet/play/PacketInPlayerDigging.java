@@ -23,6 +23,8 @@ import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.event.player.PlayerBreakBlockEvent;
+import org.enderstone.server.blocks.BlockDefinition;
+import org.enderstone.server.blocks.BlockDefinitions;
 import org.enderstone.server.entity.EntityItem;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
@@ -73,6 +75,8 @@ public class PacketInPlayerDigging extends Packet {
 				loc.setWorld(world);
 				short blockId = world.getBlockIdAt(x, y, z).getId();
 
+				BlockDefinition definition = BlockDefinitions.getBlock(world.getBlockIdAt(x, y, z));
+
 				if (getStatus() == 0) {
 					if (BlockId.byId(blockId).doesInstantBreak()) {
 						status = (byte) 2;
@@ -86,12 +90,18 @@ public class PacketInPlayerDigging extends Packet {
 						return;
 					}
 					if (networkManager.player.getLocation().isInRange(6, loc, true)) {
-						world.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
-						world.broadcastSound("dig.grass", 1F, (byte) 63, loc, networkManager.player); //TODO right sound
-						Location loca = loc.clone();
-						loca.setX(loca.getX() + 0.5);
-						loca.setZ(loca.getZ() + 0.5);
-						world.addEntity(new EntityItem(world,loca, new ItemStack(blockId, (byte) 1, (short) world.getBlockDataAt(x, y, z)), 1, new Vector(0, 0.1D, 0)));
+
+						if (definition.canBreak(networkManager.player, world, x, y, z)) {
+
+							world.setBlockAt(x, y, z, BlockId.AIR, (byte) 0);
+
+							world.broadcastSound(definition.getBreakSound(), 1F, (byte) 63, loc, networkManager.player);
+
+							Location loca = loc.clone();
+							loca.setX(loca.getX() + 0.5);
+							loca.setZ(loca.getZ() + 0.5);
+							world.addEntity(new EntityItem(world,loca, definition.getDrop(networkManager.player, world, x, y, z), 1, new Vector(0, 0.1D, 0)));
+						}
 					}
 				} else if (getStatus() == 3) {
 					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
