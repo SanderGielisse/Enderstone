@@ -33,15 +33,14 @@ public class BlockDefinitions {
 			blocks[BlockId.STONE.getId()] = new BlockDefinitionStone();
 			blocks[BlockId.GRASS.getId()] = new BlockDefinitionGrass();
 			blocks[BlockId.DIRT.getId()] = new BlockDefinitionDirt();
-			blocks[BlockId.STONE.getId()] = new BlockDefinitionCobbleStone();
+			blocks[BlockId.COBBLESTONE.getId()] = new BlockDefinitionCobbleStone();
 	};
 
 	public static BlockDefinition getBlock(BlockId type) {
 		BlockDefinition definition = blocks[type.getId()];
 		if (definition != null) {
 			return definition;
-		}
-		else {
+		} else {
 			return new BlockDefinition(type);
 		}
 	}

@@ -42,13 +42,11 @@ public class BlockDefinitionBedrock extends BlockDefinition {
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.stone";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.stone";
 	}
 }
