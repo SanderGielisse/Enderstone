@@ -35,12 +35,12 @@ public class BlockDefinitionDirt extends BlockDefinition {
 
 	@Override
 	public String getPlaceSound() {
-		return "step.dirt";
+		return "dig.grass";
 	}
 
 	@Override
 	public String getBreakSound() {
-		return "dig.dirt";
+		return "dig.grass";
 	}
 
 	@Override
