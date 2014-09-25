@@ -78,7 +78,7 @@ public enum Armor {
 		}
 	}
 
-	public Armor fromId(BlockId id) {
+	public static Armor fromId(BlockId id) {
 		return data[id.getId()];
 	}
 }

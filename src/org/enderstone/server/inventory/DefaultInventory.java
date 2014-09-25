@@ -24,6 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.enderstone.server.api.messages.CachedMessage;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
+import org.enderstone.server.inventory.armour.Armor;
 import org.enderstone.server.util.FixedSizeList;
 
 public abstract class DefaultInventory implements Inventory {
@@ -231,7 +232,8 @@ public abstract class DefaultInventory implements Inventory {
 	public void onItemClick(boolean leftMouse, int mode, int slot, boolean shiftClick, List<ItemStack> cursor) {
 		ItemStack existingStack = this.getRawItem(slot);
 		if (leftMouse) {
-			switch (this.getSlotDropType(slot)) {
+			DropType slotDropType = this.getSlotDropType(slot);
+			switch (slotDropType) {
 				case FULL_OUT: {
 					if (existingStack == null) {
 						return; // Nothing happens if the slot is get-only & isempty
@@ -261,22 +263,52 @@ public abstract class DefaultInventory implements Inventory {
 				case ARMOR_CHESTPLATE_ONLY:
 				case ARMOR_HELMET_ONLY:
 				case ARMOR_LEGGINGS_ONLY: {
-					boolean isCursorValidArmorItem = false;
+					ItemStack cursorItem = cursor.get(0);
+					Armor armor = cursorItem == null ? null : Armor.fromId(cursor.get(0).getId());
+
+					boolean isCursorValidArmorItem = armor == null ? false : armor.getDropType() == slotDropType;
 					if (shiftClick) {
 						shiftClickFromMainInventory(slot);
-
 					} else {
+						if (!isCursorValidArmorItem)
+							return;
+
 					}
 				}
+				break;
+				case ALL_ALLOWED: {
+					if (shiftClick) {
+
+					} else {
+						ItemStack cursorItem = cursor.get(0);
+						ItemStack target = getRawItems().get(slot);
+						if (cursorItem == null || target == null || !target.materialTypeMatches(cursorItem)) {
+							swapItems(cursor, 0, getRawItems(), slot);
+						} else {
+							int cursorAmount = cursorItem.getAmount();
+							int newTargetAmount = Math.min(target.getAmount() + cursorAmount, target.getId().getMaxStackSize());
+							if (newTargetAmount != target.getAmount()) {
+								cursorAmount -= newTargetAmount - target.getAmount();
+								if (cursorAmount > 0) {
+									cursorItem.setAmount(cursorAmount);
+									cursor.set(0, cursorItem);
+								} else cursor.set(0, null);
+								target.setAmount(newTargetAmount);
+								getRawItems().set(slot, target);
+							}
+						}
+					}
+				}
+				break;
 			}
 			return;
 		}
 	}
-	
+
 	@Override // TODO Look at the slot and see if the clicked inventory is part of this inventory or not
 	public List<Integer> getShiftClickLocations(int slot) {
 		List<Integer> list = new ArrayList<>();
-		for(int i = 0; i < getSize(); i++) {
+		for (int i = 0; i < getSize(); i++) {
 			list.add(i);
 		}
 		return list;
@@ -323,5 +355,15 @@ public abstract class DefaultInventory implements Inventory {
 				this.setRawItem(i, item);
 			}
 		}
+	}
+
+	private boolean swapItems(List<ItemStack> target, int targetIndex, List<ItemStack> destination, int destionationIndex) {
+		ItemStack s1 = target.get(targetIndex);
+		ItemStack s2 = destination.get(destionationIndex);
+		if (s1 == null && s2 == null) return true;
+		if (s1 == null ? s2.equals(s1) : s1.equals(s2)) return true;
+		target.set(targetIndex, s2);
+		destination.set(destionationIndex, s1);
+		return true;
 	}
 }
