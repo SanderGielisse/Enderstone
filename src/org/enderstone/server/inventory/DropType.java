@@ -22,5 +22,5 @@ package org.enderstone.server.inventory;
  * @author Fernando
  */
 public enum DropType {
-	ALL_ALLOWED, ONLY_IN, ONLY_OUT, ARMOR_ONLY
+	ALL_ALLOWED, FULL_OUT, ONLY_OUT, ARMOR_ONLY
 }
