@@ -18,6 +18,7 @@
 package org.enderstone.server.inventory;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.enderstone.server.api.messages.CachedMessage;
@@ -47,7 +48,7 @@ public abstract class DefaultInventory implements Inventory {
 		this.inventoryTitle = CachedMessage.wrap(inventoryTitle);
 		this.listeners = new CopyOnWriteArrayList<>(listeners);
 	}
-	
+
 	@Override
 	public DropType getSlotDropType(int slot) {
 		return DropType.ALL_ALLOWED;
@@ -108,7 +109,7 @@ public abstract class DefaultInventory implements Inventory {
 
 	@Override
 	public final void close() {
-		if(closed) return;
+		if (closed) return;
 		this.close0();
 		this.closed = true;
 		for (InventoryListener l : this.listeners) {
@@ -185,7 +186,7 @@ public abstract class DefaultInventory implements Inventory {
 		@Override
 		public ItemStack set(int index, ItemStack newStack) {
 			ItemStack oldValue = this.main.set(index, newStack);
-			if(!(oldValue == null ? newStack == null : oldValue.equals(newStack)))
+			if (!(oldValue == null ? newStack == null : oldValue.equals(newStack)))
 				DefaultInventory.this.callSlotChance(index + offset, oldValue, newStack);
 			return oldValue;
 		}
@@ -224,5 +225,103 @@ public abstract class DefaultInventory implements Inventory {
 	@Override
 	public void removeListener(HalfInventoryListener listener) {
 		this.removeListener(HalfInventoryListeners.toInventoryListener(listener));
+	}
+
+	@Override
+	public void onItemClick(boolean leftMouse, int mode, int slot, boolean shiftClick, List<ItemStack> cursor) {
+		ItemStack existingStack = this.getRawItem(slot);
+		if (leftMouse) {
+			switch (this.getSlotDropType(slot)) {
+				case FULL_OUT: {
+					if (existingStack == null) {
+						return; // Nothing happens if the slot is get-only & isempty
+					}
+					int maxStackSize = existingStack.getId().getMaxStackSize();
+					if (shiftClick) {
+						shiftClickFromMainInventory(slot);
+
+					} else {
+						assert shiftClick == false;
+						ItemStack cursorItem = cursor.get(0);
+						if (cursorItem == null) {
+							cursor.set(0, existingStack);
+							this.setRawItem(slot, null);
+						} else if (cursorItem.materialTypeMatches(existingStack)) {
+							int remainingItems = maxStackSize - cursorItem.getAmount();
+							if (remainingItems >= existingStack.getAmount()) {
+								cursorItem.setAmount(cursorItem.getAmount() + existingStack.getAmount());
+								this.setRawItem(slot, null);
+								cursor.set(0, cursorItem);
+							}
+						}
+					}
+				}
+				break;
+				case ARMOR_BOOTS_ONLY:
+				case ARMOR_CHESTPLATE_ONLY:
+				case ARMOR_HELMET_ONLY:
+				case ARMOR_LEGGINGS_ONLY: {
+					boolean isCursorValidArmorItem = false;
+					if (shiftClick) {
+						shiftClickFromMainInventory(slot);
+
+					} else {
+					}
+				}
+			}
+			return;
+		}
+	}
+	
+	@Override // TODO Look at the slot and see if the clicked inventory is part of this inventory or not
+	public List<Integer> getShiftClickLocations(int slot) {
+		List<Integer> list = new ArrayList<>();
+		for(int i = 0; i < getSize(); i++) {
+			list.add(i);
+		}
+		return list;
+	}
+
+	private void shiftClickFromMainInventory(int slot) {
+		ItemStack existingStack = this.getRawItem(slot);
+		int maxStackSize = existingStack.getId().getMaxStackSize();
+		int neededAmount = existingStack.getAmount();
+		for (int i : this.getShiftClickLocations(slot)) {
+			ItemStack item = this.getRawItem(i);
+			if (item == null) {
+				neededAmount = 0;
+				break;
+			} else if (item.materialTypeMatches(existingStack)) {
+				int remainingItems = maxStackSize - item.getAmount();
+				if (remainingItems >= neededAmount) {
+					neededAmount = 0;
+					break;
+				}
+				if (remainingItems > 0)
+					neededAmount -= remainingItems;
+			}
+		}
+		if (neededAmount > 0)
+			return;
+		for (int i : this.getShiftClickLocations(slot)) {
+			ItemStack item = this.getRawItem(i);
+			if (item == null) {
+				this.setRawItem(slot, existingStack);
+				this.setRawItem(slot, null);
+				break;
+			} else if (item.materialTypeMatches(existingStack)) {
+				int remainingItems = maxStackSize - item.getAmount();
+				if (remainingItems >= existingStack.getAmount()) {
+					item.setAmount(item.getAmount() + existingStack.getAmount());
+					this.setRawItem(slot, null);
+					break;
+				}
+				if (remainingItems > 0) {
+					item.setAmount(item.getAmount() + remainingItems);
+					existingStack.setAmount(existingStack.getAmount() - remainingItems);
+				}
+				this.setRawItem(i, item);
+			}
+		}
 	}
 }
