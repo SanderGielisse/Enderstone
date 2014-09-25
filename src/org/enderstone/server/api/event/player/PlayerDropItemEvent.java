@@ -28,16 +28,35 @@ public class PlayerDropItemEvent extends Event implements Cancellable {
 	private final Player player;
 	private final ItemStack droppedItem;
 
-	//TODO implement this
+	/**
+	 * PlayerDropItemEvent is called when a player drops an item from 
+	 * <ul>
+	 * <li>Pressing the drop key</li>
+	 * <li>Dropping from inside an inventory</li>
+	 * </ul>
+	 * 
+	 * @param player the player that dropped the item
+	 * @param item the item that was dropped
+	 */
 	public PlayerDropItemEvent(Player player, ItemStack droppedItem) {
 		this.player = player;
 		this.droppedItem = droppedItem;
 	}
 
+	/**
+	 * Get the player that dropped the item.
+	 * 
+	 * @return The player that dropped the item
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Get the item that was dropped.
+	 * 
+	 * @return The item that was dropped
+	 */
 	public ItemStack getDroppedItem() {
 		return droppedItem;
 	}
