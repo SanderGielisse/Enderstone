@@ -1038,7 +1038,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setSneaking(boolean sneaking) {
-		if(Main.getInstance().callEvent(new PlayerToggleSneakEvent(this))){
+		if(Main.getInstance().callEvent(new PlayerToggleSneakEvent(this, sneaking))){
 			return;
 		}
 		clientSettings.isSneaking = sneaking;
@@ -1176,7 +1176,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setSprinting(boolean sprinting) {
-		if(Main.getInstance().callEvent(new PlayerToggleSprintEvent(this))){
+		if(Main.getInstance().callEvent(new PlayerToggleSprintEvent(this, sprinting))){
 			return;
 		}
 		this.clientSettings.isSprinting = sprinting;
