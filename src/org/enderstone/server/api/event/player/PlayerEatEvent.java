@@ -20,18 +20,45 @@ package org.enderstone.server.api.event.player;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
+import org.enderstone.server.inventory.ItemStack;
 
 public class PlayerEatEvent extends Event implements Cancellable {
 
 	private boolean cancelled = false;
 	private final Player player;
+	private final ItemStack item;
 
-	public PlayerEatEvent(Player player) {
+	/**
+	 * PlayerEatEvent is called when a player 
+	 * <ul>
+	 * <li>Eats food</li>
+	 * <li>Drinks a potion</li>
+	 * </ul>
+	 * 
+	 * @param player the player that ate something
+	 * @param item the item that was eaten
+	 */
+	public PlayerEatEvent(Player player, ItemStack item) {
 		this.player = player;
+		this.item = item;
 	}
 
+	/**
+	 * Get the player that ate something
+	 * 
+	 * @return The player that ate something
+	 */
 	public Player getPlayer() {
 		return player;
+	}
+
+	/**
+	 * Get the item that was eaten
+	 * 
+	 * @return The item that was eaten
+	 */
+	public ItemStack getItem() {
+		return item;
 	}
 
 	@Override
