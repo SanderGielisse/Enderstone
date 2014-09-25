@@ -280,9 +280,11 @@ public class EnderWorld implements World{
 			}
 		}
 	}
+	
+	private final List<EnderEntity> pendingEntities = new ArrayList<>();
 
 	public void addEntity(EnderEntity e) {
-		this.entities.add(e);
+		this.pendingEntities.add(e);
 	}
 	
 	public void removeEntity(EnderEntity e, boolean broadcastRemove){
@@ -321,15 +323,22 @@ public class EnderWorld implements World{
 	}
 
 	public void serverTick() {
+		for(EnderEntity pending : this.pendingEntities){
+			this.entities.add(pending);
+			pending.onSpawn();
+		}
+		this.pendingEntities.clear();
+		
 		Iterator<EnderEntity> it = this.entities.iterator();
 		while(it.hasNext()){
 			EnderEntity e = it.next();
-			e.serverTick();
 			if (e.shouldBeRemoved()) {
-				System.out.println("Killed: " + e.toString());
-				e.getWorld().broadcastPacket(new PacketOutEntityDestroy(new Integer[] { e.getEntityId() }), e.getLocation());
 				it.remove();
+				if(e.shouldBroadcastDespawn()){
+					e.getWorld().broadcastPacket(new PacketOutEntityDestroy(new Integer[] { e.getEntityId() }), e.getLocation());
+				}
 			}
+			e.serverTick();
 		}
 		this.time += 1;
 	}
@@ -364,7 +373,7 @@ public class EnderWorld implements World{
 
 	@Override
 	public void strikeLightning(Location location) {
-		// TODO Auto-generated method stub	
+		// TODO
 	}
 
 	@Override

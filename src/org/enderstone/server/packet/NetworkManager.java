@@ -101,6 +101,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		synchronized (packets) {
 			Packet p;
 			while ((p = packets.poll()) != null) {
+				//EnderLogger.debug("---> " + p.toString());
 				ctx.write(p);
 				p.onSend(this);
 			}
@@ -229,7 +230,11 @@ public class NetworkManager extends ChannelHandlerAdapter {
 					EnderWorld world = Main.getInstance().worlds.get(0);
 					EnderLogger.info("Player " + wantedName + " spawning in world: " + world.worldName);
 					player = new EnderPlayer(world, wantedName, NetworkManager.this, uuid, skinBlob);
+					
+					//TEMPORARILY TEST
 					world.getBlock(world.getSpawn()).setBlock(BlockId.FIRE, (byte) 0);
+					world.getBlock(world.getSpawn().clone().add(1, 0, 0)).setBlock(BlockId.WATER, (byte) 0);
+					
 					world.players.add(player);
 					Main.getInstance().onlinePlayers.add(player);
 					try {

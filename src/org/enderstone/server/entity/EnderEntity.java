@@ -19,7 +19,6 @@ package org.enderstone.server.entity;
 
 import java.util.Set;
 import org.enderstone.server.Main;
-import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Entity;
@@ -44,8 +43,10 @@ public abstract class EnderEntity implements Entity {
 	private DataWatcher dataWatcher = new DataWatcher();
 	private long latestDamage = 0;
 	private int fireTicks = 0;
+	
 	private boolean shouldBeRemoved = false;
-
+	private boolean broadcastDespawn = true;
+	
 	public EnderEntity(Location location) {
 		this.entityId = entityCount++;
 		this.location = location;
@@ -153,6 +154,12 @@ public abstract class EnderEntity implements Entity {
 	@Override
 	public void remove() {
 		this.shouldBeRemoved = true;
+		this.broadcastDespawn = true;
+	}
+	
+	public void removeInternally(boolean broadcastDespawn){
+		this.shouldBeRemoved = true;
+		this.broadcastDespawn = broadcastDespawn;
 	}
 
 	protected abstract String getDamageSound();
@@ -176,6 +183,10 @@ public abstract class EnderEntity implements Entity {
 	public abstract void updateDataWatcher();
 
 	public abstract void onSpawn();
+	
+	public abstract float getWidth();
+	
+	public abstract float getHeight();
 
 	private void initHealth() {
 		this.health = getBaseHealth();
@@ -209,13 +220,31 @@ public abstract class EnderEntity implements Entity {
 	}
 	
 	public void serverTick() {
-		if(shouldBeRemoved || this.isDead()){
+		if(shouldBeRemoved || this.isDead() || Main.getInstance().doPhysics == false){
 			return;
 		}
-		BlockId id = this.getWorld().getBlock(this.getLocation()).getBlock();
-		if (id == BlockId.FIRE || id == BlockId.LAVA_FLOWING || id == BlockId.LAVA) {
+		
+		EnderWorld world = this.getWorld();
+		double x = this.getLocation().getX();
+		double y = this.getLocation().getY();
+		double z = this.getLocation().getZ();
+		BlockId id1 = world.getBlock((int)x, (int)y, (int)z).getBlock();
+		BlockId id2 = world.getBlock((int)(x + (getWidth() / 2)), (int)y, (int)z).getBlock();
+		BlockId id3 = world.getBlock((int)(x - (getWidth() / 2)), (int)y, (int)z).getBlock();
+		BlockId id4 = world.getBlock((int)x, (int)y, (int)(z - (getWidth() / 2))).getBlock();
+		BlockId id5 = world.getBlock((int)x, (int)y, (int)(z + (getWidth() / 2))).getBlock();
+		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
+		
+		boolean isInFire = compare(BlockId.FIRE, array) || compare(BlockId.LAVA, array) || compare(BlockId.LAVA_FLOWING, array);
+		if (isInFire) {
 			if (getFireTicks() == 0) {
-				setFireTicks(61); // 3 seconds burn after leaving lava/fire
+				setFireTicks(101); // 5 seconds burn after leaving lava/fire
+			}
+		}
+		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
+		if(isInWater){
+			if(this.getFireTicks() > 0){
+				this.setFireTicks(0);
 			}
 		}
 
@@ -225,9 +254,7 @@ public abstract class EnderEntity implements Entity {
 		this.fireTicks--;
 		if(fireTicks % 20 == 0){
 			if (damage(1F)) {
-				if (!(this instanceof EnderPlayer)) {
-					remove();
-				}else{
+				if ((this instanceof EnderPlayer)) {
 					Main.getInstance().broadcastMessage(new AdvancedMessage(((EnderPlayer) this).getPlayerName() + " burned to death."));
 				}
 			}
@@ -237,13 +264,25 @@ public abstract class EnderEntity implements Entity {
 		}
 	}
 
+	private boolean compare(BlockId fire, BlockId[] ids) {
+		for(BlockId id : ids){
+			if(id == fire){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public int getFireTicks() {
 		return fireTicks;
 	}
 
 	public void setFireTicks(int fireTicks) {
-		if(fireTicks > 0 && this.fireTicks > 0){
+		if(this.fireTicks > 0 && fireTicks > 0){
 			this.fireTicks = fireTicks;
+			return;
+		}
+		if(this.getFireTicks() == 0 && fireTicks == 0){
 			return;
 		}
 		this.fireTicks = fireTicks;
@@ -258,5 +297,9 @@ public abstract class EnderEntity implements Entity {
 	
 	public boolean shouldBeRemoved(){
 		return this.shouldBeRemoved;
+	}
+	
+	public boolean shouldBroadcastDespawn(){
+		return this.broadcastDespawn;
 	}
 }

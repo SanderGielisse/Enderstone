@@ -15,43 +15,28 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.api.messages;
 
-public enum ChatColor {
+package org.enderstone.server.blocks;
 
-	RESET("\u00A7r"),
+import org.enderstone.server.regions.BlockId;
 
-	MAGIC("\u00A7k"),
-	BOLD("\u00A7l"),
-	STRIKETHROUGH("\u00A7m"),
-	UNDERLINE("\u00A7n"), 
-	ITALIC("\u00A7o"), 
-	
-	BLACK("\u00A70"), 
-	DARK_BLUE("\u00A71"),
-	DARK_GREEN("\u00A72"), 
-	DARK_AQUA("\u00A73"), 
-	DARK_RED("\u00A74"), 
-	DARK_PURPLE("\u00A75"), 
-	GOLD("\u00A76"), 
-	GRAY("\u00A77"),
-	DARK_GRAY("\u00A78"),
-	BLUE("\u00A79"),
-	GREEN("\u00A7a"), 
-	AQUA("\u00A7b"), 
-	RED("\u00A7c"), 
-	LIGHT_PURPLE("\u00A7d"), 
-	YELLOW("\u00A7e"), 
-	WHITE("\u00A7f");
+/**
+ *
+ * @author gyroninja
+ */
+public class BlockDefinitionLapisBlock extends BlockDefinition {
 
-	private final String data;
-
-	private ChatColor(String data) {
-		this.data = data;
+	public BlockDefinitionLapisBlock() {
+		super(BlockId.LAPIS_BLOCK);
 	}
 
 	@Override
-	public String toString() {
-		return data;
+	public String getPlaceSound() {
+		return "step.stone";
+	}
+
+	@Override
+	public String getBreakSound() {
+		return "dig.stone";
 	}
 }

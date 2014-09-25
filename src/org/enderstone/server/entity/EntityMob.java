@@ -47,7 +47,6 @@ public abstract class EntityMob extends EnderEntity {
 		super(location);
 		this.world = world;
 		this.appearanceId = appearanceId;
-		this.onSpawn();
 	}
 
 	@Override
@@ -159,7 +158,11 @@ public abstract class EntityMob extends EnderEntity {
 
 	@Override
 	public void updateDataWatcher() {
-		this.getDataWatcher().watch(0, (byte) 0);
+		int meaning = 0;
+		if (this.getFireTicks() > 0) {
+			meaning = (byte) (meaning | 0x01);
+		}
+		this.getDataWatcher().watch(0, (byte) meaning);
 		this.getDataWatcher().watch(1, (short) 1);
 		this.getDataWatcher().watch(6, getHealth());
 	}
@@ -179,9 +182,7 @@ public abstract class EntityMob extends EnderEntity {
 	protected void onHealthUpdate(float newHealth, float lastHealth) {
 		if (newHealth <= 0) {
 			this.getWorld().broadcastPacket(new PacketOutEntityStatus(this.getEntityId(), Status.LIVING_ENTITY_DEAD), this.getLocation());
-			// entity died, remove it
-			world.removeEntity(this, false);
-
+			this.removeInternally(false);
 			// do entity drops
 			List<EntityDrop> drops = this.getDrops();
 			for (EntityDrop drop : drops) {
@@ -201,12 +202,25 @@ public abstract class EntityMob extends EnderEntity {
 	
 	@Override
 	public void serverTick() {
+		super.serverTick();
+		if(Main.getInstance().doPhysics == false){
+			return;
+		}
 		//added some temporarily mob sounds, just for fun :D
 		if (latestSound++ % (20 * 10) == 0) {
 			if (Main.random.nextBoolean()) {
 				world.broadcastPacket(new PacketOutSoundEffect(this.getRandomSound(), this.getLocation()), this.getLocation());
 			}
 		}
-		super.serverTick();
+	}
+	
+	@Override
+	public float getWidth() {
+		return 0.6F;
+	}
+	
+	@Override
+	public float getHeight() {
+		return 1.6F;
 	}
 }

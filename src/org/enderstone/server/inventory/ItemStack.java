@@ -67,7 +67,7 @@ public class ItemStack implements Cloneable {
 		this.amount = amount;
 		this.damage = damage;
 		this.compoundTag = compoundTag;
-		if (compoundTag == null) {
+		if (compoundTag == null &&  generateNBTIfNotExist) {
 			this.updateNBTData();
 		}
 	}
@@ -76,7 +76,6 @@ public class ItemStack implements Cloneable {
 		Map<String, Tag> map = new HashMap<>();
 		if (map.isEmpty()) return;
 		this.compoundTag = new CompoundTag("Item", map);
-		//this.compoundTag = null;
 	}
 
 	public short getBlockId() {
@@ -117,14 +116,17 @@ public class ItemStack implements Cloneable {
 	}
 
 	@Override
-	@SuppressWarnings("CloneDeclaresCloneNotSupported")
 	public ItemStack clone() {
 		try {
 			ItemStack s = (ItemStack) super.clone();
 			if (compoundTag == null) return s;
 			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-			new NBTOutputStream(bytes).writeTag(compoundTag);
-			s.setCompoundTag((CompoundTag) new NBTInputStream(new ByteArrayInputStream(bytes.toByteArray())).readTag());
+			try (NBTOutputStream stream = new NBTOutputStream(bytes)) {
+				stream.writeTag(compoundTag);
+			}
+			try (NBTInputStream stream = new NBTInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+				s.setCompoundTag((CompoundTag) stream.readTag());
+			}
 			return s;
 		} catch (CloneNotSupportedException | IOException err) {
 			throw new AssertionError(err);
@@ -166,6 +168,4 @@ public class ItemStack implements Cloneable {
 	public String toString() {
 		return "ItemStack{" + "Id=" + blockId + ", amount=" + amount + ", data=" + damage + ", tag=" + compoundTag + '}';
 	}
-	
-	
 }

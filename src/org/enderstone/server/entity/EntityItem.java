@@ -45,7 +45,6 @@ public class EntityItem extends EnderEntity implements Item {
 		this.pickupDelay = pickupDelay;
 		this.world = world;
 		this.vector = vector;
-		onSpawn(); // must be called from main thread
 	}
 
 	@Override
@@ -97,12 +96,12 @@ public class EntityItem extends EnderEntity implements Item {
 
 	@Override
 	protected float getBaseHealth() {
-		return 20;
+		return 1;
 	}
 
 	@Override
 	protected float getBaseMaxHealth() {
-		return 20;
+		return 1;
 	}
 
 	@Override
@@ -219,5 +218,22 @@ public class EntityItem extends EnderEntity implements Item {
 	@Override
 	public ItemStack getItemStack() {
 		return this.itemstack;
+	}
+	
+	@Override
+	protected void onHealthUpdate(float newHealth, float lastHealth) {
+		if(newHealth <= 0){
+			this.removeInternally(true);
+		}
+	}
+
+	@Override
+	public float getWidth() {
+		return 0.25F;
+	}
+
+	@Override
+	public float getHeight() {
+		return 0.25F;
 	}
 }
