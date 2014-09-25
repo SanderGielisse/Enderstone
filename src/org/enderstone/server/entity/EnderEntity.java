@@ -215,7 +215,7 @@ public abstract class EnderEntity implements Entity {
 		BlockId id = this.getWorld().getBlock(this.getLocation()).getBlock();
 		if (id == BlockId.FIRE || id == BlockId.LAVA_FLOWING || id == BlockId.LAVA) {
 			if (getFireTicks() == 0) {
-				setFireTicks(61); // 3 seconds burn after leaving lava/fire
+				setFireTicks(101); // 5 seconds burn after leaving lava/fire
 			}
 		}
 

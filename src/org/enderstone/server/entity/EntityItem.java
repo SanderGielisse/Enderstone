@@ -97,12 +97,12 @@ public class EntityItem extends EnderEntity implements Item {
 
 	@Override
 	protected float getBaseHealth() {
-		return 20;
+		return 1;
 	}
 
 	@Override
 	protected float getBaseMaxHealth() {
-		return 20;
+		return 1;
 	}
 
 	@Override
