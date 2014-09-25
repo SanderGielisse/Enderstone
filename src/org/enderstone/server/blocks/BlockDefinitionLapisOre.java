@@ -19,6 +19,9 @@
 package org.enderstone.server.blocks;
 
 import java.util.Random;
+import org.enderstone.server.api.World;
+import org.enderstone.server.api.entity.Player;
+import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.regions.BlockId;
 
 /**
@@ -28,7 +31,7 @@ import org.enderstone.server.regions.BlockId;
 public class BlockDefinitionLapisOre extends BlockDefinition {
 
 	//TODO drop random amount lapis
-	private Random random = new Random();
+	private static final Random random = new Random();
 
 	public BlockDefinitionLapisOre() {
 		super(BlockId.LAPIS_ORE);
@@ -42,5 +45,10 @@ public class BlockDefinitionLapisOre extends BlockDefinition {
 	@Override
 	public String getBreakSound() {
 		return "dig.stone";
+	}
+	
+	@Override
+	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
+		return new ItemStack(BlockId.INK_SACK, (byte) (random.nextInt(7) + 1), (short) 4); //lapis
 	}
 }

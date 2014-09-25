@@ -34,6 +34,20 @@ public class BlockDefinitions {
 			blocks[BlockId.GRASS.getId()] = new BlockDefinitionGrass();
 			blocks[BlockId.DIRT.getId()] = new BlockDefinitionDirt();
 			blocks[BlockId.COBBLESTONE.getId()] = new BlockDefinitionCobbleStone();
+			blocks[BlockId.BEDROCK.getId()] = new BlockDefinitionBedrock();
+			blocks[BlockId.COAL_ORE.getId()] = new BlockDefinitionCoalOre();
+			blocks[BlockId.GLASS.getId()] = new BlockDefinitionGlass();
+			blocks[BlockId.GOLD_ORE.getId()] = new BlockDefinitionGoldOre();
+			blocks[BlockId.IRON_ORE.getId()] = new BlockDefinitionIronOre();
+			blocks[BlockId.GRAVEL.getId()] = new BlockDefinitionGravel();
+			blocks[BlockId.LAPIS_ORE.getId()] = new BlockDefinitionLapisOre();
+			blocks[BlockId.LAPIS_BLOCK.getId()] = new BlockDefinitionLapisBlock();
+			blocks[BlockId.LEAVES.getId()] = new BlockDefinitionLeaf();
+			blocks[BlockId.LOG.getId()] = new BlockDefinitionLog();
+			blocks[BlockId.SAND.getId()] = new BlockDefinitionSand();
+			blocks[BlockId.SAPLING.getId()] = new BlockDefinitionSapling();
+			blocks[BlockId.SPONGE.getId()] = new BlockDefinitionSponge();
+			blocks[BlockId.WOOD.getId()] = new BlockDefinitionWood();
 	};
 
 	public static BlockDefinition getBlock(BlockId type) {
@@ -41,7 +55,8 @@ public class BlockDefinitions {
 		if (definition != null) {
 			return definition;
 		} else {
-			return new BlockDefinition(type);
+			blocks[type.getId()] =  new BlockDefinition(type);
+			return blocks[type.getId()];
 		}
 	}
 }

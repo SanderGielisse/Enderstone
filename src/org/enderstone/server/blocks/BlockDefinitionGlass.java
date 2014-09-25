@@ -18,6 +18,9 @@
 
 package org.enderstone.server.blocks;
 
+import org.enderstone.server.api.World;
+import org.enderstone.server.api.entity.Player;
+import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.regions.BlockId;
 
 /**
@@ -37,7 +40,14 @@ public class BlockDefinitionGlass extends BlockDefinition {
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.glass";
+	}
+	
+	@Override
+	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
+		if(false){ //TODO has silk touch
+			return super.getDrop(player, world, x, y, z);
+		}
+		return null;
 	}
 }

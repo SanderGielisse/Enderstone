@@ -18,6 +18,10 @@
 
 package org.enderstone.server.blocks;
 
+import java.util.Random;
+import org.enderstone.server.api.World;
+import org.enderstone.server.api.entity.Player;
+import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.regions.BlockId;
 
 /**
@@ -25,6 +29,8 @@ import org.enderstone.server.regions.BlockId;
  * @author gyroninja
  */
 public class BlockDefinitionGravel extends BlockDefinition {
+
+	private static final Random random = new Random();
 
 	public BlockDefinitionGravel() {
 		super(BlockId.GRAVEL);
@@ -38,5 +44,14 @@ public class BlockDefinitionGravel extends BlockDefinition {
 	@Override
 	public String getBreakSound() {
 		return "dig.gravel";
+	}
+
+	@Override
+	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
+		if (random.nextInt(10) == 0) {
+			return new ItemStack(BlockId.FLINT);
+		} else {
+			return super.getDrop(player, world, x, y, z);
+		}
 	}
 }
