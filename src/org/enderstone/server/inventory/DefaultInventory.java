@@ -272,21 +272,25 @@ public abstract class DefaultInventory implements Inventory {
 				}
 				break;
 				case ALL_ALLOWED: {
-					ItemStack cursorItem = cursor.get(0);
-					ItemStack target = getRawItems().get(slot);
-					if (cursorItem == null || target == null || !target.materialTypeMatches(cursorItem)) {
-						swapItems(cursor, 0, getRawItems(), slot);
+					if (shiftClick) {
+
 					} else {
-						int cursorAmount = cursorItem.getAmount();
-						int newTargetAmount = Math.min(target.getAmount() + cursorAmount, target.getId().getMaxStackSize());
-						if (newTargetAmount != target.getAmount()) {
-							cursorAmount -= newTargetAmount - target.getAmount();
-							if (cursorAmount > 0) {
-								cursorItem.setAmount(cursorAmount);
-								cursor.set(0, cursorItem);
-							} else cursor.set(0, null);
-							target.setAmount(newTargetAmount);
-							getRawItems().set(slot, target);
+						ItemStack cursorItem = cursor.get(0);
+						ItemStack target = getRawItems().get(slot);
+						if (cursorItem == null || target == null || !target.materialTypeMatches(cursorItem)) {
+							swapItems(cursor, 0, getRawItems(), slot);
+						} else {
+							int cursorAmount = cursorItem.getAmount();
+							int newTargetAmount = Math.min(target.getAmount() + cursorAmount, target.getId().getMaxStackSize());
+							if (newTargetAmount != target.getAmount()) {
+								cursorAmount -= newTargetAmount - target.getAmount();
+								if (cursorAmount > 0) {
+									cursorItem.setAmount(cursorAmount);
+									cursor.set(0, cursorItem);
+								} else cursor.set(0, null);
+								target.setAmount(newTargetAmount);
+								getRawItems().set(slot, target);
+							}
 						}
 					}
 				}
