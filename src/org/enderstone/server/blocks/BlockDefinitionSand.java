@@ -18,6 +18,8 @@
 
 package org.enderstone.server.blocks;
 
+import org.enderstone.server.regions.BlockId;
+
 /**
  *
  * @author gyroninja
@@ -25,19 +27,16 @@ package org.enderstone.server.blocks;
 public class BlockDefinitionSand extends BlockDefinition {
 
 	public BlockDefinitionSand() {
-
-		super(BlockType.SAND);
+		super(BlockId.SAND);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.sand";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.sand";
 	}
 }

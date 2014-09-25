@@ -21,6 +21,7 @@ package org.enderstone.server.blocks;
 import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.World;
 import org.enderstone.server.api.entity.Player;
+import org.enderstone.server.regions.BlockId;
 
 /**
  *
@@ -30,7 +31,7 @@ public class BlockDefinitionBedrock extends BlockDefinition {
 
 	public BlockDefinitionBedrock() {
 
-		super(BlockType.BEDROCK);
+		super(BlockId.BEDROCK);
 	}
 
 	@Override

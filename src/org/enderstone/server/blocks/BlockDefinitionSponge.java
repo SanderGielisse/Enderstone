@@ -18,6 +18,8 @@
 
 package org.enderstone.server.blocks;
 
+import org.enderstone.server.regions.BlockId;
+
 /**
  *
  * @author gyroninja
@@ -25,19 +27,16 @@ package org.enderstone.server.blocks;
 public class BlockDefinitionSponge extends BlockDefinition {
 
 	public BlockDefinitionSponge() {
-
-		super(BlockType.SPONGE);
+		super(BlockId.SPONGE);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.leaf";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.leaf";
 	}
 }

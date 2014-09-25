@@ -29,26 +29,39 @@ import org.enderstone.server.regions.BlockId;
  */
 public class BlockDefinition {
 
-	private final BlockType type;
+	private final BlockId type;
 
-	public BlockDefinition(BlockType type) {
+	public BlockDefinition(BlockId type) {
 
 		this.type = type;
 	}
 
-	public BlockType getType() {
+	public BlockId getType() {
 
 		return type;
 	}
 
-	public boolean canBreak(Player player, World world, int x, int y, int z) { return true; };
+	public boolean canBreak(Player player, World world, int x, int y, int z) {
+		return true;
+	}
 
-	public int getMaxStackSize() { return 64; };
+	public int getMaxStackSize() {
+		return 64;
+	}
 
-	public boolean doesInstantBreak() { return false; };
+	public boolean doesInstantBreak() {
+		return false;
+	}
 
-	public String getPlaceSound() { return ""; };
-	public String getBreakSound() { return ""; };
+	public String getPlaceSound() {
+		return "";
+	}
 
-	public ItemStack getDrop(Player player, World world, int x, int y, int z) { return new ItemStack(BlockId.valueOf(type.getName().toUpperCase()), (byte) 1, world.getBlock(x, y, z).getData()); };
+	public String getBreakSound() {
+		return "";
+	}
+
+	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
+		return new ItemStack(BlockId.valueOf(type.getName().toUpperCase()), (byte) 1, world.getBlock(x, y, z).getData());
+	}
 }

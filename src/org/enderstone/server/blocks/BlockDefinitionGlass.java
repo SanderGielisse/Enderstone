@@ -18,6 +18,8 @@
 
 package org.enderstone.server.blocks;
 
+import org.enderstone.server.regions.BlockId;
+
 /**
  *
  * @author gyroninja
@@ -25,13 +27,11 @@ package org.enderstone.server.blocks;
 public class BlockDefinitionGlass extends BlockDefinition {
 
 	public BlockDefinitionGlass() {
-
-		super(BlockType.GLASS);
+		super(BlockId.GLASS);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.glass";
 	}
 

@@ -30,8 +30,7 @@ import org.enderstone.server.regions.BlockId;
 public class BlockDefinitionStone extends BlockDefinition {
 
 	public BlockDefinitionStone() {
-
-		super(BlockType.STONE);
+		super(BlockId.STONE);
 	}
 
 	@Override
@@ -48,14 +47,9 @@ public class BlockDefinitionStone extends BlockDefinition {
 
 	@Override
 	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
-
 		if (world.getBlock(x, y, z).getData() == 0) {
-
 			return new ItemStack(BlockId.COBBLESTONE);
-		}
-
-		else {
-
+		} else {
 			return super.getDrop(player, world, x, y, z);
 		}
 	}

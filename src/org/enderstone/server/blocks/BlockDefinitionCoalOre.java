@@ -30,25 +30,21 @@ import org.enderstone.server.regions.BlockId;
 public class BlockDefinitionCoalOre extends BlockDefinition {
 
 	public BlockDefinitionCoalOre() {
-
-		super(BlockType.COAL_ORE);
+		super(BlockId.COAL_ORE);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.stone";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.stone";
 	}
 
 	@Override
 	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
-
 		return new ItemStack(BlockId.COAL);
 	}
 }

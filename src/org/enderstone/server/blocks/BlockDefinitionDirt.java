@@ -30,30 +30,24 @@ import org.enderstone.server.regions.BlockId;
 public class BlockDefinitionDirt extends BlockDefinition {
 
 	public BlockDefinitionDirt() {
-
-		super(BlockType.DIRT);
+		super(BlockId.DIRT);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.dirt";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.dirt";
 	}
 
 	@Override
 	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
-
 		if (world.getBlock(x, y, z).getData() == 2) {
-
 			return new ItemStack(BlockId.DIRT);
 		}
-
 		return super.getDrop(player, world, x, y, z);
 	}
 }

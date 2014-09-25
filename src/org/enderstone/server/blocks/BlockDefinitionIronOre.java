@@ -18,6 +18,8 @@
 
 package org.enderstone.server.blocks;
 
+import org.enderstone.server.regions.BlockId;
+
 /**
  *
  * @author gyroninja
@@ -25,19 +27,16 @@ package org.enderstone.server.blocks;
 public class BlockDefinitionIronOre extends BlockDefinition {
 
 	public BlockDefinitionIronOre() {
-
-		super(BlockType.IRON_ORE);
+		super(BlockId.IRON_ORE);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.stone";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.stone";
 	}
 }

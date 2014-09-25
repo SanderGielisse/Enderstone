@@ -19,6 +19,7 @@
 package org.enderstone.server.blocks;
 
 import java.util.Random;
+import org.enderstone.server.regions.BlockId;
 
 /**
  *
@@ -26,22 +27,20 @@ import java.util.Random;
  */
 public class BlockDefinitionLapisOre extends BlockDefinition {
 
+	//TODO drop random amount lapis
 	private Random random = new Random();
 
 	public BlockDefinitionLapisOre() {
-
-		super(BlockType.LAPIS_ORE);
+		super(BlockId.LAPIS_ORE);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.stone";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.stone";
 	}
 }

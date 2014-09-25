@@ -18,6 +18,8 @@
 
 package org.enderstone.server.blocks;
 
+import org.enderstone.server.regions.BlockId;
+
 /**
  *
  * @author gyroninja
@@ -25,19 +27,16 @@ package org.enderstone.server.blocks;
 public class BlockDefinitionGravel extends BlockDefinition {
 
 	public BlockDefinitionGravel() {
-
-		super(BlockType.GRAVEL);
+		super(BlockId.GRAVEL);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.gravel";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.gravel";
 	}
 }

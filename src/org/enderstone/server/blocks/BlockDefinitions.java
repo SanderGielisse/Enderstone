@@ -18,8 +18,6 @@
 
 package org.enderstone.server.blocks;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.enderstone.server.regions.BlockId;
 
 /**
@@ -28,34 +26,22 @@ import org.enderstone.server.regions.BlockId;
  */
 public class BlockDefinitions {
 
-	private static final Map<Integer, BlockDefinition> blocks = new HashMap<>();
+	private static final BlockDefinition[] blocks = new BlockDefinition[4096];
 
-	static {{
+	static {
+			blocks[BlockId.AIR.getId()] = new BlockDefinition(BlockId.AIR);
+			blocks[BlockId.STONE.getId()] = new BlockDefinitionStone();
+			blocks[BlockId.GRASS.getId()] = new BlockDefinitionGrass();
+			blocks[BlockId.DIRT.getId()] = new BlockDefinitionDirt();
+			blocks[BlockId.STONE.getId()] = new BlockDefinitionCobbleStone();
+	};
 
-		blocks.put(0, new BlockDefinition(BlockType.AIR));
-		blocks.put(1, new BlockDefinitionStone());
-		blocks.put(2, new BlockDefinitionGrass());
-		blocks.put(3, new BlockDefinitionDirt());
-		blocks.put(4, new BlockDefinitionCobbleStone());
-	}};
-
-	@Deprecated
-	public static BlockDefinition getBlock(BlockId id) {
-
-		return getBlock(BlockType.valueOf(id.getName().toUpperCase()));
-	}
-
-	public static BlockDefinition getBlock(BlockType type) {
-
-		BlockDefinition definition = blocks.get(type.getId());
-
+	public static BlockDefinition getBlock(BlockId type) {
+		BlockDefinition definition = blocks[type.getId()];
 		if (definition != null) {
-
 			return definition;
 		}
-
 		else {
-
 			return new BlockDefinition(type);
 		}
 	}

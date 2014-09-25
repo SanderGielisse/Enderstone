@@ -30,25 +30,21 @@ import org.enderstone.server.regions.BlockId;
 public class BlockDefinitionGrass extends BlockDefinition {
 
 	public BlockDefinitionGrass() {
-
-		super(BlockType.GRASS);
+		super(BlockId.GRASS);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.grass";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.grass";
 	}
 
 	@Override
 	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
-
 		return new ItemStack(BlockId.DIRT);
 	}
 }

@@ -18,6 +18,8 @@
 
 package org.enderstone.server.blocks;
 
+import org.enderstone.server.regions.BlockId;
+
 /**
  *
  * @author gyroninja
@@ -25,19 +27,16 @@ package org.enderstone.server.blocks;
 public class BlockDefinitionCobbleStone extends BlockDefinition {
 
 	public BlockDefinitionCobbleStone() {
-
-		super(BlockType.COBBLESTONE);
+		super(BlockId.COBBLESTONE);
 	}
 
 	@Override
 	public String getPlaceSound() {
-
 		return "step.stone";
 	}
 
 	@Override
 	public String getBreakSound() {
-
 		return "dig.stone";
 	}
 }
