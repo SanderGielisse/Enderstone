@@ -628,7 +628,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public void serverTick() {
 		super.serverTick();
-
+		if(Main.getInstance().doPhysics == false){
+			return;
+		}
 		if (getFoodLevel() == 20) {
 			this.clientSettings.isEatingTicks = 0;
 			this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(this.getHealth(), this.getFoodLevel(), this.clientSettings.foodSaturation));
@@ -800,22 +802,57 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	public void setOnGround(boolean onGround) {
+		if(Main.getInstance().doPhysics == false){
+			this.isOnGround = onGround;
+			return;
+		}
+		
+		EnderWorld world = this.getWorld();
+		double x = this.getLocation().getX();
+		double y = this.getLocation().getY();
+		double z = this.getLocation().getZ();
+		BlockId id1 = world.getBlock((int)x, (int)y, (int)z).getBlock();
+		BlockId id2 = world.getBlock((int)(x + (getWidth() / 2)), (int)y, (int)z).getBlock();
+		BlockId id3 = world.getBlock((int)(x - (getWidth() / 2)), (int)y, (int)z).getBlock();
+		BlockId id4 = world.getBlock((int)x, (int)y, (int)(z - (getWidth() / 2))).getBlock();
+		BlockId id5 = world.getBlock((int)x, (int)y, (int)(z + (getWidth() / 2))).getBlock();
+		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
+		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
+		
+		if(isInWater){
+			//reset fall damage
+			this.yLocation = this.getLocation().getY();
+		}
 		if (this.isOnGround == false && onGround == true) {
-			if (this.clientSettings.isFlying)
+			if (this.clientSettings.isFlying){
 				return; // Flying players don't get damage in vanilla
+			}
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
 			if (change > 0) {
-				if (damage((float) change)) {
-					Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " fell from a high place."));
+				if (isInWater) {
+					// nothing should happen
+				} else {
+					if (damage((float) change)) {
+						Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " fell from a high place."));
+					}
+					Main.getInstance().getWorld(this).broadcastSound("damage.fallsmall", 1F, (byte) 63, getLocation(), null);
 				}
-				Main.getInstance().getWorld(this).broadcastSound("damage.fallsmall", 1F, (byte) 63, getLocation(), null);
 			}
 		} else if (this.isOnGround == true && onGround == false) {
 			// save Y location
 			this.yLocation = this.getLocation().getY();
 		}
 		this.isOnGround = onGround;
+	}
+	
+	private boolean compare(BlockId fire, BlockId[] ids) {
+		for(BlockId id : ids){
+			if(id == fire){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void sendBlockUpdate(Location loc, short blockId, byte dataValue) {
@@ -1151,5 +1188,15 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public void displayWelcomeTitle(Message title, Message subtitle) {
 		this.networkManager.sendPacket(new PacketOutTitle(new ActionDisplayTitle(title)));
 		this.networkManager.sendPacket(new PacketOutTitle(new ActionSubtitle(subtitle)));
+	}
+
+	@Override
+	public float getWidth() {
+		return 0.6F;
+	}
+
+	@Override
+	public float getHeight() {
+		return 1.68F;
 	}
 }

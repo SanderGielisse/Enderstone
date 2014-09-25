@@ -47,7 +47,6 @@ public abstract class EntityMob extends EnderEntity {
 		super(location);
 		this.world = world;
 		this.appearanceId = appearanceId;
-		this.onSpawn();
 	}
 
 	@Override
@@ -203,12 +202,25 @@ public abstract class EntityMob extends EnderEntity {
 	
 	@Override
 	public void serverTick() {
+		super.serverTick();
+		if(Main.getInstance().doPhysics == false){
+			return;
+		}
 		//added some temporarily mob sounds, just for fun :D
 		if (latestSound++ % (20 * 10) == 0) {
 			if (Main.random.nextBoolean()) {
 				world.broadcastPacket(new PacketOutSoundEffect(this.getRandomSound(), this.getLocation()), this.getLocation());
 			}
 		}
-		super.serverTick();
+	}
+	
+	@Override
+	public float getWidth() {
+		return 0.6F;
+	}
+	
+	@Override
+	public float getHeight() {
+		return 1.6F;
 	}
 }

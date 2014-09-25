@@ -30,6 +30,7 @@ import org.enderstone.server.packet.play.PacketOutEntityStatus;
 import org.enderstone.server.packet.play.PacketOutEntityVelocity;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.EnderWorld;
 
 public abstract class EnderEntity implements Entity {
 
@@ -182,6 +183,10 @@ public abstract class EnderEntity implements Entity {
 	public abstract void updateDataWatcher();
 
 	public abstract void onSpawn();
+	
+	public abstract float getWidth();
+	
+	public abstract float getHeight();
 
 	private void initHealth() {
 		this.health = getBaseHealth();
@@ -215,16 +220,29 @@ public abstract class EnderEntity implements Entity {
 	}
 	
 	public void serverTick() {
-		if(shouldBeRemoved || this.isDead()){
+		if(shouldBeRemoved || this.isDead() || Main.getInstance().doPhysics == false){
 			return;
 		}
-		BlockId id = this.getWorld().getBlock(this.getLocation()).getBlock();
-		if (id == BlockId.FIRE || id == BlockId.LAVA_FLOWING || id == BlockId.LAVA) {
+		
+		EnderWorld world = this.getWorld();
+		double x = this.getLocation().getX();
+		double y = this.getLocation().getY();
+		double z = this.getLocation().getZ();
+		BlockId id1 = world.getBlock((int)x, (int)y, (int)z).getBlock();
+		BlockId id2 = world.getBlock((int)(x + (getWidth() / 2)), (int)y, (int)z).getBlock();
+		BlockId id3 = world.getBlock((int)(x - (getWidth() / 2)), (int)y, (int)z).getBlock();
+		BlockId id4 = world.getBlock((int)x, (int)y, (int)(z - (getWidth() / 2))).getBlock();
+		BlockId id5 = world.getBlock((int)x, (int)y, (int)(z + (getWidth() / 2))).getBlock();
+		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
+		
+		boolean isInFire = compare(BlockId.FIRE, array) || compare(BlockId.LAVA, array) || compare(BlockId.LAVA_FLOWING, array);
+		if (isInFire) {
 			if (getFireTicks() == 0) {
 				setFireTicks(101); // 5 seconds burn after leaving lava/fire
 			}
 		}
-		if(id == BlockId.WATER || id == BlockId.WATER_FLOWING){
+		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
+		if(isInWater){
 			if(this.getFireTicks() > 0){
 				this.setFireTicks(0);
 			}
@@ -244,6 +262,15 @@ public abstract class EnderEntity implements Entity {
 		if(this.fireTicks == 0){
 			this.setFireTicks(0);
 		}
+	}
+
+	private boolean compare(BlockId fire, BlockId[] ids) {
+		for(BlockId id : ids){
+			if(id == fire){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public int getFireTicks() {

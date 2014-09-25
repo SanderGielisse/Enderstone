@@ -325,6 +325,7 @@ public class EnderWorld implements World{
 	public void serverTick() {
 		for(EnderEntity pending : this.pendingEntities){
 			this.entities.add(pending);
+			pending.onSpawn();
 		}
 		this.pendingEntities.clear();
 		
