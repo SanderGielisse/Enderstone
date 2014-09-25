@@ -18,6 +18,8 @@
 
 package org.enderstone.server.inventory;
 
+import java.util.List;
+
 /**
  *
  * @author Fernando
@@ -28,5 +30,6 @@ public interface Inventory extends AutoCloseable, HalfInventory {
 	
 	public void removeListener(InventoryListener listener);
 
+	public void onItemClick(boolean leftMouse, int mode, int slot, boolean shiftClick, List<ItemStack> cursor);
 	
 }
