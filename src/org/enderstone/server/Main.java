@@ -59,6 +59,7 @@ import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.inventory.DefaultCraftingRecipes;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
@@ -356,6 +357,11 @@ public class Main implements Runnable {
 	private long latestChunkUpdate = 0;
 
 	private void serverTick(long tick) {
+		int recepies = DefaultCraftingRecipes.serverTick();
+		if(recepies != -1) {
+			EnderLogger.debug(recepies + " crafting recepies listeners loaded!");
+		}
+		
 		for (EnderPlayer ep : onlinePlayers) {
 			ep.serverTick();
 		}

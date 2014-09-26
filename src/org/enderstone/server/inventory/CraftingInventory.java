@@ -32,7 +32,7 @@ public class CraftingInventory extends DefaultHalfInventory {
 	private static final CachedMessage TITLE = CachedMessage.wrap(new SimpleMessage("Crafting Table"));
 
 	public CraftingInventory(Location location) {
-		super(InventoryType.CRAFTING_TABLE, 10, TITLE, new CraftingInventoryListener(3, 3, 0, 1, DefaultCraftingRecipes.recipes));
+		super(InventoryType.CRAFTING_TABLE, 10, TITLE, new CraftingInventoryListener(3, 3, 0, 1, DefaultCraftingRecipes.getRecipes()));
 		this.location = location;
 	}
 
