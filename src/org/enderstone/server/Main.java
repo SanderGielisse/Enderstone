@@ -361,32 +361,22 @@ public class Main implements Runnable {
 		if(recepies != -1) {
 			EnderLogger.debug(recepies + " crafting recepies listeners loaded!");
 		}
-		
-		for (EnderPlayer ep : onlinePlayers) {
-			ep.serverTick();
-		}
-
-		if ((latestKeepAlive++ & 0b0011_1111) == 0) { // faster than % 64 == 0
-			for (EnderPlayer p : onlinePlayers) {
+		boolean doKeepAliveUpdate = (latestKeepAlive++ & 0b0011_1111) == 0; // faster than % 64 == 0
+		boolean doChunkUpdate = (latestChunkUpdate++ & 0b0001_1111) == 0; // faster than % 31 == 0
+		boolean doUpdateTimeAndWeather = (tick & 0b0011_1111) == 0; // faster than % 64 == 0
+		for (EnderPlayer p : onlinePlayers) {
+			p.serverTick();
+			if (doKeepAliveUpdate) { 
 				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));
 			}
-		}
-
-		if ((latestChunkUpdate++ & 0b0001_1111) == 0) { // faster than % 31 == 0
-			for (EnderPlayer p : onlinePlayers) {
-				if (p.isDead()) {
-					continue;
-				}
+			if (doChunkUpdate && !p.isDead()) {
 				p.getWorld().doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.renderDistance - 1, MAX_VIEW_DISTANCE));
 				p.updatePlayers(onlinePlayers);
 			}
 			for (EnderWorld world : worlds) {
 				world.updateEntities(onlinePlayers);
 			}
-		}
-
-		if ((tick & 0b0011_1111) == 0) { // faster than % 64 == 0
-			for (EnderPlayer p : onlinePlayers) {
+			if (doUpdateTimeAndWeather) {
 				p.getNetworkManager().sendPacket(new PacketOutUpdateTime(tick, this.getWorld(p).getTime()));
 			}
 		}
