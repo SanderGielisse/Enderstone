@@ -29,15 +29,31 @@ public class PlayerInventoryClickEvent extends Event implements Cancellable {
 	private final InventoryHandler inventory;
 
 	//TODO implement this
+	/**
+	 * PlayerInventoryClickEvent is called when a player clicks inside of an inventory.
+	 * 
+	 * @param player the player that clicked inside an inventory
+	 * @param inventory the inventory that was clicked inside
+	 */
 	public PlayerInventoryClickEvent(Player player, InventoryHandler inventory) {
 		this.player = player;
 		this.inventory = inventory;
 	}
 
+	/**
+	 * Get the player that clicked inside an inventory.
+	 * 
+	 * @return The player that clicked inside an inventory
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Get the inventory that was clicked inside.
+	 * 
+	 * @return The inventory that was clicked inside
+	 */
 	public InventoryHandler getInventory() {
 		return inventory;
 	}

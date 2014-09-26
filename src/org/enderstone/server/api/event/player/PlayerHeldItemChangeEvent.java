@@ -28,20 +28,42 @@ public class PlayerHeldItemChangeEvent extends Event implements Cancellable {
 	private final short oldSlot;
 	private final short newSlot;
 
+	/**
+	 * PlayerHeldItemChangeEvent is called when a player changes their held item.
+	 * 
+	 * @param player the player that switched their held item
+	 * @param oldSlot the slot that the old item was in
+	 * @param newSlot the slot that the new item is in
+	 */
 	public PlayerHeldItemChangeEvent(Player player, short oldSlot, short newSlot) {
 		this.player = player;
 		this.oldSlot = oldSlot;
 		this.newSlot = newSlot;
 	}
 
+	/**
+	 * Get the player that switched their held item.
+	 * 
+	 * @return The player that switched their held item
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Get the slot that the old item was in.
+	 * 
+	 * @return The slot that the old item was in.
+	 */
 	public short getOldSlot() {
 		return oldSlot;
 	}
 
+	/**
+	 * Get the slot that the new item is in.
+	 * 
+	 * @return The slot that the new item is
+	 */
 	public short getNewSlot() {
 		return newSlot;
 	}

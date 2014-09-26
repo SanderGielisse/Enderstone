@@ -27,8 +27,22 @@ public class PlayerRespawnEvent extends Event implements Cancellable {
 	private final Player player;
 
 	//TODO implement this
+	/**
+	 * PlayerRespawnEvent is called when a player respawns.
+	 * 
+	 * @param player the player that respawned
+	 */
 	public PlayerRespawnEvent(Player player) {
 		this.player = player;
+	}
+
+	/**
+	 * Get the player that respawned.
+	 * 
+	 * @return The player that respawned
+	 */
+	public Player getPlayer() {
+		return player;
 	}
 
 	@Override
@@ -39,9 +53,5 @@ public class PlayerRespawnEvent extends Event implements Cancellable {
 	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
-	}
-
-	public Player getPlayer() {
-		return player;
 	}
 }

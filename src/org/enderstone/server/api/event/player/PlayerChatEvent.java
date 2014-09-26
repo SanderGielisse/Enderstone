@@ -28,27 +28,58 @@ public class PlayerChatEvent extends Event implements Cancellable {
 	private String message;
 	private String format = "<%name> %message"; // example default
 
+	/**
+	 * PlayerChatEvent is called when a player talks in chat.
+	 * 
+	 * @param player the player that was talking
+	 * @param message what was spoken
+	 */
 	public PlayerChatEvent(Player player, String message) {
 		this.player = player;
 		this.message = message;
 	}
 
+	/**
+	 * Get the player that was talking.
+	 * 
+	 * @return The player that was talking
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * Get the message that was spoken.
+	 * 
+	 * @return The message that was spoken
+	 */
 	public String getMessage() {
 		return message;
 	}
 
+	/**
+	 * Set the message that will be spoken.
+	 * 
+	 * @param message the message that will be spoken
+	 */
 	public void setMessage(String message) {
 		this.message = message;
 	}
 
+	/**
+	 * Get the format of the current message.
+	 * 
+	 * @return The format of the current message
+	 */
 	public String getFormat() {
 		return format;
 	}
 
+	/**
+	 * Set the format of the current message.
+	 * 
+	 * @param format the format of the current message
+	 */
 	public void setFormat(String format) {
 		this.format = format;
 	}

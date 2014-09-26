@@ -29,10 +29,44 @@ public class PlayerMoveEvent extends Event implements Cancellable {
 	private final Location fromLocation;
 	private final Location toLocation;
 
+	/**
+	 * PlayerMoveEvent is called when a player moves from one location to another.
+	 * 
+	 * @param player the player that moved
+	 * @param fromLocation the location the player moved from
+	 * @param toLocation the location the player moved to
+	 */
 	public PlayerMoveEvent(Player player, Location fromLocation, Location toLocation) {
 		this.player = player;
 		this.fromLocation = fromLocation;
 		this.toLocation = toLocation;
+	}
+
+	/**
+	 * Get the player that moved.
+	 * 
+	 * @return The player that moed
+	 */
+	public Player getPlayer() {
+		return player;
+	}
+
+	/**
+	 * Get the location the player moved from.
+	 * 
+	 * @return The location the player moved form
+	 */
+	public Location getFromLocation() {
+		return fromLocation;
+	}
+
+	/**
+	 * Get the location the player moved to.
+	 * 
+	 * @return The location the player moved to
+	 */
+	public Location getToLocation() {
+		return toLocation;
 	}
 
 	@Override
@@ -43,17 +77,5 @@ public class PlayerMoveEvent extends Event implements Cancellable {
 	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
-	}
-
-	public Player getPlayer() {
-		return player;
-	}
-
-	public Location getFromLocation() {
-		return fromLocation;
-	}
-
-	public Location getToLocation() {
-		return toLocation;
 	}
 }

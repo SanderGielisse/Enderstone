@@ -19,8 +19,18 @@ package org.enderstone.server.api.event;
 
 public interface Cancellable {
 
+	/**
+	 * Checks whether the event was canceled.
+	 * 
+	 * @return true when the event is canceled
+	 */
 	public boolean isCancelled();
 
+	/**
+	 * Set whether or not the event will be canceled.
+	 * 
+	 * @param cancelled whether or not the event is canceled
+	 */
 	public void setCancelled(boolean cancelled);
 
 }

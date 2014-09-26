@@ -83,7 +83,7 @@ public class PacketInBlockPlacement extends Packet {
 				//called when started eating, pulling bow etc.
 				if (x == -1 && z == -1 && direct == -1) {
 					if (FoodType.fromBlockId(getHeldItem().getBlockId()) != null) {
-						if(Main.getInstance().callEvent(new PlayerEatEvent(networkManager.player))){
+						if(Main.getInstance().callEvent(new PlayerEatEvent(networkManager.player, getHeldItem()))){
 							return;
 						}
 						networkManager.player.clientSettings.isEatingTicks = 1;
