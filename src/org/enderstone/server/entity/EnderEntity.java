@@ -23,6 +23,7 @@ import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.World;
 import org.enderstone.server.api.entity.Entity;
+import org.enderstone.server.api.event.entity.EntityDamageEvent;
 import org.enderstone.server.api.messages.AdvancedMessage;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutAnimation;
@@ -76,6 +77,10 @@ public abstract class EnderEntity implements Entity {
 	}
 
 	public boolean damage(float damage) {
+		EntityDamageEvent e = new EntityDamageEvent(this, damage);
+		if (Main.getInstance().callEvent(e)) {
+			return !isDead();
+		}
 		if (Float.isNaN(this.health))
 			initHealth();
 		if (health == 0)
@@ -87,7 +92,7 @@ public abstract class EnderEntity implements Entity {
 				p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
 			}
 		}
-		return this.setHealth(Math.max(health - damage, 0));
+		return this.setHealth(Math.max(health - e.getDamage(), 0));
 	}
 
 	public boolean damage(float damage, Vector knockback) {
