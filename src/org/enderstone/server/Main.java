@@ -352,6 +352,15 @@ public class Main implements Runnable {
 		}
 		return null;
 	}
+	
+	public EnderPlayer getPlayer(UUID uuid) {
+		for (EnderPlayer ep : this.onlinePlayers) {
+			if (ep.uuid.equals(uuid)) {
+				return ep;
+			}
+		}
+		return null;
+	}
 
 	private long latestKeepAlive = 0;
 	private long latestChunkUpdate = 0;
