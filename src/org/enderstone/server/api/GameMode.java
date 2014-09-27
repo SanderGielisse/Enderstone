@@ -22,10 +22,20 @@ public enum GameMode {
 
 	private final int id;
 
+	/**
+	 * Creates a new element of GameMode
+	 * 
+	 * @param id the id of the new element
+	 */
 	private GameMode(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * Get the id of the element.
+	 * 
+	 * @return The id of the element
+	 */
 	public int getId() {
 		return id;
 	}

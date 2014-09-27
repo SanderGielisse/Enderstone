@@ -61,15 +61,32 @@ public enum Particle {
     
     private final String name;
     private final int id;
-    
+   
+	/**
+	 * Creates a new element of Particle
+	 * 
+	 * @param name the name of the particle
+	 * @param id the id of the new element
+	 */
 	private Particle(String name, int id) {
 		this.name = name;
 		this.id = id;
 	}
-	
+
+	/**
+	 * Get the name of the element.
+	 * 
+	 * @return The name of the element
+	 */
 	public String getName() {
 		return name;
 	}
+
+	/**
+	 * Get the id of the element.
+	 * 
+	 * @return The id of the element
+	 */
 	public int getId() {
 		return id;
 	}
