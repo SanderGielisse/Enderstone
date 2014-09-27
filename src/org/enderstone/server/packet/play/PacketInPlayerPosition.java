@@ -17,8 +17,8 @@
  */
 package org.enderstone.server.packet.play;
 
-
 import java.io.IOException;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.event.player.PlayerMoveEvent;
@@ -72,36 +72,38 @@ public class PacketInPlayerPosition extends Packet {
 
 			@Override
 			public void run() {
-				if (networkManager.player != null) {
-					Location loc = networkManager.player.getLocation();
-					if (networkManager.player.waitingForValidMoveAfterTeleport > 0) {
-						if (Math.max(Math.max(
-								getX() < loc.getX() ? loc.getX() - getX() : getX() - loc.getX(),
-										getFeetY() < loc.getY() ? loc.getY() - getFeetY() : getFeetY() - loc.getY()),
-								getZ() < loc.getZ() ? loc.getZ() - getZ() : getZ() - loc.getZ()
-						) > 0.1) {
-							if (networkManager.player.waitingForValidMoveAfterTeleport++ > 100) {
-								networkManager.player.teleportInternally(loc);
-							}
-							return;
+				if (networkManager.player == null) {
+					return;
+				}
+				Location loc = networkManager.player.getLocation();
+				if (networkManager.player.waitingForValidMoveAfterTeleport > 0) {
+					if (Math.max(Math.max(
+							getX() < loc.getX() ? loc.getX() - getX() : getX() - loc.getX(),
+							getFeetY() < loc.getY() ? loc.getY() - getFeetY() : getFeetY() - loc.getY()),
+							getZ() < loc.getZ() ? loc.getZ() - getZ() : getZ() - loc.getZ()
+					) > 0.1) {
+						if (networkManager.player.waitingForValidMoveAfterTeleport++ > 100) {
+							networkManager.player.teleportInternally(loc);
 						}
-						networkManager.player.waitingForValidMoveAfterTeleport = 0;
-					}
-					
-					Location newLoc = loc.clone();
-					newLoc.setX(getX());
-					newLoc.setY(getFeetY());
-					newLoc.setZ(getZ());
-					if(Main.getInstance().callEvent(new PlayerMoveEvent(networkManager.player, loc, newLoc))){
 						return;
 					}
-					
-					networkManager.player.broadcastLocation(new Location(networkManager.player.getWorld(), getX(), getFeetY(), getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
-					loc.setX(getX());
-					loc.setY(getFeetY());
-					loc.setZ(getZ());
-					networkManager.player.setOnGround(isOnGround());
+					networkManager.player.waitingForValidMoveAfterTeleport = 0;
 				}
+
+				Location newLoc = loc.clone();
+				newLoc.setX(getX());
+				newLoc.setY(getFeetY());
+				newLoc.setZ(getZ());
+				if (Main.getInstance().callEvent(new PlayerMoveEvent(networkManager.player, loc, newLoc))) {
+					return;
+				}
+
+				networkManager.player.broadcastLocation(new Location(networkManager.player.getWorld(), getX(), getFeetY(), getZ(), networkManager.player.getLocation().getYaw(), networkManager.player.getLocation().getPitch()));
+				loc.setX(getX());
+				loc.setY(getFeetY());
+				loc.setZ(getZ());
+				networkManager.player.setOnGround(isOnGround());
+
 			}
 		});
 	}

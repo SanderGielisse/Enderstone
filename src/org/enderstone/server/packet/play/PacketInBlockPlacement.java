@@ -18,7 +18,9 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.event.player.PlayerEatEvent;
 import org.enderstone.server.blocks.BlockDefinition;
@@ -30,6 +32,7 @@ import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.EnderBlock;
 
 public class PacketInBlockPlacement extends Packet {
 
@@ -67,6 +70,18 @@ public class PacketInBlockPlacement extends Packet {
 
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
+		if (getLocation().getY() != -1) {
+			Main.getInstance().sendToMainThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					Block block = networkManager.player.getWorld().getBlock(getLocation());
+					BlockDefinition def = BlockDefinitions.getBlock(block.getBlock());
+					def.onRightClick(networkManager.player, block);
+				}
+			});
+		}
+
 		if (getHeldItem() == null || getHeldItem().getBlockId() == -1) {
 			return;
 		}
@@ -77,13 +92,12 @@ public class PacketInBlockPlacement extends Packet {
 				int x = getLocation().getBlockX();
 				int y = getLocation().getBlockY();
 				int z = getLocation().getBlockZ();
-
 				byte direct = getDirection();
 
-				//called when started eating, pulling bow etc.
+				// called when started eating, pulling bow etc.
 				if (x == -1 && z == -1 && direct == -1) {
 					if (FoodType.fromBlockId(getHeldItem().getBlockId()) != null) {
-						if(Main.getInstance().callEvent(new PlayerEatEvent(networkManager.player, getHeldItem()))){
+						if (Main.getInstance().callEvent(new PlayerEatEvent(networkManager.player, getHeldItem()))) {
 							return;
 						}
 						networkManager.player.clientSettings.isEatingTicks = 1;
@@ -92,7 +106,7 @@ public class PacketInBlockPlacement extends Packet {
 					}
 					return;
 				}
-				
+
 				if (direct == 0) {
 					y--;
 				} else if (direct == 1) {
@@ -112,17 +126,17 @@ public class PacketInBlockPlacement extends Packet {
 
 					if (getHeldItem() == null || pl.getInventoryHandler().getItemInHand() == null) {
 						if (Main.getInstance().getWorld(pl).getBlockIdAt(x, y, z).getId() == 0) {
-							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short)0, (byte) 0); //tell client it failed and set the block back to air
+							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short) 0, (byte) 0); // tell client it failed and set the block back to air
 						}
 						return;
 					}
 					if (pl.getInventoryHandler().getItemInHand().getBlockId() != getHeldItem().getBlockId() && pl.getInventoryHandler().getItemInHand().getAmount() != getHeldItem().getAmount()) {
 						if (Main.getInstance().getWorld(pl).getBlockIdAt(x, y, z).getId() == 0) {
-							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short)0, (byte) 0); //tell client it failed and set the block back to air
+							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short) 0, (byte) 0); // tell client it failed and set the block back to air
 						}
 						return;
 					}
-					
+
 					if (BlockId.byId(getHeldItem().getBlockId()).isValidBlock()) {
 
 						Main.getInstance().getWorld(pl).setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
@@ -138,7 +152,7 @@ public class PacketInBlockPlacement extends Packet {
 		});
 	}
 
-	public Location getLocation(){
+	public Location getLocation() {
 		return loc;
 	}
 

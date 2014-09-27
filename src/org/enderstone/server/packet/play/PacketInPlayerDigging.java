@@ -18,6 +18,7 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
@@ -63,10 +64,14 @@ public class PacketInPlayerDigging extends Packet {
 
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
+		
 		Main.getInstance().sendToMainThread(new Runnable() {
-
+				
 			@Override
 			public void run() {
+				if (networkManager.player == null) {
+					return;
+				}
 				int x = getLocation().getBlockX();
 				int y = getLocation().getBlockY();
 				int z = getLocation().getBlockZ();

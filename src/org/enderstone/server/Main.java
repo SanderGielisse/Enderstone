@@ -59,6 +59,7 @@ import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.inventory.DefaultCraftingRecipes;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
@@ -90,7 +91,8 @@ public class Main implements Runnable {
 			this.add(47); // 1.8
 		}
 	});
-	public static final String[] AUTHORS = new String[] { "BigTeddy98 (Sander)", "ferrybig (Fernando)" };
+	public static final String[] AUTHORS = new String[] { "BigTeddy98 [Sander Gielisse]", "ferrybig [Fernando van Loenhout]" };
+	public static final String[] TOP_CONTRIBUTORS = new String[] {"Gyroninja"};
 	public static final Random random = new Random();
 	public volatile Thread mainThread;
 	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();
@@ -148,6 +150,7 @@ public class Main implements Runnable {
 		Main.instance = this;
 		EnderLogger.info("Starting " + NAME + " " + VERSION + " server version " + PROTOCOL_VERSION + ".");
 		EnderLogger.info("Authors: " + Arrays.asList(AUTHORS).toString());
+		EnderLogger.info("Top contributors: " + Arrays.asList(TOP_CONTRIBUTORS).toString() + " <--- Thanks to them!");
 		EnderLogger.info("Loading server.properties file...");
 		this.loadConfigFromDisk();
 		EnderLogger.info("Loaded server.properties file!");
@@ -351,36 +354,40 @@ public class Main implements Runnable {
 		}
 		return null;
 	}
+	
+	public EnderPlayer getPlayer(UUID uuid) {
+		for (EnderPlayer ep : this.onlinePlayers) {
+			if (ep.uuid.equals(uuid)) {
+				return ep;
+			}
+		}
+		return null;
+	}
 
 	private long latestKeepAlive = 0;
 	private long latestChunkUpdate = 0;
 
 	private void serverTick(long tick) {
-		for (EnderPlayer ep : onlinePlayers) {
-			ep.serverTick();
+		int recepies = DefaultCraftingRecipes.serverTick();
+		if(recepies != -1) {
+			EnderLogger.debug(recepies + " crafting recepies listeners loaded!");
 		}
-
-		if ((latestKeepAlive++ & 0b0011_1111) == 0) { // faster than % 64 == 0
-			for (EnderPlayer p : onlinePlayers) {
+		boolean doKeepAliveUpdate = (latestKeepAlive++ & 0b0011_1111) == 0; // faster than % 64 == 0
+		boolean doChunkUpdate = (latestChunkUpdate++ & 0b0001_1111) == 0; // faster than % 31 == 0
+		boolean doUpdateTimeAndWeather = (tick & 0b0011_1111) == 0; // faster than % 64 == 0
+		for (EnderPlayer p : onlinePlayers) {
+			p.serverTick();
+			if (doKeepAliveUpdate) { 
 				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));
 			}
-		}
-
-		if ((latestChunkUpdate++ & 0b0001_1111) == 0) { // faster than % 31 == 0
-			for (EnderPlayer p : onlinePlayers) {
-				if (p.isDead()) {
-					continue;
-				}
+			if (doChunkUpdate && !p.isDead()) {
 				p.getWorld().doChunkUpdatesForPlayer(p, p.chunkInformer, Math.min(p.clientSettings.renderDistance - 1, MAX_VIEW_DISTANCE));
 				p.updatePlayers(onlinePlayers);
 			}
 			for (EnderWorld world : worlds) {
 				world.updateEntities(onlinePlayers);
 			}
-		}
-
-		if ((tick & 0b0011_1111) == 0) { // faster than % 64 == 0
-			for (EnderPlayer p : onlinePlayers) {
+			if (doUpdateTimeAndWeather) {
 				p.getNetworkManager().sendPacket(new PacketOutUpdateTime(tick, this.getWorld(p).getTime()));
 			}
 		}
