@@ -106,7 +106,6 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		synchronized (packets) {
 			Packet p;
 			while ((p = packets.poll()) != null) {
-				//EnderLogger.debug("---> " + p.toString());
 				ctx.write(p);
 				p.onSend(this);
 			}
@@ -122,7 +121,6 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			return;
 		}
 		((Packet) msg).onRecieve(this);
-		// EnderLogger.debug("in: " + msg);
 		forcePacketFlush();
 	}
 
@@ -136,13 +134,11 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		this.onDisconnect();
-		EnderLogger.debug("Inactive!");
 		super.channelInactive(ctx);
 	}
 
 	@Override
 	public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-		EnderLogger.debug("Close!");
 		super.close(ctx, promise);
 	}
 

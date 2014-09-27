@@ -22,6 +22,7 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.UUID;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.entity.PlayerTextureStore;
 import org.enderstone.server.packet.NetworkManager;
