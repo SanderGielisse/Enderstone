@@ -42,8 +42,8 @@ public class MinecraftCompressionCodex extends MessageToByteEncoder<ByteBuf> {
 		
 		int startSize = incoming.readVarInt();
 		
-		{ // compress it
-			ByteBuf temporarilyBuf = Unpooled.buffer();
+		ByteBuf temporarilyBuf = Unpooled.buffer();
+		try { // compress it
 			
 			byte[] array = new byte[startSize];
 			incoming.readBytes(array); //the whole uncompressed packet
@@ -62,7 +62,9 @@ public class MinecraftCompressionCodex extends MessageToByteEncoder<ByteBuf> {
 			outgoing.writeVarInt(temporarilyBuf.readableBytes() + Packet.getVarIntSize(startSize));
 			outgoing.writeVarInt(startSize);
 			outgoing.writeBytes(temporarilyBuf);
+		} finally {
 			temporarilyBuf.release();
+			bufIn.release();
 		}
 	}
 }
