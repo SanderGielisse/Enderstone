@@ -48,6 +48,7 @@ public class BlockDefinitions {
 			blocks[BlockId.SAPLING.getId()] = new BlockDefinitionSapling();
 			blocks[BlockId.SPONGE.getId()] = new BlockDefinitionSponge();
 			blocks[BlockId.WOOD.getId()] = new BlockDefinitionWood();
+			blocks[BlockId.WORKBENCH.getId()] = new BlockDefinitionWorkbench();
 	};
 
 	public static BlockDefinition getBlock(BlockId type) {
