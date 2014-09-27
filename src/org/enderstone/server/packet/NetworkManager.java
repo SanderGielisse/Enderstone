@@ -18,9 +18,11 @@
 package org.enderstone.server.packet;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.io.IOException;
@@ -63,13 +65,16 @@ import org.enderstone.server.regions.EnderWorld;
 public class NetworkManager extends ChannelHandlerAdapter {
 
 	public ChannelHandlerContext ctx;
+	/**
+	 * MAIN THREAD USE ONLY
+	 */
 	public EnderPlayer player;
 	public String wantedName;
 	private EncryptionSettings encryptionSettings;
 	public UUID uuid;
 	public PlayerTextureStore skinBlob;
 	public int clientVersion;
-	
+
 	public PacketHandshake latestHandshakePacket;
 	public volatile int handShakeStatus = -1;
 
@@ -96,7 +101,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 		encryptionSettings.verifyToken = new byte[16];
 		Main.random.nextBytes(encryptionSettings.verifyToken);
 	}
-	
+
 	public void forcePacketFlush() {
 		synchronized (packets) {
 			Packet p;
@@ -111,8 +116,11 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
-		if (this.ctx == null)
-			this.ctx = ctx;
+		this.ctx = ctx;
+		if (isConnected == false) {
+			EnderLogger.warn("Skipping " + msg.getClass().getName() + " because closed connection!");
+			return;
+		}
 		((Packet) msg).onRecieve(this);
 		// EnderLogger.debug("in: " + msg);
 		forcePacketFlush();
@@ -128,26 +136,37 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		this.onDisconnect();
+		EnderLogger.debug("Inactive!");
 		super.channelInactive(ctx);
 	}
 
-	private void onDisconnect() {
-		if (this.isConnected == false) return;
-		synchronized (packets) {
-			if (this.isConnected == false) return;
-			this.isConnected = false;
-			this.packets.clear();
-			if (player != null && player.isOnline()) {
-				final EnderPlayer subPlayer = player;
-				Main.getInstance().sendToMainThread(new Runnable() {
+	@Override
+	public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+		EnderLogger.debug("Close!");
+		super.close(ctx, promise);
+	}
 
-					@Override
-					public void run() {
-						subPlayer.onDisconnect();
-					}
-				});
-				player.isOnline = false;
+	private void onDisconnect() {
+		Main.getInstance().sendToMainThread(new Runnable() {
+
+			@Override
+			public void run() {
+				disconnectConnection();
 			}
+		});
+
+	}
+
+	/**
+	 * MAIN THREAD ONLY
+	 */
+	private void disconnectConnection() {
+		if (this.isConnected == false) return;
+		if (player != null) player.onDisconnect();
+		player = null;
+		synchronized (packets) {
+			isConnected = false;
+			packets.clear();
 		}
 	}
 
@@ -169,7 +188,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 				this.packets.offer(packet);
 			}
 		}
-		if(this.player != null && this.player.isDead()){
+		if (this.player != null && this.player.isDead()) {
 			this.forcePacketFlush();
 		}
 	}
@@ -226,15 +245,19 @@ public class NetworkManager extends ChannelHandlerAdapter {
 			Main.getInstance().sendToMainThread(new Runnable() {
 
 				@Override
-				public void run() {					
+				public void run() {
 					EnderWorld world = Main.getInstance().worlds.get(0);
 					EnderLogger.info("Player " + wantedName + " spawning in world: " + world.worldName);
+					EnderPlayer existingPlayer = Main.getInstance().getPlayer(uuid);
+					if (existingPlayer != null) {
+						existingPlayer.networkManager.disconnect("Logged in from another location", false);
+					}
 					player = new EnderPlayer(world, wantedName, NetworkManager.this, uuid, skinBlob);
-					
+
 					//TEMPORARILY TEST
 					world.getBlock(world.getSpawn()).setBlock(BlockId.FIRE, (byte) 0);
 					world.getBlock(world.getSpawn().clone().add(1, 0, 0)).setBlock(BlockId.WATER, (byte) 0);
-					
+
 					world.players.add(player);
 					Main.getInstance().onlinePlayers.add(player);
 					try {
@@ -243,10 +266,10 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						sendPacket(new PacketOutUpdateTime(0, world.getTime()));
 						Location loc = player.getLocation();
 						loc.cloneFrom(world.getSpawn());
-						
+
 						PlayerJoinEvent e = new PlayerJoinEvent(player);
 						Main.getInstance().callEvent(e);
-						if(e.getDisconnectMessage() != null){
+						if (e.getDisconnectMessage() != null) {
 							disconnect(e.getDisconnectMessage().toPlainText(), false);
 							return;
 						}
@@ -297,6 +320,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	/**
 	 * Disconnected the player with the specified warning
+	 *
 	 * @param message the disconnect message
 	 * @deprecated This method doesn't know the real cause of the disconnect, use disconnect(Message, boolean) instead
 	 */
@@ -304,11 +328,11 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	public void disconnect(String message) {
 		this.disconnect(message, true);
 	}
-	
+
 	public void disconnect(String message, boolean byError) {
 		this.disconnect(new SimpleMessage(message), byError);
 	}
-	
+
 	@Deprecated
 	public void disconnect(Message message) {
 		this.disconnect(message, true);
@@ -316,47 +340,47 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	/**
 	 * Disconnects the player
+	 *
 	 * @param message the message to kick the player
 	 * @param byError if true, then the reason of the kick is printed in the console
 	 */
 	public void disconnect(Message message, boolean byError) {
 		try {
-			Main.getInstance().sendToMainThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					if(Main.getInstance().onlinePlayers.contains(player)){
-						Main.getInstance().onlinePlayers.remove(player);
-					}
-				}
-			});
-			
 			this.ctx.channel().pipeline().addFirst("packet_r_disconnected", new DiscardingReader());
 			Level level = byError ? Level.WARNING : Level.INFO;
 			if (this.player == null)
 				EnderLogger.logger.log(level, "Kicking unregistered channel " + this.digitalName() + ": " + message.toPlainText());
 			else
-				EnderLogger.logger.log(level, "Kicking " + this.digitalName() +": " + message.toPlainText());
+				EnderLogger.logger.log(level, "Kicking " + this.digitalName() + ": " + message.toPlainText());
 			Packet p = codex.getDisconnectionPacket(message);
-			this.ctx.channel().pipeline().addFirst(new DiscardingReader());
-			if (p != null)
-				ctx.write(p).addListener(ChannelFutureListener.CLOSE);
+			if (p != null) {
+				synchronized (packets) {
+					ChannelFuture f = ctx.write(p);
+					f.addListener(new ChannelFutureListener() {
+
+						@Override
+						public void operationComplete(ChannelFuture future) {
+							ctx.close();
+						}
+					});
+					ctx.flush();
+				}//ChannelFutureListener.CLOSE
+			} else
+				ctx.close();
 		} catch (Exception ex) {
 			EnderLogger.exception(ex);
-		}
-		finally
-		{
-			this.onDisconnect();
+		} finally {
+			this.disconnectConnection();
 		}
 	}
-	
-	public void enableCompression(){
+
+	public void enableCompression() {
 		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_r_decompressor", new MinecraftDecompressionCodex(this));
 		this.ctx.pipeline().addBefore("packet_rw_converter", "packet_w_compressor", new MinecraftCompressionCodex(this));
 	}
-	public String digitalName()
-	{
-		InetSocketAddress address = (InetSocketAddress)ctx.channel().remoteAddress();
-		return "["+address.getAddress()+"|"+address.getPort()+"]-("+String.valueOf(this.wantedName)+"";
+
+	public String digitalName() {
+		InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
+		return "[" + address.getAddress() + "|" + address.getPort() + "]-(" + String.valueOf(this.wantedName) + "";
 	}
 }

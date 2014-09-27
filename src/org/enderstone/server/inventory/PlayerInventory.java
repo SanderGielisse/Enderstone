@@ -35,7 +35,7 @@ public class PlayerInventory extends DefaultInventory {
 	public PlayerInventory(EnderPlayer player) {
 		super(InventoryType.PLAYER_INVENTORY, 45,
 				HalfInventoryListeners.toInventoryListener(
-						new CraftingInventoryListener(2, 2, 0, 1, DefaultCraftingRecipes.recipes)));
+						new CraftingInventoryListener(2, 2, 0, 1, DefaultCraftingRecipes.getRecipes())));
 		this.player = player;
 	}
 

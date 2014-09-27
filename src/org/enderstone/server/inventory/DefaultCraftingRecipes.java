@@ -18,18 +18,26 @@
 package org.enderstone.server.inventory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.enderstone.server.regions.BlockId;
 
 import static org.enderstone.server.regions.BlockId.*;
+import org.enderstone.server.util.MergedList;
 /**
  *
  * @author Fernando
  */
 public class DefaultCraftingRecipes {
 
-	public final static List<CraftingListener> recipes;
+	private static Collection<CraftingListener> recipes;
+	
+	private static final List<CraftingListener> vanilaRecipes;
+	
+	private static final List<CraftingListener> registeredRecipes = new ArrayList<>();
+	
+	private static boolean needsRebuild = true;
 
 	static {
 		List<SimpleRecipe>[] tmp = (List<SimpleRecipe>[]) new List<?>[3 * 3];
@@ -293,7 +301,7 @@ public class DefaultCraftingRecipes {
 				}
 			});
 		}
-		recipes = Collections.unmodifiableList(listener);
+		vanilaRecipes = Collections.unmodifiableList(listener);
 	}
 
 	private static void r(List<SimpleRecipe>[] tmp, ItemStack result, ItemStack[]... items) {
@@ -321,5 +329,52 @@ public class DefaultCraftingRecipes {
 			}
 		}
 		r(tmp, result, items1);
+	}
+
+	/**
+	 * @return the registered recipes
+	 */
+	public static Collection<? extends CraftingListener> getRecipes() {
+		return recipes;
+	}
+
+	/**
+	 * @return the recipes from vanila
+	 */
+	public static List<CraftingListener> getVanilaRecipes() {
+		return vanilaRecipes;
+	}
+	
+	public static void registerRecipeListener(CraftingListener listener) {
+		registeredRecipes.add(listener);
+		needsRebuild = true;
+	}
+	
+	public static void removeRecipeListener(CraftingListener listener) {
+		registeredRecipes.remove(listener);
+		needsRebuild = true;
+	}
+	
+	private static void buildRecipeList() {
+		recipes = Collections.unmodifiableCollection(new MergedList.Builder<CraftingListener>()
+				.addList(0, DefaultCraftingRecipes.registeredRecipes).
+				addList(DefaultCraftingRecipes.registeredRecipes.size(), vanilaRecipes)
+				.build());
+		needsRebuild = false;
+	}
+	private static boolean needsRebuildRecipeList() {
+		return needsRebuild;
+	}
+	
+	/**
+	 * INTERNAL-USE-ONLY
+	 * @return 
+	 */
+	public static int serverTick() {
+		if(needsRebuildRecipeList()) {
+			buildRecipeList();
+			return recipes.size();
+		}
+		return -1;
 	}
 }
