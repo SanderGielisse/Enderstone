@@ -335,7 +335,9 @@ public class EnderWorld implements World{
 			if (e.shouldBeRemoved()) {
 				it.remove();
 				if(e.shouldBroadcastDespawn()){
-					e.getWorld().broadcastPacket(new PacketOutEntityDestroy(new Integer[] { e.getEntityId() }), e.getLocation());
+					if (e.getWorld() instanceof EnderWorld) {
+						((EnderWorld) e.getWorld()).broadcastPacket(new PacketOutEntityDestroy(new Integer[] { e.getEntityId() }), e.getLocation());
+					}
 				}
 			}
 			e.serverTick();

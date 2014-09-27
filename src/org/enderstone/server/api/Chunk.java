@@ -19,15 +19,54 @@ package org.enderstone.server.api;
 
 public interface Chunk {
 
+	/**
+	 * Get the block at the specified location.
+	 * 
+	 * @param x x position of requested block
+	 * @param y y position of requested block
+	 * @param z z position of requested block
+	 * 
+	 * @return The block at the specified location.
+	 */
 	public Block getBlockAt(int x, int y, int z);
 
+	/**
+	 * Get the block at the specified location.
+	 * 
+	 * @param location the location of the requested block
+	 * 
+	 * @return The requested block
+	 */
 	public Block getBlockAt(Location location);
 
+	/**
+	 * Get the X position of the chunk.
+	 * 
+	 * @return The x position of the chunk
+	 */
 	public int getX();
 
+	/**
+	 * Get the Z position of the chunk.
+	 * 
+	 * @return The Z position of the chunk
+	 */
 	public int getZ();
 
+	/**
+	 * Get the world the chunk is in.
+	 * 
+	 * @return The world the chunk is in
+	 */
 	public World getWorld();
 
+	/**
+	 * Get the highest block at the specified location.
+	 * 
+	 * @param x x position of requested block
+	 * @param z z position of requested block
+	 * 
+	 * @return The highest block at the specified location
+	 */
 	public int getHighestBlockAt(int x, int z);
 }

@@ -34,6 +34,11 @@ public class SimpleMessage implements Message {
 		}
 	};
 
+	/**
+	 * Constructs a simple message from a string.
+	 * 
+	 * @param text the contents of the message
+	 */
 	public SimpleMessage(String text) {
 		this.text = text;
 	}
@@ -54,10 +59,16 @@ public class SimpleMessage implements Message {
 	public String toAsciiText() {
 		return toPlainText();
 	}
-	
-	public AdvancedMessage color(ChatColor ... colors)
+
+	/**
+	 * Combines multiple colors into an advanced message.
+	 * 
+	 * @param colors the colors to combine
+	 * 
+	 * @return AdvancedMessage with colors combined
+	 */
+	public AdvancedMessage color(ChatColor... colors)
 	{
 		return new AdvancedMessage().getBase().setText(text).combineColor(colors).build();
 	}
-
 }

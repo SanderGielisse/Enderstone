@@ -21,6 +21,7 @@ import java.util.Set;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
+import org.enderstone.server.api.World;
 import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.api.messages.AdvancedMessage;
 import org.enderstone.server.packet.Packet;
@@ -97,7 +98,9 @@ public abstract class EnderEntity implements Entity {
 		this.latestDamage = Main.getInstance().getCurrentServerTick();
 		
 		boolean death = this.damage(damage);
-		this.getWorld().broadcastPacket(new PacketOutEntityVelocity(getEntityId(), knockback), this.getLocation());
+		if (this.getWorld() instanceof EnderWorld) {
+			((EnderWorld) this.getWorld()).broadcastPacket(new PacketOutEntityVelocity(getEntityId(), knockback), this.getLocation());
+		}
 		return death;
 	}
 
@@ -224,7 +227,7 @@ public abstract class EnderEntity implements Entity {
 			return;
 		}
 		
-		EnderWorld world = this.getWorld();
+		World world = this.getWorld();
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();
 		double z = this.getLocation().getZ();
