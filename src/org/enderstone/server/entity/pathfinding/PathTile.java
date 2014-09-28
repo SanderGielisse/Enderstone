@@ -29,10 +29,8 @@ public class PathTile {
 	private final int yOffset;
 	private final int zOffset;
 
-	private double pastCost = -1;
-	private double futureCost = -1;
-
-	private double gridCost = -1;
+	private double goalCost = -1;
+	private double heuristicCost = -1;
 
 	private PathTile parent = null;
 
@@ -56,12 +54,12 @@ public class PathTile {
 		return zOffset;
 	}
 
-	public double getPastCost() {
-		return pastCost;
+	public double getGoalCost() {
+		return goalCost;
 	}
 
-	public double getFutureCost() {
-		return futureCost;
+	public double getHeuristicCost() {
+		return heuristicCost;
 	}
 
 	public PathTile getParent() {
@@ -116,9 +114,15 @@ public class PathTile {
 		return start.clone().add(xOffset, yOffset, zOffset);
 	}
 
-	public void calculatePastCost(int startX, int startY, int startZ, boolean update) {
+	public void calculateCost(int startX, int startY, int startZ, int endX, int endY, int endZ) {
 
-		if (update || (!update && pastCost == -1)) {
+		calculateGoalCost(xOffset, xOffset, xOffset);
+		calculateHeuristicCost(xOffset, xOffset, xOffset, xOffset, xOffset, xOffset);
+	}
+
+	private void calculateGoalCost(int startX, int startY, int startZ) {
+
+		if (goalCost == -1) {
 
 			PathTile currentTile = this;
 			PathTile currentParent;
@@ -149,19 +153,19 @@ public class PathTile {
 				currentTile = currentParent;
 			}
 
-			this.pastCost = pCost;
+			this.goalCost = pCost;
 		}
 	}
 
-	public void calculateFutureCost(int startX, int startY, int startZ, int endX, int endY, int endZ, boolean update) {
+	private void calculateHeuristicCost(int startX, int startY, int startZ, int endX, int endY, int endZ) {
 
-		if (update || (!update && futureCost == -1)) {
+		if (heuristicCost == -1) {
 
 			int futureX = startX + xOffset;
 			int futureY = startY + yOffset;
 			int futureZ = startZ + zOffset;
 
-			this.futureCost = getDistance(futureX, futureY, futureZ, endX, endY, endZ);
+			this.heuristicCost = getDistance(futureX, futureY, futureZ, endX, endY, endZ);
 		}
 	}
 

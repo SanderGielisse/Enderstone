@@ -50,7 +50,7 @@ public class PathFinder {
 
 	private final String endTileId;
 
-	private int result;
+	private boolean hasPath;
 
 	private boolean checkOnce;
 
@@ -80,8 +80,7 @@ public class PathFinder {
 
 		PathTile tile = new PathTile(0, 0, 0, null);
 
-		tile.calculatePastCost(startX, startY, startZ, true);
-		tile.calculateFutureCost(startX, startY, startZ, endX, endY, endZ, true);
+		tile.calculateCost(startX, startY, startZ, endX, endY, endZ);
 
 		openTiles.add(tile);
 
@@ -95,9 +94,9 @@ public class PathFinder {
 		return new Location(world, endX, endY, endZ, 0, 0);
 	}
 
-	public int getResult() {
+	public boolean hasPath() {
 
-		return result;
+		return hasPath;
 	}
 
 	public ArrayList<PathTile> getPath() {
@@ -108,7 +107,7 @@ public class PathFinder {
 
 			if (abs(startX - endX) > range || abs(startY - endY) > range || abs(startZ - endZ) > range) {
 
-				result = -1;
+				hasPath = false;
 
 				return null;
 			}
@@ -122,7 +121,7 @@ public class PathFinder {
 				processAdjacentTiles(currentTile);
 			}
 
-			if (this.result == -1) {
+			if (!hasPath) {
 
 				return null;
 			}
@@ -160,14 +159,14 @@ public class PathFinder {
 
 		if (openTiles.isEmpty()) {
 
-			result = -1;
+			hasPath = false;
 
 			return false;
 		}
 
 		if (closedTiles.containsKey(endTileId)) {
 
-			this.result = 0;
+			hasPath = true;
 
 			return false;
 		}
@@ -186,19 +185,18 @@ public class PathFinder {
 
 		for (PathTile t : openTiles.values()) {
 
-			t.calculatePastCost(startX, startY, startZ, true);
-			t.calculateFutureCost(startX, startY, startZ, endX, endY, endZ, true);
+			t.calculateCost(startX, startY, startZ, endX, endY, endZ);
 
 			if (cost == 0) {
 
-				cost = t.getPastCost() + t.getFutureCost();
+				cost = t.getGoalCost() + t.getHeuristicCost();
 
 				drop = t;
 			}
 
 			else {
 
-				double tileCost = t.getPastCost() + t.getFutureCost();
+				double tileCost = t.getGoalCost() + t.getHeuristicCost();
 
 				if (tileCost < cost) {
 
@@ -258,8 +256,7 @@ public class PathFinder {
 						}
 					}
 	
-					t.calculatePastCost(startX, startY, startZ, true);
-					t.calculateFutureCost(startX, startY, startZ, endX, endY, endZ, true);
+					t.calculateCost(startX, startY, startZ, endX, endY, endZ);
 
 					possible.add(t);
 				}
@@ -277,12 +274,11 @@ public class PathFinder {
 
 			else {
 
-				if ((t.getPastCost() + t.getFutureCost()) < (open.getPastCost() + open.getFutureCost())) {
+				if ((t.getGoalCost() + t.getHeuristicCost()) < (open.getGoalCost() + open.getHeuristicCost())) {
 
 					open.setParent(currentTile);
 
-					open.calculatePastCost(startX, startY, startZ, true);
-					open.calculateFutureCost(startX, startY, startZ, endX, endY, endZ, true);
+					t.calculateCost(startX, startY, startZ, endX, endY, endZ);
 				}
 			}
 		}
