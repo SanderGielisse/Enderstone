@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.enderstone.server.entity.ai.pathfinding;
+package org.enderstone.server.entity.pathfinding;
 
 import org.enderstone.server.api.Location;
 
