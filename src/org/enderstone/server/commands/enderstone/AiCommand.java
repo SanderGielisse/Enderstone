@@ -77,7 +77,7 @@ public class AiCommand extends SimpleCommand {
 								}
 							});
 
-							synchronized (AiCommand.this) {
+							synchronized (this) {
 
 								wait(500);
 							}
