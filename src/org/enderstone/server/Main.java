@@ -47,6 +47,7 @@ import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.commands.CommandMap;
+import org.enderstone.server.commands.enderstone.AiCommand;
 import org.enderstone.server.commands.enderstone.CraftingDebugCommand;
 import org.enderstone.server.commands.enderstone.DebugCommand;
 import org.enderstone.server.commands.enderstone.PingCommand;
@@ -120,6 +121,8 @@ public class Main implements Runnable {
 		commands.registerCommand(new DebugCommand());
 		commands.registerCommand(new WorldCommand());
 		commands.registerCommand(new CraftingDebugCommand());
+
+		commands.registerCommand(new AiCommand());
 	}
 
 	private static Main instance;

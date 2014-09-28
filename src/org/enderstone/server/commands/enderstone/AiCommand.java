@@ -37,7 +37,7 @@ import org.enderstone.server.entity.pathfinding.PathTile;
  */
 public class AiCommand extends SimpleCommand {
 
-	public AiCommand(String permissions, String name, int priority, String... aliasses) {
+	public AiCommand() {
 		super("command.enderstone.ai", "ai", CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY);
 	}
 
