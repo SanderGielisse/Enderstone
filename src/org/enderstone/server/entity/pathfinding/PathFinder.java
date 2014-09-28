@@ -189,14 +189,16 @@ public class PathFinder {
 			t.calculatePastCost(startX, startY, startZ, true);
 			t.calculateFutureCost(startX, startY, startZ, endX, endY, endZ, true);
 
-			double tileCost = t.getPastCost() + t.getFutureCost();
-
 			if (cost == 0) {
+
+				cost = t.getPastCost() + t.getFutureCost();
 
 				drop = t;
 			}
 
 			else {
+
+				double tileCost = t.getPastCost() + t.getFutureCost();
 
 				if (tileCost < cost) {
 

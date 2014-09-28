@@ -26,10 +26,12 @@ import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.EntitySpider;
 import org.enderstone.server.entity.pathfinding.PathFinder;
 import org.enderstone.server.entity.pathfinding.PathTile;
+import org.enderstone.server.regions.BlockId;
 
 /**
  *
@@ -46,15 +48,9 @@ public class AiCommand extends SimpleCommand {
 
 		if (sender instanceof EnderPlayer) {
 
-			EnderPlayer player = (EnderPlayer) sender;
+			final EnderPlayer player = (EnderPlayer) sender;
 
-			final Location start = player.getLocation().clone().add(0, -1, 0);
-
-			PathFinder pathfinder = new PathFinder(start, new Location(player.getWorld(), 0, 63, 0, 0, 0), 32);
-
-			final List<PathTile> path = pathfinder.getPath();
-
-			final EntitySpider aispider = new EntitySpider(player.getWorld(), path.get(0).getLocation(start).clone().add(0, 1, 0));
+			final EntitySpider aispider = new EntitySpider(player.getWorld(), new Location(player.getWorld(), 0.5, 64, 0.5, 0, 0));
 
 			player.getWorld().addEntity(aispider);
 
@@ -64,22 +60,46 @@ public class AiCommand extends SimpleCommand {
 				public void run() {
 
 					try {
-						for (int i = 1; i < path.size(); i++) {
 
-							final int node = i; 
+						while (!aispider.isDead()) {
 
-							Main.getInstance().sendToMainThread(new Runnable() {
+							final Location start = getBlockUnderEntity(aispider);
 
-								@Override
-								public void run() {
+							Location playerLoc = getBlockUnderEntity(player);
 
-									aispider.teleport(path.get(node).getLocation(start).clone().add(0, 1, 0));
+							PathFinder pathfinder = new PathFinder(start, playerLoc, 32);
+
+							if (pathfinder.getResult() == -1) {
+
+								synchronized (this) {
+
+									wait(5000);//Wait 5 seconds before trying again
+
+									continue;
 								}
-							});
+							}
 
-							synchronized (this) {
+							final List<PathTile> path = pathfinder.getPath();
 
-								wait(500);
+							for (int i = 1; i < Math.min(path.size(), 5); i++) {
+
+								final int node = i; 
+
+								Main.getInstance().sendToMainThread(new Runnable() {
+
+									@Override
+									public void run() {
+
+										aispider.teleport(path.get(node).getLocation(start).clone().add(0.5, 1, 0.5));
+
+										aispider.getWorld().getBlock(path.get(node).getLocation(start)).setBlock(BlockId.GLASS, (byte) 0);
+									}
+								});
+
+								synchronized (this) {
+
+									wait(100);
+								}
 							}
 						}
 					}
@@ -87,6 +107,21 @@ public class AiCommand extends SimpleCommand {
 					catch(InterruptedException ex) {
 
 						System.out.println("Move thread interupted");
+					}
+				}
+
+				private Location getBlockUnderEntity(EnderEntity e) {
+
+					Location check = e.getLocation().clone();
+
+					for (int i = 0;; i++) {
+
+						if (!e.getWorld().getBlock(check).getBlock().doesInstantBreak()) {
+
+							return check;
+						}
+
+						check.add(0, -1, 0);
 					}
 				}
 			};

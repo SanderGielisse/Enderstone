@@ -32,6 +32,8 @@ public class PathTile {
 	private double pastCost = -1;
 	private double futureCost = -1;
 
+	private double gridCost = -1;
+
 	private PathTile parent = null;
 
 	public PathTile(int x, int y, int z, PathTile parent) {
@@ -116,7 +118,7 @@ public class PathTile {
 
 	public void calculatePastCost(int startX, int startY, int startZ, boolean update) {
 
-		if (update ^ pastCost == -1) {
+		if (update || (!update && pastCost == -1)) {
 
 			PathTile currentTile = this;
 			PathTile currentParent;
@@ -131,12 +133,12 @@ public class PathTile {
 
 				if (dx == 1 && dy == 1 && dz == 1) {
 
-					pCost += 1.7;//Square root of 3
+					pCost += 1.7;//Square root of 3 (length of bottom left of cube to top right of cube)
 				}
 
-				else if ((dx == 1 || dz == 1) && (dy == 1 || dy == 0)) {
+				else if (((dx == 1 || dz == 1) && dy == 1) || ((dx == 1 || dz == 1) && dy == 0)) {
 
-					pCost += 1.4;//Square root of 2
+					pCost += 1.4;//Square root of 2 (length of bottom left of square to top right of square)
 				}
 
 				else {
@@ -153,7 +155,7 @@ public class PathTile {
 
 	public void calculateFutureCost(int startX, int startY, int startZ, int endX, int endY, int endZ, boolean update) {
 
-		if (update ^ pastCost == -1) {
+		if (update || (!update && futureCost == -1)) {
 
 			int futureX = startX + xOffset;
 			int futureY = startY + yOffset;
