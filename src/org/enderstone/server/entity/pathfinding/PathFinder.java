@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.World;
@@ -97,7 +98,7 @@ public class PathFinder {
 		if (!checkOnce) {
 
 			checkOnce ^= true;
-	
+
 			if (abs(startX - endX) > range || abs(startY - endY) > range || abs(startZ - endZ) > range) {
 
 				result = -1;
@@ -227,29 +228,52 @@ public class PathFinder {
 						continue;
 					}
 
-					if (x != 0 && z != 0 && (y == 0 || y == 1)) {
+					if (!canWalkOn(t)) {
 
-						PathTile xOffset = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset(), currentTile);
-						PathTile zOffset = new PathTile(currentTile.getXOffset(), currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile);
-	
-						if (!(canWalkOn(xOffset) || (canWalkOn(zOffset)))) {
-	
-							continue;
-						}
+						continue;
 					}
-	
+
 					if (closedTiles.containsKey(t.toString())) {
 	
 						continue;
 					}
-	
-					if (canWalkOn(t)) {
-	
-						t.calculatePastCost(startX, startY, startZ, true);
-						t.calculateFutureCost(startX, startY, startZ, endX, endY, endZ, true);
 
-						possible.add(t);
+					if (x != 0 && z != 0 && (y == 0 || y == 1)) {
+
+						PathTile xOffset = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset(), currentTile);
+						PathTile zOffset = new PathTile(currentTile.getXOffset(), currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile);
+
+						if (!((canWalkOn(xOffset) || (canWalkOn(zOffset))))) {
+
+							continue;
+						}
 					}
+	
+					t.calculatePastCost(startX, startY, startZ, true);
+					t.calculateFutureCost(startX, startY, startZ, endX, endY, endZ, true);
+
+					possible.add(t);
+				}
+			}
+		}
+
+		for (PathTile t : possible) {
+
+			PathTile open = openTiles.get(t.toString());
+
+			if (open == null) {
+
+				openTiles.add(t, false);
+			}
+
+			else {
+
+				if ((t.getPastCost() + t.getFutureCost()) < (open.getPastCost() + open.getFutureCost())) {
+
+					open.setParent(currentTile);
+
+					open.calculatePastCost(startX, startY, startZ, true);
+					open.calculateFutureCost(startX, startY, startZ, endX, endY, endZ, true);
 				}
 			}
 		}
@@ -260,6 +284,14 @@ public class PathFinder {
 
 		BlockId type = world.getBlockIdAt(startX + t.getXOffset(), startY + t.getYOffset(), startZ + t.getZOffset());
 
-		return !(type.doesInstantBreak() || type == BlockId.LAVA || type == BlockId.LAVA_FLOWING || type == BlockId.FIRE || type == BlockId.CROPS || type == BlockId.LADDER || type == BlockId || type == BlockId.FENCE || type == BlockId.FENCE_GATE || type == BlockId.NETHER_FENCE);
+		if (!(type.doesInstantBreak() || type == BlockId.LAVA || type == BlockId.LAVA_FLOWING || type == BlockId.FIRE || type == BlockId.CROPS || type == BlockId.LADDER || type == BlockId.FENCE || type == BlockId.FENCE_GATE || type == BlockId.NETHER_FENCE)) {
+
+			BlockId type2 = world.getBlockIdAt(startX + t.getXOffset(), startY + t.getYOffset() + 1, startZ + t.getZOffset());
+			BlockId type3 = world.getBlockIdAt(startX + t.getXOffset(), startY + t.getYOffset() + 2, startZ + t.getZOffset());
+
+			return type2.doesInstantBreak() && type3 == BlockId.AIR;
+		}
+
+		return false;
 	}
 }
