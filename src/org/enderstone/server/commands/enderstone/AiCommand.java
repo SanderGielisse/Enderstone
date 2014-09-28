@@ -76,11 +76,11 @@ public class AiCommand extends SimpleCommand {
 									aispider.teleport(path.get(node).getLocation(start).clone().add(0, 1, 0));
 								}
 							});
-						}
 
-						synchronized (this) {
+							synchronized (AiCommand.this) {
 
-							wait(500);
+								wait(500);
+							}
 						}
 					}
 
