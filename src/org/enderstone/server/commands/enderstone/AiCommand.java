@@ -69,7 +69,9 @@ public class AiCommand extends SimpleCommand {
 
 							PathFinder pathfinder = new PathFinder(start, playerLoc, 32);
 
-							if (pathfinder.getResult() == -1) {
+							final List<PathTile> path = pathfinder.getPath();
+
+							if (!pathfinder.hasPath()) {
 
 								synchronized (this) {
 
@@ -79,9 +81,7 @@ public class AiCommand extends SimpleCommand {
 								}
 							}
 
-							final List<PathTile> path = pathfinder.getPath();
-
-							for (int i = 1; i < Math.min(path.size(), 5); i++) {
+							for (int i = 1; i < Math.min(path.size(), 100); i++) {
 
 								final int node = i; 
 
