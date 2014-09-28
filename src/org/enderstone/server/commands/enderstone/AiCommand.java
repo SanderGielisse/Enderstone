@@ -63,26 +63,30 @@ public class AiCommand extends SimpleCommand {
 				@Override
 				public void run() {
 
-					for (int i = 1; i < path.size(); i++) {
+					try {
+						for (int i = 1; i < path.size(); i++) {
 
-						final int node = i; 
+							final int node = i; 
 
-						Main.getInstance().sendToMainThread(new Runnable() {
+							Main.getInstance().sendToMainThread(new Runnable() {
 
-							@Override
-							public void run() {
+								@Override
+								public void run() {
 
-								aispider.teleport(path.get(node).getLocation(start).clone().add(0, 1, 0));
-							}
-						});
-
-						try {
-							synchronized (this) {
-							wait(500);
-							}
-						} catch (InterruptedException ex) {
-							Logger.getLogger(PingCommand.class.getName()).log(Level.SEVERE, null, ex);
+									aispider.teleport(path.get(node).getLocation(start).clone().add(0, 1, 0));
+								}
+							});
 						}
+
+						synchronized (this) {
+
+							wait(500);
+						}
+					}
+
+					catch(InterruptedException ex) {
+
+						System.out.println("Move thread interupted");
 					}
 				}
 			};
