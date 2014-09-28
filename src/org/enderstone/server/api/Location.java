@@ -280,13 +280,14 @@ public class Location implements Cloneable {
 	 * 
 	 * @param spawn location to transform into
 	 */
-	public void cloneFrom(Location spawn) {
+	public Location cloneFrom(Location spawn) {
 		this.world = spawn.world;
 		this.x = spawn.x;
 		this.y = spawn.y;
 		this.z = spawn.z;
 		this.yaw = spawn.yaw;
 		this.pitch = spawn.pitch;
+		return this;
 	}
 
 	/**

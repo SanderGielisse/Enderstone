@@ -40,6 +40,6 @@ public class BlockDefinitionWorkbench extends BlockDefinition {
 	
 	@Override
 	public void onRightClick(EnderPlayer player, Block block) {
-		player.getInventoryHandler().openInventory(new CraftingInventory(player.getLocation().clone()));
+		player.getInventoryHandler().openInventory(new CraftingInventory(player.getLocation()));
 	}
 }

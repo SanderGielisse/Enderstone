@@ -83,6 +83,7 @@ public class PacketInPlayerLook extends Packet {
 				}
 				loc.setPitch(getPitch());
 				loc.setYaw(getYaw());
+				networkManager.player.setLocation(loc);
 				networkManager.player.setOnGround(isOnGround());
 			}
 		});

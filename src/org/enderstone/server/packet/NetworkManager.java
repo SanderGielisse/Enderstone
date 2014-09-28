@@ -262,7 +262,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) player.clientSettings.gameMode.getId(), (byte) 0, (byte) 1, (byte) 60, "default", false));
 						sendPacket(new PacketOutUpdateTime(0, world.getTime()));
 						Location loc = player.getLocation();
-						loc.cloneFrom(world.getSpawn());
+						player.setLocation(loc.cloneFrom(world.getSpawn()));
 
 						PlayerJoinEvent e = new PlayerJoinEvent(player);
 						Main.getInstance().callEvent(e);

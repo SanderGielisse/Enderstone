@@ -261,7 +261,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		boolean succes = currentWorld.players.remove(this);
 		assert succes;
 		toWorld.players.add(this);
-		this.getLocation().cloneFrom(toWorld.getSpawn());
+		this.setLocation(this.getLocation().cloneFrom(toWorld.getSpawn()));
 		this.loadedChunks.clear();
 		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 3);
 		networkManager.player.getInventoryHandler().updateInventory();
@@ -611,7 +611,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	
 	public void teleportInternally(Location newLocation){
 		this.waitingForValidMoveAfterTeleport = 1;
-		this.getLocation().cloneFrom(newLocation);
+		this.setLocation(this.getLocation().cloneFrom(newLocation));
 
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(newLocation.getX(), newLocation.getY(), newLocation.getZ(), newLocation.getYaw(), newLocation.getPitch(), (byte) 0b00000));
 

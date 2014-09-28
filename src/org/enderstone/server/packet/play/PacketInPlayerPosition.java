@@ -102,6 +102,7 @@ public class PacketInPlayerPosition extends Packet {
 				loc.setX(getX());
 				loc.setY(getFeetY());
 				loc.setZ(getZ());
+				networkManager.player.setLocation(loc);
 				networkManager.player.setOnGround(isOnGround());
 
 			}
