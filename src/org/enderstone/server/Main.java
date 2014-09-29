@@ -259,7 +259,7 @@ public class Main implements Runnable {
 				}
 				this.lastTick += Main.EXCEPTED_SLEEP_TIME;
 				long sleepTime = (lastTick) - System.currentTimeMillis();
-				
+
 				if (sleepTime < Main.CANT_KEEP_UP_TIMEOUT) {
 					this.warn("Can't keep up! " + -(sleepTime / Main.EXCEPTED_SLEEP_TIME) + " ticks behind!");
 					this.lastTick = System.currentTimeMillis();

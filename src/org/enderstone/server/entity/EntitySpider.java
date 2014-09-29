@@ -51,4 +51,8 @@ public class EntitySpider extends EntityMob{
 		}
 	}
 
+	@Override
+	public float getMovementSpeed() {
+		return 4;
+	}
 }

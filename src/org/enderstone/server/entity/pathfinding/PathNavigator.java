@@ -48,6 +48,8 @@ public class PathNavigator {
 		this.start = start;
 
 		this.path = path;
+
+		currentTile = 0;
 	}
 
 	//Goals should be added in order of priority
@@ -89,16 +91,16 @@ public class PathNavigator {
 				currentTile++;
 			}
 
-			Location nextDestination = path.get(currentTile).getLocation(start);
+			Location nextDestination = path.get(currentTile).getLocation(start).add(0, 1, 0);
 
-			Vector difference = Vector.substract(nextDestination, mob.getLocation());
+			Vector difference = Vector.substract(mob.getLocation(), nextDestination);
 
 			float speed = mob.getMovementSpeed() / 20;//20 ticks per second
 
 			difference.setX(difference.getX() > 0 ? Math.min(difference.getX(), speed) : Math.max(difference.getX(), -speed));
 			difference.setY(difference.getY() > 0 ? Math.min(difference.getY(), speed) : Math.max(difference.getY(), -speed));
 			difference.setZ(difference.getZ() > 0 ? Math.min(difference.getZ(), speed) : Math.max(difference.getZ(), -speed));
-System.out.println(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
+
 			//Change new move method
 			mob.teleport(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
 		}

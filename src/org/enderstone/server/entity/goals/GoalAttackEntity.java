@@ -26,6 +26,8 @@ public class GoalAttackEntity implements Goal {
 
 	private EnderEntity target;
 
+	private int lastUpdate;
+
 	public GoalAttackEntity(EntityMob mob, Class<? extends Entity> targetType) {
 
 		this.mob = mob;
@@ -62,6 +64,32 @@ public class GoalAttackEntity implements Goal {
 	@Override
 	public void start() {
 
+		pathfindToTarget();
+	}
+
+	@Override
+	public void run() {
+
+		lastUpdate++;
+
+		if (lastUpdate > 20) {
+
+			lastUpdate = 0;
+
+			pathfindToTarget();
+		}
+	};
+
+	@Override
+	public void reset() {
+
+		target = null;
+
+		mob.getNavigator().setPath(null, null);
+	}
+
+	private void pathfindToTarget() {
+
 		PathFinder pathfinder = new PathFinder(mob.getLocation(), target.getLocation(), 32);
 
 		List<PathTile> path = pathfinder.getPath();
@@ -75,19 +103,5 @@ public class GoalAttackEntity implements Goal {
 
 			mob.getNavigator().setPath(null, null);
 		}
-	}
-
-	@Override
-	public void run() {
-
-		//Update the path
-	};
-
-	@Override
-	public void reset() {
-
-		target = null;
-
-		mob.getNavigator().setPath(null, null);
 	}
 }
