@@ -19,6 +19,7 @@ package org.enderstone.server.inventory;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.enderstone.server.api.messages.CachedMessage;
@@ -224,11 +225,7 @@ public abstract class DefaultInventory extends AbstractInventory {
 
 	@Override // TODO Look at the slot and see if the clicked inventory is part of this inventory or not
 	public List<Integer> getShiftClickLocations(int slot) {
-		List<Integer> list = new ArrayList<>();
-		for (int i = 0; i < getSize(); i++) {
-			list.add(i);
-		}
-		return list;
+		return Collections.emptyList();
 	}
 
 }
