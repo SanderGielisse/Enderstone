@@ -23,7 +23,9 @@ import java.util.Set;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
+import org.enderstone.server.api.entity.Mob;
 import org.enderstone.server.entity.drops.EntityDrop;
+import org.enderstone.server.entity.pathfinding.PathNavigator;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
@@ -38,10 +40,11 @@ import org.enderstone.server.packet.play.PacketOutSpawnMob;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
 
-public abstract class EntityMob extends EnderEntity {
+public abstract class EntityMob extends EnderEntity implements Mob {
 
-	private byte appearanceId;
-	private EnderWorld world;
+	private final byte appearanceId;
+	private final EnderWorld world;
+	private final PathNavigator navigator = new PathNavigator();
 
 	EntityMob(byte appearanceId, EnderWorld world, Location location) {
 		super(location);
@@ -222,5 +225,10 @@ public abstract class EntityMob extends EnderEntity {
 	@Override
 	public float getHeight() {
 		return 1.6F;
+	}
+
+	@Override
+	public PathNavigator getNavigator() {
+		return navigator;
 	}
 }

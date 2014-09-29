@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
 
@@ -54,7 +55,10 @@ public class PathFinder {
 
 	private boolean checkOnce;
 
-	public PathFinder(Location start, Location end, int range) {
+	public PathFinder(Location startLoc, Location endLoc, int range) {
+
+		Location start = getBlockUnderLocation(startLoc);
+		Location end = getBlockUnderLocation(endLoc);
 
 		if (start.getWorld().getBlockIdAt(start).doesInstantBreak()) {
 
@@ -298,5 +302,20 @@ public class PathFinder {
 		}
 
 		return false;
+	}
+
+	private Location getBlockUnderLocation(Location loc) {
+
+		Location check = loc.clone();
+
+		for (int i = 0;; i++) {
+
+			if (!loc.getWorld().getBlock(check).getBlock().doesInstantBreak()) {
+
+				return check;
+			}
+
+			check.add(0, -1, 0);
+		}
 	}
 }
