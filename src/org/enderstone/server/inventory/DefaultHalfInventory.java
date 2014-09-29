@@ -215,7 +215,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 	}
 
 	@Override
-	public Inventory openFully(PlayerInventory inventory) {
+	public Inventory openFully(HalfInventory inventory) {
 		FullInventory tmp = new FullInventory(inventory, this.combineItems(inventory));
 		this.fullInventories.add(tmp);
 		return tmp;
@@ -226,7 +226,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 		return DropType.ALL_ALLOWED;
 	}
 
-	protected abstract MergedList<ItemStack> combineItems(PlayerInventory inventory);
+	protected abstract MergedList<ItemStack> combineItems(HalfInventory inventory);
 
 	protected final List<FullInventory> fullInventories = new ArrayList<>();
 
@@ -235,7 +235,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 		private final List<ItemStack> items;
 		private boolean closed = false;
 
-		public FullInventory(PlayerInventory inventory, MergedList items) {
+		public FullInventory(HalfInventory inventory, MergedList items) {
 			this.items = items;
 			this.listeners = new CopyOnWriteArrayList<>();
 		}
@@ -276,7 +276,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 		}
 
 		@Override
-		public Inventory openFully(PlayerInventory inventory) {
+		public Inventory openFully(HalfInventory inventory) {
 			return this;
 		}
 

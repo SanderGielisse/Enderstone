@@ -204,7 +204,7 @@ public abstract class DefaultInventory extends AbstractInventory {
 	}
 
 	@Override
-	public Inventory openFully(PlayerInventory inventory) {
+	public Inventory openFully(HalfInventory inventory) {
 		return this;
 	}
 

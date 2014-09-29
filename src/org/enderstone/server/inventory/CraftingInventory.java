@@ -47,7 +47,7 @@ public class CraftingInventory extends DefaultHalfInventory {
 	}
 
 	@Override
-	public Inventory openFully(PlayerInventory inventory) {
+	public Inventory openFully(HalfInventory inventory) {
 		Inventory inv = super.openFully(inventory);
 		inv.addListener(new InventoryListener() {
 
@@ -69,7 +69,7 @@ public class CraftingInventory extends DefaultHalfInventory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected MergedList<ItemStack> combineItems(PlayerInventory inventory) {
+	protected MergedList<ItemStack> combineItems(HalfInventory inventory) {
 		return new MergedList.Builder<ItemStack>().addList(0, this.items, 0, 10).addList(10, inventory.getRawItems(), 9, 36).build();
 	}
 
