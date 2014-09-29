@@ -64,7 +64,6 @@ public class MinecraftCompressionCodex extends MessageToByteEncoder<ByteBuf> {
 			outgoing.writeBytes(temporarilyBuf);
 		} finally {
 			temporarilyBuf.release();
-			bufIn.release();
 		}
 	}
 }

@@ -27,6 +27,13 @@ public class Vector {
 	public double motY;
 	public double motZ;
 
+	/**
+	 * Creates a new vector with the X, Y, and Z values assigned to both it's location and velocity.
+	 * 
+	 * @param x the location and velocity of the vector along the X axis
+	 * @param y the location and velocity of the vector along the Y axis
+	 * @param z the location and velocity of the vector along the Z axis
+	 */
 	public Vector(double x, double y, double z) {
 		this.x = x;
 		this.y = y;
@@ -36,34 +43,79 @@ public class Vector {
 		this.motZ = z;
 	}
 
+	/**
+	 * Get the X location of the vector.
+	 * 
+	 * @return The X location of the vector
+	 */
 	public double getX() {
 		return x;
 	}
 
+	/**
+	 * Set the X location of the vector.
+	 * 
+	 * @param x the new X location of the vector
+	 */
 	public void setX(double x) {
 		this.x = x;
 	}
 
+	/**
+	 * Get the Y location of the vector.
+	 * 
+	 * @return The Y location of the vector
+	 */
 	public double getY() {
 		return y;
 	}
 
+	/**
+	 * Set the Y location of the vector.
+	 * 
+	 * @param y the new Y location of the vector
+	 */
 	public void setY(double y) {
 		this.y = y;
 	}
 
+	/**
+	 * Get the Z location of the vector.
+	 * 
+	 * @return The Z location of the vector
+	 */
 	public double getZ() {
 		return z;
 	}
 
+	/**
+	 * Set the Z location of the vector.
+	 * 
+	 * @param z the new Z location of the vector
+	 */
 	public void setZ(double z) {
 		this.z = z;
 	}
 
+	/**
+	 * Gets the vector of the difference of two locations.
+	 * 
+	 * @param fromLocation starting location
+	 * @param toLocation ending location
+	 * 
+	 * @return The difference of two locations
+	 */
 	public static Vector substract(Location fromLocation, Location toLocation) {
 		return new Vector(toLocation.getX() - fromLocation.getX(), toLocation.getY() - fromLocation.getY(), toLocation.getZ() - fromLocation.getZ());
 	}
-	
+
+	/**
+	 * Normalize the vector and also returns itself.
+	 * 
+	 * @param distance the distance to normalize
+	 * 
+	 * @return The normalized vector
+	 */
 	public Vector normalize(double distance){
 		this.x = x / distance;
 		this.y = y / distance;

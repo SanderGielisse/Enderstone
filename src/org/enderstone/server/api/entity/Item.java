@@ -20,7 +20,12 @@ package org.enderstone.server.api.entity;
 import org.enderstone.server.inventory.ItemStack;
 
 public interface Item extends Entity{
-	
+
+	/**
+	 * Get the itemstack of the dropped item.
+	 * 
+	 * @return The itemstack of the dropped item
+	 */
 	public ItemStack getItemStack();
 	
 }

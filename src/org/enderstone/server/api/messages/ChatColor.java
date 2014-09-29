@@ -46,6 +46,11 @@ public enum ChatColor {
 
 	private final String data;
 
+	/**
+	 * Creates a new element of ChatColor
+	 * 
+	 * @param data the color code of the new element
+	 */
 	private ChatColor(String data) {
 		this.data = data;
 	}

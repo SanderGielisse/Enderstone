@@ -26,10 +26,20 @@ public class PlayerJoinEvent extends Event {
 	private Message disconnectMessage = null;
 	private final Player player;
 
+	/**
+	 * PlayerJoinEvent is called when a player joins a server.
+	 * 
+	 * @param player the player that joined the server
+	 */
 	public PlayerJoinEvent(Player player) {
 		this.player = player;
 	}
 
+	/**
+	 * Get the player that joined the server.
+	 * 
+	 * @return The player that joined the server
+	 */
 	public Player getPlayer() {
 		return player;
 	}

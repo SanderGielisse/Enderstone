@@ -29,10 +29,44 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
 	private final Location fromLocation;
 	private final Location toLocation;
 
+	/**
+	 * PlayerTeleportEvent is called when a player teleports to a new location.
+	 * 
+	 * @param player the player that teleported
+	 * @param fromLocation the location the player teleported from
+	 * @param toLocation the location the player teleported to
+	 */
 	public PlayerTeleportEvent(Player player, Location fromLocation, Location toLocation) {
 		this.player = player;
 		this.fromLocation = fromLocation;
 		this.toLocation = toLocation;
+	}
+
+	/**
+	 * Get the player that teleported.
+	 * 
+	 * @return The player that teleported
+	 */
+	public Player getPlayer() {
+		return player;
+	}
+
+	/**
+	 * Get the location the player teleported from.
+	 * 
+	 * @return The location the player teleported from
+	 */
+	public Location getFromLocation() {
+		return fromLocation;
+	}
+
+	/**
+	 * Get the location the player teleported to.
+	 * 
+	 * @return The location the player teleported to
+	 */
+	public Location getToLocation() {
+		return toLocation;
 	}
 
 	@Override
@@ -43,17 +77,5 @@ public class PlayerTeleportEvent extends Event implements Cancellable {
 	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
-	}
-
-	public Player getPlayer() {
-		return player;
-	}
-
-	public Location getFromLocation() {
-		return fromLocation;
-	}
-
-	public Location getToLocation() {
-		return toLocation;
 	}
 }

@@ -18,17 +18,51 @@
 package org.enderstone.server.api.event.player;
 
 import org.enderstone.server.api.entity.Player;
+import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
 
-public class PlayerToggleSprintEvent extends Event {
+public class PlayerToggleSprintEvent extends Event implements Cancellable {
 
+	private boolean cancelled = false;
 	private final Player player;
+	private final boolean sprinting;
 
-	public PlayerToggleSprintEvent(Player player) {
+	/**
+	 * PlayerToggleSprintEvent is called when a player starts or stops sprinting.
+	 * 
+	 * @param player the player that either started or stopped sprinting
+	 * @param sprinting whether or not the player started sprinting
+	 */
+	public PlayerToggleSprintEvent(Player player, boolean sprinting) {
 		this.player = player;
+		this.sprinting = sprinting;
 	}
 
+	/**
+	 * Get the player that either started or stopped sprinting.
+	 * 
+	 * @return 
+	 */
 	public Player getPlayer() {
 		return player;
+	}
+
+	/**
+	 * Get whether or not the player started sprinting.
+	 * 
+	 * @return Whether or not the player started sprinting
+	 */
+	public boolean isSprinting() {
+		return sprinting;
+	}
+
+	@Override
+	public boolean isCancelled() {
+		return this.cancelled;
+	}
+
+	@Override
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
 	}
 }

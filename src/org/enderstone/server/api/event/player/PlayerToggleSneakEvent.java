@@ -25,9 +25,35 @@ public class PlayerToggleSneakEvent extends Event implements Cancellable {
 
 	private boolean cancelled = false;
 	private final Player player;
+	private final boolean sneaking;
 
-	public PlayerToggleSneakEvent(Player player) {
+	/**
+	 * PlayerToggleSneakEvent is called when a player starts or stops sneaking.
+	 * 
+	 * @param player the player that either started or stopped sneaking
+	 * @param sneaking whether or not the player started sneaking
+	 */
+	public PlayerToggleSneakEvent(Player player, boolean sneaking) {
 		this.player = player;
+		this.sneaking = sneaking;
+	}
+
+	/**
+	 * Get the player that either started or stopped sneaking.
+	 * 
+	 * @return The player that either started or stopped sneaking
+	 */
+	public Player getPlayer() {
+		return player;
+	}
+
+	/**
+	 * Get whether or not the player started sneaking.
+	 * 
+	 * @return Whether or not the player started sneaking
+	 */
+	public boolean isSneaking() {
+		return sneaking;
 	}
 
 	@Override
@@ -38,9 +64,5 @@ public class PlayerToggleSneakEvent extends Event implements Cancellable {
 	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
-	}
-
-	public Player getPlayer() {
-		return player;
 	}
 }

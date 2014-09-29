@@ -19,34 +19,105 @@ package org.enderstone.server.api.entity;
 
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
+import org.enderstone.server.api.World;
 import org.enderstone.server.entity.EnderEntity;
-import org.enderstone.server.regions.EnderWorld;
 
 public interface Entity {
 
+	/**
+	 * Teleports the entity to the given location.
+	 * 
+	 * @param loc The location to be teleported to
+	 */
 	public void teleport(Location loc);
 
+	/**
+	 * Teleports the entity to another entity.
+	 * 
+	 * @param loc The other entity to be teleported to
+	 */
 	public void teleport(EnderEntity e);
 
+	/**
+	 * Get the location of the entity.
+	 * 
+	 * @return The location of the entity
+	 */
 	public Location getLocation();
 
+	/**
+	 * Get the health of the entity.
+	 * 
+	 * @return The health of the entity
+	 */
 	public float getHealth();
 
+	/**
+	 * Set the health of the entity.
+	 * 
+	 * @param health The health to set the entity to
+	 * 
+	 * @return true if successfully set
+	 */
 	public boolean setHealth(float health);
 
+	/**
+	 * Get the maximum health of the entity.
+	 * 
+	 * @return The maximum health of the entity
+	 */
 	public float getMaxHealth();
 
+	/**
+	 * Set the maximum health of the entity,
+	 * 
+	 * @param maxhealth The maximum health to set the entity to
+	 */
 	public void setMaxHealth(float maxhealth);
 
-	public EnderWorld getWorld();
+	/**
+	 * Get the world the entity is in.
+	 * 
+	 * @return The world the entity is in
+	 */
+	public World getWorld();
 
+	/**
+	 * Get the ticks that the entity will be on fire for.
+	 * 
+	 * @return The ticks that the entity will be on fire for.
+	 */
 	public int getFireTicks();
 
+	/**
+	 * Set the ticks the entity will be on fire for.
+	 * 
+	 * @param fireTicks The ticks the entity will be set on fire for
+	 */
 	public void setFireTicks(int fireTicks);
 	
+	/**
+	 * Damage the entity
+	 * 
+	 * @param damage amount to damage the entity by
+	 * 
+	 * @return true if player survived damage
+	 */
 	public boolean damage(float damage);
-	
+
+	/**
+	 * Damage the entity and knock back player.
+	 * 
+	 * @param damage amount to damage the entity by
+	 * @param knockback vector to knockback the player by
+	 * 
+	 * @return true if player survived damage
+	 */
 	public boolean damage(float damage, Vector knockback);
-	
+
+	/**
+	 * Removes the entity from the world.
+	 * 
+	 */
 	public void remove();
 }

@@ -23,9 +23,24 @@ package org.enderstone.server.api.messages;
  */
 public interface Message {
 
+	/**
+	 * Convert the message into plain text.
+	 * 
+	 * @return The message in plain text
+	 */
 	public String toPlainText();
 
+	/**
+	 * Convert the message into json encoding.
+	 * 
+	 * @return The message in json encoding
+	 */
 	public String toMessageJson();
 
+	/**
+	 * Convert the message into ascii encoding.
+	 * 
+	 * @return The message in ascii encoding
+	 */
 	public String toAsciiText();
 }

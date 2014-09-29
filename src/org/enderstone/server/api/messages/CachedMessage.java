@@ -22,18 +22,28 @@ package org.enderstone.server.api.messages;
  *
  * @author Fernando
  */
-public class CachedMessage implements Message{
+public class CachedMessage implements Message {
 
 	private final Message upper;
 
+	/**
+	 * Creates a cached object of a message.
+	 * 
+	 * @param upper The message to be cached
+	 */
 	private CachedMessage(Message upper) {
 		this.upper = upper;
 	}
-	
-	public static CachedMessage wrap(Message messafe)
+
+	/**
+	 * Wraps a message into a cached object.
+	 * 
+	 * @param message The message to be wrapped
+	 */
+	public static CachedMessage wrap(Message message)
 	{
-		if(messafe instanceof CachedMessage) return (CachedMessage)messafe;
-		return new CachedMessage(messafe);
+		if(message instanceof CachedMessage) return (CachedMessage)message;
+		return new CachedMessage(message);
 	}
 	
 	private transient String plainText;
@@ -56,12 +66,14 @@ public class CachedMessage implements Message{
 		if(asciiText != null) return asciiText;
 		return asciiText = upper.toAsciiText();
 	}
-	
+
+	/**
+	 * Clears the cache of the message.
+	 */
 	public void clearCache()
 	{
 		this.asciiText = null;
 		this.jsonText = null;
 		this.plainText = null;
 	}
-	
 }

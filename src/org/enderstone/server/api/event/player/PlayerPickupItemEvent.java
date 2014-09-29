@@ -20,52 +20,41 @@ package org.enderstone.server.api.event.player;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
+import org.enderstone.server.inventory.ItemStack;
 
-public class PlayerCommandEvent extends Event implements Cancellable {
+public class PlayerPickupItemEvent extends Event implements Cancellable {
 
 	private boolean cancelled = false;
 	private final Player player;
-	private final String command;
-	private final String[] arguments;
+	private final ItemStack item;
 
 	/**
-	 * PlayerCommandEvent is called when a player uses a command.
+	 * PlayerPickupItemEvent is called when a player picks up an item.
 	 * 
-	 * @param player the player that used the command
-	 * @param command the command that was used
-	 * @param arguments the arguments of the command
+	 * @param player the player that picked the item up
+	 * @param item the item that was picked up
 	 */
-	public PlayerCommandEvent(Player player, String command, String[] arguments) {
+	public PlayerPickupItemEvent(Player player, ItemStack item) {
 		this.player = player;
-		this.command = command;
-		this.arguments = arguments;
+		this.item = item;
 	}
 
 	/**
-	 * Get the player that used the command.
+	 * Get the player that picked the item up.
 	 * 
-	 * @return The player that used the command
+	 * @return The player that picked the item up
 	 */
 	public Player getPlayer() {
 		return player;
 	}
 
 	/**
-	 * Get the command that was used.
+	 * Get the item that was picked up.
 	 * 
-	 * @return The command that was used
+	 * @return The item that was picked up
 	 */
-	public String getCommand() {
-		return command;
-	}
-
-	/**
-	 * Get the arguments of the command.
-	 * 
-	 * @return The arguments of the command
-	 */
-	public String[] getArguments() {
-		return arguments;
+	public ItemStack getDroppedItem() {
+		return item;
 	}
 
 	@Override

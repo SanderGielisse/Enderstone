@@ -18,6 +18,8 @@
 package org.enderstone.server.inventory;
 
 import java.util.List;
+import org.enderstone.server.Main;
+import org.enderstone.server.api.event.player.PlayerPickupItemEvent;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.util.MergedList;
@@ -118,6 +120,9 @@ public class PlayerInventory extends DefaultInventory {
 	}
 
 	public ItemStack pickUpItem(ItemStack item) {
+		if (Main.getInstance().callEvent(new PlayerPickupItemEvent(player, item))) {
+			return item;
+		}
 		return DefaultInventory.tryAddItem(this.getItemInsertionOrder(), item);
 	}
 }

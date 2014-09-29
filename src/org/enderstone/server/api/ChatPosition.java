@@ -23,10 +23,20 @@ public enum ChatPosition {
 
 	private final int id;
 
+	/**
+	 * Creates a new element of ChatPosition
+	 * 
+	 * @param id the id of the new element
+	 */
 	private ChatPosition(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * Get the id of the element.
+	 * 
+	 * @return The id of the element
+	 */
 	public int getId() {
 		return id;
 	}
