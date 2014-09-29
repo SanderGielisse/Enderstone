@@ -93,13 +93,14 @@ public class PathNavigator {
 
 			Vector difference = Vector.substract(nextDestination, mob.getLocation());
 
-			int speed = (int) (mob.getMovementSpeed() / 20);//20 ticks per second
+			float speed = mob.getMovementSpeed() / 20;//20 ticks per second
 
-			difference.setX(difference.getX() > speed ? difference.getX() : (difference.getX() > 0 ? speed : -speed));
-			difference.setY(difference.getY() > speed ? difference.getY() : (difference.getY() > 0 ? speed : -speed));
-			difference.setZ(difference.getZ() > speed ? difference.getZ() : (difference.getZ() > 0 ? speed : -speed));
-
-			//move mob by vector
+			difference.setX(difference.getX() > 0 ? Math.min(difference.getX(), speed) : Math.max(difference.getX(), -speed));
+			difference.setY(difference.getY() > 0 ? Math.min(difference.getY(), speed) : Math.max(difference.getY(), -speed));
+			difference.setZ(difference.getZ() > 0 ? Math.min(difference.getZ(), speed) : Math.max(difference.getZ(), -speed));
+System.out.println(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
+			//Change new move method
+			mob.teleport(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
 		}
 	}
 
@@ -113,6 +114,8 @@ public class PathNavigator {
 
 					currentGoal = goal;
 
+					currentGoal.start();
+
 					break;
 				}
 			}
@@ -121,6 +124,8 @@ public class PathNavigator {
 		else {
 
 			if (!currentGoal.shouldContinue()) {
+
+				currentGoal.reset();
 
 				currentGoal = null;
 			}
@@ -137,6 +142,8 @@ public class PathNavigator {
 
 					currentTarget = target;
 
+					currentTarget.start();
+
 					break;
 				}
 			}
@@ -145,6 +152,8 @@ public class PathNavigator {
 		else {
 
 			if (!currentTarget.shouldContinue()) {
+
+				currentTarget.reset();
 
 				currentTarget = null;
 			}

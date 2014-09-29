@@ -204,6 +204,7 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 		if(Main.getInstance().doPhysics == false){
 			return;
 		}
+		navigator.run();
 		if (latestSound++ % (20 * 10) == 0) {
 			if (Main.random.nextBoolean()) {
 				world.broadcastPacket(new PacketOutSoundEffect(this.getRandomSound(), this.getLocation()), this.getLocation());

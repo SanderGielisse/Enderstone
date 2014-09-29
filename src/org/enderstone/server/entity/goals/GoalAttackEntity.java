@@ -6,8 +6,11 @@
 
 package org.enderstone.server.entity.goals;
 
+import java.util.Collection;
 import java.util.List;
+import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.entity.EnderEntity;
+import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.EntityMob;
 import org.enderstone.server.entity.pathfinding.PathFinder;
 import org.enderstone.server.entity.pathfinding.PathTile;
@@ -19,18 +22,35 @@ import org.enderstone.server.entity.pathfinding.PathTile;
 public class GoalAttackEntity implements Goal {
 
 	private final EntityMob mob;
-	private final EnderEntity target;
+	private final Class<? extends Entity> targetType;
 
-	public GoalAttackEntity(EntityMob mob, EnderEntity target) {
+	private EnderEntity target;
+
+	public GoalAttackEntity(EntityMob mob, Class<? extends Entity> targetType) {
 
 		this.mob = mob;
-		this.target = target;
+		this.targetType = targetType;
 	}
 
 	@Override
 	public boolean shouldStart() {
 
-		return mob.getLocation().distanceSquared(target.getLocation()) < 1024;//32 squared = 1024
+		Collection<EnderEntity> entities = (Collection<EnderEntity>) (targetType == EnderPlayer.class ? mob.getWorld().getPlayers() : mob.getWorld().getEntities());
+
+		for (Entity e : entities) {
+
+			if (e.getClass().equals(targetType)) {
+
+				if (mob.getLocation().distanceSquared(e.getLocation()) < 1024) {//32 squared = 1024
+
+					target = (EnderEntity) e;
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	@Override
@@ -53,7 +73,7 @@ public class GoalAttackEntity implements Goal {
 
 		else {
 
-			reset();
+			mob.getNavigator().setPath(null, null);
 		}
 	}
 
@@ -65,6 +85,8 @@ public class GoalAttackEntity implements Goal {
 
 	@Override
 	public void reset() {
+
+		target = null;
 
 		mob.getNavigator().setPath(null, null);
 	}
