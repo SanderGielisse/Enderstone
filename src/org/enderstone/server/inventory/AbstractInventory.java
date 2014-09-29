@@ -105,28 +105,57 @@ public abstract class AbstractInventory implements Inventory {
 			}
 			break;
 			default: {
+				ItemStack cursorItem = cursor.get(0);
 				if (leftMouse) {
-					ItemStack cursorItem = cursor.get(0);
-					ItemStack target = getRawItems().get(slot);
-					if (cursorItem == null || target == null || !target.materialTypeMatches(cursorItem)) {
+					if (cursorItem == null || slotItemStack == null || !slotItemStack.materialTypeMatches(cursorItem)) {
 						swapItems(cursor, 0, getRawItems(), slot);
 					} else {
 						int cursorAmount = cursorItem.getAmount();
-						int newTargetAmount = Math.min(target.getAmount() + cursorAmount, target.getId().getMaxStackSize());
-						if (newTargetAmount != target.getAmount()) {
-							cursorAmount -= newTargetAmount - target.getAmount();
+						int newTargetAmount = Math.min(slotItemStack.getAmount() + cursorAmount, slotItemStack.getId().getMaxStackSize());
+						if (newTargetAmount != slotItemStack.getAmount()) {
+							cursorAmount -= newTargetAmount - slotItemStack.getAmount();
 							if (cursorAmount > 0) {
 								cursorItem.setAmount(cursorAmount);
 								cursor.set(0, cursorItem);
 							} else cursor.set(0, null);
-							target.setAmount(newTargetAmount);
-							getRawItems().set(slot, target);
+							slotItemStack.setAmount(newTargetAmount);
+							getRawItems().set(slot, slotItemStack);
 						}
 					}
 				} else {
-
+					if (cursorItem == null && slotItemStack == null) return;
+					if (cursorItem == null) {
+						int amout = slotItemStack.getAmount();
+						int otherAmount = amout / 2;
+						int cursorAmount = amout - otherAmount;
+						cursorItem = slotItemStack.clone();
+						cursorItem.setAmount(cursorAmount);
+						cursor.set(0, cursorItem);
+						if (otherAmount == 0)
+							this.setRawItem(slot, null);
+						else {
+							slotItemStack.setAmount(otherAmount);
+							this.setRawItem(slot, slotItemStack);
+						}
+					} else if (slotItemStack == null || slotItemStack.materialTypeMatches(cursorItem)) {
+						assert cursorItem != null;
+						if (slotItemStack == null) {
+							slotItemStack = cursorItem.clone();
+							slotItemStack.setAmount(0);
+						}
+						int cursorAmount = cursorItem.getAmount();
+						int newOtherAmount = Math.min(slotItemStack.getAmount() + 1, slotItemStack.getId().getMaxStackSize());
+						if (newOtherAmount != slotItemStack.getAmount()) {
+							cursorAmount -= 1;
+							if (cursorAmount > 0) {
+								cursorItem.setAmount(cursorAmount);
+								cursor.set(0, cursorItem);
+							} else cursor.set(0, null);
+							slotItemStack.setAmount(newOtherAmount);
+							this.setRawItem(slot, slotItemStack);
+						}
+					}
 				}
-
 			}
 			break;
 
