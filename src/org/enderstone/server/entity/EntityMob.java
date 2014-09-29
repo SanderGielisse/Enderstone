@@ -68,12 +68,7 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 	@Override
 	public void teleport(Location loc) {
 		world.broadcastPacket(new PacketOutEntityTeleport(getEntityId(), (int) (loc.getX() * 32.0D), (int) (loc.getY() * 32.0D), (int) (loc.getZ() * 32.0D), (byte) 0, (byte) 0, false), this.getLocation());
-		Location oldLoc = this.getLocation();
-		oldLoc.setX(loc.getX());
-		oldLoc.setY(loc.getY());
-		oldLoc.setZ(loc.getZ());
-		oldLoc.setPitch(loc.getPitch());
-		oldLoc.setYaw(loc.getYaw());
+		this.setLocation(this.getLocation().cloneFrom(loc));
 	}
 
 	@Override
@@ -209,12 +204,16 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 		if(Main.getInstance().doPhysics == false){
 			return;
 		}
-		//added some temporarily mob sounds, just for fun :D
 		if (latestSound++ % (20 * 10) == 0) {
 			if (Main.random.nextBoolean()) {
 				world.broadcastPacket(new PacketOutSoundEffect(this.getRandomSound(), this.getLocation()), this.getLocation());
 			}
 		}
+	}
+	
+	public void moveInstantly(Location toLocation){
+		this.broadcastLocation(toLocation);
+		this.setLocation(toLocation);
 	}
 	
 	@Override

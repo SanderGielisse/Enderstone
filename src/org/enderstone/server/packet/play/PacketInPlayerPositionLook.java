@@ -99,6 +99,7 @@ public class PacketInPlayerPositionLook extends Packet {
 				loc.setZ(getZ());
 				loc.setPitch(getPitch());
 				loc.setYaw(getYaw());
+				networkManager.player.setLocation(loc);
 				networkManager.player.setOnGround(isOnGround());
 			}
 		});

@@ -40,7 +40,7 @@ public class CraftingDebugCommand extends SimpleCommand {
 	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
 		try
 		{
-			((EnderPlayer)sender).getInventoryHandler().openInventory(new CraftingInventory(((EnderPlayer)sender).getLocation().clone()));
+			((EnderPlayer)sender).getInventoryHandler().openInventory(new CraftingInventory(((EnderPlayer)sender).getLocation()));
 			return COMMAND_SUCCES;
 		}
 		catch(ClassCastException err)
