@@ -50,11 +50,6 @@ public abstract class DefaultInventory extends AbstractInventory {
 	}
 
 	@Override
-	public DropType getSlotDropType(int slot) {
-		return DropType.ALL_ALLOWED;
-	}
-
-	@Override
 	public void setRawItem(int slotNumber, ItemStack stack) {
 		this.items.set(slotNumber, stack);
 	}

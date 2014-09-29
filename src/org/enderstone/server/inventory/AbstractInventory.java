@@ -215,4 +215,9 @@ public abstract class AbstractInventory implements Inventory {
 		destination.set(destionationIndex, s1);
 		return true;
 	}
+
+	@Override
+	public DropType getSlotDropType(int slot) {
+		return DropType.ALL_ALLOWED;
+	}
 }
