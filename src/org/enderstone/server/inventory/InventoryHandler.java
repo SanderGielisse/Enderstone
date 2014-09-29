@@ -185,72 +185,17 @@ public class InventoryHandler {
 						if (slot == -999)
 							drop(this.itemOnCursor, true, 0);
 						else {
-							assert slot != -999;
-							ItemStack cursor = this.itemOnCursor.get(0);
-							ItemStack target = this.activeInventory.getRawItems().get(slot);
-							if (cursor == null || target == null || !target.materialTypeMatches(cursor)) {
-								swapItems(this.itemOnCursor, 0, this.activeInventory.getRawItems(), slot);
-							} else {
-								int cursorAmount = cursor.getAmount();
-								int newTargetAmount = Math.min(target.getAmount() + cursorAmount, target.getId().getMaxStackSize());
-								if (newTargetAmount != target.getAmount()) {
-									cursorAmount -= newTargetAmount - target.getAmount();
-									if (cursorAmount > 0) {
-										cursor.setAmount(cursorAmount);
-										this.itemOnCursor.set(0, cursor);
-									} else this.itemOnCursor.set(0, null);
-									target.setAmount(newTargetAmount);
-									this.activeInventory.getRawItems().set(slot, target);
-								}
-							}
+							this.activeInventory.onItemClick(true, mode, slot, false, itemOnCursor);
 						}
 					}
 					return true;
 					case 1: {
 						//normal right mouse click
 						ItemStack cursor = this.itemOnCursor.get(0);
-						switch (slot) {
-							case -999: {
-								assert slot == -999;
-								if (cursor != null)
-									drop(this.itemOnCursor, false, 0);
-							}
-							break;
-							default: {
-								ItemStack other = this.activeInventory.getRawItems().get(slot);
-								if (cursor == null && other == null) return true;
-								if (cursor == null) {
-									int amout = other.getAmount();
-									int otherAmount = amout / 2;
-									int cursorAmount = amout - otherAmount;
-									cursor = other.clone();
-									cursor.setAmount(cursorAmount);
-									this.itemOnCursor.set(0, cursor);
-									if (otherAmount == 0)
-										this.activeInventory.getRawItems().set(slot, null);
-									else {
-										other.setAmount(otherAmount);
-										this.activeInventory.getRawItems().set(slot, other);
-									}
-								} else if (other == null || other.materialTypeMatches(cursor)) {
-									assert cursor != null;
-									if (other == null) {
-										other = cursor.clone();
-										other.setAmount(0);
-									}
-									int cursorAmount = cursor.getAmount();
-									int newOtherAmount = Math.min(other.getAmount() + 1, other.getId().getMaxStackSize());
-									if (newOtherAmount != other.getAmount()) {
-										cursorAmount -= 1;
-										if (cursorAmount > 0) {
-											cursor.setAmount(cursorAmount);
-											this.itemOnCursor.set(0, cursor);
-										} else this.itemOnCursor.set(0, null);
-										other.setAmount(newOtherAmount);
-										this.activeInventory.getRawItems().set(slot, other);
-									}
-								}
-							}
+						if (slot == -999)
+							drop(this.itemOnCursor, true, 0);
+						else {
+							this.activeInventory.onItemClick(false, mode, slot, false, itemOnCursor);
 						}
 					}
 					return true;
@@ -263,8 +208,10 @@ public class InventoryHandler {
 			case 1: {
 				if (button == 0) {
 					//shift  + left mouse
+					this.activeInventory.onItemClick(true, mode, slot, true, itemOnCursor);
 				} else if (button == 1) {
 					//shift  + right mouse
+					this.activeInventory.onItemClick(false, mode, slot, true, itemOnCursor);
 				}
 			}
 			break;
@@ -275,19 +222,22 @@ public class InventoryHandler {
 			}
 			return true;
 			case 3: {
-				//middle mouse click
+				// TODO middle mouse click
 			}
 			break;
 			case 4: {
 				switch (slot) {
+					case -1:
 					case -999: {
 						switch (button) {
 							case 0: {
 								//left click outside inventory
+								drop(this.itemOnCursor, true, 0);
 							}
 							break;
 							case 1: {
 								//right click outside inventory
+								drop(this.itemOnCursor, false, 0);
 							}
 							break;
 							default: {
@@ -300,12 +250,16 @@ public class InventoryHandler {
 						switch (button) {
 							case 0: {
 								//drop key Q
-								drop(this.activeInventory.getRawItems(), false, this.selectedHotbarSlot);
+								FixedSizeList<ItemStack> tmp = new FixedSizeList<>(new ItemStack[1]);
+								this.activeInventory.onItemClick(true, mode, slot, false, tmp);
+								drop(tmp, true, 0);
 							}
 							return true;
 							case 1: {
 								//ctrl + drop key Q
-								drop(this.activeInventory.getRawItems(), true, this.selectedHotbarSlot);
+								FixedSizeList<ItemStack> tmp = new FixedSizeList<>(new ItemStack[1]);
+								this.activeInventory.onItemClick(true, mode, slot, false, tmp);
+								drop(tmp, true, 0);
 							}
 							return true;
 							default: {
