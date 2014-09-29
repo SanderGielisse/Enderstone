@@ -44,7 +44,7 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 
 	private final byte appearanceId;
 	private final EnderWorld world;
-	private final PathNavigator navigator = new PathNavigator();
+	private final PathNavigator navigator = new PathNavigator(this);
 
 	EntityMob(byte appearanceId, EnderWorld world, Location location) {
 		super(location);
@@ -230,5 +230,10 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 	@Override
 	public PathNavigator getNavigator() {
 		return navigator;
+	}
+
+	@Override
+	public float getMovementSpeed() {
+		return 2;
 	}
 }

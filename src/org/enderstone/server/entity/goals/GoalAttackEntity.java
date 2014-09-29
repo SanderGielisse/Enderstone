@@ -48,7 +48,7 @@ public class GoalAttackEntity implements Goal {
 
 		if (pathfinder.hasPath()) {
 
-			mob.getNavigator().setPath(path);
+			mob.getNavigator().setPath(pathfinder.getStartLocation(), path);
 		}
 
 		else {
@@ -58,11 +58,14 @@ public class GoalAttackEntity implements Goal {
 	}
 
 	@Override
-	public void run() {};
+	public void run() {
+
+		//Update the path
+	};
 
 	@Override
 	public void reset() {
 
-		mob.getNavigator().setPath(null);
+		mob.getNavigator().setPath(null, null);
 	}
 }

@@ -93,6 +93,11 @@ public class PathFinder {
 		this.endTileId = "PathTile{xOffset=" + (endX - startX) + " yOffset=" + (endY - startY) + " zOffset=" + (endZ - startZ) + '}';
 	}
 
+	public Location getStartLocation() {
+
+		return new Location(world, startX, startY, startZ, 0, 0);
+	}
+
 	public Location getEndLocation() {
 
 		return new Location(world, endX, endY, endZ, 0, 0);
