@@ -261,10 +261,7 @@ public class PathFinder {
 
 					if (x != 0 && z != 0 && (y == 0 || y == 1)) {
 
-						PathTile xOffset = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset(), currentTile, startX, startY, startZ, endX, endY, endZ);
-						PathTile zOffset = new PathTile(currentTile.getXOffset(), currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile, startX, startY, startZ, endX, endY, endZ);
-
-						if (!((canWalkOn(xOffset) || (canWalkOn(zOffset))))) {
+						if (!((canWalkOn(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset()) || (canWalkOn(currentTile.getXOffset(), currentTile.getYOffset() + y, currentTile.getZOffset() + z))))) {
 
 							continue;
 						}
@@ -294,15 +291,20 @@ public class PathFinder {
 		}
 	}
 
-	//TODO add checks for different sized mobs
 	private boolean canWalkOn(PathTile t) {
 
-		BlockId type = world.getBlockIdAt(startX + t.getXOffset(), startY + t.getYOffset(), startZ + t.getZOffset());
+		return canWalkOn(t.getXOffset(), t.getYOffset(), t.getZOffset());
+	}
+
+	//TODO add checks for different sized mobs
+	private boolean canWalkOn(int offsetX, int offsetY, int offsetZ) {
+
+		BlockId type = world.getBlockIdAt(startX + offsetX, startY + offsetY, startZ + offsetZ);
 
 		if (!(type.doesInstantBreak() || type == BlockId.LAVA || type == BlockId.LAVA_FLOWING || type == BlockId.FIRE || type == BlockId.CROPS || type == BlockId.LADDER || type == BlockId.FENCE || type == BlockId.FENCE_GATE || type == BlockId.NETHER_FENCE)) {
 
-			BlockId type2 = world.getBlockIdAt(startX + t.getXOffset(), startY + t.getYOffset() + 1, startZ + t.getZOffset());
-			BlockId type3 = world.getBlockIdAt(startX + t.getXOffset(), startY + t.getYOffset() + 2, startZ + t.getZOffset());
+			BlockId type2 = world.getBlockIdAt(startX + offsetX, startY + offsetY + 1, startZ + offsetZ);
+			BlockId type3 = world.getBlockIdAt(startX + offsetX, startY + offsetY + 2, startZ + offsetZ);
 
 			return type2.doesInstantBreak() && type3 == BlockId.AIR;
 		}
