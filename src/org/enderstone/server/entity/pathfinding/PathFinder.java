@@ -242,19 +242,22 @@ public class PathFinder {
 						continue;
 					}
 
-					PathTile t = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile, startX, startY, startZ, endX, endY, endZ);
+					int hash = 7;
+					hash = 89 * hash + (currentTile.getXOffset() + x);
+					hash = 89 * hash + (currentTile.getYOffset() + y);
+					hash = 89 * hash + (currentTile.getZOffset() + z);
 
-					if (closedTiles.containsKey(t.hashCode())) {
+					if (closedTiles.containsKey(hash)) {
 	
 						continue;
 					}
 
-					if (!t.isInRange(range)) {
+					if (!(range - Math.abs(currentTile.getXOffset() + x) >= 0 && range - Math.abs(currentTile.getYOffset() + y) >= 0 && range - Math.abs(currentTile.getZOffset() + z) >= 0)) {
 
 						continue;
 					}
 
-					if (!canWalkOn(t)) {
+					if (!canWalkOn(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset() + z)) {
 
 						continue;
 					}
@@ -266,6 +269,8 @@ public class PathFinder {
 							continue;
 						}
 					}
+
+					PathTile t = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile, startX, startY, startZ, endX, endY, endZ);
 
 					possible.add(t);
 				}
