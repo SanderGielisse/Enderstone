@@ -19,15 +19,15 @@ package org.enderstone.server.inventory;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.enderstone.server.api.messages.CachedMessage;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
-import org.enderstone.server.inventory.armour.Armor;
 import org.enderstone.server.util.FixedSizeList;
 
-public abstract class DefaultInventory implements Inventory {
+public abstract class DefaultInventory extends AbstractInventory {
 
 	protected final int size;
 	protected final InventoryType type;
@@ -48,11 +48,6 @@ public abstract class DefaultInventory implements Inventory {
 		this.items = new InventoryWrapper(size);
 		this.inventoryTitle = CachedMessage.wrap(inventoryTitle);
 		this.listeners = new CopyOnWriteArrayList<>(listeners);
-	}
-
-	@Override
-	public DropType getSlotDropType(int slot) {
-		return DropType.ALL_ALLOWED;
 	}
 
 	@Override
@@ -209,7 +204,7 @@ public abstract class DefaultInventory implements Inventory {
 	}
 
 	@Override
-	public Inventory openFully(PlayerInventory inventory) {
+	public Inventory openFully(HalfInventory inventory) {
 		return this;
 	}
 
@@ -228,142 +223,4 @@ public abstract class DefaultInventory implements Inventory {
 		this.removeListener(HalfInventoryListeners.toInventoryListener(listener));
 	}
 
-	@Override
-	public void onItemClick(boolean leftMouse, int mode, int slot, boolean shiftClick, List<ItemStack> cursor) {
-		ItemStack existingStack = this.getRawItem(slot);
-		if (leftMouse) {
-			DropType slotDropType = this.getSlotDropType(slot);
-			switch (slotDropType) {
-				case FULL_OUT: {
-					if (existingStack == null) {
-						return; // Nothing happens if the slot is get-only & isempty
-					}
-					int maxStackSize = existingStack.getId().getMaxStackSize();
-					if (shiftClick) {
-						shiftClickFromMainInventory(slot);
-
-					} else {
-						assert shiftClick == false;
-						ItemStack cursorItem = cursor.get(0);
-						if (cursorItem == null) {
-							cursor.set(0, existingStack);
-							this.setRawItem(slot, null);
-						} else if (cursorItem.materialTypeMatches(existingStack)) {
-							int remainingItems = maxStackSize - cursorItem.getAmount();
-							if (remainingItems >= existingStack.getAmount()) {
-								cursorItem.setAmount(cursorItem.getAmount() + existingStack.getAmount());
-								this.setRawItem(slot, null);
-								cursor.set(0, cursorItem);
-							}
-						}
-					}
-				}
-				break;
-				case ARMOR_BOOTS_ONLY:
-				case ARMOR_CHESTPLATE_ONLY:
-				case ARMOR_HELMET_ONLY:
-				case ARMOR_LEGGINGS_ONLY: {
-					ItemStack cursorItem = cursor.get(0);
-					Armor armor = cursorItem == null ? null : Armor.fromId(cursor.get(0).getId());
-
-					boolean isCursorValidArmorItem = armor == null ? false : armor.getDropType() == slotDropType;
-					if (shiftClick) {
-						shiftClickFromMainInventory(slot);
-					} else {
-						if (!isCursorValidArmorItem)
-							return;
-
-					}
-				}
-				break;
-				case ALL_ALLOWED: {
-					if (shiftClick) {
-
-					} else {
-						ItemStack cursorItem = cursor.get(0);
-						ItemStack target = getRawItems().get(slot);
-						if (cursorItem == null || target == null || !target.materialTypeMatches(cursorItem)) {
-							swapItems(cursor, 0, getRawItems(), slot);
-						} else {
-							int cursorAmount = cursorItem.getAmount();
-							int newTargetAmount = Math.min(target.getAmount() + cursorAmount, target.getId().getMaxStackSize());
-							if (newTargetAmount != target.getAmount()) {
-								cursorAmount -= newTargetAmount - target.getAmount();
-								if (cursorAmount > 0) {
-									cursorItem.setAmount(cursorAmount);
-									cursor.set(0, cursorItem);
-								} else cursor.set(0, null);
-								target.setAmount(newTargetAmount);
-								getRawItems().set(slot, target);
-							}
-						}
-					}
-				}
-				break;
-			}
-			return;
-		}
-	}
-
-	@Override // TODO Look at the slot and see if the clicked inventory is part of this inventory or not
-	public List<Integer> getShiftClickLocations(int slot) {
-		List<Integer> list = new ArrayList<>();
-		for (int i = 0; i < getSize(); i++) {
-			list.add(i);
-		}
-		return list;
-	}
-
-	private void shiftClickFromMainInventory(int slot) {
-		ItemStack existingStack = this.getRawItem(slot);
-		int maxStackSize = existingStack.getId().getMaxStackSize();
-		int neededAmount = existingStack.getAmount();
-		for (int i : this.getShiftClickLocations(slot)) {
-			ItemStack item = this.getRawItem(i);
-			if (item == null) {
-				neededAmount = 0;
-				break;
-			} else if (item.materialTypeMatches(existingStack)) {
-				int remainingItems = maxStackSize - item.getAmount();
-				if (remainingItems >= neededAmount) {
-					neededAmount = 0;
-					break;
-				}
-				if (remainingItems > 0)
-					neededAmount -= remainingItems;
-			}
-		}
-		if (neededAmount > 0)
-			return;
-		for (int i : this.getShiftClickLocations(slot)) {
-			ItemStack item = this.getRawItem(i);
-			if (item == null) {
-				this.setRawItem(slot, existingStack);
-				this.setRawItem(slot, null);
-				break;
-			} else if (item.materialTypeMatches(existingStack)) {
-				int remainingItems = maxStackSize - item.getAmount();
-				if (remainingItems >= existingStack.getAmount()) {
-					item.setAmount(item.getAmount() + existingStack.getAmount());
-					this.setRawItem(slot, null);
-					break;
-				}
-				if (remainingItems > 0) {
-					item.setAmount(item.getAmount() + remainingItems);
-					existingStack.setAmount(existingStack.getAmount() - remainingItems);
-				}
-				this.setRawItem(i, item);
-			}
-		}
-	}
-
-	private boolean swapItems(List<ItemStack> target, int targetIndex, List<ItemStack> destination, int destionationIndex) {
-		ItemStack s1 = target.get(targetIndex);
-		ItemStack s2 = destination.get(destionationIndex);
-		if (s1 == null && s2 == null) return true;
-		if (s1 == null ? s2.equals(s1) : s1.equals(s2)) return true;
-		target.set(targetIndex, s2);
-		destination.set(destionationIndex, s1);
-		return true;
-	}
 }

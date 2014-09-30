@@ -266,6 +266,11 @@ public class DefaultCraftingRecipes {
 				new BlockId[]{BlockId.SAND, BlockId.SAND},
 				new BlockId[]{BlockId.SAND, BlockId.SAND}
 		);
+		
+		//Wooden planks
+		r(tmp, BlockId.WOOD, (short) 4,
+				new BlockId[]{BlockId.LOG}
+		);
 
 		//Chiseled sandstone
 		r(tmp, new ItemStack(BlockId.SANDSTONE, (byte) 4, (short) 1),

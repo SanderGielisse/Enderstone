@@ -17,6 +17,8 @@
  */
 package org.enderstone.server.inventory;
 
+import java.util.Arrays;
+import java.util.List;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.messages.CachedMessage;
 import org.enderstone.server.api.messages.SimpleMessage;
@@ -47,7 +49,7 @@ public class CraftingInventory extends DefaultHalfInventory {
 	}
 
 	@Override
-	public Inventory openFully(PlayerInventory inventory) {
+	public Inventory openFully(HalfInventory inventory) {
 		Inventory inv = super.openFully(inventory);
 		inv.addListener(new InventoryListener() {
 
@@ -69,8 +71,29 @@ public class CraftingInventory extends DefaultHalfInventory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected MergedList<ItemStack> combineItems(PlayerInventory inventory) {
+	protected MergedList<ItemStack> combineItems(HalfInventory inventory) {
 		return new MergedList.Builder<ItemStack>().addList(0, this.items, 0, 10).addList(10, inventory.getRawItems(), 9, 36).build();
 	}
 
+	@Override
+	public DropType getSlotDropType(int slot) {
+		if(slot == 0) return DropType.FULL_OUT;
+		return super.getSlotDropType(slot);
+	}
+
+	
+	private static final List<Integer> shiftToInventory = PlayerInventory.getInventorySlotsShiftClickOrder(10);
+	private static final List<Integer> shiftToInventoryHotbar = PlayerInventory.getHotbarSlotsShiftClickOrder(10);
+	private static final List<Integer> shiftToInventoryMain = PlayerInventory.getMainInventorySlotsShiftClickOrder(10);
+	
+	@Override
+	public List<Integer> getShiftClickLocations(int slot) {
+		if(slot < 10)
+			return shiftToInventory;
+		else if(slot < 10 + (3 * 9))
+			return shiftToInventoryHotbar;
+		else if(slot < 10 + (4 * 9))
+			return shiftToInventoryMain;
+		else throw new IndexOutOfBoundsException("Invalid slot: "+slot );
+	}
 }
