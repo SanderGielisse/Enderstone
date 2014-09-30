@@ -34,7 +34,7 @@ public abstract class AbstractInventory implements Inventory {
 			do {
 				shiftClickFromMainInventory(slot, true);
 				slotItemStack = this.getRawItem(slot);
-			} while (!lastResult.equals(slotItemStack));
+			} while (lastResult.equals(slotItemStack));
 		} else if (shiftClick) {
 			shiftClickFromMainInventory(slot, false);
 			return;
@@ -165,9 +165,11 @@ public abstract class AbstractInventory implements Inventory {
 
 	private void shiftClickFromMainInventory(int slot, boolean onlyWholeStackOut) {
 		ItemStack existingStack = this.getRawItem(slot);
+		if (existingStack == null) return;
 		int maxStackSize = existingStack.getId().getMaxStackSize();
 		int neededAmount = existingStack.getAmount();
-		for (int i : this.getShiftClickLocations(slot)) {
+		List<Integer> shiftClickLocations = this.getShiftClickLocations(slot);
+		for (int i : shiftClickLocations) {
 			ItemStack item = this.getRawItem(i);
 			if (item == null) {
 				neededAmount = 0;
@@ -184,26 +186,31 @@ public abstract class AbstractInventory implements Inventory {
 		}
 		if (neededAmount > 0 && onlyWholeStackOut)
 			return;
-		for (int i : this.getShiftClickLocations(slot)) {
+		for (int i : shiftClickLocations) {
 			ItemStack item = this.getRawItem(i);
-			if (item == null) {
-				this.setRawItem(slot, existingStack);
-				this.setRawItem(slot, null);
-				break;
-			} else if (item.materialTypeMatches(existingStack)) {
+			if (item != null && item.materialTypeMatches(existingStack)) {
 				int remainingItems = maxStackSize - item.getAmount();
 				if (remainingItems >= existingStack.getAmount()) {
 					item.setAmount(item.getAmount() + existingStack.getAmount());
-					this.setRawItem(slot, null);
-					break;
-				}
-				if (remainingItems > 0) {
+					this.setRawItem(i, item);
+					existingStack.setAmount(0);
+				} else if (remainingItems > 0) {
 					item.setAmount(item.getAmount() + remainingItems);
 					existingStack.setAmount(existingStack.getAmount() - remainingItems);
+					this.setRawItem(i, item);
 				}
-				this.setRawItem(i, item);
+
 			}
 		}
+		if (existingStack.getAmount() != 0)
+			for (int i : shiftClickLocations) {
+				ItemStack item = this.getRawItem(i);
+				if (item == null) {
+					this.setRawItem(i, existingStack);
+					break;
+				}
+			}
+		this.setRawItem(slot, null);
 	}
 
 	private boolean swapItems(List<ItemStack> target, int targetIndex, List<ItemStack> destination, int destionationIndex) {
