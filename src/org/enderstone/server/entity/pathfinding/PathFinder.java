@@ -86,9 +86,7 @@ public class PathFinder {
 
 		this.range = range;
 
-		PathTile tile = new PathTile(0, 0, 0, null);
-
-		tile.calculateCost(startX, startY, startZ, endX, endY, endZ);
+		PathTile tile = new PathTile(0, 0, 0, null, startX, startY, startZ, endX, endY, endZ);
 
 		openTiles.add(tile);
 
@@ -128,11 +126,6 @@ public class PathFinder {
 				hasPath = false;
 
 				return null;
-			}
-
-			for (PathTile t : openTiles.values()) {
-
-				t.calculateCost(startX, startY, startZ, endX, endY, endZ);
 			}
 
 			PathTile currentTile = null;
@@ -249,7 +242,7 @@ public class PathFinder {
 						continue;
 					}
 
-					PathTile t = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile);
+					PathTile t = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile, startX, startY, startZ, endX, endY, endZ);
 
 					if (closedTiles.containsKey(t.hashCode())) {
 	
@@ -268,16 +261,14 @@ public class PathFinder {
 
 					if (x != 0 && z != 0 && (y == 0 || y == 1)) {
 
-						PathTile xOffset = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset(), currentTile);
-						PathTile zOffset = new PathTile(currentTile.getXOffset(), currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile);
+						PathTile xOffset = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset(), currentTile, startX, startY, startZ, endX, endY, endZ);
+						PathTile zOffset = new PathTile(currentTile.getXOffset(), currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile, startX, startY, startZ, endX, endY, endZ);
 
 						if (!((canWalkOn(xOffset) || (canWalkOn(zOffset))))) {
 
 							continue;
 						}
 					}
-	
-					t.calculateCost(startX, startY, startZ, endX, endY, endZ);
 
 					possible.add(t);
 				}

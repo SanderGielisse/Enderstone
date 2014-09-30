@@ -18,7 +18,6 @@
 package org.enderstone.server.entity.pathfinding;
 
 import org.enderstone.server.api.Location;
-import org.enderstone.server.regions.EnderChunk;
 
 /**
  *
@@ -33,71 +32,110 @@ public class PathTile {
 	private double goalCost = -1;
 	private double heuristicCost = -1;
 
+	private final int startX;
+	private final int startY;
+	private final int startZ;
+
+	private final int endX;
+	private final int endY;
+	private final int endZ;
+
 	private PathTile parent = null;
 
-	public PathTile(int x, int y, int z, PathTile parent) {
+	public PathTile(int x, int y, int z, PathTile parent, int startX, int startY, int startZ, int endX, int endY, int endZ) {
+
 		this.xOffset = x;
 		this.yOffset = y;
 		this.zOffset = z;
 
+		this.startX = startX;
+		this.startY = startY;
+		this.startZ = startZ;
+
+		this.endX = endX;
+		this.endY = endY;
+		this.endZ = endZ;
+
 		this.parent = parent;
+
+		calculateCost();
 	}
 
 	public int getXOffset() {
+
 		return xOffset;
 	}
 
 	public int getYOffset() {
+
 		return yOffset;
 	}
 
 	public int getZOffset() {
+
 		return zOffset;
 	}
 
 	public double getGoalCost() {
+
 		return goalCost;
 	}
 
 	public double getHeuristicCost() {
+
 		return heuristicCost;
 	}
 
 	public PathTile getParent() {
+
 		return parent;
 	}
 
 	public void setParent(PathTile parent) {
+
 		this.parent = parent;
+
+		calculateGoalCost();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+
 		if (this == obj) {
+
 			return true;
 		}
+
 		if (!(obj instanceof PathTile)) {
+
 			return false;
 		}
+
 		PathTile tile = (PathTile) obj;
+
 		return tile.getXOffset() == getXOffset() && tile.getYOffset() == getYOffset() && tile.getZOffset() == getZOffset();
 	}
 
 	@Override
 	public int hashCode() {
+
 		int hash = 7;
+
 		hash = 89 * hash + this.xOffset;
 		hash = 89 * hash + this.yOffset;
 		hash = 89 * hash + this.zOffset;
+
 		return hash;
 	}
 
 	@Override
 	public String toString() {
+
 		return "PathTile{" + "xOffset=" + xOffset + " yOffset=" + yOffset + " zOffset=" + zOffset + '}';
 	}
 
 	public boolean isInRange(int range) {
+
 		return (range - Math.abs(xOffset) >= 0 && range - Math.abs(yOffset) >= 0 && range - Math.abs(zOffset) >= 0);
 	}
 
@@ -115,13 +153,13 @@ public class PathTile {
 		return start.clone().add(xOffset, yOffset, zOffset);
 	}
 
-	public void calculateCost(int startX, int startY, int startZ, int endX, int endY, int endZ) {
+	private void calculateCost() {
 
-		calculateGoalCost(xOffset, xOffset, xOffset);
-		calculateHeuristicCost(xOffset, xOffset, xOffset, xOffset, xOffset, xOffset);
+		calculateGoalCost();
+		calculateHeuristicCost();
 	}
 
-	private void calculateGoalCost(int startX, int startY, int startZ) {
+	private void calculateGoalCost() {
 
 		if (goalCost == -1) {
 
@@ -158,7 +196,7 @@ public class PathTile {
 		}
 	}
 
-	private void calculateHeuristicCost(int startX, int startY, int startZ, int endX, int endY, int endZ) {
+	private void calculateHeuristicCost() {
 
 		if (heuristicCost == -1) {
 
