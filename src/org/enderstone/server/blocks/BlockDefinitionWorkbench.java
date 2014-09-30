@@ -15,59 +15,31 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.enderstone.server.blocks;
 
 import org.enderstone.server.api.Block;
-import org.enderstone.server.api.World;
-import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.inventory.CraftingInventory;
 import org.enderstone.server.regions.BlockId;
 
-/**
- *
- * @author gyroninja
- */
-public class BlockDefinition {
+public class BlockDefinitionWorkbench extends BlockDefinition {
 
-	private final BlockId type;
-
-	public BlockDefinition(BlockId type) {
-
-		this.type = type;
+	public BlockDefinitionWorkbench() {
+		super(BlockId.WORKBENCH);
 	}
 
-	public BlockId getType() {
-
-		return type;
-	}
-
-	public boolean canBreak(Player player, World world, int x, int y, int z) {
-		return true;
-	}
-
-	public int getMaxStackSize() {
-		return 64;
-	}
-
-	public boolean doesInstantBreak() {
-		return false;
-	}
-
-	public void onRightClick(EnderPlayer player, Block block) {};
-
-	public void onLeftClick(EnderPlayer player, Block block) {};
-
+	@Override
 	public String getPlaceSound() {
-		return "";
+		return "step.wood";
 	}
 
+	@Override
 	public String getBreakSound() {
-		return "";
+		return "dig.wood";
 	}
-
-	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
-		return new ItemStack(BlockId.valueOf(type.getName().toUpperCase()), (byte) 1, world.getBlock(x, y, z).getData());
+	
+	@Override
+	public void onRightClick(EnderPlayer player, Block block) {
+		player.getInventoryHandler().openInventory(new CraftingInventory(player.getLocation()));
 	}
 }

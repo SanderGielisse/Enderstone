@@ -199,15 +199,15 @@ public class EntityItem extends EnderEntity implements Item {
 	}
 
 	private boolean canGoUp() {
-		return world.getBlock(this.getLocation().clone().add(0D, 1D, 0D)).getBlock() == BlockId.AIR;
+		return world.getBlock(this.getLocation().add(0D, 1D, 0D)).getBlock() == BlockId.AIR;
 	}
 	
 	public boolean canGoDown(){
-		return world.getBlock(this.getLocation().clone().add(0.25D, 0, 0D)).getBlock().doesInstantBreak() &&
-				world.getBlock(this.getLocation().clone().add(-0.25D, 0, 0D)).getBlock().doesInstantBreak() && 
-						world.getBlock(this.getLocation().clone().add(0D, 0, 0.25D)).getBlock().doesInstantBreak() && 
-							world.getBlock(this.getLocation().clone().add(0D, 0, -0.25D)).getBlock().doesInstantBreak() &&
-									world.getBlock(this.getLocation().clone().add(0, -1D, 0)).getBlock().doesInstantBreak();
+		return world.getBlock(this.getLocation().add(0.25D, 0, 0D)).getBlock().doesInstantBreak() &&
+				world.getBlock(this.getLocation().add(-0.25D, 0, 0D)).getBlock().doesInstantBreak() && 
+						world.getBlock(this.getLocation().add(0D, 0, 0.25D)).getBlock().doesInstantBreak() && 
+							world.getBlock(this.getLocation().add(0D, 0, -0.25D)).getBlock().doesInstantBreak() &&
+									world.getBlock(this.getLocation().add(0, -1D, 0)).getBlock().doesInstantBreak();
 	}
 
 	@Override

@@ -52,6 +52,7 @@ import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.InventoryListener;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.inventory.PlayerInventory;
+import org.enderstone.server.inventory.armour.Armor;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketInTabComplete;
@@ -260,7 +261,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		boolean succes = currentWorld.players.remove(this);
 		assert succes;
 		toWorld.players.add(this);
-		this.getLocation().cloneFrom(toWorld.getSpawn());
+		this.setLocation(this.getLocation().cloneFrom(toWorld.getSpawn()));
 		this.loadedChunks.clear();
 		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 3);
 		networkManager.player.getInventoryHandler().updateInventory();
@@ -610,7 +611,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	
 	public void teleportInternally(Location newLocation){
 		this.waitingForValidMoveAfterTeleport = 1;
-		this.getLocation().cloneFrom(newLocation);
+		this.setLocation(this.getLocation().cloneFrom(newLocation));
 
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(newLocation.getX(), newLocation.getY(), newLocation.getZ(), newLocation.getYaw(), newLocation.getPitch(), (byte) 0b00000));
 
@@ -720,6 +721,15 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 		if (this.clientSettings.godMode)
 			return false;
+		
+		for (ItemStack stack : this.getInventoryHandler().getPlayerInventory().getArmor()) {
+			if (stack != null) {
+				Armor armor = Armor.fromId(stack.getId());
+				if (armor != null) {
+					damage = damage * armor.getDamageMultiplier();
+				}
+			}
+		}
 		return super.damage(damage);
 	}
 

@@ -54,6 +54,7 @@ import org.enderstone.server.packet.codec.MinecraftCompressionCodex;
 import org.enderstone.server.packet.codec.MinecraftDecompressionCodex;
 import org.enderstone.server.packet.codec.MinecraftServerCodex;
 import org.enderstone.server.packet.login.PacketOutLoginSucces;
+import org.enderstone.server.packet.play.PacketInPlayerOnGround;
 import org.enderstone.server.packet.play.PacketOutJoinGame;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSpawnPosition;
@@ -261,7 +262,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						sendPacket(new PacketOutJoinGame(player.getEntityId(), (byte) player.clientSettings.gameMode.getId(), (byte) 0, (byte) 1, (byte) 60, "default", false));
 						sendPacket(new PacketOutUpdateTime(0, world.getTime()));
 						Location loc = player.getLocation();
-						loc.cloneFrom(world.getSpawn());
+						player.setLocation(loc.cloneFrom(world.getSpawn()));
 
 						PlayerJoinEvent e = new PlayerJoinEvent(player);
 						Main.getInstance().callEvent(e);

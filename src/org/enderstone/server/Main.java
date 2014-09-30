@@ -91,7 +91,8 @@ public class Main implements Runnable {
 			this.add(47); // 1.8
 		}
 	});
-	public static final String[] AUTHORS = new String[] { "BigTeddy98 (Sander)", "ferrybig (Fernando)" };
+	public static final String[] AUTHORS = new String[] { "BigTeddy98 [Sander Gielisse]", "ferrybig [Fernando van Loenhout]" };
+	public static final String[] TOP_CONTRIBUTORS = new String[] {"Gyroninja"};
 	public static final Random random = new Random();
 	public volatile Thread mainThread;
 	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();
@@ -149,6 +150,7 @@ public class Main implements Runnable {
 		Main.instance = this;
 		EnderLogger.info("Starting " + NAME + " " + VERSION + " server version " + PROTOCOL_VERSION + ".");
 		EnderLogger.info("Authors: " + Arrays.asList(AUTHORS).toString());
+		EnderLogger.info("Top contributors: " + Arrays.asList(TOP_CONTRIBUTORS).toString() + " <--- Thanks to them!");
 		EnderLogger.info("Loading server.properties file...");
 		this.loadConfigFromDisk();
 		EnderLogger.info("Loaded server.properties file!");

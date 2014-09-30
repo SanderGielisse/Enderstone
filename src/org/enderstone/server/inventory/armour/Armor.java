@@ -67,7 +67,7 @@ public enum Armor {
 	}
 
 	public float getDamageMultiplier() {
-		return (120 - percentage) / 100; // 120 because of 80% as a maximum
+		return (140 - percentage) / 100; // 135 because of 60% as a maximum
 	}
 
 	private final static Armor[] data = new Armor[4096];

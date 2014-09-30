@@ -58,7 +58,11 @@ public abstract class EnderEntity implements Entity {
 	}
 
 	public Location getLocation() {
-		return location;
+		return location.clone();
+	}
+	
+	public void setLocation(Location newLoc){
+		this.location.cloneFrom(newLoc);
 	}
 
 	public abstract Packet[] getSpawnPackets();
