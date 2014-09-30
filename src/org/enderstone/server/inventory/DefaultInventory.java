@@ -223,9 +223,4 @@ public abstract class DefaultInventory extends AbstractInventory {
 		this.removeListener(HalfInventoryListeners.toInventoryListener(listener));
 	}
 
-	@Override // TODO Look at the slot and see if the clicked inventory is part of this inventory or not
-	public List<Integer> getShiftClickLocations(int slot) {
-		return Collections.emptyList();
-	}
-
 }
