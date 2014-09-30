@@ -39,8 +39,7 @@ import org.enderstone.server.regions.BlockId;
  */
 public class AiCommand extends SimpleCommand {
 
-	int total;
-	int count;
+	private int avg;
 
 	public AiCommand() {
 		super("command.enderstone.ai", "ai", CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY);
@@ -59,6 +58,8 @@ public class AiCommand extends SimpleCommand {
 
 			Runnable moveTask = new Runnable() {
 
+				boolean once = true;
+
 				@Override
 				public void run() {
 
@@ -72,7 +73,21 @@ public class AiCommand extends SimpleCommand {
 
 							PathFinder pathfinder = new PathFinder(start, playerLoc, 32);
 
+							long time = System.currentTimeMillis();
+
 							final List<PathTile> path = pathfinder.getPath();
+
+							long took = System.currentTimeMillis() - time;
+
+							if (once) {
+
+								avg += took;
+								avg /= 2;
+
+								System.out.println("AI TOOK:" + took + " AVG: " + avg);
+
+								once = false;
+							}
 
 							if (!pathfinder.hasPath()) {
 
