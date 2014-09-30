@@ -240,7 +240,7 @@ public abstract class EnderEntity implements Entity {
 		if(shouldBeRemoved || this.isDead() || Main.getInstance().doPhysics == false){
 			return;
 		}
-		
+			
 		World world = this.getWorld();
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();

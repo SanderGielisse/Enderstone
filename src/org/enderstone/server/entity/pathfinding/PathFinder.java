@@ -251,6 +251,11 @@ public class PathFinder {
 
 					PathTile t = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile);
 
+					if (closedTiles.containsKey(t.hashCode())) {
+	
+						continue;
+					}
+
 					if (!t.isInRange(range)) {
 
 						continue;
@@ -258,11 +263,6 @@ public class PathFinder {
 
 					if (!canWalkOn(t)) {
 
-						continue;
-					}
-
-					if (closedTiles.containsKey(t.hashCode())) {
-	
 						continue;
 					}
 
@@ -298,8 +298,6 @@ public class PathFinder {
 				if ((t.getGoalCost() + t.getHeuristicCost()) < (open.getGoalCost() + open.getHeuristicCost())) {
 
 					open.setParent(currentTile);
-
-					t.calculateCost(startX, startY, startZ, endX, endY, endZ);
 				}
 			}
 		}

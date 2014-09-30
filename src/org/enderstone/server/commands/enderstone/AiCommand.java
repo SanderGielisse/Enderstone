@@ -39,6 +39,9 @@ import org.enderstone.server.regions.BlockId;
  */
 public class AiCommand extends SimpleCommand {
 
+	int total;
+	int count;
+
 	public AiCommand() {
 		super("command.enderstone.ai", "ai", CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY);
 	}
@@ -61,27 +64,27 @@ public class AiCommand extends SimpleCommand {
 
 					try {
 
-						//while (!aispider.isDead()) {
+						while (!aispider.isDead()) {
 
 							final Location start = getBlockUnderEntity(aispider);
 
 							Location playerLoc = getBlockUnderEntity(player);
 
 							PathFinder pathfinder = new PathFinder(start, playerLoc, 32);
-long time = System.currentTimeMillis();
+
 							final List<PathTile> path = pathfinder.getPath();
-System.out.println("AI TOOK:" + (System.currentTimeMillis() - time));
+
 							if (!pathfinder.hasPath()) {
 
 								synchronized (this) {
 
 									wait(5000);//Wait 5 seconds before trying again
 
-							//		continue;
+									continue;
 								}
 							}
 
-							for (int i = 1; i < Math.min(path.size(), 100); i++) {
+							for (int i = 1; i < Math.min(path.size(), 5); i++) {
 
 								final int node = i; 
 
@@ -99,7 +102,7 @@ System.out.println("AI TOOK:" + (System.currentTimeMillis() - time));
 								synchronized (this) {
 
 									wait(100);
-					//			}
+								}
 							}
 						}
 					}
