@@ -317,6 +317,10 @@ public class InventoryHandler {
 			this.activeInventory = this.equimentInventory;
 		} else {
 			assert this.activeInventory == this.equimentInventory;
+			drop(this.equimentInventory.getRawItems(), true, 1);
+			drop(this.equimentInventory.getRawItems(), true, 2);
+			drop(this.equimentInventory.getRawItems(), true, 3);
+			drop(this.equimentInventory.getRawItems(), true, 4);
 		}
 		this.updateInventory();
 		drop(this.itemOnCursor, true, 0);
