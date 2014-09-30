@@ -23,16 +23,16 @@ import java.util.HashMap;
  *
  * @author gyroninja
  */
-public class PathTileList extends HashMap<String, PathTile> {
+public class PathTileList extends HashMap<Integer, PathTile> {
 
 	public void add(PathTile tile) {
 
-		this.put(tile.toString(), tile);
+		this.put(tile.hashCode(), tile);
 	}
 
 	public void add(PathTile tile, boolean overrite) {
 
-		if (containsKey(tile.toString())) {
+		if (containsKey(tile.hashCode())) {
 
 			if (overrite) {
 

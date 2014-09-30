@@ -61,23 +61,23 @@ public class AiCommand extends SimpleCommand {
 
 					try {
 
-						while (!aispider.isDead()) {
+						//while (!aispider.isDead()) {
 
 							final Location start = getBlockUnderEntity(aispider);
 
 							Location playerLoc = getBlockUnderEntity(player);
 
 							PathFinder pathfinder = new PathFinder(start, playerLoc, 32);
-
+long time = System.currentTimeMillis();
 							final List<PathTile> path = pathfinder.getPath();
-
+System.out.println("AI TOOK:" + (System.currentTimeMillis() - time));
 							if (!pathfinder.hasPath()) {
 
 								synchronized (this) {
 
 									wait(5000);//Wait 5 seconds before trying again
 
-									continue;
+							//		continue;
 								}
 							}
 
@@ -99,7 +99,7 @@ public class AiCommand extends SimpleCommand {
 								synchronized (this) {
 
 									wait(100);
-								}
+					//			}
 							}
 						}
 					}

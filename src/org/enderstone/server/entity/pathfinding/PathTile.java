@@ -18,6 +18,7 @@
 package org.enderstone.server.entity.pathfinding;
 
 import org.enderstone.server.api.Location;
+import org.enderstone.server.regions.EnderChunk;
 
 /**
  *
@@ -97,7 +98,7 @@ public class PathTile {
 	}
 
 	public boolean isInRange(int range) {
-		return (range - abs(xOffset) >= 0 && range - abs(yOffset) >= 0 && range - abs(zOffset) >= 0);
+		return (range - Math.abs(xOffset) >= 0 && range - Math.abs(yOffset) >= 0 && range - Math.abs(zOffset) >= 0);
 	}
 
 	public double getDistance(int startX, int startY, int startZ, int endX, int endY, int endZ) {
@@ -131,9 +132,9 @@ public class PathTile {
 
 			while ((currentParent = currentTile.getParent()) != null) {
 
-				int dx = abs(currentTile.getXOffset() - currentParent.getXOffset());
-				int dy = abs(currentTile.getYOffset() - currentParent.getYOffset());
-				int dz = abs(currentTile.getZOffset() - currentParent.getZOffset());
+				int dx = Math.abs(currentTile.getXOffset() - currentParent.getXOffset());
+				int dy = Math.abs(currentTile.getYOffset() - currentParent.getYOffset());
+				int dz = Math.abs(currentTile.getZOffset() - currentParent.getZOffset());
 
 				if (dx == 1 && dy == 1 && dz == 1) {
 
@@ -167,10 +168,5 @@ public class PathTile {
 
 			this.heuristicCost = getDistance(futureX, futureY, futureZ, endX, endY, endZ);
 		}
-	}
-
-	private int abs(int x) {
-
-		return x > 0 ? x : -x;
 	}
 }

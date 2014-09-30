@@ -23,10 +23,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
+import org.enderstone.server.regions.RegionSet;
 
 /**
  *
@@ -49,28 +53,28 @@ public class PathFinder {
 	private final PathTileList openTiles = new PathTileList();
 	private final PathTileList closedTiles = new PathTileList();
 
-	private final String endTileId;
+	private final int endTileId;
 
 	private boolean hasPath;
 
-	private boolean checkOnce;
+	private AtomicBoolean checkOnce = new AtomicBoolean();
 
 	public PathFinder(Location startLoc, Location endLoc, int range) {
 
 		Location start = getBlockUnderLocation(startLoc);
 		Location end = getBlockUnderLocation(endLoc);
 
-		if (start.getWorld().getBlockIdAt(start).doesInstantBreak()) {
+		world = start.getWorld();
+
+		if (world.getBlockIdAt(start).doesInstantBreak()) {
 
 			throw new IllegalArgumentException("Starting location is invalid");
 		}
 
-		if (end.getWorld().getBlockIdAt(end).doesInstantBreak()) {
+		if (world.getBlockIdAt(end).doesInstantBreak()) {
 
 			throw new IllegalArgumentException("Ending location is invalid");
 		}
-
-		world = start.getWorld();
 
 		startX = start.getBlockX();
 		startY = start.getBlockY();
@@ -90,7 +94,12 @@ public class PathFinder {
 
 		processAdjacentTiles(tile);
 
-		this.endTileId = "PathTile{xOffset=" + (endX - startX) + " yOffset=" + (endY - startY) + " zOffset=" + (endZ - startZ) + '}';
+		int hash = 7;
+		hash = 89 * hash + (endX - startX);
+		hash = 89 * hash + (endY - startY);
+		hash = 89 * hash + (endZ - startZ);
+
+		this.endTileId = hash;
 	}
 
 	public Location getStartLocation() {
@@ -108,17 +117,22 @@ public class PathFinder {
 		return hasPath;
 	}
 
-	public ArrayList<PathTile> getPath() {
+	public List<PathTile> getPath() {
 
-		if (!checkOnce) {
+		if (!checkOnce.get()) {
 
-			checkOnce ^= true;
+			checkOnce.set(true);
 
 			if (abs(startX - endX) > range || abs(startY - endY) > range || abs(startZ - endZ) > range) {
 
 				hasPath = false;
 
 				return null;
+			}
+
+			for (PathTile t : openTiles.values()) {
+
+				t.calculateCost(startX, startY, startZ, endX, endY, endZ);
 			}
 
 			PathTile currentTile = null;
@@ -194,8 +208,6 @@ public class PathFinder {
 
 		for (PathTile t : openTiles.values()) {
 
-			t.calculateCost(startX, startY, startZ, endX, endY, endZ);
-
 			if (cost == 0) {
 
 				cost = t.getGoalCost() + t.getHeuristicCost();
@@ -216,7 +228,7 @@ public class PathFinder {
 			}
 		}
 
-		openTiles.remove(drop.toString());
+		openTiles.remove(drop.hashCode());
 		closedTiles.add(drop);
 
 		return drop;
@@ -249,7 +261,7 @@ public class PathFinder {
 						continue;
 					}
 
-					if (closedTiles.containsKey(t.toString())) {
+					if (closedTiles.containsKey(t.hashCode())) {
 	
 						continue;
 					}
@@ -274,7 +286,7 @@ public class PathFinder {
 
 		for (PathTile t : possible) {
 
-			PathTile open = openTiles.get(t.toString());
+			PathTile open = openTiles.get(t.hashCode());
 
 			if (open == null) {
 
