@@ -216,9 +216,11 @@ public class InventoryHandler {
 				if (button == 0) {
 					//shift  + left mouse
 					this.activeInventory.onItemClick(true, mode, slot, true, itemOnCursor);
+					return true;
 				} else if (button == 1) {
 					//shift  + right mouse
 					this.activeInventory.onItemClick(false, mode, slot, true, itemOnCursor);
+					return true;
 				}
 			}
 			break;
@@ -241,12 +243,12 @@ public class InventoryHandler {
 								//left click outside inventory
 								drop(this.itemOnCursor, true, 0);
 							}
-							break;
+							return true;
 							case 1: {
 								//right click outside inventory
 								drop(this.itemOnCursor, false, 0);
 							}
-							break;
+							return true;
 							default: {
 								player.networkManager.disconnect("Invalid button?? m:4 -> s:-999 -> b:" + button, true);
 							}
