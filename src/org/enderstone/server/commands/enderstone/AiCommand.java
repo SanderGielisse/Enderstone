@@ -17,21 +17,17 @@
  */
 package org.enderstone.server.commands.enderstone;
 
+import java.math.BigInteger;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;
-import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.entity.EntitySpider;
 import org.enderstone.server.entity.pathfinding.PathFinder;
 import org.enderstone.server.entity.pathfinding.PathTile;
-import org.enderstone.server.regions.BlockId;
 
 /**
  *
@@ -42,6 +38,7 @@ public class AiCommand extends SimpleCommand {
 	private int avg;
 
 	public AiCommand() {
+
 		super("command.enderstone.ai", "ai", CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY);
 	}
 
@@ -52,103 +49,38 @@ public class AiCommand extends SimpleCommand {
 
 			final EnderPlayer player = (EnderPlayer) sender;
 
-			final EntitySpider aispider = new EntitySpider(player.getWorld(), new Location(player.getWorld(), 0.5, 64, 0.5, 0, 0));
+			PathFinder pathfinder = new PathFinder(getBlockUnderLocation(new Location(player.getWorld(), 0.5, 64, 0.5, 0, 0)), getBlockUnderLocation(player.getLocation()), 32);
 
-			player.getWorld().addEntity(aispider);
+			long time = System.nanoTime();
 
-			Runnable moveTask = new Runnable() {
+			final List<PathTile> path = pathfinder.getPath();
 
-				boolean once = true;
+			long took = System.nanoTime() - time;
 
-				@Override
-				public void run() {
+			if (pathfinder.hasPath()) {
 
-					try {
+				avg += took;
+				avg /= 2;
 
-						while (!aispider.isDead()) {
-
-							final Location start = getBlockUnderEntity(aispider);
-
-							Location playerLoc = getBlockUnderEntity(player);
-
-							PathFinder pathfinder = new PathFinder(start, playerLoc, 32);
-
-							long time = System.currentTimeMillis();
-
-							final List<PathTile> path = pathfinder.getPath();
-
-							long took = System.currentTimeMillis() - time;
-
-							if (once) {
-
-								avg += took;
-								avg /= 2;
-
-								System.out.println("AI TOOK:" + took + " AVG: " + avg);
-
-								once = false;
-							}
-
-							if (!pathfinder.hasPath()) {
-
-								synchronized (this) {
-
-									wait(5000);//Wait 5 seconds before trying again
-
-									continue;
-								}
-							}
-
-							for (int i = 1; i < Math.min(path.size(), 5); i++) {
-
-								final int node = i; 
-
-								Main.getInstance().sendToMainThread(new Runnable() {
-
-									@Override
-									public void run() {
-
-										aispider.teleport(path.get(node).getLocation(start).clone().add(0.5, 1, 0.5));
-
-										aispider.getWorld().getBlock(path.get(node).getLocation(start)).setBlock(BlockId.GLASS, (byte) 0);
-									}
-								});
-
-								synchronized (this) {
-
-									wait(100);
-								}
-							}
-						}
-					}
-
-					catch(InterruptedException ex) {
-
-						System.out.println("Move thread interupted");
-					}
-				}
-
-				private Location getBlockUnderEntity(EnderEntity e) {
-
-					Location check = e.getLocation().clone();
-
-					for (int i = 0;; i++) {
-
-						if (!e.getWorld().getBlock(check).getBlock().doesInstantBreak()) {
-
-							return check;
-						}
-
-						check.add(0, -1, 0);
-					}
-				}
-			};
-
-			Thread moveThread = new Thread(moveTask);
-
-			moveThread.start();
+				sender.sendMessage(new SimpleMessage("AI TOOK:" + (((double) took) / 1000000) + "MS AVG: " + (((double) avg) / 1000000) + "MS"));
+			}
 		}
 
 		return COMMAND_SUCCES;
+	}
+
+	private Location getBlockUnderLocation(Location loc) {
+
+		Location check = loc.clone();
+
+		for (int i = 0;; i++) {
+
+			if (!loc.getWorld().getBlock(check).getBlock().doesInstantBreak()) {
+
+				return check;
+			}
+
+			check.add(0, -1, 0);
+		}
 	}
 }
