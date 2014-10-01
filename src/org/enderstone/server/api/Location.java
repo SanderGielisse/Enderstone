@@ -313,10 +313,12 @@ public class Location implements Cloneable {
 	 * This method adds the motion of the vector to this location.
 	 * 
 	 * @param velocity The velocity to apply
+	 * @return the location + the vector
 	 */
-	public void applyVector(Vector velocity) {
-		this.x += velocity.motX;
-		this.y += velocity.motY;
-		this.z += velocity.motZ;
+	public Location applyVector(Vector vector) {
+		this.x += vector.motX;
+		this.y += vector.motY;
+		this.z += vector.motZ;
+		return this;
 	}
 }

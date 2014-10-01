@@ -55,9 +55,13 @@ public class BlockDefinition {
 		return false;
 	}
 
-	public void onRightClick(EnderPlayer player, Block block) {};
+	public boolean onRightClick(EnderPlayer player, Block block) {
+		return false;
+	}
 
-	public void onLeftClick(EnderPlayer player, Block block) {};
+	public boolean onLeftClick(EnderPlayer player, Block block) {
+		return false;
+	}
 
 	public String getPlaceSound() {
 		return "";
