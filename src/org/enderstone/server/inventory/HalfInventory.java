@@ -38,7 +38,7 @@ public interface HalfInventory extends AutoCloseable{
 
 	public Message getTitle();
 
-	public Inventory openFully(PlayerInventory inventory);
+	public Inventory openFully(HalfInventory inventory);
 	
 	public void addListener(HalfInventoryListener listener);
 	

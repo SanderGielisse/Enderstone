@@ -17,11 +17,16 @@
  */
 package org.enderstone.server.inventory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.event.player.PlayerPickupItemEvent;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.inventory.armour.Armor;
 import org.enderstone.server.util.MergedList;
 
 /**
@@ -125,4 +130,149 @@ public class PlayerInventory extends DefaultInventory {
 		}
 		return DefaultInventory.tryAddItem(this.getItemInsertionOrder(), item);
 	}
+
+	/**
+	 * INTERNAL USE ONLY returns the slots items must be placed in when they come from other inventories
+	 *
+	 * @param offset all numbers will be offset by this number
+	 * @return
+	 */
+	static List<Integer> getInventorySlotsShiftClickOrder(int offset) {
+		return getInventorySlotsShiftClickOrder(new ArrayList<Integer>(1 * 9), offset, false);
+	}
+
+	private static List<Integer> getInventorySlotsShiftClickOrder(List<Integer> l, int offset, boolean reverse) {
+		if (reverse)
+			for (int i = 0; i < (3 * 9); i++) {
+				l.add(i + offset);
+			}
+		for (int i = 0; i < (1 * 9); i++) {
+			l.add(i + offset + (3 * 9));
+		}
+		if (!reverse)
+			for (int i = 0; i < (3 * 9); i++) {
+				l.add(i + offset);
+			}
+		return l;
+	}
+
+	/**
+	 * INTERNAL USE ONLY returns the slots items must be placed in when they come from other inventories
+	 *
+	 * @param offset all numbers will be offset by this number
+	 * @return
+	 */
+	static List<Integer> getHotbarSlotsShiftClickOrder(int offset) {
+		return getHotbarSlotsShiftClickOrder(new ArrayList<Integer>(4 * 9), offset);
+	}
+
+	/**
+	 * INTERNAL USE ONLY returns the slots items must be placed in when they come from other inventories
+	 */
+	private static List<Integer> getHotbarSlotsShiftClickOrder(List<Integer> l, int offset) {
+		for (int i = 0; i < (1 * 9); i++) {
+			l.add(i + offset + (3 * 9));
+		}
+		return l;
+	}
+
+	/**
+	 * INTERNAL USE ONLY returns the slots items must be placed in when they come from other inventories
+	 *
+	 * @param offset all numbers will be offset by this number
+	 * @return
+	 */
+	static List<Integer> getMainInventorySlotsShiftClickOrder(int offset) {
+		return getMainInventorySlotsShiftClickOrder(new ArrayList<Integer>(9), offset);
+	}
+
+	private static List<Integer> getMainInventorySlotsShiftClickOrder(List<Integer> l, int offset) {
+		for (int i = 0; i < (3 * 9); i++) {
+			l.add(i + offset);
+		}
+		return l;
+	}
+	// TODO There has to be a better way to track all the slots where a item is placed when its being shift clicked....
+	private static final List<Integer> shiftToInventory = PlayerInventory.getInventorySlotsShiftClickOrder(9);
+	private static final List<Integer> shiftToInventoryReverse = PlayerInventory.getInventorySlotsShiftClickOrder(new ArrayList<Integer>(), 9, true);
+	private static final List<Integer> shiftToInventoryHotbar = PlayerInventory.getHotbarSlotsShiftClickOrder(9);
+	private static final List<Integer> shiftToInventoryHotbarHelmet = PlayerInventory.getHotbarSlotsShiftClickOrder(
+			new ArrayList(Arrays.<Integer>asList(5)), 9);
+	private static final List<Integer> shiftToInventoryHotbarChestPlate = PlayerInventory.getHotbarSlotsShiftClickOrder(
+			new ArrayList(Arrays.<Integer>asList(6)), 9);
+	private static final List<Integer> shiftToInventoryHotbarLeggings = PlayerInventory.getHotbarSlotsShiftClickOrder(
+			new ArrayList(Arrays.<Integer>asList(7)), 9);
+	private static final List<Integer> shiftToInventoryHotbarBoots = PlayerInventory.getHotbarSlotsShiftClickOrder(
+			new ArrayList(Arrays.<Integer>asList(8)), 9);
+	private static final List<Integer> shiftToInventoryMain = PlayerInventory.getMainInventorySlotsShiftClickOrder(9);
+	private static final List<Integer> shiftToInventoryMainHelmet = PlayerInventory.getMainInventorySlotsShiftClickOrder(
+			new ArrayList(Arrays.<Integer>asList(5)), 9);
+	private static final List<Integer> shiftToInventoryMainChestPlate = PlayerInventory.getMainInventorySlotsShiftClickOrder(
+			new ArrayList(Arrays.<Integer>asList(6)), 9);
+	private static final List<Integer> shiftToInventoryMainLeggings = PlayerInventory.getMainInventorySlotsShiftClickOrder(
+			new ArrayList(Arrays.<Integer>asList(7)), 9);
+	private static final List<Integer> shiftToInventoryMainBoots = PlayerInventory.getMainInventorySlotsShiftClickOrder(
+			new ArrayList(Arrays.<Integer>asList(8)), 9);
+
+	private static <T> List<T> addToList(List<T> list, T element) {
+		list.add(element);
+		return list;
+	}
+
+	@Override
+	public List<Integer> getShiftClickLocations(int slot) {
+		DropType itemType = DropType.ALL_ALLOWED;
+		{
+			ItemStack item = this.getRawItem(slot);
+			if (item != null) {
+				Armor armorType = Armor.fromId(item.getId());
+				if (armorType != null) {
+					itemType = armorType.getDropType();
+				}
+			}
+		}
+		if (itemType == null) itemType = DropType.ALL_ALLOWED;
+		if (slot == 0)
+			return shiftToInventory; // Why these slots are at a other order than the other slots? I don't know..
+		if (slot < 9)
+			return shiftToInventoryReverse;
+		else if (slot < 9 + (3 * 9))
+			switch (itemType) {
+				case ARMOR_BOOTS_ONLY:
+					return shiftToInventoryHotbarBoots;
+				case ARMOR_LEGGINGS_ONLY:
+					return shiftToInventoryHotbarLeggings;
+				case ARMOR_CHESTPLATE_ONLY:
+					return shiftToInventoryHotbarChestPlate;
+				case ARMOR_HELMET_ONLY:
+					return shiftToInventoryHotbarHelmet;
+				default:
+					return shiftToInventoryHotbar;
+			}
+		else if (slot < 9 + (4 * 9))
+			switch (itemType) {
+				case ARMOR_BOOTS_ONLY:
+					return shiftToInventoryMainBoots;
+				case ARMOR_LEGGINGS_ONLY:
+					return shiftToInventoryMainLeggings;
+				case ARMOR_CHESTPLATE_ONLY:
+					return shiftToInventoryMainChestPlate;
+				case ARMOR_HELMET_ONLY:
+					return shiftToInventoryMainHelmet;
+				default:
+					return shiftToInventoryMain;
+			}
+		else throw new IndexOutOfBoundsException("Invalid slot: " + slot);
+	}
+	
+	@Override
+	public DropType getSlotDropType(int slot) {
+		if(slot == 0) return DropType.FULL_OUT;
+		if(slot == 5) return DropType.ARMOR_HELMET_ONLY;
+		if(slot == 6) return DropType.ARMOR_CHESTPLATE_ONLY;
+		if(slot == 7) return DropType.ARMOR_LEGGINGS_ONLY;
+		if(slot == 8) return DropType.ARMOR_BOOTS_ONLY;
+		return DropType.ALL_ALLOWED;
+	}
+
 }

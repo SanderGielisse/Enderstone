@@ -215,7 +215,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 	}
 
 	@Override
-	public Inventory openFully(PlayerInventory inventory) {
+	public Inventory openFully(HalfInventory inventory) {
 		FullInventory tmp = new FullInventory(inventory, this.combineItems(inventory));
 		this.fullInventories.add(tmp);
 		return tmp;
@@ -226,16 +226,16 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 		return DropType.ALL_ALLOWED;
 	}
 
-	protected abstract MergedList<ItemStack> combineItems(PlayerInventory inventory);
+	protected abstract MergedList<ItemStack> combineItems(HalfInventory inventory);
 
 	protected final List<FullInventory> fullInventories = new ArrayList<>();
 
-	protected class FullInventory implements Inventory {
+	protected class FullInventory extends AbstractInventory {
 
 		private final List<ItemStack> items;
 		private boolean closed = false;
 
-		public FullInventory(PlayerInventory inventory, MergedList items) {
+		public FullInventory(HalfInventory inventory, MergedList items) {
 			this.items = items;
 			this.listeners = new CopyOnWriteArrayList<>();
 		}
@@ -276,7 +276,7 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 		}
 
 		@Override
-		public Inventory openFully(PlayerInventory inventory) {
+		public Inventory openFully(HalfInventory inventory) {
 			return this;
 		}
 
@@ -321,22 +321,10 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 			return DefaultHalfInventory.this.getSlotDropType(slot);
 		}
 
-		@Override // TODO Look at the slot and see if the clicked inventory is part of this inventory or not
-		public List<Integer> getShiftClickLocations(int slot) {
-			List<Integer> list = new ArrayList<>();
-			for (int i = 0; i < getSize(); i++) {
-				list.add(i);
-			}
-			return list;
-		}
-
 		@Override
-		public void onItemClick(boolean leftMouse, int mode, int slot, boolean shiftClick, List<ItemStack> cursor) {
-			throw new UnsupportedOperationException("Not supported yet."); // TODO IMPLEMENT THIS
+		public List<Integer> getShiftClickLocations(int slot) {
+			return DefaultHalfInventory.this.getShiftClickLocations(slot);
 		}
-		
-		
-
 	}
 
 	@Override
@@ -353,14 +341,4 @@ public abstract class DefaultHalfInventory implements HalfInventory {
 	public void removeListener(HalfInventoryListener listener) {
 		this.listeners.remove(listener);
 	}
-
-	@Override // TODO Look at the slot and see if the clicked inventory is part of this inventory or not
-	public List<Integer> getShiftClickLocations(int slot) {
-		List<Integer> list = new ArrayList<>();
-		for (int i = 0; i < getSize(); i++) {
-			list.add(i);
-		}
-		return list;
-	}
-
 }
