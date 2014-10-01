@@ -101,9 +101,11 @@ public class SimpleGenerator implements ChunkGenerator {
 				setBlock(15, 1, source);
 				setBlock(14, 0, source);
 				
-				//temporirily mob spawn
+				//TEMPORARILY TESTS
 				world.addEntity(new EntitySpider(world, new Location(world, source.getX() * 16, source.getHighestBlockAt(0, 0) + 1, source.getZ() * 16, 0F, 0F)));
-
+				source.setBlock(8, source.getHighestBlockAt(8, 0), 0, BlockId.WATER, (byte) 0);
+				source.setBlock(9, source.getHighestBlockAt(9, 0), 0, BlockId.FIRE, (byte) 0);
+				
 				int x = random.nextInt(5) + 3, z = random.nextInt(5) + 3;
 				try {
 					generateTree(source, x, source.getHighestBlockAt(x, z), z);

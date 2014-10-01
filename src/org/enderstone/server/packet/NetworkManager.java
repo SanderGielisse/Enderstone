@@ -251,10 +251,6 @@ public class NetworkManager extends ChannelHandlerAdapter {
 					}
 					player = new EnderPlayer(world, wantedName, NetworkManager.this, uuid, skinBlob);
 
-					//TEMPORARILY TEST
-					world.getBlock(world.getSpawn()).setBlock(BlockId.FIRE, (byte) 0);
-					world.getBlock(world.getSpawn().clone().add(1, 0, 0)).setBlock(BlockId.WATER, (byte) 0);
-
 					world.players.add(player);
 					Main.getInstance().onlinePlayers.add(player);
 					try {
