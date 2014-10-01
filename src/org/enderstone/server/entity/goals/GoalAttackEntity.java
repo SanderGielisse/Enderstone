@@ -19,6 +19,7 @@ package org.enderstone.server.entity.goals;
 
 import java.util.Collection;
 import java.util.List;
+import org.enderstone.server.api.Location;
 import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EnderPlayer;
@@ -75,7 +76,7 @@ public class GoalAttackEntity implements Goal {
 	@Override
 	public void start() {
 
-		pathfindToTarget();
+		pathfindToTarget(mob.getLocation());
 	}
 
 	@Override
@@ -86,8 +87,13 @@ public class GoalAttackEntity implements Goal {
 		if (lastUpdate > 20) {
 
 			lastUpdate = 0;
+	
+			PathTile currentTile = mob.getNavigator().getCurrentTile();
 
-			pathfindToTarget();
+			if (currentTile != null) {
+
+				pathfindToTarget(currentTile.getLocation(mob.getNavigator().getPathfinder().getStartLocation()));
+			}
 		}
 	};
 
@@ -98,8 +104,8 @@ public class GoalAttackEntity implements Goal {
 
 		mob.getNavigator().setPath(null, null);
 	}
-	
-	private void pathfindToTarget() {
+
+	private void pathfindToTarget(Location start) {
 
 		PathFinder pathfinder = new PathFinder(mob.getLocation(), target.getLocation(), 32);
 
@@ -107,7 +113,7 @@ public class GoalAttackEntity implements Goal {
 
 		if (pathfinder.hasPath()) {
 
-			mob.getNavigator().setPath(pathfinder.getStartLocation(), path);
+			mob.getNavigator().setPath(pathfinder, path);
 		}
 
 		else {

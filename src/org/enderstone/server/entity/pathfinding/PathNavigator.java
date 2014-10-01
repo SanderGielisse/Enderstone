@@ -39,7 +39,7 @@ public class PathNavigator {
 	private Goal currentGoal;
 	private Target currentTarget;
 
-	private Location start;
+	private PathFinder pathfinder;
 
 	private List<PathTile> path;
 	private int currentTile = 0;
@@ -56,9 +56,24 @@ public class PathNavigator {
 		return path;
 	}
 
-	public void setPath(Location start, List<PathTile> path) {
+	public PathTile getCurrentTile() {
 
-		this.start = start;
+		if (path != null) {
+
+			return path.get(currentTile);
+		}
+
+		return null;
+	}
+
+	public PathFinder getPathfinder() {
+
+		return pathfinder;
+	}
+
+	public void setPath(PathFinder pathfinder, List<PathTile> path) {
+
+		this.pathfinder = pathfinder;
 
 		this.path = path;
 
@@ -97,7 +112,7 @@ public class PathNavigator {
 
 		if (path != null) {
 
-			if (mob.getLocation().isInRange(1, path.get(currentTile).getLocation(start), false)) {
+			if (mob.getLocation().isInRange(1, path.get(currentTile).getLocation(pathfinder.getStartLocation()), false)) {
 
 				if (path.size() == currentTile + 1) {
 
@@ -107,7 +122,7 @@ public class PathNavigator {
 				currentTile++;
 			}
 
-			Location nextDestination = path.get(currentTile).getLocation(start).add(0, 1, 0);
+			Location nextDestination = path.get(currentTile).getLocation(pathfinder.getStartLocation()).add(0, 1, 0);
 
 			Vector difference = Vector.substract(mob.getLocation(), nextDestination);
 
