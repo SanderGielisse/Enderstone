@@ -114,7 +114,7 @@ public class GoalAttackEntity implements Goal {
 
 		PathFinder pathfinder = new PathFinder(mob.getLocation(), target.getLocation(), 32);
 
-		List<PathTile> path = pathfinder.getPath();
+		List<PathTile> path = pathfinder.calculatePath();
 
 		if (pathfinder.hasPath()) {
 

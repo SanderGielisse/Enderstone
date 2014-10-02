@@ -53,7 +53,7 @@ public class AiCommand extends SimpleCommand {
 
 			long time = System.nanoTime();
 
-			final List<PathTile> path = pathfinder.getPath();
+			final List<PathTile> path = pathfinder.calculatePath();
 
 			long took = System.nanoTime() - time;
 

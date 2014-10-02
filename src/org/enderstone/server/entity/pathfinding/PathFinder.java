@@ -103,7 +103,7 @@ public class PathFinder {
 		return hasPath;
 	}
 
-	public List<PathTile> getPath() {
+	public List<PathTile> calculatePath() {
 
 		if (Math.abs(startX - endX) > range || Math.abs(startY - endY) > range || Math.abs(startZ - endZ) > range) {
 
