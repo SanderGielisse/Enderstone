@@ -15,23 +15,34 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.api.entity;
+package org.enderstone.server.api.event.entity;
 
-import org.enderstone.server.entity.pathfinding.PathNavigator;
+import org.enderstone.server.api.event.Event;
+import org.enderstone.server.entity.EnderEntity;
 
-public interface Mob extends Entity {
+/**
+ *
+ * @author gyroninja
+ */
+public class EntityDeathEvent extends Event {
+
+	private final EnderEntity entity;
 
 	/**
-	 * Get the navigator for the mob.
+	 * EntityDeathEvent is called when an entity dies.
 	 * 
-	 * @return The navigator for the mob
+	 * @param entity the entity that died
 	 */
-	public abstract PathNavigator getNavigator();
+	public EntityDeathEvent(EnderEntity entity) {
+		this.entity = entity;
+	}
 
 	/**
-	 * Get the movement speed of the mob in meters per second.
+	 * Get the entity that died.
 	 * 
-	 * @return The movement speed of the mob in meters per second.
+	 * @return The entity that died
 	 */
-	public abstract float getMovementSpeed();
+	public EnderEntity getEntity() {
+		return entity;
+	}
 }
