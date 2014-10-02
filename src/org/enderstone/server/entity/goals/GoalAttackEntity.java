@@ -70,6 +70,11 @@ public class GoalAttackEntity implements Goal {
 	@Override
 	public boolean shouldContinue() {
 
+		if (target.isDead() || (target instanceof EnderPlayer && !((EnderPlayer) target).isOnline)) {
+
+			return false;
+		}
+
 		return mob.getLocation().distanceSquared(target.getLocation()) < 1024;//32 squared = 1024
 	}
 
