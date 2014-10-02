@@ -1209,4 +1209,111 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public float getHeight() {
 		return 1.68F;
 	}
+
+	@Override
+	public Iterator<Location> getLineOfSight(double range, int blocksPerLocation) {
+		List<Location> list = new ArrayList<>();
+		Location startLocation = this.getHeadLocation();
+		Location endLocation = this.getTargetBlock(range);
+		double xDiff = endLocation.getX() - startLocation.getX();
+		double yDiff = endLocation.getY() - startLocation.getY();
+		double zDiff = endLocation.getZ() - startLocation.getZ();
+		
+		double xScale = xDiff / (blocksPerLocation * range);
+		double yScale = yDiff / (blocksPerLocation * range);
+		double zScale = zDiff / (blocksPerLocation * range);
+		
+		double currentX = 0;
+		double currentY = 0;
+		double currentZ = 0;
+		
+		for (int i = 0; i < (blocksPerLocation * range); i++) {
+			currentX += xScale;
+			currentY += yScale;
+			currentZ += zScale;
+			list.add(new Location(endLocation.getWorld(), currentX + startLocation.getX(), currentY + startLocation.getY(), currentZ + startLocation.getZ(), 0D, 0D));
+		}
+		return list.iterator();
+	}
+
+	@Override
+	public Location getTargetBlock(double range) {
+		double yaw = this.getHeadLocation().getYaw();
+		double pitch = this.getHeadLocation().getPitch();
+		
+		boolean watchingUp = false;
+		boolean watchingNorth = false;
+		boolean watchingEast = false;
+		boolean watchingSouth = false;
+		boolean watchingWest = false;
+		
+		if(pitch >= 0){
+			watchingUp = true;
+		}else if(pitch < 0){
+			pitch *= -1;
+		}
+		
+		while(yaw > 360){
+			yaw -= 360;
+		}
+		while(yaw < -360){
+			yaw += 360;
+		}
+		
+		if(isInBetween(yaw, -360, -270)){
+			yaw *= -1;
+			yaw -= 270;
+			yaw = 90 - yaw;
+			watchingNorth = true;
+		} else if(isInBetween(yaw, -270, -180)){
+			yaw *= -1;
+			yaw -= 180;
+			yaw = 90 - yaw;
+			watchingEast = true;
+		} else if(isInBetween(yaw, -180, -90)){
+			yaw *= -1;
+			yaw -= 90;
+			yaw = 90 - yaw;
+			watchingSouth = true;
+		} else if(isInBetween(yaw, -90, 0)){
+			yaw *= -1;
+			yaw = 90 - yaw;
+			watchingWest = true;
+		} else if(isInBetween(yaw, 0, 90)){
+			watchingNorth = true;
+		} else if(isInBetween(yaw, 90, 180)){
+			yaw -= 90;
+			watchingEast = true;
+		} else if(isInBetween(yaw, 180, 270)){
+			yaw -= 180;
+			watchingSouth = true;
+		} else if(isInBetween(yaw, 270, 360)){
+			yaw -= 270;
+			watchingWest = true;
+		}
+		
+		double radianYaw = Math.toRadians(yaw);
+		double radianPitch = Math.toRadians(pitch);
+		
+		double yTranslation = Math.sin(radianPitch) * range;
+		double hozTranslation = Math.cos(radianPitch) * range;
+		double xTranslation = Math.cos(radianYaw) * hozTranslation;
+		double zTranslation = Math.sin(radianYaw) * hozTranslation;
+		
+		Location old = this.getLocation();
+		if(watchingNorth){
+			return new Location(old.getWorld(), old.getX() - zTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() + xTranslation, yaw, pitch);
+		}else if(watchingEast){
+			return new Location(old.getWorld(), old.getX() - xTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() - zTranslation, yaw, pitch);
+		}else if(watchingSouth){
+			return new Location(old.getWorld(), old.getX() + zTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() - xTranslation, yaw, pitch);
+		}else if(watchingWest){
+			return new Location(old.getWorld(), old.getX() + xTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() + zTranslation, yaw, pitch);
+		}
+		throw new RuntimeException("This shouldn't happen! PITCH: " + pitch + " YAW: " + yaw + " North: " + watchingNorth + " East: " + watchingEast + " South: " + watchingSouth + " West: " + watchingWest);
+	}
+
+	private static boolean isInBetween(double yaw, int from, int to) {
+		return yaw >= from && yaw <= to;
+	}
 }
