@@ -133,7 +133,8 @@ public class PathNavigator {
 			difference.setZ(difference.getZ() > 0 ? Math.min(difference.getZ(), speed) : Math.max(difference.getZ(), -speed));
 
 			//Change new move method
-			mob.teleport(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
+			//mob.teleport(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
+			mob.moveInstantly(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
 
 			//There is probably a better way to do this
 			if (difference.getX() == 0) {
