@@ -1211,17 +1211,35 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	@Override
-	public Iterator<Location> getLineOfSight(double range) {
+	public Iterator<Location> getLineOfSight(double range, int blocksPerLocation) {
 		List<Location> list = new ArrayList<>();
-
+		Location startLocation = this.getHeadLocation();
+		Location endLocation = this.getTargetBlock(range);
+		double xDiff = endLocation.getX() - startLocation.getX();
+		double yDiff = endLocation.getY() - startLocation.getY();
+		double zDiff = endLocation.getZ() - startLocation.getZ();
 		
+		double xScale = xDiff / (blocksPerLocation * range);
+		double yScale = yDiff / (blocksPerLocation * range);
+		double zScale = zDiff / (blocksPerLocation * range);
+		
+		double currentX = 0;
+		double currentY = 0;
+		double currentZ = 0;
+		
+		for (int i = 0; i < (blocksPerLocation * range); i++) {
+			currentX += xScale;
+			currentY += yScale;
+			currentZ += zScale;
+			list.add(new Location(endLocation.getWorld(), currentX + startLocation.getX(), currentY + startLocation.getY(), currentZ + startLocation.getZ(), 0D, 0D));
+		}
 		return list.iterator();
 	}
 
 	@Override
 	public Location getTargetBlock(double range) {
-		double yaw = this.getLocation().getYaw();
-		double pitch = this.getLocation().getPitch();
+		double yaw = this.getHeadLocation().getYaw();
+		double pitch = this.getHeadLocation().getPitch();
 		
 		boolean watchingUp = false;
 		boolean watchingNorth = false;

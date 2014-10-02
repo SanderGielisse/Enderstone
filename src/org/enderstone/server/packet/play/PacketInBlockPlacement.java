@@ -18,7 +18,7 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
-import org.enderstone.server.EnderLogger;
+import java.util.Iterator;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
@@ -32,7 +32,6 @@ import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 import org.enderstone.server.regions.BlockId;
-import org.enderstone.server.regions.EnderBlock;
 
 public class PacketInBlockPlacement extends Packet {
 
@@ -73,7 +72,7 @@ public class PacketInBlockPlacement extends Packet {
 		Main.getInstance().sendToMainThread(new Runnable() {
 
 			@Override
-			public void run() {				
+			public void run() {
 				if (getLocation().getY() != -1) {
 					Block block = networkManager.player.getWorld().getBlock(getLocation());
 					BlockDefinition def = BlockDefinitions.getBlock(block.getBlock());

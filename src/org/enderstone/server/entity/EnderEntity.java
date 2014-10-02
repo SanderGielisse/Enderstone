@@ -309,4 +309,9 @@ public abstract class EnderEntity implements Entity {
 	public boolean shouldBroadcastDespawn(){
 		return this.broadcastDespawn;
 	}
+	
+	@Override
+	public Location getHeadLocation() {
+		return this.getLocation().add(0, this.getHeight(), 0);
+	}
 }

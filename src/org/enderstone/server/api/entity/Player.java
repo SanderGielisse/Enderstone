@@ -369,10 +369,11 @@ public interface Player {
 	 * returns an iterator with the locations of the blocks a player is looking at
 	 * 
 	 * @param range
+	 * @param locationsPerBlock the amount of locations is should return for each block
 	 * @return iterator with the locations of the blocks a player is looking at
 	 */
 	
-	public Iterator<Location> getLineOfSight(double range);
+	public Iterator<Location> getLineOfSight(double range, int locationsPerBlock);
 	
 	/**
 	 * returns the location of the block a player is looking at

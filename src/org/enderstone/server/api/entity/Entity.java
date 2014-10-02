@@ -120,4 +120,11 @@ public interface Entity {
 	 * 
 	 */
 	public void remove();
+	
+	/**
+	 * returns the location of the head of the entity
+	 * 
+	 * @return the location of the head of the entity
+	 */
+	public Location getHeadLocation();
 }
