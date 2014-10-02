@@ -17,6 +17,7 @@
  */
 package org.enderstone.server.api.entity;
 
+import java.util.Iterator;
 import org.enderstone.server.api.ChatPosition;
 import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.Location;
@@ -363,4 +364,22 @@ public interface Player {
 	 * @param subtitle The sub message to display to the player
 	 */
 	public void displayWelcomeTitle(Message title, Message subtitle);
+	
+	/**
+	 * returns an iterator with the locations of the blocks a player is looking at
+	 * 
+	 * @param range
+	 * @param locationsPerBlock the amount of locations is should return for each block
+	 * @return iterator with the locations of the blocks a player is looking at
+	 */
+	
+	public Iterator<Location> getLineOfSight(double range, int locationsPerBlock);
+	
+	/**
+	 * returns the location of the block a player is looking at
+	 * 
+	 * @param range
+	 * @return the location of the block a player is looking at (ignores solid blocks)
+	 */
+	public Location getTargetBlock(double range);
 }

@@ -48,6 +48,20 @@ public class Location implements Cloneable {
 	}
 
 	/**
+	 * Location stores a position and rotation of where an object can be located
+	 * 
+	 * @param world the world the location is in
+	 * @param x the x position of the location
+	 * @param y the y position of the location
+	 * @param z the z position of the location
+	 * @param yaw the yaw of the location
+	 * @param pitch the pitch of the location
+	 */
+	public Location(EnderWorld world, double x, double y, double z, double yaw, double pitch) {
+		this(world, (float) x, (float) y, (float) z, (float) yaw, (float) pitch);
+	}
+
+	/**
 	 * Get the world the location is in.
 	 * 
 	 * @return The world the location is in

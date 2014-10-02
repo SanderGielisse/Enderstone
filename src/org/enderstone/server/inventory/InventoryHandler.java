@@ -140,7 +140,7 @@ public class InventoryHandler {
 			if (Main.getInstance().callEvent(new PlayerDropItemEvent(player, stack))) {
 				return;
 			}
-			world.dropItem(player.getLocation(), stack, 10);
+			world.dropItem(player.getLocation(), stack, 30);
 			inventory.set(slot, null);
 		} else {
 			if (Main.getInstance().callEvent(new PlayerDropItemEvent(player, stack))) {
@@ -149,7 +149,7 @@ public class InventoryHandler {
 			stack.setAmount((byte) (stack.getAmount() - 1));
 			ItemStack cloned = stack.clone();
 			cloned.setAmount((byte) 1);
-			world.dropItem(player.getLocation(), cloned, 10);
+			world.dropItem(player.getLocation(), cloned, 30);
 			inventory.set(slot, stack);
 		}
 	}
