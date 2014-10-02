@@ -90,7 +90,7 @@ public class PlayerInventory extends DefaultInventory {
 
 	public List<ItemStack> getItemInsertionOrder() {
 		if (itemInsertionOrder != null) return itemInsertionOrder;
-		return itemInsertionOrder = new MergedList.Builder<ItemStack>().addList(0, getHotbar(), 0, 9).addList(9, getTopInventory(), 9, 3 * 9).build();
+		return itemInsertionOrder = new MergedList.Builder<ItemStack>().addList(0, getHotbar(), 0, 9).addList(9, getTopInventory(), 0, 3 * 9).build();
 	}
 
 	@Override
@@ -142,15 +142,12 @@ public class PlayerInventory extends DefaultInventory {
 	}
 
 	private static List<Integer> getInventorySlotsShiftClickOrder(List<Integer> l, int offset, boolean reverse) {
-		if (reverse)
-			for (int i = 0; i < (3 * 9); i++) {
+		if (reverse) {
+			for (int i = 0; i < (4 * 9); i++) {
 				l.add(i + offset);
 			}
-		for (int i = 0; i < (1 * 9); i++) {
-			l.add(i + offset + (3 * 9));
-		}
-		if (!reverse)
-			for (int i = 0; i < (3 * 9); i++) {
+		} else
+			for (int i = (4 * 9) - 1; i >= -1; i--) {
 				l.add(i + offset);
 			}
 		return l;

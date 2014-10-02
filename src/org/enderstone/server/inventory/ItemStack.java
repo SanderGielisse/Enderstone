@@ -132,6 +132,12 @@ public class ItemStack implements Cloneable {
 			throw new AssertionError(err);
 		}
 	}
+	
+	public ItemStack zeroSizeClone() {
+		ItemStack i = this.clone();
+		i.setAmount((byte)0);
+		return i;
+	}
 
 	public BlockId getId() {
 		return BlockId.byId(this.blockId);
