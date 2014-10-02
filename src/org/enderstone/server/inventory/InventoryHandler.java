@@ -227,9 +227,9 @@ public class InventoryHandler {
 			case 2: {
 				// Press on number on keyboard
 				int targetSlot = button;
-				swapItems(this.equimentInventory.getHotbar(), targetSlot, this.activeInventory.getRawItems(), slot);
+				//swapItems(this.equimentInventory.getHotbar(), targetSlot, this.activeInventory.getRawItems(), slot);
 			}
-			return true;
+			return false;
 			case 3: {
 				// TODO middle mouse click
 			}
