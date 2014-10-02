@@ -134,6 +134,61 @@ public class PathNavigator {
 
 			//Change new move method
 			mob.teleport(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
+
+			//There is probably a better way to do this
+			if (difference.getX() == 0) {
+
+				if (difference.getZ() > 0) {
+
+					mob.broadcastRotation(0, 0);
+
+					return;
+				}
+
+				else {
+
+					mob.broadcastRotation(0, 180);
+
+					return;
+				}
+			}
+
+			else if (difference.getZ() == 0) {
+
+				if (difference.getX() > 0) {
+
+					mob.broadcastRotation(0, 270);
+
+					return;
+				}
+
+				else {
+
+					mob.broadcastRotation(0, 90);
+
+					return;
+				}
+			}
+
+			else if (difference.getX() > 0 && difference.getZ() > 0) {
+
+				mob.broadcastRotation(0, 315);
+			}
+
+			else if (difference.getX() < 0 && difference.getZ() < 0) {
+
+				mob.broadcastRotation(0, 135);
+			}
+
+			else if (difference.getX() < 0 && difference.getZ() > 0) {
+
+				mob.broadcastRotation(0, 45);
+			}
+
+			else if (difference.getX() > 0 && difference.getZ() < 0) {
+
+				mob.broadcastRotation(0, 225);
+			}
 		}
 	}
 
