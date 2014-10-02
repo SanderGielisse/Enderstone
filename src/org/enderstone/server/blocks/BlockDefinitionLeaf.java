@@ -45,7 +45,7 @@ public class BlockDefinitionLeaf extends BlockDefinition {
 	
 	@Override
 	public ItemStack getDrop(Player player, World world, int x, int y, int z) {
-		if(player.getItemInHand().getBlockId() == BlockId.SHEARS.getId()){
+		if(player.getItemInHand() != null && player.getItemInHand().getBlockId() == BlockId.SHEARS.getId()){
 			return new ItemStack(BlockId.LEAVES);
 		}
 		return null;
