@@ -50,6 +50,7 @@ import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.enderstone.AiCommand;
 import org.enderstone.server.commands.enderstone.CraftingDebugCommand;
 import org.enderstone.server.commands.enderstone.DebugCommand;
+import org.enderstone.server.commands.enderstone.LagCommand;
 import org.enderstone.server.commands.enderstone.PingCommand;
 import org.enderstone.server.commands.enderstone.QuitCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
@@ -78,7 +79,8 @@ public class Main implements Runnable {
 	public static final String NAME = "Enderstone";
 	public static final String VERSION = "1.0.0";
 	public static final String PROTOCOL_VERSION = "1.8";
-	public static final int EXCEPTED_SLEEP_TIME = 1000 / 20;
+	public static final int EXCEPTED_TICK_RATE = 20;
+	public static final int EXCEPTED_SLEEP_TIME = 1000 / EXCEPTED_TICK_RATE;
 	public static final int CANT_KEEP_UP_TIMEOUT = -10000;
 	public static final int MAX_VIEW_DISTANCE = 10;
 	public static final int MAX_NETTY_BOSS_THREADS = 4;
@@ -121,11 +123,17 @@ public class Main implements Runnable {
 		commands.registerCommand(new DebugCommand());
 		commands.registerCommand(new WorldCommand());
 		commands.registerCommand(new CraftingDebugCommand());
+		commands.registerCommand(new LagCommand());
 
 		commands.registerCommand(new AiCommand());
 	}
 
 	private static Main instance;
+	/**
+	 * This array is used to store the last lag of the server, it can be used by plugins to calculate the lagg
+	 */
+	private final long[] lastTickSlices = new long[128];
+	private int lastTickPointer = 0;
 
 	public final Set<EnderPlayer> onlinePlayers = new HashSet<>();
 	public final List<EnderWorld> worlds = new ArrayList<>();
@@ -259,7 +267,8 @@ public class Main implements Runnable {
 				}
 				this.lastTick += Main.EXCEPTED_SLEEP_TIME;
 				long sleepTime = (lastTick) - System.currentTimeMillis();
-
+				Main.this.lastTickSlices[Main.this.lastTickPointer] = sleepTime;
+				if(++Main.this.lastTickPointer >= Main.this.lastTickSlices.length) Main.this.lastTickPointer = 0;
 				if (sleepTime < Main.CANT_KEEP_UP_TIMEOUT) {
 					this.warn("Can't keep up! " + -(sleepTime / Main.EXCEPTED_SLEEP_TIME) + " ticks behind!");
 					this.lastTick = System.currentTimeMillis();
@@ -491,5 +500,16 @@ public class Main implements Runnable {
 			((Cancellable) e).isCancelled();
 		}
 		return false;
+	}
+	
+	public long[] getLastLag() {
+		long[] last = new long[this.lastTickSlices.length];
+		if(this.lastTickPointer == 0)
+			System.arraycopy(this.lastTickSlices, 0, last, 0, last.length);
+		else {
+			System.arraycopy(this.lastTickSlices, this.lastTickPointer, last, 0, last.length - this.lastTickPointer);
+			System.arraycopy(this.lastTickSlices, 0, last, last.length - this.lastTickPointer, this.lastTickPointer);
+		}
+		return last;
 	}
 }
