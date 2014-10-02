@@ -168,6 +168,9 @@ public class EntityItem extends EnderEntity implements Item {
 	@Override
 	public void serverTick() {
 		super.serverTick();
+		if(Main.getInstance().doPhysics == false){
+			return;
+		}
 		if (pickupDelay > 0) {
 			pickupDelay--;
 		}
@@ -195,7 +198,7 @@ public class EntityItem extends EnderEntity implements Item {
 		if(getVelocity().motY < -1){
 			this.getVelocity().motY = -1;
 		}
-		this.getLocation().applyVector(getVelocity());
+		this.setLocation(this.getLocation().applyVector(getVelocity()));
 	}
 
 	private boolean canGoUp() {

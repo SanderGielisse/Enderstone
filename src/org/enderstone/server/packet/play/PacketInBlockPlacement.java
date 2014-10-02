@@ -70,25 +70,23 @@ public class PacketInBlockPlacement extends Packet {
 
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
-		if (getLocation().getY() != -1) {
-			Main.getInstance().sendToMainThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					Block block = networkManager.player.getWorld().getBlock(getLocation());
-					BlockDefinition def = BlockDefinitions.getBlock(block.getBlock());
-					def.onRightClick(networkManager.player, block);
-				}
-			});
-		}
-
-		if (getHeldItem() == null || getHeldItem().getBlockId() == -1) {
-			return;
-		}
 		Main.getInstance().sendToMainThread(new Runnable() {
 
 			@Override
 			public void run() {
+				if (getLocation().getY() != -1) {
+					Block block = networkManager.player.getWorld().getBlock(getLocation());
+					BlockDefinition def = BlockDefinitions.getBlock(block.getBlock());
+					boolean stop = def.onRightClick(networkManager.player, block);
+					if (stop) {
+						return;
+					}
+				}
+
+				if (getHeldItem() == null || getHeldItem().getBlockId() == -1) {
+					return;
+				}
+				
 				int x = getLocation().getBlockX();
 				int y = getLocation().getBlockY();
 				int z = getLocation().getBlockZ();

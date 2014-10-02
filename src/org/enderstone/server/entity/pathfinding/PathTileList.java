@@ -15,23 +15,34 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.api.entity;
+package org.enderstone.server.entity.pathfinding;
 
-import org.enderstone.server.entity.pathfinding.PathNavigator;
+import java.util.HashMap;
 
-public interface Mob extends Entity {
+/**
+ *
+ * @author gyroninja
+ */
+public class PathTileList extends HashMap<Integer, PathTile> {
 
-	/**
-	 * Get the navigator for the mob.
-	 * 
-	 * @return The navigator for the mob
-	 */
-	public abstract PathNavigator getNavigator();
+	public void add(PathTile tile) {
 
-	/**
-	 * Get the movement speed of the mob in meters per second.
-	 * 
-	 * @return The movement speed of the mob in meters per second.
-	 */
-	public abstract float getMovementSpeed();
+		this.put(tile.hashCode(), tile);
+	}
+
+	public void add(PathTile tile, boolean overwrite) {
+
+		if (containsKey(tile.hashCode())) {
+
+			if (overwrite) {
+
+				add(tile);
+			}
+		}
+
+		else {
+
+			add(tile);
+		}
+	}
 }

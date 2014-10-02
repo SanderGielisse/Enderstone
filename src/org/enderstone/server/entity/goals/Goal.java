@@ -15,23 +15,18 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.api.entity;
+package org.enderstone.server.entity.goals;
 
-import org.enderstone.server.entity.pathfinding.PathNavigator;
+/**
+ *
+ * @author gyroninja
+ */
+public interface Goal {
 
-public interface Mob extends Entity {
+	public abstract boolean shouldStart();
+	public abstract boolean shouldContinue();
 
-	/**
-	 * Get the navigator for the mob.
-	 * 
-	 * @return The navigator for the mob
-	 */
-	public abstract PathNavigator getNavigator();
-
-	/**
-	 * Get the movement speed of the mob in meters per second.
-	 * 
-	 * @return The movement speed of the mob in meters per second.
-	 */
-	public abstract float getMovementSpeed();
+	public abstract void start();
+	public abstract void run();
+	public abstract void reset();
 }
