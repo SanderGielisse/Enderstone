@@ -17,6 +17,7 @@
  */
 package org.enderstone.server.inventory;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
@@ -91,6 +92,8 @@ public class InventoryHandler {
 	private byte nextWindowId = 1;
 	private int selectedHotbarSlot = 0;
 	private final List<ItemStack> itemOnCursor = new FixedSizeList<>(new ItemStack[1]);
+	private final List<Integer> lastDrag = new ArrayList<>(64);
+	private int dragType;
 
 	public short getHeldItemSlot(){
 		return (short) this.selectedHotbarSlot;
@@ -192,7 +195,7 @@ public class InventoryHandler {
 						if (slot == -999)
 							drop(this.itemOnCursor, true, 0);
 						else {
-							this.activeInventory.onItemClick(true, mode, slot, false, itemOnCursor);
+							this.activeInventory.onItemClick(true, null, slot, false, itemOnCursor);
 						}
 					}
 					return true;
@@ -202,7 +205,7 @@ public class InventoryHandler {
 						if (slot == -999)
 							drop(this.itemOnCursor, true, 0);
 						else {
-							this.activeInventory.onItemClick(false, mode, slot, false, itemOnCursor);
+							this.activeInventory.onItemClick(false, null, slot, false, itemOnCursor);
 						}
 					}
 					return true;
@@ -215,11 +218,11 @@ public class InventoryHandler {
 			case 1: {
 				if (button == 0) {
 					//shift  + left mouse
-					this.activeInventory.onItemClick(true, mode, slot, true, itemOnCursor);
+					this.activeInventory.onItemClick(true, null, slot, true, itemOnCursor);
 					return true;
 				} else if (button == 1) {
 					//shift  + right mouse
-					this.activeInventory.onItemClick(false, mode, slot, true, itemOnCursor);
+					this.activeInventory.onItemClick(false, null, slot, true, itemOnCursor);
 					return true;
 				}
 			}
@@ -260,14 +263,14 @@ public class InventoryHandler {
 							case 0: {
 								//drop key Q
 								FixedSizeList<ItemStack> tmp = new FixedSizeList<>(new ItemStack[1]);
-								this.activeInventory.onItemClick(true, mode, slot, false, tmp);
+								this.activeInventory.onItemClick(true, null, slot, false, tmp);
 								drop(tmp, true, 0);
 							}
 							return true;
 							case 1: {
 								//ctrl + drop key Q
 								FixedSizeList<ItemStack> tmp = new FixedSizeList<>(new ItemStack[1]);
-								this.activeInventory.onItemClick(true, mode, slot, false, tmp);
+								this.activeInventory.onItemClick(true, null, slot, false, tmp);
 								drop(tmp, true, 0);
 							}
 							return true;
@@ -282,21 +285,31 @@ public class InventoryHandler {
 			case 5: {
 				if (button == 0) {
 					//started left or middle mouse button drag
+					this.lastDrag.clear();
+					dragType = 0;
 				} else if (button == 4) {
 					//started right mouse drag
+					this.lastDrag.clear();
+					dragType = 1;
 				} else if (button == 1) {
 					//add slot for left-mouse drag
+					if(dragType == 0 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
+						this.lastDrag.add(slot);
 				} else if (button == 5) {
 					//add slot for right-mouse drag
+					if(dragType == 1 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
+						this.lastDrag.add(slot);
 				} else if (button == 2) {
 					//ending left-mouse drag
+					this.activeInventory.onItemClick(true, this.lastDrag, slot, false, this.itemOnCursor);
 				} else if (button == 6) {
 					//ending right-mouse drag
-				}
+					this.activeInventory.onItemClick(true, this.lastDrag, slot, false, this.itemOnCursor);
+				} else return false;
 			}
-			break;
+			return true;
 			case 6: {
-				//double click
+				// TODO Add double clicking in future commits
 			}
 			break;
 			default: {
@@ -378,6 +391,8 @@ public class InventoryHandler {
 		if (++this.nextWindowId < 0) {
 			this.nextWindowId = 1;
 		}
+		lastDrag.clear();
+		dragType = -1;
 		// TODO add support for horse chests
 		player.debug(nextWindowId + "\n  size:"+inventory.getSize()+"",EnderPlayer.PlayerDebugger.INVENTORY);
 		this.player.networkManager.sendPacket(

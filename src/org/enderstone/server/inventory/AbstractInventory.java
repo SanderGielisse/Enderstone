@@ -23,7 +23,47 @@ import org.enderstone.server.inventory.armour.Armor;
 public abstract class AbstractInventory implements Inventory {
 
 	@Override
-	public void onItemClick(boolean leftMouse, int mode, int slot, boolean shiftClick, List<ItemStack> cursor) {
+	public void onItemClick(boolean leftMouse, List<Integer> draggedSlots, int slot, boolean shiftClick, List<ItemStack> cursor) {
+		if (draggedSlots != null) {
+			System.out.println(draggedSlots);
+			ItemStack cursorItem = cursor.get(0);
+			if (cursorItem == null) return;
+			int maxStackSize = cursorItem.getId().getMaxStackSize();
+			int amountToSlots;
+			if (leftMouse) {
+				amountToSlots = cursorItem.getAmount() / draggedSlots.size();
+			} else {
+				amountToSlots = 1;
+			}
+			int itemsRemaining = Math.max(cursorItem.getAmount() / amountToSlots, 0);
+			for (Integer s : draggedSlots) {
+				DropType type = this.getSlotDropType(s);
+				if (type != DropType.ALL_ALLOWED) continue; // TODO if new item slots are added, edit this list
+				ItemStack existingItem = this.getRawItem(s);
+				if (existingItem != null) {
+					if (!existingItem.materialTypeMatches(cursorItem))
+						continue;
+					if (existingItem.getAmount() >= maxStackSize)
+						continue;
+				}
+
+				int itemsToTake = Math.min(
+						Math.min(maxStackSize - (existingItem == null ? 0 : existingItem.getAmount()), amountToSlots),
+						cursorItem.getAmount());
+				assert itemsToTake >= 0;
+				if (itemsToTake > 0) {
+					if (existingItem == null)
+						existingItem = cursorItem.zeroSizeClone();
+					existingItem.setAmount(existingItem.getAmount() + itemsToTake);
+					cursorItem.setAmount(cursorItem.getAmount() - itemsToTake);
+					this.setRawItem(s, existingItem);
+				}
+			}
+			assert cursorItem.getAmount() >= itemsRemaining;
+			assert cursorItem.getAmount() >= 0;
+			cursor.set(0, cursorItem.getAmount() == 0 ? null : cursorItem);
+			return;
+		}
 		ItemStack slotItemStack = this.getRawItem(slot);
 		DropType slotDropType = this.getSlotDropType(slot);
 		if (shiftClick && slotDropType == DropType.FULL_OUT) {

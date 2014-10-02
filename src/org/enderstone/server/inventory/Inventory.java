@@ -30,6 +30,6 @@ public interface Inventory extends AutoCloseable, HalfInventory {
 	
 	public void removeListener(InventoryListener listener);
 
-	public void onItemClick(boolean leftMouse, int mode, int slot, boolean shiftClick, List<ItemStack> cursor);
+	public void onItemClick(boolean leftMouse, List<Integer> draggedSlots, int slot, boolean shiftClick, List<ItemStack> cursor);
 	
 }
