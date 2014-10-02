@@ -38,6 +38,7 @@ import org.enderstone.server.packet.play.PacketOutWindowItems;
 import org.enderstone.server.packet.play.PacketOutWindowProperty;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.util.FixedSizeList;
+import org.enderstone.server.util.MergedList;
 
 /**
  *
@@ -230,9 +231,13 @@ public class InventoryHandler {
 			case 2: {
 				// Press on number on keyboard
 				int targetSlot = button;
-				//swapItems(this.equimentInventory.getHotbar(), targetSlot, this.activeInventory.getRawItems(), slot);
+				if(targetSlot < 0 || targetSlot > 8) {
+					player.networkManager.disconnect("Invalid button?? " + mode + "->" + button, true);
+				}
+				this.activeInventory.onItemClick(true, null, slot, false, new MergedList.Builder<ItemStack>().
+						addList(0, this.equimentInventory.getHotbar(), targetSlot, 1).build());
 			}
-			return false;
+			return true;
 			case 3: {
 				// TODO middle mouse click
 			}
