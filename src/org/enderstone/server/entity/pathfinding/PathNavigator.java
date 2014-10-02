@@ -56,6 +56,20 @@ public class PathNavigator {
 		return path;
 	}
 
+	public void setPath(PathFinder pathfinder, List<PathTile> path) {
+
+		this.pathfinder = pathfinder;
+
+		this.path = path;
+
+		currentTile = 0;
+	}
+
+	public PathFinder getPathfinder() {
+
+		return pathfinder;
+	}
+
 	public PathTile getCurrentTile() {
 
 		if (path != null) {
@@ -64,20 +78,6 @@ public class PathNavigator {
 		}
 
 		return null;
-	}
-
-	public PathFinder getPathfinder() {
-
-		return pathfinder;
-	}
-
-	public void setPath(PathFinder pathfinder, List<PathTile> path) {
-
-		this.pathfinder = pathfinder;
-
-		this.path = path;
-
-		currentTile = 0;
 	}
 
 	//Goals should be added in order of priority

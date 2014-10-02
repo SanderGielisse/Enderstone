@@ -30,11 +30,11 @@ public class PathTileList extends HashMap<Integer, PathTile> {
 		this.put(tile.hashCode(), tile);
 	}
 
-	public void add(PathTile tile, boolean overrite) {
+	public void add(PathTile tile, boolean overwrite) {
 
 		if (containsKey(tile.hashCode())) {
 
-			if (overrite) {
+			if (overwrite) {
 
 				add(tile);
 			}

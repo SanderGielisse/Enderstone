@@ -25,9 +25,9 @@ import org.enderstone.server.api.Location;
  */
 public class PathTile {
 
-	private final int xOffset;
-	private final int yOffset;
-	private final int zOffset;
+	private final int offsetX;
+	private final int offsetY;
+	private final int offsetZ;
 
 	private double goalCost = -1;
 	private double heuristicCost = -1;
@@ -44,9 +44,9 @@ public class PathTile {
 
 	public PathTile(int x, int y, int z, PathTile parent, int startX, int startY, int startZ, int endX, int endY, int endZ) {
 
-		this.xOffset = x;
-		this.yOffset = y;
-		this.zOffset = z;
+		this.offsetX = x;
+		this.offsetY = y;
+		this.offsetZ = z;
 
 		this.startX = startX;
 		this.startY = startY;
@@ -63,17 +63,17 @@ public class PathTile {
 
 	public int getXOffset() {
 
-		return xOffset;
+		return offsetX;
 	}
 
 	public int getYOffset() {
 
-		return yOffset;
+		return offsetY;
 	}
 
 	public int getZOffset() {
 
-		return zOffset;
+		return offsetZ;
 	}
 
 	public double getGoalCost() {
@@ -119,11 +119,16 @@ public class PathTile {
 	@Override
 	public int hashCode() {
 
+		return calculateHashCode(offsetX, offsetY, offsetZ);
+	}
+
+	public static int calculateHashCode(int x, int y, int z) {
+
 		int hash = 7;
 
-		hash = 89 * hash + this.xOffset;
-		hash = 89 * hash + this.yOffset;
-		hash = 89 * hash + this.zOffset;
+		hash = 89 * hash + x;
+		hash = 89 * hash + y;
+		hash = 89 * hash + z;
 
 		return hash;
 	}
@@ -131,12 +136,12 @@ public class PathTile {
 	@Override
 	public String toString() {
 
-		return "PathTile{" + "xOffset=" + xOffset + " yOffset=" + yOffset + " zOffset=" + zOffset + '}';
+		return "PathTile{" + "xOffset=" + offsetX + " yOffset=" + offsetY + " zOffset=" + offsetZ + '}';
 	}
 
 	public boolean isInRange(int range) {
 
-		return (range - Math.abs(xOffset) >= 0 && range - Math.abs(yOffset) >= 0 && range - Math.abs(zOffset) >= 0);
+		return (range - Math.abs(offsetX) >= 0 && range - Math.abs(offsetY) >= 0 && range - Math.abs(offsetZ) >= 0);
 	}
 
 	public double getDistance(int startX, int startY, int startZ, int endX, int endY, int endZ) {
@@ -150,7 +155,7 @@ public class PathTile {
 
 	public Location getLocation(Location start) {
 
-		return start.clone().add(xOffset, yOffset, zOffset);
+		return start.clone().add(offsetX, offsetY, offsetZ);
 	}
 
 	private void calculateCost() {
@@ -159,6 +164,7 @@ public class PathTile {
 		calculateHeuristicCost();
 	}
 
+	//TODO Add cost to go through water and other blocks
 	private void calculateGoalCost() {
 
 		if (goalCost == -1) {
@@ -200,9 +206,9 @@ public class PathTile {
 
 		if (heuristicCost == -1) {
 
-			int futureX = startX + xOffset;
-			int futureY = startY + yOffset;
-			int futureZ = startZ + zOffset;
+			int futureX = startX + offsetX;
+			int futureY = startY + offsetY;
+			int futureZ = startZ + offsetZ;
 
 			this.heuristicCost = getDistance(futureX, futureY, futureZ, endX, endY, endZ);
 		}

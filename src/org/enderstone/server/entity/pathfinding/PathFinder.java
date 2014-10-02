@@ -23,14 +23,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
-import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.regions.BlockId;
-import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
-import org.enderstone.server.regions.RegionSet;
 
 /**
  *
@@ -38,7 +33,7 @@ import org.enderstone.server.regions.RegionSet;
  */
 public class PathFinder {
 
-	private EnderWorld world;
+	private final EnderWorld world;
 
 	private final int startX;
 	private final int startY;
@@ -56,8 +51,6 @@ public class PathFinder {
 	private final int endTileId;
 
 	private boolean hasPath;
-
-	private AtomicBoolean checkOnce = new AtomicBoolean();
 
 	public PathFinder(Location startLoc, Location endLoc, int range) {
 
@@ -92,12 +85,7 @@ public class PathFinder {
 
 		processAdjacentTiles(tile);
 
-		int hash = 7;
-		hash = 89 * hash + (endX - startX);
-		hash = 89 * hash + (endY - startY);
-		hash = 89 * hash + (endZ - startZ);
-
-		this.endTileId = hash;
+		this.endTileId = PathTile.calculateHashCode(endX - startX, endY - startY, endZ - startZ);
 	}
 
 	public Location getStartLocation() {
@@ -117,58 +105,43 @@ public class PathFinder {
 
 	public List<PathTile> getPath() {
 
-		if (!checkOnce.get()) {
+		if (Math.abs(startX - endX) > range || Math.abs(startY - endY) > range || Math.abs(startZ - endZ) > range) {
 
-			checkOnce.set(true);
+			hasPath = false;
 
-			if (abs(startX - endX) > range || abs(startY - endY) > range || abs(startZ - endZ) > range) {
+			return null;
+		}
 
-				hasPath = false;
+		PathTile currentTile = null;
 
-				return null;
+		while (canContinue()) {
+
+			currentTile = getLowestCostTile();
+
+			processAdjacentTiles(currentTile);
+		}
+
+		if (hasPath) {
+
+			List<PathTile> pathTrace = new LinkedList<>();
+
+			PathTile parentTile;
+
+			pathTrace.add(currentTile);
+
+			while ((parentTile = currentTile.getParent()) != null) {
+
+				pathTrace.add(parentTile);
+
+				currentTile = parentTile;
 			}
 
-			PathTile currentTile = null;
+			Collections.reverse(pathTrace);
 
-			while (canContinue()) {
-
-				currentTile = getLowestCostTile();
-
-				processAdjacentTiles(currentTile);
-			}
-
-			if (!hasPath) {
-
-				return null;
-			}
-
-			else {
-
-				List<PathTile> pathTrace = new LinkedList<>();
-
-				PathTile parentTile;
-
-				pathTrace.add(currentTile);
-
-				while ((parentTile = currentTile.getParent()) != null) {
-
-					pathTrace.add(parentTile);
-
-					currentTile = parentTile;
-				}
-
-				Collections.reverse(pathTrace);
-
-				return new ArrayList<>(pathTrace);
-			}
+			return new ArrayList<>(pathTrace);
 		}
 
 		return null;
-	}
-
-	private int abs(int x) {
-
-		return x > 0 ? x : -x;
 	}
 
 	private boolean canContinue() {
@@ -294,11 +267,6 @@ public class PathFinder {
 				}
 			}
 		}
-	}
-
-	private boolean canWalkOn(PathTile t) {
-
-		return canWalkOn(t.getXOffset(), t.getYOffset(), t.getZOffset());
 	}
 
 	//TODO add checks for different sized mobs
