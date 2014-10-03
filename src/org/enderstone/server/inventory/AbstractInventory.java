@@ -194,6 +194,8 @@ public abstract class AbstractInventory implements Inventory {
 							slotItemStack.setAmount(newOtherAmount);
 							this.setRawItem(slot, slotItemStack);
 						}
+					} else {
+						swapItems(cursor, 0, getRawItems(), slot);
 					}
 				}
 			}
