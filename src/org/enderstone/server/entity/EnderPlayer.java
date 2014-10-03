@@ -662,7 +662,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 
 		boolean didFoodUpdate = false;
-		if (!this.isDead() && latestFood++ % (30 * 20) == 0) { // TODO do this how it goes in default Minecraft
+		latestFood++;
+		if (!this.isDead() && ((latestFood % (10 * 20) == 0 && this.isSprinting()) || (latestFood % (50 * 20) == 0 && !this.isSprinting()))) {
 			didFoodUpdate = true;
 			if (this.clientSettings.foodSaturation > 0) {
 				this.clientSettings.foodSaturation--;
@@ -676,7 +677,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				}
 			}
 		}
-		if (!this.isDead() && latestHeal++ % (15 * 20) == 0 && !didFoodUpdate) { // TODO do this how it goes in default Minecraft
+		if (!this.isDead() && latestHeal++ % (15 * 20) == 0 && !didFoodUpdate) {
 			if ((this.getHealth() + 0.5F) <= this.getMaxHealth() && this.getFoodLevel() > 0) {
 				this.setHealth(this.getHealth() + 0.5F);
 			}
