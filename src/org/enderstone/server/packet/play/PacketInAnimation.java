@@ -57,7 +57,7 @@ public class PacketInAnimation extends Packet {
 
 			@Override
 			public void run() {
-				Iterator<Location> lineOfSight = networkManager.player.getLineOfSight(4, 1);
+				Iterator<Location> lineOfSight = networkManager.player.getLineOfSight(4, 3);
 				while(lineOfSight.hasNext()){
 					Location next = lineOfSight.next();
 					if(networkManager.player.getWorld().getBlock(next).getBlock() == BlockId.FIRE){
