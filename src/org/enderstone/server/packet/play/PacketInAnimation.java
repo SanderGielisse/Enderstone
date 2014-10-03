@@ -18,10 +18,14 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.Location;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
+import org.enderstone.server.regions.BlockId;
 
 public class PacketInAnimation extends Packet {
 
@@ -53,6 +57,15 @@ public class PacketInAnimation extends Packet {
 
 			@Override
 			public void run() {
+				Iterator<Location> lineOfSight = networkManager.player.getLineOfSight(4, 1);
+				while(lineOfSight.hasNext()){
+					Location next = lineOfSight.next();
+					if(networkManager.player.getWorld().getBlock(next).getBlock() == BlockId.FIRE){
+						networkManager.player.getWorld().setBlockAt(next.getBlockX(), next.getBlockY(), next.getBlockZ(), BlockId.AIR, (byte) 0);
+						break;
+					}
+				}
+				
 				networkManager.player.getWorld().broadcastPacket(new PacketOutAnimation(networkManager.player.getEntityId(), armSwingId), networkManager.player.getLocation(), networkManager.player);
 			}
 		});
