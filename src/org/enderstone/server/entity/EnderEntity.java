@@ -251,11 +251,11 @@ public abstract class EnderEntity implements Entity {
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();
 		double z = this.getLocation().getZ();
-		BlockId id1 = world.getBlock((int)Math.floor(x), (int)Math.floor(y), (int)z).getBlock();
-		BlockId id2 = world.getBlock((int)Math.floor(x + (getWidth() / 2)), (int)Math.floor(y), (int)Math.floor(z)).getBlock();
-		BlockId id3 = world.getBlock((int)Math.floor(x - (getWidth() / 2)), (int)Math.floor(y), (int)Math.floor(z)).getBlock();
-		BlockId id4 = world.getBlock((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z - (getWidth() / 2))).getBlock();
-		BlockId id5 = world.getBlock((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z + (getWidth() / 2))).getBlock();
+		BlockId id1 = world.getBlock(floor(x), floor(y), floor(z)).getBlock();
+		BlockId id2 = world.getBlock(floor(x + (getWidth() / 2)), floor(y), floor(z)).getBlock();
+		BlockId id3 = world.getBlock(floor(x - (getWidth() / 2)), floor(y), floor(z)).getBlock();
+		BlockId id4 = world.getBlock(floor(x), floor(y), floor(z - (getWidth() / 2))).getBlock();
+		BlockId id5 = world.getBlock(floor(x), floor(y), floor(z + (getWidth() / 2))).getBlock();
 		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
 		
 		boolean isInFire = compare(BlockId.FIRE, array) || compare(BlockId.LAVA, array) || compare(BlockId.LAVA_FLOWING, array);
@@ -285,8 +285,13 @@ public abstract class EnderEntity implements Entity {
 			this.setFireTicks(0);
 		}
 	}
+	
+	public static int floor(double num) {
+		final int floor = (int) num;
+		return floor == num ? floor : floor - (int) (Double.doubleToRawLongBits(num) >>> 63);
+	}
 
-	private boolean compare(BlockId fire, BlockId[] ids) {
+	private static boolean compare(BlockId fire, BlockId[] ids) {
 		for(BlockId id : ids){
 			if(id == fire){
 				return true;

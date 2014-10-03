@@ -130,7 +130,7 @@ public class Main implements Runnable {
 
 	private static Main instance;
 	/**
-	 * This array is used to store the last lag of the server, it can be used by plugins to calculate the lagg
+	 * This array is used to store the last lag of the server, it can be used by plugins to calculate the lag
 	 */
 	private final long[] lastTickSlices = new long[128];
 	private int lastTickPointer = 0;
