@@ -32,6 +32,7 @@ import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
 import org.enderstone.server.api.Vector;
+import org.enderstone.server.api.World;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.api.event.player.PlayerChatEvent;
 import org.enderstone.server.api.event.player.PlayerCommandEvent;
@@ -661,7 +662,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 
 		boolean didFoodUpdate = false;
-		if (!this.isDead() && latestFood++ % (30 * 20) == 0) { // TODO do this how it goes in default Minecraft
+		latestFood++;
+		if (!this.isDead() && ((latestFood % (10 * 20) == 0 && this.isSprinting()) || (latestFood % (50 * 20) == 0 && !this.isSprinting()))) {
 			didFoodUpdate = true;
 			if (this.clientSettings.foodSaturation > 0) {
 				this.clientSettings.foodSaturation--;
@@ -675,7 +677,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				}
 			}
 		}
-		if (!this.isDead() && latestHeal++ % (15 * 20) == 0 && !didFoodUpdate) { // TODO do this how it goes in default Minecraft
+		if (!this.isDead() && latestHeal++ % (15 * 20) == 0 && !didFoodUpdate) {
 			if ((this.getHealth() + 0.5F) <= this.getMaxHealth() && this.getFoodLevel() > 0) {
 				this.setHealth(this.getHealth() + 0.5F);
 			}
@@ -817,15 +819,15 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			return;
 		}
 		
-		EnderWorld world = this.getWorld();
+		World world = this.getWorld();
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();
 		double z = this.getLocation().getZ();
-		BlockId id1 = world.getBlock((int)x, (int)y, (int)z).getBlock();
-		BlockId id2 = world.getBlock((int)(x + (getWidth() / 2)), (int)y, (int)z).getBlock();
-		BlockId id3 = world.getBlock((int)(x - (getWidth() / 2)), (int)y, (int)z).getBlock();
-		BlockId id4 = world.getBlock((int)x, (int)y, (int)(z - (getWidth() / 2))).getBlock();
-		BlockId id5 = world.getBlock((int)x, (int)y, (int)(z + (getWidth() / 2))).getBlock();
+		BlockId id1 = world.getBlock(floor(x), floor(y), floor(z)).getBlock();
+		BlockId id2 = world.getBlock(floor(x + (getWidth() / 2)), floor(y), floor(z)).getBlock();
+		BlockId id3 = world.getBlock(floor(x - (getWidth() / 2)), floor(y), floor(z)).getBlock();
+		BlockId id4 = world.getBlock(floor(x), floor(y), floor(z - (getWidth() / 2))).getBlock();
+		BlockId id5 = world.getBlock(floor(x), floor(y), floor(z + (getWidth() / 2))).getBlock();
 		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
 		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
 		
