@@ -18,6 +18,7 @@
 package org.enderstone.server.entity;
 
 import java.util.Set;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
@@ -66,11 +67,13 @@ public abstract class EnderEntity implements Entity {
 	public void setLocation(Location newLoc){
 		this.location.cloneFrom(newLoc);
 	}
-
+	
 	public abstract Packet[] getSpawnPackets();
 
+	@Override
 	public abstract void teleport(Location loc);
 
+	@Override
 	public abstract void teleport(EnderEntity entity);
 
 	public abstract void onRightClick(EnderPlayer attacker);
@@ -130,6 +133,7 @@ public abstract class EnderEntity implements Entity {
 
 	public final void heal() {
 		setHealth(this.getMaxHealth());
+		setFireTicks(0);
 	}
 
 	protected void onHealthUpdate(float newHealth, float lastHealth) {
@@ -240,28 +244,29 @@ public abstract class EnderEntity implements Entity {
 		if(shouldBeRemoved || this.isDead() || Main.getInstance().doPhysics == false){
 			return;
 		}
-			
+		//if (this instanceof EnderPlayer) {
+			//EnderLogger.debug("FireTicks: " + fireTicks);
+		//}
 		World world = this.getWorld();
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();
 		double z = this.getLocation().getZ();
-		BlockId id1 = world.getBlock((int)x, (int)y, (int)z).getBlock();
-		BlockId id2 = world.getBlock((int)(x + (getWidth() / 2)), (int)y, (int)z).getBlock();
-		BlockId id3 = world.getBlock((int)(x - (getWidth() / 2)), (int)y, (int)z).getBlock();
-		BlockId id4 = world.getBlock((int)x, (int)y, (int)(z - (getWidth() / 2))).getBlock();
-		BlockId id5 = world.getBlock((int)x, (int)y, (int)(z + (getWidth() / 2))).getBlock();
+		BlockId id1 = world.getBlock((int)Math.floor(x), (int)Math.floor(y), (int)z).getBlock();
+		BlockId id2 = world.getBlock((int)Math.floor(x + (getWidth() / 2)), (int)Math.floor(y), (int)Math.floor(z)).getBlock();
+		BlockId id3 = world.getBlock((int)Math.floor(x - (getWidth() / 2)), (int)Math.floor(y), (int)Math.floor(z)).getBlock();
+		BlockId id4 = world.getBlock((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z - (getWidth() / 2))).getBlock();
+		BlockId id5 = world.getBlock((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z + (getWidth() / 2))).getBlock();
 		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
 		
 		boolean isInFire = compare(BlockId.FIRE, array) || compare(BlockId.LAVA, array) || compare(BlockId.LAVA_FLOWING, array);
-		if (isInFire) {
-			if (getFireTicks() == 0) {
-				setFireTicks(101); // 5 seconds burn after leaving lava/fire
-			}
-		}
 		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
-		if(isInWater){
-			if(this.getFireTicks() > 0){
+		if (isInWater) {
+			if (this.getFireTicks() > 0) {
 				this.setFireTicks(0);
+			}
+		} else if (isInFire) {
+			if (getFireTicks() == 0) {
+				setFireTicks(100); // 5 seconds burn after leaving lava/fire
 			}
 		}
 
@@ -269,7 +274,7 @@ public abstract class EnderEntity implements Entity {
 			return;
 		}
 		this.fireTicks--;
-		if(fireTicks % 20 == 0){
+		if(fireTicks % 10 == 0){
 			if (damage(1F)) {
 				if ((this instanceof EnderPlayer)) {
 					Main.getInstance().broadcastMessage(new AdvancedMessage(((EnderPlayer) this).getPlayerName() + " burned to death."));
@@ -299,7 +304,7 @@ public abstract class EnderEntity implements Entity {
 			this.fireTicks = fireTicks;
 			return;
 		}
-		if(this.getFireTicks() == 0 && fireTicks == 0){
+		if(this.fireTicks == 0 && fireTicks == 0){
 			return;
 		}
 		this.fireTicks = fireTicks;
