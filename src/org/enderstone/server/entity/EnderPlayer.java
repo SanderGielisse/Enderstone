@@ -32,6 +32,7 @@ import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Particle;
 import org.enderstone.server.api.Vector;
+import org.enderstone.server.api.World;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.api.event.player.PlayerChatEvent;
 import org.enderstone.server.api.event.player.PlayerCommandEvent;
@@ -817,15 +818,15 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			return;
 		}
 		
-		EnderWorld world = this.getWorld();
+		World world = this.getWorld();
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();
 		double z = this.getLocation().getZ();
-		BlockId id1 = world.getBlock((int)x, (int)y, (int)z).getBlock();
-		BlockId id2 = world.getBlock((int)(x + (getWidth() / 2)), (int)y, (int)z).getBlock();
-		BlockId id3 = world.getBlock((int)(x - (getWidth() / 2)), (int)y, (int)z).getBlock();
-		BlockId id4 = world.getBlock((int)x, (int)y, (int)(z - (getWidth() / 2))).getBlock();
-		BlockId id5 = world.getBlock((int)x, (int)y, (int)(z + (getWidth() / 2))).getBlock();
+		BlockId id1 = world.getBlock(floor(x), floor(y), floor(z)).getBlock();
+		BlockId id2 = world.getBlock(floor(x + (getWidth() / 2)), floor(y), floor(z)).getBlock();
+		BlockId id3 = world.getBlock(floor(x - (getWidth() / 2)), floor(y), floor(z)).getBlock();
+		BlockId id4 = world.getBlock(floor(x), floor(y), floor(z - (getWidth() / 2))).getBlock();
+		BlockId id5 = world.getBlock(floor(x), floor(y), floor(z + (getWidth() / 2))).getBlock();
 		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
 		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
 		
