@@ -418,8 +418,12 @@ public class InventoryHandler {
 	public void updateInventory() {
 		this.player.networkManager.sendPacket(new PacketOutWindowItems(playerWindowId, equimentInventory.getRawItems().toArray(new ItemStack[equimentInventory.getSize()])));
 	}
-	
+
 	public void updateRemoteInventory() {
+		if(activeInventory == equimentInventory) {
+			this.updateInventory();
+			return;
+		}
 		this.player.networkManager.sendPacket(new PacketOutWindowItems(nextWindowId, activeInventory.getRawItems().toArray(new ItemStack[activeInventory.getSize()])));
 	}
 
