@@ -176,9 +176,7 @@ public class InventoryHandler {
 		byte windowId = packet.getWindowId();
 		int slot = packet.getSlot();
 		int button = packet.getButton();
-		short actionNumber = packet.getActionNumber();
 		int mode = packet.getMode();
-		ItemStack itemStack = packet.getItemStack();
 		if (windowId != this.nextWindowId && windowId != 0) {
 			player.sendMessage(new SimpleMessage("Invalid inventory interaction!"));
 			return false;
@@ -298,11 +296,11 @@ public class InventoryHandler {
 					dragType = 1;
 				} else if (button == 1) {
 					//add slot for left-mouse drag
-					if(dragType == 0 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
+					if (dragType == 0 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
 						this.lastDrag.add(slot);
 				} else if (button == 5) {
 					//add slot for right-mouse drag
-					if(dragType == 1 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
+					if (dragType == 1 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
 						this.lastDrag.add(slot);
 				} else if (button == 2) {
 					//ending left-mouse drag
@@ -369,9 +367,9 @@ public class InventoryHandler {
 
 	public void openInventory(HalfInventory inv) {
 		Inventory inventory;
-		if (inv == null) 
+		if (inv == null)
 			inventory = equimentInventory;
-		else 
+		else
 			inventory = inv.openFully(equimentInventory);
 		this.drop(this.itemOnCursor, true, 0);
 		itemOnCursor.set(0, null);
@@ -399,14 +397,14 @@ public class InventoryHandler {
 		lastDrag.clear();
 		dragType = -1;
 		// TODO add support for horse chests
-		player.debug(nextWindowId + "\n  size:"+inventory.getSize()+"",EnderPlayer.PlayerDebugger.INVENTORY);
+		player.debug(nextWindowId + "\n  size:" + inventory.getSize() + "", EnderPlayer.PlayerDebugger.INVENTORY);
 		this.player.networkManager.sendPacket(
-				new PacketOutOpenWindow(
-						this.nextWindowId, 
-						inventory.getType(), 
-						inventory.getTitle(), 
-						(byte) (inventory.getType().getPacketSize() == -1 ? inv.getSize() : inventory.getType().getPacketSize()),
-						0)
+			new PacketOutOpenWindow(
+				this.nextWindowId,
+				inventory.getType(),
+				inventory.getTitle(),
+				(byte) (inventory.getType().getPacketSize() == -1 ? inv.getSize() : inventory.getType().getPacketSize()),
+				0)
 		);
 		boolean isNonEmpty = false;
 		int size = inv.getSize();
