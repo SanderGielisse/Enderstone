@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.event.player.PlayerDropItemEvent;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.EnderPlayer;
@@ -166,6 +167,17 @@ public class InventoryHandler {
 
 	public void recievePacket(PacketInClickWindow packet) {
 		//player.sendMessage(new SimpleMessage(packet.toString()));
+		int slot = packet.getSlot();
+		byte windowId = packet.getWindowId();
+		if (windowId != this.nextWindowId && windowId != 0) {
+			return;
+		}
+		if(slot > 0 && slot < this.activeInventory.getSize() && 
+			!(this.activeInventory.getRawItem(slot) == null ? 
+			packet.getItemStack() == null : 
+			this.activeInventory.getRawItem(slot).equals(packet.getItemStack()))) {
+			player.networkManager.sendPacket(new PacketOutSetSlot(windowId, (short) slot, this.activeInventory.getRawItem(slot)));
+		}
 		boolean correctTransaction = handleInventoryClick(packet);
 		player.debug("Cursor: "+this.itemOnCursor.get(0),EnderPlayer.PlayerDebugger.INVENTORY);
 		if(!correctTransaction) player.sendMessage(new SimpleMessage("Unable to process inventory action: "+packet.toString()));
@@ -229,15 +241,25 @@ public class InventoryHandler {
 			case 2: {
 				// Press on number on keyboard
 				int targetSlot = button;
-				if(targetSlot < 0 || targetSlot > 8) {
+				if (targetSlot < 0 || targetSlot > 8) {
 					player.networkManager.disconnect("Invalid button?? " + mode + "->" + button, true);
+					return false;
 				}
 				this.activeInventory.onItemClick(true, null, slot, false, new MergedList.Builder<ItemStack>().
-						addList(0, this.equimentInventory.getHotbar(), targetSlot, 1).build());
+					addList(0, this.equimentInventory.getHotbar(), targetSlot, 1).build());
 			}
 			return true;
 			case 3: {
 				// TODO middle mouse click
+				if (player.getGameMode() == GameMode.CREATIVE) {
+					ItemStack clone = this.activeInventory.getRawItem(slot); // this makes an implied clone of the item
+					if(clone != null) {
+						clone.setAmount(clone.getId().getMaxStackSize());
+						this.itemOnCursor.set(0, clone);
+					} else {
+						this.activeInventory.onItemClick(true, null, slot, false, itemOnCursor);
+					}
+				}
 			}
 			break;
 			case 4: {
