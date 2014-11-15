@@ -289,6 +289,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_CHICKEN, (byte) 10));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_RABBIT, (byte) 10));
 
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.FLINT_AND_STEEL, (byte) 1));
+
 		this.inventoryHandler.getPlayerInventory().setRawItem(5, new ItemStack(BlockId.DIAMOND_HELMET, (byte) 1));
 
 		this.updateDataWatcher();

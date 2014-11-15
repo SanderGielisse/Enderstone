@@ -23,10 +23,9 @@ package org.enderstone.server.entity.goals;
  */
 public interface Goal {
 
-	public abstract boolean shouldStart();
-	public abstract boolean shouldContinue();
-
-	public abstract void start();
+	public abstract boolean start();
 	public abstract void run();
 	public abstract void reset();
+
+	public abstract boolean shouldContinue();
 }

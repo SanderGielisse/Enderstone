@@ -15,17 +15,41 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity.targets;
+
+package org.enderstone.server.items;
+
+import org.enderstone.server.api.Block;
+import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.regions.BlockId;
 
 /**
  *
  * @author gyroninja
  */
-public interface Target {
+public class ItemDefinition {
 
-	public abstract boolean start();
-	public abstract void run();
-	public abstract void reset();
+	private final BlockId type;
 
-	public abstract boolean shouldContinue();
+	public ItemDefinition(BlockId type) {
+
+		this.type = type;
+	}
+
+	public BlockId getType() {
+
+		return type;
+	}
+
+	public int getMaxStackSize() {
+		return 64;
+	}
+
+	public void onLeftClick(EnderPlayer player, Block block) {};
+
+	public void onRightClick(EnderPlayer player, Block block) {};
+
+	public int getAttackDamage() {
+
+		return 1;
+	}
 }

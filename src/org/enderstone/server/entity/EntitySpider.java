@@ -20,6 +20,7 @@ package org.enderstone.server.entity;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.entity.goals.GoalAttackEntity;
+import org.enderstone.server.entity.targets.TargetEntityInRange;
 import org.enderstone.server.regions.EnderWorld;
 
 public class EntitySpider extends EntityMob{
@@ -29,7 +30,9 @@ public class EntitySpider extends EntityMob{
 	public EntitySpider(EnderWorld world, Location location) {
 		super(APPEARANCE_ID, world, location);
 
-		this.getNavigator().addGoal(new GoalAttackEntity(this, EnderPlayer.class));
+		this.getNavigator().addGoal(new GoalAttackEntity(this));
+
+		this.getNavigator().addTarget(new TargetEntityInRange(this, EnderPlayer.class));
 	}
 
 	@Override

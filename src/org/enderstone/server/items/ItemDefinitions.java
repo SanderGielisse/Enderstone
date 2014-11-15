@@ -15,17 +15,33 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity.targets;
+
+package org.enderstone.server.items;
+
+import org.enderstone.server.regions.BlockId;
 
 /**
  *
  * @author gyroninja
  */
-public interface Target {
+public class ItemDefinitions {
 
-	public abstract boolean start();
-	public abstract void run();
-	public abstract void reset();
+	private static final ItemDefinition[] items = new ItemDefinition[4096];
 
-	public abstract boolean shouldContinue();
+	static {
+			items[BlockId.IRON_SPADE.getId()] = new ItemDefinitionIronShovel();
+			items[BlockId.IRON_PICKAXE.getId()] = new ItemDefinitionIronPickaxe();
+			items[BlockId.IRON_AXE.getId()] = new ItemDefinitionIronAxe();
+			items[BlockId.FLINT_AND_STEEL.getId()] = new ItemDefinitionFlintAndSteel();
+	};
+
+	public static ItemDefinition getItem(BlockId type) {
+		ItemDefinition definition = items[type.getId()];
+		if (definition != null) {
+			return definition;
+		} else {
+			items[type.getId()] =  new ItemDefinition(type);
+			return items[type.getId()];
+		}
+	}
 }

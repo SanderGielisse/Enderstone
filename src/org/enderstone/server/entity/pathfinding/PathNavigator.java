@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EntityMob;
 import org.enderstone.server.entity.goals.Goal;
 import org.enderstone.server.entity.targets.Target;
@@ -32,6 +33,8 @@ import org.enderstone.server.entity.targets.Target;
 public class PathNavigator {
 
 	private final EntityMob mob;
+
+	private EnderEntity target;
 
 	private final List<Goal> goals = new ArrayList<>();
 	private final List<Target> targets = new ArrayList<>();
@@ -49,6 +52,16 @@ public class PathNavigator {
 	public PathNavigator(EntityMob mob) {
 
 		this.mob = mob;
+	}
+
+	public EnderEntity getTarget() {
+
+		return target;
+	}
+
+	public void setTarget(EnderEntity target) {
+
+		this.target = target;
 	}
 
 	public List<PathTile> getPath() {
@@ -199,11 +212,9 @@ public class PathNavigator {
 
 			for (Goal goal : goals) {
 
-				if (goal.shouldStart()) {
+				if (goal.start()) {
 
 					currentGoal = goal;
-
-					currentGoal.start();
 
 					break;
 				}
@@ -225,13 +236,11 @@ public class PathNavigator {
 
 		if (currentTarget == null) {
 
-			for (Target target : targets) {
+			for (Target newTarget : targets) {
 
-				if (target.shouldStart()) {
+				if (newTarget.start()) {
 
-					currentTarget = target;
-
-					currentTarget.start();
+					currentTarget = newTarget;
 
 					break;
 				}
