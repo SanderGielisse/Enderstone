@@ -47,7 +47,7 @@ public class PacketInRequest extends Packet {
 	@Override
 	public void onRecieve(NetworkManager networkManager) {
 		int protocol = networkManager.latestHandshakePacket.getProtocol();
-		if (!Main.PROTOCOL.contains(protocol)) {
+		if (!Main.SUPPORTED_PROTOCOLS.contains(protocol)) {
 			protocol = Main.DEFAULT_PROTOCOL;
 		}
 		JSONObject json = new JSONObject();

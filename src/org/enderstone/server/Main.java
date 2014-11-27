@@ -91,14 +91,14 @@ public class Main implements Runnable {
 	public static final int MAX_NETTY_WORKER_THREADS = 8;
 	public static final int MAX_SLEEP = 100;
 	public static final int DEFAULT_PROTOCOL = 47;
-	public static final Set<Integer> PROTOCOL = Collections.unmodifiableSet(new HashSet<Integer>() {
+	public static final Set<Integer> SUPPORTED_PROTOCOLS = Collections.unmodifiableSet(new HashSet<Integer>() {
 		private static final long serialVersionUID = 1L;
 
 		{
 			this.add(47); // 1.8
 		}
 	});
-	public static final String[] AUTHORS = new String[] { "BigTeddy98 [Sander Gielisse]", "ferrybig [Fernando van Loenhout]" };
+	public static final String[] AUTHORS = new String[] { "sander2798 [Sander Gielisse]", "ferrybig [Fernando van Loenhout]" };
 	public static final String[] TOP_CONTRIBUTORS = new String[] { "Gyroninja" };
 	public static final Random random = new Random();
 	public volatile Thread mainThread;

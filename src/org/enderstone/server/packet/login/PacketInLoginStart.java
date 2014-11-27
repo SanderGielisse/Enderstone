@@ -62,6 +62,10 @@ public class PacketInLoginStart extends Packet {
 	public void onRecieve(final NetworkManager networkManager) {
 		assert networkManager.player == null;
 		networkManager.wantedName = name;
+		if (!Main.SUPPORTED_PROTOCOLS.contains(networkManager.latestHandshakePacket.getProtocol())) {
+			networkManager.disconnect(new SimpleMessage("Outdated client! This server supports version " + Main.PROTOCOL_VERSION + "."), false);
+			return;
+		}
 		try {
 			ByteBuf tempBuf = Unpooled.buffer();
 			new PacketOutSetCompression(1).writeFully(new PacketDataWrapper(networkManager, tempBuf));
