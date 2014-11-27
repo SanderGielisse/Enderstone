@@ -23,7 +23,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import org.enderstone.server.api.Location;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
 
@@ -33,6 +35,7 @@ import org.enderstone.server.regions.EnderWorld;
  */
 public class PathFinder {
 
+	private final EnderEntity entity;
 	private final EnderWorld world;
 
 	private final int startX;
@@ -52,7 +55,8 @@ public class PathFinder {
 
 	private boolean hasPath;
 
-	public PathFinder(Location startLoc, Location endLoc, int range) {
+	public PathFinder(EnderEntity entity, Location startLoc, Location endLoc, int range) {
+		this.entity = entity;
 
 		Location start = getBlockUnderLocation(startLoc);
 		Location end = getBlockUnderLocation(endLoc);
@@ -60,12 +64,10 @@ public class PathFinder {
 		world = start.getWorld();
 
 		if (world.getBlockIdAt(start).doesInstantBreak()) {
-
 			throw new IllegalArgumentException("Starting location is invalid");
 		}
 
 		if (world.getBlockIdAt(end).doesInstantBreak()) {
-
 			throw new IllegalArgumentException("Ending location is invalid");
 		}
 
@@ -202,7 +204,7 @@ public class PathFinder {
 
 	private void processAdjacentTiles(PathTile currentTile) {
 
-		Set<PathTile> possible = new HashSet<>(26);//3x3x3 region minus start tile;
+		Set<PathTile> possible = new HashSet<>(26);// 3x3x3 region minus start tile;
 
 		for (int x = -1; x <= 1; x++) {
 
@@ -221,7 +223,7 @@ public class PathFinder {
 					hash = 89 * hash + (currentTile.getZOffset() + z);
 
 					if (closedTiles.containsKey(hash)) {
-	
+
 						continue;
 					}
 
@@ -269,20 +271,33 @@ public class PathFinder {
 		}
 	}
 
-	//TODO add checks for different sized mobs
 	private boolean canWalkOn(int offsetX, int offsetY, int offsetZ) {
-
-		BlockId type = world.getBlockIdAt(startX + offsetX, startY + offsetY, startZ + offsetZ);
-
-		if (!(type.doesInstantBreak() || type == BlockId.LAVA || type == BlockId.LAVA_FLOWING || type == BlockId.FIRE || type == BlockId.CROPS || type == BlockId.LADDER || type == BlockId.FENCE || type == BlockId.FENCE_GATE || type == BlockId.NETHER_FENCE)) {
-
-			BlockId type2 = world.getBlockIdAt(startX + offsetX, startY + offsetY + 1, startZ + offsetZ);
-			BlockId type3 = world.getBlockIdAt(startX + offsetX, startY + offsetY + 2, startZ + offsetZ);
-
-			return type2.doesInstantBreak() && type3 == BlockId.AIR;
+		int x = startX + offsetX;
+		int y = startY + offsetY;
+		int z = startZ + offsetZ;
+		float size = 0.4F;
+		if (this.entity != null) {
+			size = this.entity.getWidth();
 		}
-
+		if (this.isSolid(world.getBlockIdAt(x, y, z)) ||
+				this.isSolid(world.getBlockIdAt((int) (x + size), y, z)) ||
+				this.isSolid(world.getBlockIdAt((int) (x - size), y, z)) ||
+				this.isSolid(world.getBlockIdAt(x, y, (int) (z + size))) ||
+				this.isSolid(world.getBlockIdAt(x, y, (int) (z - size)))) {
+			if (!this.isSolid(world.getBlockIdAt(x, y + 1, z))) {
+				if (!this.isSolid(world.getBlockIdAt(x, y + 2, z))) {
+					return true;
+				}
+			}
+		}
 		return false;
+	}
+
+	private boolean isSolid(BlockId id) {
+		if (id == null || id == BlockId.AIR || id == BlockId.LAVA_FLOWING || id == BlockId.LAVA || id == BlockId.FIRE || id == BlockId.CROPS || id == BlockId.LADDER || id.doesInstantBreak()) {
+			return false;
+		}
+		return true;
 	}
 
 	private Location getBlockUnderLocation(Location loc) {

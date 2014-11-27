@@ -19,14 +19,15 @@ package org.enderstone.server.packet.play;
 
 import java.io.IOException;
 import java.util.Iterator;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.event.player.PlayerEatEvent;
 import org.enderstone.server.blocks.BlockDefinition;
 import org.enderstone.server.blocks.BlockDefinitions;
-import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.entity.FoodType;
+import org.enderstone.server.entity.player.EnderPlayer;
+import org.enderstone.server.entity.player.FoodType;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;

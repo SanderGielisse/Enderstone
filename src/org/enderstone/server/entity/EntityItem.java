@@ -18,10 +18,12 @@
 package org.enderstone.server.entity;
 
 import java.util.Set;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Item;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutCollectItem;

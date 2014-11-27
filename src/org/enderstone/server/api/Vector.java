@@ -148,4 +148,9 @@ public class Vector {
 		this.z += z;
 		return this;
 	}
+
+	@Override
+	public String toString() {
+		return "Vector [x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
 }

@@ -22,6 +22,7 @@ import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.entity.goals.Goal;
 import org.enderstone.server.entity.goals.GoalAttackEntity;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.regions.EnderWorld;
 
 public class EntitySpider extends EntityMob {

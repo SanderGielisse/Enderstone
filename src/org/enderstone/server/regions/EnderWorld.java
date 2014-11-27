@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Block;
@@ -38,9 +39,9 @@ import org.enderstone.server.api.entity.Item;
 import org.enderstone.server.api.entity.Mob;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.entity.EnderEntity;
-import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.EntityItem;
 import org.enderstone.server.entity.EntitySpider;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;

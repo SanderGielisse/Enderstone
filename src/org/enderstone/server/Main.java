@@ -63,7 +63,7 @@ import org.enderstone.server.commands.vanila.StopCommand;
 import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderEntity;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.DefaultCraftingRecipes;
 import org.enderstone.server.packet.ConnectionInitializer;
 import org.enderstone.server.packet.Packet;
