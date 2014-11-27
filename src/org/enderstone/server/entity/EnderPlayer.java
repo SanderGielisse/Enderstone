@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.ChatPosition;
@@ -119,12 +120,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			}
 
 			@Override
-			public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue) {
-			}
+			public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue) {}
 
 			@Override
-			public void closeInventory(Inventory inv) {
-			}
+			public void closeInventory(Inventory inv) {}
 		});
 	}
 	public final PlayerSettings clientSettings = new PlayerSettings();
@@ -209,9 +208,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + entitySubId;
-		result = prime * result + ((textureSignature == null) ? 0 : textureSignature.hashCode());
-		result = prime * result + ((textureValue == null) ? 0 : textureValue.hashCode());
-		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
 		return result;
 	}
 
@@ -225,21 +221,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			return false;
 		EnderPlayer other = (EnderPlayer) obj;
 		if (entitySubId != other.entitySubId)
-			return false;
-		if (textureSignature == null) {
-			if (other.textureSignature != null)
-				return false;
-		} else if (!textureSignature.equals(other.textureSignature))
-			return false;
-		if (textureValue == null) {
-			if (other.textureValue != null)
-				return false;
-		} else if (!textureValue.equals(other.textureValue))
-			return false;
-		if (uuid == null) {
-			if (other.uuid != null)
-				return false;
-		} else if (!uuid.equals(other.uuid))
 			return false;
 		return true;
 	}
@@ -476,7 +457,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		if (latestCheck++ % 3 == 0) {
 			// check if item entities nearby
 			Iterator<EnderEntity> it = Main.getInstance().getWorld(this).entities.iterator();
-			while(it.hasNext()){
+			while (it.hasNext()) {
 				EnderEntity e = it.next();
 				if (e.getLocation().isInRange(2, this.getLocation(), true)) {
 					boolean remove = e.onCollision(this);
@@ -497,7 +478,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		if (this.isDead()) {
 			return;
 		}
-		
+
 		checkCollision();
 
 		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
@@ -604,13 +585,13 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void teleport(Location newLocation) {
-		if(Main.getInstance().callEvent(new PlayerTeleportEvent(this, this.getLocation(), newLocation))){
+		if (Main.getInstance().callEvent(new PlayerTeleportEvent(this, this.getLocation(), newLocation))) {
 			return;
 		}
 		this.teleportInternally(newLocation);
 	}
-	
-	public void teleportInternally(Location newLocation){
+
+	public void teleportInternally(Location newLocation) {
 		this.waitingForValidMoveAfterTeleport = 1;
 		this.setLocation(this.getLocation().cloneFrom(newLocation));
 
@@ -630,7 +611,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public void serverTick() {
 		super.serverTick();
-		if(Main.getInstance().doPhysics == false){
+		if (Main.getInstance().doPhysics == false) {
 			return;
 		}
 		if (getFoodLevel() == 20) {
@@ -723,7 +704,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 		if (this.clientSettings.godMode)
 			return false;
-		
+
 		for (ItemStack stack : this.getInventoryHandler().getPlayerInventory().getArmor()) {
 			if (stack != null) {
 				Armor armor = Armor.fromId(stack.getId());
@@ -814,11 +795,11 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	public void setOnGround(boolean onGround) {
-		if(Main.getInstance().doPhysics == false){
+		if (Main.getInstance().doPhysics == false) {
 			this.isOnGround = onGround;
 			return;
 		}
-		
+
 		World world = this.getWorld();
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();
@@ -830,13 +811,13 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		BlockId id5 = world.getBlock(floor(x), floor(y), floor(z + (getWidth() / 2))).getBlock();
 		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
 		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
-		
-		if(isInWater){
-			//reset fall damage
+
+		if (isInWater) {
+			// reset fall damage
 			this.yLocation = this.getLocation().getY();
 		}
 		if (this.isOnGround == false && onGround == true) {
-			if (this.clientSettings.isFlying){
+			if (this.clientSettings.isFlying) {
 				return; // Flying players don't get damage in vanilla
 			}
 			// fall damage
@@ -857,10 +838,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 		this.isOnGround = onGround;
 	}
-	
+
 	private boolean compare(BlockId fire, BlockId[] ids) {
-		for(BlockId id : ids){
-			if(id == fire){
+		for (BlockId id : ids) {
+			if (id == fire) {
 				return true;
 			}
 		}
@@ -903,12 +884,12 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public void kick(Message reason) {
 		PlayerKickEvent e = new PlayerKickEvent(this, reason);
-		if(e.isCancelled()){
+		if (e.isCancelled()) {
 			return;
 		}
 		if (e.getReason() == null) {
 			this.getNetworkManager().disconnect(reason, false);
-		}else{
+		} else {
 			this.getNetworkManager().disconnect(e.getReason(), false);
 		}
 	}
@@ -1050,7 +1031,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setSneaking(boolean sneaking) {
-		if(Main.getInstance().callEvent(new PlayerToggleSneakEvent(this, sneaking))){
+		if (Main.getInstance().callEvent(new PlayerToggleSneakEvent(this, sneaking))) {
 			return;
 		}
 		clientSettings.isSneaking = sneaking;
@@ -1188,7 +1169,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setSprinting(boolean sprinting) {
-		if(Main.getInstance().callEvent(new PlayerToggleSprintEvent(this, sprinting))){
+		if (Main.getInstance().callEvent(new PlayerToggleSprintEvent(this, sprinting))) {
 			return;
 		}
 		this.clientSettings.isSprinting = sprinting;
@@ -1220,15 +1201,15 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		double xDiff = endLocation.getX() - startLocation.getX();
 		double yDiff = endLocation.getY() - startLocation.getY();
 		double zDiff = endLocation.getZ() - startLocation.getZ();
-		
+
 		double xScale = xDiff / (blocksPerLocation * range);
 		double yScale = yDiff / (blocksPerLocation * range);
 		double zScale = zDiff / (blocksPerLocation * range);
-		
+
 		double currentX = 0;
 		double currentY = 0;
 		double currentZ = 0;
-		
+
 		for (int i = 0; i < (blocksPerLocation * range); i++) {
 			currentX += xScale;
 			currentY += yScale;
@@ -1242,74 +1223,74 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public Location getTargetBlock(double range) {
 		double yaw = this.getHeadLocation().getYaw();
 		double pitch = this.getHeadLocation().getPitch();
-		
+
 		boolean watchingUp = false;
 		boolean watchingNorth = false;
 		boolean watchingEast = false;
 		boolean watchingSouth = false;
 		boolean watchingWest = false;
-		
-		if(pitch >= 0){
+
+		if (pitch >= 0) {
 			watchingUp = true;
-		}else if(pitch < 0){
+		} else if (pitch < 0) {
 			pitch *= -1;
 		}
-		
-		while(yaw > 360){
+
+		while (yaw > 360) {
 			yaw -= 360;
 		}
-		while(yaw < -360){
+		while (yaw < -360) {
 			yaw += 360;
 		}
-		
-		if(isInBetween(yaw, -360, -270)){
+
+		if (isInBetween(yaw, -360, -270)) {
 			yaw *= -1;
 			yaw -= 270;
 			yaw = 90 - yaw;
 			watchingNorth = true;
-		} else if(isInBetween(yaw, -270, -180)){
+		} else if (isInBetween(yaw, -270, -180)) {
 			yaw *= -1;
 			yaw -= 180;
 			yaw = 90 - yaw;
 			watchingEast = true;
-		} else if(isInBetween(yaw, -180, -90)){
+		} else if (isInBetween(yaw, -180, -90)) {
 			yaw *= -1;
 			yaw -= 90;
 			yaw = 90 - yaw;
 			watchingSouth = true;
-		} else if(isInBetween(yaw, -90, 0)){
+		} else if (isInBetween(yaw, -90, 0)) {
 			yaw *= -1;
 			yaw = 90 - yaw;
 			watchingWest = true;
-		} else if(isInBetween(yaw, 0, 90)){
+		} else if (isInBetween(yaw, 0, 90)) {
 			watchingNorth = true;
-		} else if(isInBetween(yaw, 90, 180)){
+		} else if (isInBetween(yaw, 90, 180)) {
 			yaw -= 90;
 			watchingEast = true;
-		} else if(isInBetween(yaw, 180, 270)){
+		} else if (isInBetween(yaw, 180, 270)) {
 			yaw -= 180;
 			watchingSouth = true;
-		} else if(isInBetween(yaw, 270, 360)){
+		} else if (isInBetween(yaw, 270, 360)) {
 			yaw -= 270;
 			watchingWest = true;
 		}
-		
+
 		double radianYaw = Math.toRadians(yaw);
 		double radianPitch = Math.toRadians(pitch);
-		
+
 		double yTranslation = Math.sin(radianPitch) * range;
 		double hozTranslation = Math.cos(radianPitch) * range;
 		double xTranslation = Math.cos(radianYaw) * hozTranslation;
 		double zTranslation = Math.sin(radianYaw) * hozTranslation;
-		
+
 		Location old = this.getLocation();
-		if(watchingNorth){
+		if (watchingNorth) {
 			return new Location(old.getWorld(), old.getX() - zTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() + xTranslation, yaw, pitch);
-		}else if(watchingEast){
+		} else if (watchingEast) {
 			return new Location(old.getWorld(), old.getX() - xTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() - zTranslation, yaw, pitch);
-		}else if(watchingSouth){
+		} else if (watchingSouth) {
 			return new Location(old.getWorld(), old.getX() + zTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() - xTranslation, yaw, pitch);
-		}else if(watchingWest){
+		} else if (watchingWest) {
 			return new Location(old.getWorld(), old.getX() + xTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() + zTranslation, yaw, pitch);
 		}
 		throw new RuntimeException("This shouldn't happen! PITCH: " + pitch + " YAW: " + yaw + " North: " + watchingNorth + " East: " + watchingEast + " South: " + watchingSouth + " West: " + watchingWest);

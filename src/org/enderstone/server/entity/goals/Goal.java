@@ -17,6 +17,8 @@
  */
 package org.enderstone.server.entity.goals;
 
+import org.enderstone.server.entity.EnderEntity;
+
 /**
  *
  * @author gyroninja
@@ -24,9 +26,14 @@ package org.enderstone.server.entity.goals;
 public interface Goal {
 
 	public abstract boolean shouldStart();
+
 	public abstract boolean shouldContinue();
 
+	public abstract EnderEntity getCurrentTarget();
+
 	public abstract void start();
+
 	public abstract void run();
+
 	public abstract void reset();
 }

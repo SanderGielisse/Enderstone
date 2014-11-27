@@ -21,6 +21,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -41,8 +42,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
+
 import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
 import org.enderstone.server.api.messages.Message;
@@ -62,6 +65,7 @@ import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.inventory.DefaultCraftingRecipes;
+import org.enderstone.server.packet.ConnectionInitializer;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
@@ -95,7 +99,7 @@ public class Main implements Runnable {
 		}
 	});
 	public static final String[] AUTHORS = new String[] { "BigTeddy98 [Sander Gielisse]", "ferrybig [Fernando van Loenhout]" };
-	public static final String[] TOP_CONTRIBUTORS = new String[] {"Gyroninja"};
+	public static final String[] TOP_CONTRIBUTORS = new String[] { "Gyroninja" };
 	public static final Random random = new Random();
 	public volatile Thread mainThread;
 	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();
@@ -137,7 +141,7 @@ public class Main implements Runnable {
 
 	public final Set<EnderPlayer> onlinePlayers = new HashSet<>();
 	public final List<EnderWorld> worlds = new ArrayList<>();
-	private final List<Runnable> sendToMainThread = new ArrayList<Runnable>(); //don't forget to synchronize
+	private final List<Runnable> sendToMainThread = new ArrayList<Runnable>(); // don't forget to synchronize
 
 	public static Main getInstance() {
 		return instance;
@@ -196,7 +200,7 @@ public class Main implements Runnable {
 						ServerBootstrap bootstrap = new ServerBootstrap();
 						bootstrap.group(bossGroup, workerGroup);
 						bootstrap.channel(NioServerSocketChannel.class);
-						bootstrap.childHandler(new MinecraftServerInitializer());
+						bootstrap.childHandler(new ConnectionInitializer());
 
 						bootstrap.bind(nettyPort).sync().channel().closeFuture().sync();
 					} catch (InterruptedException e) {
@@ -220,6 +224,7 @@ public class Main implements Runnable {
 				EnderLogger.info("Main Server Thread initialized and started!");
 				EnderLogger.info("" + NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + port + "!");
 
+				// TODO support multiple worlds with a simple and good working system
 				worlds.add(new EnderWorld("world1", new SimpleGenerator()));
 				worlds.add(new EnderWorld("world2", new FlyingIslandsGenerator()));
 
@@ -268,7 +273,8 @@ public class Main implements Runnable {
 				this.lastTick += Main.EXCEPTED_SLEEP_TIME;
 				long sleepTime = (lastTick) - System.currentTimeMillis();
 				Main.this.lastTickSlices[Main.this.lastTickPointer] = sleepTime;
-				if(++Main.this.lastTickPointer >= Main.this.lastTickSlices.length) Main.this.lastTickPointer = 0;
+				if (++Main.this.lastTickPointer >= Main.this.lastTickSlices.length)
+					Main.this.lastTickPointer = 0;
 				if (sleepTime < Main.CANT_KEEP_UP_TIMEOUT) {
 					this.warn("Can't keep up! " + -(sleepTime / Main.EXCEPTED_SLEEP_TIME) + " ticks behind!");
 					this.lastTick = System.currentTimeMillis();
@@ -366,7 +372,7 @@ public class Main implements Runnable {
 		}
 		return null;
 	}
-	
+
 	public EnderPlayer getPlayer(UUID uuid) {
 		for (EnderPlayer ep : this.onlinePlayers) {
 			if (ep.uuid.equals(uuid)) {
@@ -381,15 +387,27 @@ public class Main implements Runnable {
 
 	private void serverTick(long tick) {
 		int recepies = DefaultCraftingRecipes.serverTick();
-		if(recepies != -1) {
+		if (recepies != -1) {
 			EnderLogger.debug(recepies + " crafting recepies listeners loaded!");
 		}
-		boolean doKeepAliveUpdate = (latestKeepAlive++ & 0b0011_1111) == 0; // faster than % 64 == 0
-		boolean doChunkUpdate = (latestChunkUpdate++ & 0b0001_1111) == 0; // faster than % 31 == 0
-		boolean doUpdateTimeAndWeather = (tick & 0b0011_1111) == 0; // faster than % 64 == 0
+		boolean doKeepAliveUpdate = (latestKeepAlive++ & 0b0011_1111) == 0; // faster
+																			// than
+																			// %
+																			// 64
+																			// ==
+																			// 0
+		boolean doChunkUpdate = (latestChunkUpdate++ & 0b0001_1111) == 0; // faster
+																			// than
+																			// %
+																			// 31
+																			// ==
+																			// 0
+		boolean doUpdateTimeAndWeather = (tick & 0b0011_1111) == 0; // faster
+																	// than % 64
+																	// == 0
 		for (EnderPlayer p : onlinePlayers) {
 			p.serverTick();
-			if (doKeepAliveUpdate) { 
+			if (doKeepAliveUpdate) {
 				p.getNetworkManager().sendPacket(new PacketKeepAlive(p.keepAliveID = random.nextInt(Integer.MAX_VALUE)));
 			}
 			if (doChunkUpdate && !p.isDead()) {
@@ -489,22 +507,22 @@ public class Main implements Runnable {
 		for (EnderPlayer ep : this.onlinePlayers) {
 			if (ep.getEntityId() == targetId) {
 				return ep;
-			} 
+			}
 		}
 		return null;
 	}
 
 	public boolean callEvent(Event e) {
-		//TODO - call events
-		if(e instanceof Cancellable){
+		// TODO call events
+		if (e instanceof Cancellable) {
 			((Cancellable) e).isCancelled();
 		}
 		return false;
 	}
-	
+
 	public long[] getLastLag() {
 		long[] last = new long[this.lastTickSlices.length];
-		if(this.lastTickPointer == 0)
+		if (this.lastTickPointer == 0)
 			System.arraycopy(this.lastTickSlices, 0, last, 0, last.length);
 		else {
 			System.arraycopy(this.lastTickSlices, this.lastTickPointer, last, 0, last.length - this.lastTickPointer);
