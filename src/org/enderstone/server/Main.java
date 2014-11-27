@@ -107,6 +107,8 @@ public class Main implements Runnable {
 	public List<Operator> operators = new OperatorLoader().load();
 
 	public Properties prop = null;
+	public volatile String motd;
+	public volatile int maxPlayers = 20;
 	public UUIDFactory uuidFactory = new UUIDFactory();
 	public String FAVICON = null;
 	public int port;
@@ -139,6 +141,7 @@ public class Main implements Runnable {
 	private final long[] lastTickSlices = new long[128];
 	private int lastTickPointer = 0;
 
+	public volatile int playerCount = 0; // high performance solution for getting the onlinePlayers.size() from an async thread
 	public final Set<EnderPlayer> onlinePlayers = new HashSet<>();
 	public final List<EnderWorld> worlds = new ArrayList<>();
 	private final List<Runnable> sendToMainThread = new ArrayList<Runnable>(); // don't forget to synchronize
@@ -168,6 +171,8 @@ public class Main implements Runnable {
 		EnderLogger.info("Top contributors: " + Arrays.asList(TOP_CONTRIBUTORS).toString() + " <--- Thanks to them!");
 		EnderLogger.info("Loading server.properties file...");
 		this.loadConfigFromDisk();
+		this.motd = (String) prop.get("motd");
+		// TODO read max players from config
 		EnderLogger.info("Loaded server.properties file!");
 
 		EnderLogger.info("Loading favicon...");
@@ -390,21 +395,10 @@ public class Main implements Runnable {
 		if (recepies != -1) {
 			EnderLogger.debug(recepies + " crafting recepies listeners loaded!");
 		}
-		boolean doKeepAliveUpdate = (latestKeepAlive++ & 0b0011_1111) == 0; // faster
-																			// than
-																			// %
-																			// 64
-																			// ==
-																			// 0
-		boolean doChunkUpdate = (latestChunkUpdate++ & 0b0001_1111) == 0; // faster
-																			// than
-																			// %
-																			// 31
-																			// ==
-																			// 0
-		boolean doUpdateTimeAndWeather = (tick & 0b0011_1111) == 0; // faster
-																	// than % 64
-																	// == 0
+		this.playerCount = this.onlinePlayers.size();
+		boolean doKeepAliveUpdate = (latestKeepAlive++ & 0b0011_1111) == 0; // faster than % 64 == 0
+		boolean doChunkUpdate = (latestChunkUpdate++ & 0b0001_1111) == 0; // faster than % 31 == 0
+		boolean doUpdateTimeAndWeather = (tick & 0b0011_1111) == 0; // faster than % 64 == 0
 		for (EnderPlayer p : onlinePlayers) {
 			p.serverTick();
 			if (doKeepAliveUpdate) {

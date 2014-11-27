@@ -19,11 +19,13 @@ package org.enderstone.server.packet.login;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.UUID;
-import org.enderstone.server.EnderLogger;
+
 import org.enderstone.server.Main;
+import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.PlayerTextureStore;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
@@ -35,8 +37,7 @@ public class PacketInLoginStart extends Packet {
 	// incoming
 	private String name;
 
-	public PacketInLoginStart() {
-	}
+	public PacketInLoginStart() {}
 
 	public PacketInLoginStart(String name) {
 		this.name = name;
@@ -60,9 +61,7 @@ public class PacketInLoginStart extends Packet {
 	@Override
 	public void onRecieve(final NetworkManager networkManager) {
 		assert networkManager.player == null;
-		
 		networkManager.wantedName = name;
-		
 		try {
 			ByteBuf tempBuf = Unpooled.buffer();
 			new PacketOutSetCompression(1).writeFully(new PacketDataWrapper(networkManager, tempBuf));
@@ -71,23 +70,22 @@ public class PacketInLoginStart extends Packet {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		if (Main.getInstance().playerCount >= Main.getInstance().maxPlayers) {
+			networkManager.disconnect(new SimpleMessage("This server is full!"), false);
+			return;
+		}
 		if (Main.getInstance().onlineMode) {
 			networkManager.regenerateEncryptionSettings();
 			NetworkManager.EncryptionSettings en = networkManager.getEncryptionSettings();
-			networkManager.sendPacket(new PacketOutEncryptionRequest(
-					en.getServerid(), en.getKeyPair().getPublic(), en.getVerifyToken()));
+			networkManager.sendPacket(new PacketOutEncryptionRequest(en.getServerid(), en.getKeyPair().getPublic(), en.getVerifyToken()));
 		} else {
 			UUIDFactory factory = Main.getInstance().uuidFactory;
 			UUID uuid = factory.getPlayerUUIDAsync(name);
 			PlayerTextureStore texture;
-			if(uuid == null)
-			{
+			if (uuid == null) {
 				texture = PlayerTextureStore.DEFAULT_STORE;
 				uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charset.forName("UTF_8")));
-			}
-			else
-			{
+			} else {
 				texture = factory.getTextureDataAsync(uuid);
 			}
 			networkManager.wantedName = name;

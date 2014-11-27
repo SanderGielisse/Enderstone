@@ -27,8 +27,7 @@ import org.json.JSONObject;
 public class PacketInRequest extends Packet {
 
 	@Override
-	public void read(PacketDataWrapper wrapper) throws IOException {
-	}
+	public void read(PacketDataWrapper wrapper) throws IOException {}
 
 	@Override
 	public void write(PacketDataWrapper wrapper) throws IOException {
@@ -51,12 +50,10 @@ public class PacketInRequest extends Packet {
 		if (!Main.PROTOCOL.contains(protocol)) {
 			protocol = Main.DEFAULT_PROTOCOL;
 		}
-
-		//TODO fix thread-safety problem on onlinePlayers.size();
 		JSONObject json = new JSONObject();
 		json.put("version", new JSONObject().put("name", Main.PROTOCOL_VERSION).put("protocol", protocol));
-		json.put("players", new JSONObject().put("max", 20).put("online", Main.getInstance().onlinePlayers.size()));
-		json.put("description", Main.getInstance().prop.get("motd"));
+		json.put("players", new JSONObject().put("max", Main.getInstance().maxPlayers).put("online", Main.getInstance().playerCount));
+		json.put("description", Main.getInstance().motd);
 
 		if (Main.getInstance().FAVICON != null) {
 			json.put("favicon", Main.getInstance().FAVICON);
