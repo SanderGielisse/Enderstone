@@ -119,7 +119,6 @@ public abstract class EnderEntity implements Entity {
 		boolean death = this.damage(damage);
 		((EnderWorld) this.getWorld()).broadcastPacket(new PacketOutEntityVelocity(this.getEntityId(), knockback), this.getLocation());
 		this.location.add(knockback.getX(), knockback.getY(), knockback.getZ());
-		EnderLogger.debug("VECTOR: " + knockback.toString());
 		return death;
 	}
 
