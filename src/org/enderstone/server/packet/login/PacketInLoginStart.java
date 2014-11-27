@@ -26,7 +26,7 @@ import java.util.UUID;
 
 import org.enderstone.server.Main;
 import org.enderstone.server.api.messages.SimpleMessage;
-import org.enderstone.server.entity.PlayerTextureStore;
+import org.enderstone.server.entity.player.PlayerTextureStore;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;

@@ -15,7 +15,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity.drops;
+package org.enderstone.server.entity;
 
 import org.enderstone.server.inventory.ItemStack;
 

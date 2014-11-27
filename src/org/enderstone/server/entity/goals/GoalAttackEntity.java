@@ -23,10 +23,10 @@ import java.util.List;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.entity.EnderEntity;
-import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.EntityMob;
 import org.enderstone.server.entity.pathfinding.PathFinder;
 import org.enderstone.server.entity.pathfinding.PathTile;
+import org.enderstone.server.entity.player.EnderPlayer;
 
 /**
  *
@@ -94,7 +94,7 @@ public class GoalAttackEntity implements Goal {
 	}
 
 	private void pathfindToTarget(Location start) {
-		PathFinder pathfinder = new PathFinder(mob.getLocation(), target.getLocation(), 32);
+		PathFinder pathfinder = new PathFinder(mob, mob.getLocation(), target.getLocation(), 32);
 		List<PathTile> path = pathfinder.calculatePath();
 		if (pathfinder.hasPath()) {
 			mob.getNavigator().setPath(pathfinder, path);

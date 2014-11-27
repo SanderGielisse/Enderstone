@@ -15,7 +15,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity;
+package org.enderstone.server.entity.player;
 
 public enum EquipmentUpdateType {
 	HELMET_CHANGE, CHESTPLATE_CHANGE, LEGGINGS_CHANGE, BOOTS_CHANGE, ITEM_IN_HAND_CHANGE, ALL;

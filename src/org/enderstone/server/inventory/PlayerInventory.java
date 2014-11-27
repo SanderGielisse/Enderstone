@@ -22,10 +22,11 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.event.player.PlayerPickupItemEvent;
 import org.enderstone.server.api.messages.SimpleMessage;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.armour.Armor;
 import org.enderstone.server.util.MergedList;
 

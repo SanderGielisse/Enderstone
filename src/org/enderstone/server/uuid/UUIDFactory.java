@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
 import org.enderstone.server.EnderLogger;
-import org.enderstone.server.entity.PlayerTextureStore;
+import org.enderstone.server.entity.player.PlayerTextureStore;
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -21,7 +21,7 @@ package org.enderstone.server.blocks;
 import org.enderstone.server.api.Block;
 import org.enderstone.server.api.World;
 import org.enderstone.server.api.entity.Player;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.regions.BlockId;
 

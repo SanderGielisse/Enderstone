@@ -15,7 +15,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity;
+package org.enderstone.server.entity.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +49,7 @@ import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.inventory.Inventory;
 import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.InventoryListener;
@@ -859,7 +860,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		if (this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2))) {
+		if (this.damage(DamageItemType.fromItemStack(attacker.getInventoryHandler().getItemInHand()), Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2).add(0, 0.2F, 0))) {
 			Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " was killed by " + attacker.getPlayerName()));
 		}
 	}

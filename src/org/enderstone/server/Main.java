@@ -63,7 +63,7 @@ import org.enderstone.server.commands.vanila.StopCommand;
 import org.enderstone.server.commands.vanila.TeleportCommand;
 import org.enderstone.server.commands.vanila.TellCommand;
 import org.enderstone.server.entity.EnderEntity;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.DefaultCraftingRecipes;
 import org.enderstone.server.packet.ConnectionInitializer;
 import org.enderstone.server.packet.Packet;
@@ -393,7 +393,7 @@ public class Main implements Runnable {
 	private void serverTick(long tick) {
 		int recepies = DefaultCraftingRecipes.serverTick();
 		if (recepies != -1) {
-			EnderLogger.debug(recepies + " crafting recepies listeners loaded!");
+			EnderLogger.debug(recepies + " crafting recipes listeners loaded!");
 		}
 		this.playerCount = this.onlinePlayers.size();
 		boolean doKeepAliveUpdate = (latestKeepAlive++ & 0b0011_1111) == 0; // faster than % 64 == 0
