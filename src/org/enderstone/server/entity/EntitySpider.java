@@ -19,16 +19,17 @@ package org.enderstone.server.entity;
 
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.api.Vector;
+import org.enderstone.server.entity.goals.Goal;
 import org.enderstone.server.entity.goals.GoalAttackEntity;
 import org.enderstone.server.regions.EnderWorld;
 
-public class EntitySpider extends EntityMob{
-	
+public class EntitySpider extends EntityMob {
+
 	private static final byte APPEARANCE_ID = (byte) 52;
 
 	public EntitySpider(EnderWorld world, Location location) {
 		super(APPEARANCE_ID, world, location);
-
 		this.getNavigator().addGoal(new GoalAttackEntity(this, EnderPlayer.class));
 	}
 
@@ -44,9 +45,9 @@ public class EntitySpider extends EntityMob{
 
 	@Override
 	protected String getRandomSound() {
-		if(Main.random.nextBoolean()){
+		if (Main.random.nextBoolean()) {
 			return "mob.spider.say";
-		}else{
+		} else {
 			return "mob.spider.step";
 		}
 	}
@@ -54,5 +55,20 @@ public class EntitySpider extends EntityMob{
 	@Override
 	public float getMovementSpeed() {
 		return 4;
+	}
+
+	@Override
+	public boolean onCollision(EnderPlayer withPlayer) {
+		for (Goal pathfinder : this.getNavigator().getGoals()) {
+			if (pathfinder instanceof GoalAttackEntity) {
+				GoalAttackEntity entityAttack = (GoalAttackEntity) pathfinder;
+				if (entityAttack.getCurrentTarget() != null && entityAttack.getCurrentTarget() instanceof EnderPlayer) {
+					if (entityAttack.getCurrentTarget().equals(withPlayer)) {
+						withPlayer.damage(2F, Vector.substract(this.getLocation(), withPlayer.getLocation()).multiply(0.2F).add(0, 0.2F, 0));
+					}
+				}
+			}
+		}
+		return super.onCollision(withPlayer);
 	}
 }
