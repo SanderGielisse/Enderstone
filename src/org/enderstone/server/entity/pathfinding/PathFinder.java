@@ -276,8 +276,10 @@ public class PathFinder {
 		int y = startY + offsetY;
 		int z = startZ + offsetZ;
 		float size = 0.4F;
+		float height = 1.5F;
 		if (this.entity != null) {
 			size = this.entity.getWidth();
+			height = this.entity.getHeight();
 		}
 		if (this.isSolid(world.getBlockIdAt(x, y, z)) ||
 				this.isSolid(world.getBlockIdAt((int) (x + size), y, z)) ||
@@ -285,7 +287,7 @@ public class PathFinder {
 				this.isSolid(world.getBlockIdAt(x, y, (int) (z + size))) ||
 				this.isSolid(world.getBlockIdAt(x, y, (int) (z - size)))) {
 			if (!this.isSolid(world.getBlockIdAt(x, y + 1, z))) {
-				if (!this.isSolid(world.getBlockIdAt(x, y + 2, z))) {
+				if (!this.isSolid(world.getBlockIdAt(x, (int) (y + height), z))) {
 					return true;
 				}
 			}
