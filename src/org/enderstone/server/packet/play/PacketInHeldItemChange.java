@@ -18,9 +18,10 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.event.player.PlayerHeldItemChangeEvent;
-import org.enderstone.server.entity.EquipmentUpdateType;
+import org.enderstone.server.entity.player.EquipmentUpdateType;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;

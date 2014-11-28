@@ -18,6 +18,7 @@
 package org.enderstone.server.commands.vanila;
 
 import java.util.List;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.messages.AdvancedMessage;
 import org.enderstone.server.api.messages.AdvancedMessage.AdvancedMessagePart.ClickEventType;
@@ -28,7 +29,7 @@ import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 
 /**
  *

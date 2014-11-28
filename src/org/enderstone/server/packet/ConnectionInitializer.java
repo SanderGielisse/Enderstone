@@ -15,27 +15,23 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.commands.enderstone;
+package org.enderstone.server.packet;
 
-import org.enderstone.server.commands.Command;
-import org.enderstone.server.commands.CommandMap;
-import org.enderstone.server.commands.CommandSender;
-import org.enderstone.server.commands.SimpleCommand;
-import org.enderstone.server.entity.player.EnderPlayer;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import java.util.concurrent.TimeUnit;
+import org.enderstone.server.packet.NetworkManager;
 
-/**
- *
- * @author Fernando
- */
-public class QuitCommand extends SimpleCommand{
-	public QuitCommand() {
-		super("command.enderstone.quit","quit",CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY);
-	}
+public class ConnectionInitializer extends ChannelInitializer<SocketChannel> {
 
 	@Override
-	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
-		((EnderPlayer)sender).networkManager.disconnect("Goodbye", false);
-		return COMMAND_SUCCES;
+	protected void initChannel(SocketChannel channel) throws Exception {
+		ChannelPipeline line = channel.pipeline();
+		NetworkManager manager = new NetworkManager();
+		line.addLast("packet_r_timeout", new ReadTimeoutHandler(30, TimeUnit.SECONDS));
+		line.addLast("packet_rw_converter", manager.createCodex());
+		line.addLast("packet_rw_reader", manager);
 	}
-	
 }

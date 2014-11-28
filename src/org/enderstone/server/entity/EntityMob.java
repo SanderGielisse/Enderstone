@@ -20,12 +20,14 @@ package org.enderstone.server.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Mob;
-import org.enderstone.server.entity.drops.EntityDrop;
 import org.enderstone.server.entity.pathfinding.PathNavigator;
+import org.enderstone.server.entity.player.DamageItemType;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
@@ -60,9 +62,7 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 
 	@Override
 	public Packet[] getSpawnPackets() {
-		return new Packet[] {
-				new PacketOutSpawnMob(this.getEntityId(), this.appearanceId, (int) (getLocation().getX() * 32.0D), (int) (getLocation().getY() * 32.0D), (int) (getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (byte) 0, (short) 0, (short) 0, (short) 0, this.getDataWatcher())
-		};
+		return new Packet[] { new PacketOutSpawnMob(this.getEntityId(), this.appearanceId, (int) (getLocation().getX() * 32.0D), (int) (getLocation().getY() * 32.0D), (int) (getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (byte) 0, (short) 0, (short) 0, (short) 0, this.getDataWatcher()) };
 	}
 
 	@Override
@@ -77,12 +77,11 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 	}
 
 	@Override
-	public void onRightClick(EnderPlayer attacker) {
-	}
+	public void onRightClick(EnderPlayer attacker) {}
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		this.damage(5F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2));
+		this.damage(DamageItemType.fromItemStack(attacker.getInventoryHandler().getItemInHand()), Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2).setY(-0.2F).multiply(10F));
 	}
 
 	@Override
@@ -195,13 +194,13 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 	public EnderWorld getWorld() {
 		return this.world;
 	}
-	
+
 	private long latestSound = 0;
-	
+
 	@Override
 	public void serverTick() {
 		super.serverTick();
-		if(Main.getInstance().doPhysics == false){
+		if (Main.getInstance().doPhysics == false) {
 			return;
 		}
 		navigator.run();
@@ -213,17 +212,17 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 			}
 		}
 	}
-	
-	public void moveInstantly(Location toLocation){
+
+	public void moveInstantly(Location toLocation) {
 		this.broadcastLocation(toLocation);
 		this.setLocation(toLocation);
 	}
-	
+
 	@Override
 	public float getWidth() {
 		return 0.6F;
 	}
-	
+
 	@Override
 	public float getHeight() {
 		return 1.6F;

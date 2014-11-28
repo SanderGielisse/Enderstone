@@ -19,7 +19,8 @@ package org.enderstone.server.packet.play;
 
 import java.io.IOException;
 import java.util.UUID;
-import org.enderstone.server.entity.ProfileProperty;
+
+import org.enderstone.server.entity.player.ProfileProperty;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 

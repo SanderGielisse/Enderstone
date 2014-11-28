@@ -15,34 +15,39 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity.drops;
+package org.enderstone.server.regions.tileblocks;
 
-import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.regions.EnderWorld;
 
-public class EntityDrop {
+public abstract class TileBlock {
 
-	private ItemStack stack;
-	private int dropChance;
+	private final EnderWorld world;
+	private final int x;
+	private final int y;
+	private final int z;
 
-	public EntityDrop(ItemStack stack, int dropChance) {
-		this.stack = stack;
-		this.dropChance = dropChance;
+	public TileBlock(EnderWorld world, int x, int y, int z) {
+		this.world = world;
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
 
-	public ItemStack getStack() {
-		return stack;
+	public EnderWorld getWorld() {
+		return world;
 	}
 
-	public void setStack(ItemStack stack) {
-		this.stack = stack;
+	public int getX() {
+		return x;
 	}
 
-	public int getDropChance() {
-		return dropChance;
+	public int getY() {
+		return y;
 	}
 
-	public void setDropChance(int dropChance) {
-		this.dropChance = dropChance;
+	public int getZ() {
+		return z;
 	}
 
+	public abstract boolean serverTick();
 }

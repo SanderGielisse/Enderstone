@@ -25,6 +25,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
@@ -37,30 +38,30 @@ import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
+
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.event.player.PlayerJoinEvent;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
-import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.entity.PlayerTextureStore;
+import org.enderstone.server.entity.player.EnderPlayer;
+import org.enderstone.server.entity.player.PlayerTextureStore;
 import org.enderstone.server.packet.codec.DiscardingReader;
 import org.enderstone.server.packet.codec.MinecraftCompressionCodex;
 import org.enderstone.server.packet.codec.MinecraftDecompressionCodex;
 import org.enderstone.server.packet.codec.MinecraftServerCodex;
 import org.enderstone.server.packet.login.PacketOutLoginSucces;
-import org.enderstone.server.packet.play.PacketInPlayerOnGround;
 import org.enderstone.server.packet.play.PacketOutJoinGame;
 import org.enderstone.server.packet.play.PacketOutPlayerPositionLook;
 import org.enderstone.server.packet.play.PacketOutSpawnPosition;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
 import org.enderstone.server.packet.play.PacketOutUpdateTime;
-import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderWorld;
 
 public class NetworkManager extends ChannelHandlerAdapter {
@@ -88,8 +89,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	public void regenerateEncryptionSettings() {
 		encryptionSettings = new EncryptionSettings();
-		// encryptionSettings.serverid = new BigInteger(130,
-		// Main.random).toString(32).substring(0, 20);
+		// encryptionSettings.serverid = new BigInteger(130, Main.random).toString(32).substring(0, 20);
 		encryptionSettings.serverid = "";
 		KeyPairGenerator keyPairGenerator;
 		try {
@@ -158,8 +158,10 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	 * MAIN THREAD ONLY
 	 */
 	private void disconnectConnection() {
-		if (this.isConnected == false) return;
-		if (player != null) player.onDisconnect();
+		if (this.isConnected == false)
+			return;
+		if (player != null)
+			player.onDisconnect();
 		player = null;
 		synchronized (packets) {
 			isConnected = false;
@@ -178,9 +180,11 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	}
 
 	public void sendPacket(Packet... packets) {
-		if (this.isConnected == false) return;
+		if (this.isConnected == false)
+			return;
 		synchronized (packets) {
-			if (this.isConnected == false) return;
+			if (this.isConnected == false)
+				return;
 			for (Packet packet : packets) {
 				this.packets.offer(packet);
 			}
@@ -314,7 +318,8 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	/**
 	 * Disconnected the player with the specified warning
 	 *
-	 * @param message the disconnect message
+	 * @param message
+	 *            the disconnect message
 	 * @deprecated This method doesn't know the real cause of the disconnect, use disconnect(Message, boolean) instead
 	 */
 	@Deprecated
@@ -334,8 +339,10 @@ public class NetworkManager extends ChannelHandlerAdapter {
 	/**
 	 * Disconnects the player
 	 *
-	 * @param message the message to kick the player
-	 * @param byError if true, then the reason of the kick is printed in the console
+	 * @param message
+	 *            the message to kick the player
+	 * @param byError
+	 *            if true, then the reason of the kick is printed in the console
 	 */
 	public void disconnect(Message message, boolean byError) {
 		try {
@@ -357,7 +364,7 @@ public class NetworkManager extends ChannelHandlerAdapter {
 						}
 					});
 					ctx.flush();
-				}//ChannelFutureListener.CLOSE
+				}// ChannelFutureListener.CLOSE
 			} else
 				ctx.close();
 		} catch (Exception ex) {

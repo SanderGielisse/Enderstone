@@ -19,16 +19,21 @@ package org.enderstone.server.regions;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Chunk;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.World;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.packet.play.PacketOutBlockChange;
+import org.enderstone.server.regions.tileblocks.TileBlock;
+import org.enderstone.server.regions.tileblocks.TileBlocks;
 
 /**
  *
@@ -39,13 +44,11 @@ public class EnderChunk implements Chunk{
 	protected final static int CHUNK_SECTION_SIZE = 16;
 	protected final static int MAX_CHUNK_SECTIONS = 16;
 	private static final Reference<EnderChunkMap> NULL_REFERENCE = new WeakReference<EnderChunkMap>(null);
+	private final int x;
 	private final int z;
 	private final short[][] blockID;
 	private final byte[][] data;
 	private final byte[] biome;
-	//private final List<BlockData> blockData;
-	//private final List<BlockData> activeBlockData = new LinkedList<>();
-	private final int x;
 	public boolean hasPopulated = false;
 	private boolean isValid = true;
 	private EnderWorld world;
@@ -130,7 +133,22 @@ public class EnderChunk implements Chunk{
 		}
 		blockID[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = material.getId();
 		this.data[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = data;
-
+		
+		// do this if the block might be able to fall or move by physics
+		if (Main.getInstance().doPhysics) {
+			world.doTileBlock(x + (16 * this.x), y, z + (16 * this.z));
+			world.doTileBlock(x - 1 + (16 * this.x), y, z + (16 * this.z));
+			world.doTileBlock(x + 1 + (16 * this.x), y, z + (16 * this.z));
+			world.doTileBlock(x + (16 * this.x), y, z + 1 + (16 * this.z));
+			world.doTileBlock(x + (16 * this.x), y, z - 1 + (16 * this.z));
+			if (y < 255) {
+				world.doTileBlock(x + (16 * this.x), y + 1, z + (16 * this.z));
+			}
+			if (y > 0) {
+				world.doTileBlock(x + (16 * this.x), y - 1, z + (16 * this.z));
+			}
+		}
+		
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			if (player.getWorld().worldName.equals(world.worldName)) {
 				if (player.getLoadedChunks().contains(this)) {

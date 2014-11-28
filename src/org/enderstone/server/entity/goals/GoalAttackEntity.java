@@ -38,6 +38,7 @@ public class GoalAttackEntity implements Goal {
 		this.mob = mob;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean start() {
 
@@ -48,7 +49,7 @@ public class GoalAttackEntity implements Goal {
 
 		pathfindToTarget(mob.getLocation());
 
-		return mob.getNavigator().getPathfinder().hasPath();
+		return mob.getNavigator().getPathfinder() != null && mob.getNavigator().getPathfinder().hasPath();
 	}
 
 	@Override
@@ -59,17 +60,11 @@ public class GoalAttackEntity implements Goal {
 
 	@Override
 	public void run() {
-
 		lastUpdate++;
-
 		if (lastUpdate > 20) {
-
 			lastUpdate = 0;
-	
 			PathTile currentTile = mob.getNavigator().getCurrentTile();
-
 			if (currentTile != null) {
-
 				pathfindToTarget(currentTile.getLocation(mob.getNavigator().getPathfinder().getStartLocation()));
 			}
 		}
@@ -83,17 +78,19 @@ public class GoalAttackEntity implements Goal {
 
 	private void pathfindToTarget(Location start) {
 
-		PathFinder pathfinder = new PathFinder(mob.getLocation(), mob.getNavigator().getTarget().getLocation(), 32);
+		if (mob.getNavigator().getTarget() != null) {
 
-		List<PathTile> path = pathfinder.calculatePath();
+			PathFinder pathfinder = new PathFinder(mob, mob.getLocation(), mob.getNavigator().getTarget().getLocation(), 32);
 
-		if (pathfinder.hasPath()) {
-
-			mob.getNavigator().setPath(pathfinder, path);
+			List<PathTile> path = pathfinder.calculatePath();
+			if (pathfinder.hasPath()) {
+				mob.getNavigator().setPath(pathfinder, path);
+			} else {
+				mob.getNavigator().setPath(null, null);
+			}
 		}
 
 		else {
-
 			mob.getNavigator().setPath(null, null);
 		}
 	}

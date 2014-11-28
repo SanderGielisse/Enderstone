@@ -15,27 +15,8 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.commands.enderstone;
+package org.enderstone.server.entity.player;
 
-import org.enderstone.server.commands.Command;
-import org.enderstone.server.commands.CommandMap;
-import org.enderstone.server.commands.CommandSender;
-import org.enderstone.server.commands.SimpleCommand;
-import org.enderstone.server.entity.player.EnderPlayer;
-
-/**
- *
- * @author Fernando
- */
-public class QuitCommand extends SimpleCommand{
-	public QuitCommand() {
-		super("command.enderstone.quit","quit",CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY);
-	}
-
-	@Override
-	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
-		((EnderPlayer)sender).networkManager.disconnect("Goodbye", false);
-		return COMMAND_SUCCES;
-	}
-	
+public enum EquipmentUpdateType {
+	HELMET_CHANGE, CHESTPLATE_CHANGE, LEGGINGS_CHANGE, BOOTS_CHANGE, ITEM_IN_HAND_CHANGE, ALL;
 }

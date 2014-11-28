@@ -17,6 +17,7 @@
  */
 package org.enderstone.server.regions;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Block;
@@ -37,14 +39,16 @@ import org.enderstone.server.api.entity.Item;
 import org.enderstone.server.api.entity.Mob;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.entity.EnderEntity;
-import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.EntityItem;
 import org.enderstone.server.entity.EntitySpider;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.regions.generators.MultiChunkBlockPopulator;
+import org.enderstone.server.regions.tileblocks.TileBlock;
+import org.enderstone.server.regions.tileblocks.TileBlocks;
 import org.enderstone.server.util.IntegerArrayComparator;
 
 public class EnderWorld implements World{
@@ -57,6 +61,7 @@ public class EnderWorld implements World{
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
 	public final Set<EnderEntity> entities = new HashSet<>();
 	public final Set<EnderPlayer> players = new HashSet<>();
+	public final List<TileBlock> tickList = new ArrayList<>();
 	private Location spawnLocation;
 	public final String worldName;
 
@@ -342,7 +347,38 @@ public class EnderWorld implements World{
 			}
 			e.serverTick();
 		}
+		if (this.time % 10 == 0) {
+			List<TileBlock> copiedList = new ArrayList<>(tickList);
+			for (TileBlock tile : copiedList) {
+				boolean shouldRemove = tile.serverTick();
+				if (shouldRemove) {
+					this.tickList.remove(tile);
+				}
+			}
+		}
 		this.time += 1;
+	}
+	
+	public void doTileBlock(int x, int y, int z) {
+		EnderChunk chunk = this.getChunk(x >> 4, z >> 4, false);
+		if(chunk == null){
+			return;
+		}
+		BlockId blockId = chunk.getBlock(x & 0xF, y & 0xFF, z & 0xF);
+		Class<? extends TileBlock> clazz = TileBlocks.getTileBlock(blockId);
+		if(clazz != null){
+			for(TileBlock tile : this.tickList){
+				if(tile.getX() == x && tile.getY() == y && tile.getZ() == z){
+					//already is a tile block
+					return;
+				}
+			}
+			try {
+				this.tickList.add(clazz.getConstructor(EnderWorld.class, int.class, int.class, int.class).newInstance(this, x, y, z));
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void broadcastPacket(Packet packet, Location loc){

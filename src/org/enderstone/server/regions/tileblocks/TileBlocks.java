@@ -15,8 +15,21 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity;
+package org.enderstone.server.regions.tileblocks;
 
-public enum EquipmentUpdateType {
-	HELMET_CHANGE, CHESTPLATE_CHANGE, LEGGINGS_CHANGE, BOOTS_CHANGE, ITEM_IN_HAND_CHANGE, ALL;
+import org.enderstone.server.regions.BlockId;
+
+public class TileBlocks {
+
+	private final static Class<?>[] registeredBlocks = new Class<?>[4096];
+
+	static {
+		registeredBlocks[BlockId.WATER.getId()] = WaterTileBlock.class;
+		registeredBlocks[BlockId.WATER_FLOWING.getId()] = WaterTileBlock.class;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Class<? extends TileBlock> getTileBlock(BlockId blockId) {
+		return (Class<? extends TileBlock>) registeredBlocks[blockId.getId()];
+	}
 }

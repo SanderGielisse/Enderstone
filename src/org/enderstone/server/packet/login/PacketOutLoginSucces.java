@@ -28,8 +28,7 @@ public class PacketOutLoginSucces extends Packet {
 	private String UUID;
 	private String username;
 
-	public PacketOutLoginSucces() {
-	}
+	public PacketOutLoginSucces() {}
 
 	public PacketOutLoginSucces(String UUID, String username) {
 		this.UUID = UUID;
@@ -64,10 +63,9 @@ public class PacketOutLoginSucces extends Packet {
 	public String getUsername() {
 		return username;
 	}
-	
+
 	@Override
-	public void onSend(NetworkManager manager)
-	{
+	public void onSend(NetworkManager manager) {
 		manager.getCodex().setState(HandshakeState.PLAY);
 	}
 }

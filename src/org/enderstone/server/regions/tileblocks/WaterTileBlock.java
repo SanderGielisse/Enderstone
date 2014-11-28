@@ -15,23 +15,33 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server;
+package org.enderstone.server.regions.tileblocks;
 
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import java.util.concurrent.TimeUnit;
-import org.enderstone.server.packet.NetworkManager;
+import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.regions.EnderWorld;
 
-public class MinecraftServerInitializer extends ChannelInitializer<SocketChannel> {
+public class WaterTileBlock extends TileBlock {
+
+	public WaterTileBlock(EnderWorld world, int x, int y, int z) {
+		super(world, x, y, z);
+	}
 
 	@Override
-	protected void initChannel(SocketChannel channel) throws Exception {
-		ChannelPipeline line = channel.pipeline();
-		NetworkManager manager = new NetworkManager();
-		line.addLast("packet_r_timeout", new ReadTimeoutHandler(30, TimeUnit.SECONDS));
-		line.addLast("packet_rw_converter", manager.createCodex());
-		line.addLast("packet_rw_reader", manager);
+	public boolean serverTick() {
+		if(getY() - 1 < 0){
+			return true;
+		}
+		if(getY() + 1 > 255){
+			return true;
+		}
+		BlockId id = getWorld().getBlock(getX(), getY() - 1, getZ()).getBlock();
+		if (id == BlockId.AIR) {
+			getWorld().setBlockAt(getX(), getY() - 1, getZ(), BlockId.WATER_FLOWING, (byte) 0);
+			return false;
+		}else if(id == BlockId.WATER_FLOWING){
+			getWorld().setBlockAt(getX(), getY() - 1, getZ(), BlockId.WATER, (byte) 0);
+			return true;
+		}
+		return true;
 	}
 }

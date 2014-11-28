@@ -19,11 +19,13 @@ package org.enderstone.server.inventory;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
+import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.event.player.PlayerDropItemEvent;
 import org.enderstone.server.api.messages.SimpleMessage;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.packet.play.PacketInClickWindow;
 import org.enderstone.server.packet.play.PacketInCloseWindow;
 import org.enderstone.server.packet.play.PacketInConfirmTransaction;
@@ -143,12 +145,12 @@ public class InventoryHandler {
 			world.dropItem(player.getLocation(), stack, 30);
 			inventory.set(slot, null);
 		} else {
-			if (Main.getInstance().callEvent(new PlayerDropItemEvent(player, stack))) {
-				return;
-			}
 			stack.setAmount((byte) (stack.getAmount() - 1));
 			ItemStack cloned = stack.clone();
 			cloned.setAmount((byte) 1);
+			if (Main.getInstance().callEvent(new PlayerDropItemEvent(player, cloned))) {
+				return;
+			}
 			world.dropItem(player.getLocation(), cloned, 30);
 			inventory.set(slot, stack);
 		}
@@ -166,6 +168,17 @@ public class InventoryHandler {
 
 	public void recievePacket(PacketInClickWindow packet) {
 		//player.sendMessage(new SimpleMessage(packet.toString()));
+		int slot = packet.getSlot();
+		byte windowId = packet.getWindowId();
+		if (windowId != this.nextWindowId && windowId != 0) {
+			return;
+		}
+		if(slot > 0 && slot < this.activeInventory.getSize() && 
+			!(this.activeInventory.getRawItem(slot) == null ? 
+			packet.getItemStack() == null : 
+			this.activeInventory.getRawItem(slot).equals(packet.getItemStack()))) {
+			player.networkManager.sendPacket(new PacketOutSetSlot(windowId, (short) slot, this.activeInventory.getRawItem(slot)));
+		}
 		boolean correctTransaction = handleInventoryClick(packet);
 		player.debug("Cursor: "+this.itemOnCursor.get(0),EnderPlayer.PlayerDebugger.INVENTORY);
 		if(!correctTransaction) player.sendMessage(new SimpleMessage("Unable to process inventory action: "+packet.toString()));
@@ -176,9 +189,7 @@ public class InventoryHandler {
 		byte windowId = packet.getWindowId();
 		int slot = packet.getSlot();
 		int button = packet.getButton();
-		short actionNumber = packet.getActionNumber();
 		int mode = packet.getMode();
-		ItemStack itemStack = packet.getItemStack();
 		if (windowId != this.nextWindowId && windowId != 0) {
 			player.sendMessage(new SimpleMessage("Invalid inventory interaction!"));
 			return false;
@@ -231,15 +242,25 @@ public class InventoryHandler {
 			case 2: {
 				// Press on number on keyboard
 				int targetSlot = button;
-				if(targetSlot < 0 || targetSlot > 8) {
+				if (targetSlot < 0 || targetSlot > 8) {
 					player.networkManager.disconnect("Invalid button?? " + mode + "->" + button, true);
+					return false;
 				}
 				this.activeInventory.onItemClick(true, null, slot, false, new MergedList.Builder<ItemStack>().
-						addList(0, this.equimentInventory.getHotbar(), targetSlot, 1).build());
+					addList(0, this.equimentInventory.getHotbar(), targetSlot, 1).build());
 			}
 			return true;
 			case 3: {
 				// TODO middle mouse click
+				if (player.getGameMode() == GameMode.CREATIVE) {
+					ItemStack clone = this.activeInventory.getRawItem(slot); // this makes an implied clone of the item
+					if(clone != null) {
+						clone.setAmount(clone.getId().getMaxStackSize());
+						this.itemOnCursor.set(0, clone);
+					} else {
+						this.activeInventory.onItemClick(true, null, slot, false, itemOnCursor);
+					}
+				}
 			}
 			break;
 			case 4: {
@@ -298,11 +319,11 @@ public class InventoryHandler {
 					dragType = 1;
 				} else if (button == 1) {
 					//add slot for left-mouse drag
-					if(dragType == 0 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
+					if (dragType == 0 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
 						this.lastDrag.add(slot);
 				} else if (button == 5) {
 					//add slot for right-mouse drag
-					if(dragType == 1 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
+					if (dragType == 1 && slot < this.activeInventory.getSize() && !this.lastDrag.contains(slot))
 						this.lastDrag.add(slot);
 				} else if (button == 2) {
 					//ending left-mouse drag
@@ -369,9 +390,9 @@ public class InventoryHandler {
 
 	public void openInventory(HalfInventory inv) {
 		Inventory inventory;
-		if (inv == null) 
+		if (inv == null)
 			inventory = equimentInventory;
-		else 
+		else
 			inventory = inv.openFully(equimentInventory);
 		this.drop(this.itemOnCursor, true, 0);
 		itemOnCursor.set(0, null);
@@ -399,14 +420,14 @@ public class InventoryHandler {
 		lastDrag.clear();
 		dragType = -1;
 		// TODO add support for horse chests
-		player.debug(nextWindowId + "\n  size:"+inventory.getSize()+"",EnderPlayer.PlayerDebugger.INVENTORY);
+		player.debug(nextWindowId + "\n  size:" + inventory.getSize() + "", EnderPlayer.PlayerDebugger.INVENTORY);
 		this.player.networkManager.sendPacket(
-				new PacketOutOpenWindow(
-						this.nextWindowId, 
-						inventory.getType(), 
-						inventory.getTitle(), 
-						(byte) (inventory.getType().getPacketSize() == -1 ? inv.getSize() : inventory.getType().getPacketSize()),
-						0)
+			new PacketOutOpenWindow(
+				this.nextWindowId,
+				inventory.getType(),
+				inventory.getTitle(),
+				(byte) (inventory.getType().getPacketSize() == -1 ? inv.getSize() : inventory.getType().getPacketSize()),
+				0)
 		);
 		boolean isNonEmpty = false;
 		int size = inv.getSize();
@@ -420,8 +441,12 @@ public class InventoryHandler {
 	public void updateInventory() {
 		this.player.networkManager.sendPacket(new PacketOutWindowItems(playerWindowId, equimentInventory.getRawItems().toArray(new ItemStack[equimentInventory.getSize()])));
 	}
-	
+
 	public void updateRemoteInventory() {
+		if(activeInventory == equimentInventory) {
+			this.updateInventory();
+			return;
+		}
 		this.player.networkManager.sendPacket(new PacketOutWindowItems(nextWindowId, activeInventory.getRawItems().toArray(new ItemStack[activeInventory.getSize()])));
 	}
 

@@ -25,7 +25,6 @@ public abstract class AbstractInventory implements Inventory {
 	@Override
 	public void onItemClick(boolean leftMouse, List<Integer> draggedSlots, int slot, boolean shiftClick, List<ItemStack> cursor) {
 		if (draggedSlots != null) {
-			System.out.println(draggedSlots);
 			ItemStack cursorItem = cursor.get(0);
 			if (cursorItem == null) return;
 			int maxStackSize = cursorItem.getId().getMaxStackSize();
@@ -194,6 +193,8 @@ public abstract class AbstractInventory implements Inventory {
 							slotItemStack.setAmount(newOtherAmount);
 							this.setRawItem(slot, slotItemStack);
 						}
+					} else {
+						swapItems(cursor, 0, getRawItems(), slot);
 					}
 				}
 			}

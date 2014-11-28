@@ -15,27 +15,34 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.commands.enderstone;
+package org.enderstone.server.entity;
 
-import org.enderstone.server.commands.Command;
-import org.enderstone.server.commands.CommandMap;
-import org.enderstone.server.commands.CommandSender;
-import org.enderstone.server.commands.SimpleCommand;
-import org.enderstone.server.entity.player.EnderPlayer;
+import org.enderstone.server.inventory.ItemStack;
 
-/**
- *
- * @author Fernando
- */
-public class QuitCommand extends SimpleCommand{
-	public QuitCommand() {
-		super("command.enderstone.quit","quit",CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY);
+public class EntityDrop {
+
+	private ItemStack stack;
+	private int dropChance;
+
+	public EntityDrop(ItemStack stack, int dropChance) {
+		this.stack = stack;
+		this.dropChance = dropChance;
 	}
 
-	@Override
-	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
-		((EnderPlayer)sender).networkManager.disconnect("Goodbye", false);
-		return COMMAND_SUCCES;
+	public ItemStack getStack() {
+		return stack;
 	}
-	
+
+	public void setStack(ItemStack stack) {
+		this.stack = stack;
+	}
+
+	public int getDropChance() {
+		return dropChance;
+	}
+
+	public void setDropChance(int dropChance) {
+		this.dropChance = dropChance;
+	}
+
 }

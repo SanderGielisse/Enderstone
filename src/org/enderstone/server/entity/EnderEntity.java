@@ -18,6 +18,8 @@
 package org.enderstone.server.entity;
 
 import java.util.Set;
+
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
@@ -26,6 +28,7 @@ import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.api.event.entity.EntityDamageEvent;
 import org.enderstone.server.api.event.entity.EntityDeathEvent;
 import org.enderstone.server.api.messages.AdvancedMessage;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutAnimation;
 import org.enderstone.server.packet.play.PacketOutEntityMetadata;
@@ -46,13 +49,13 @@ public abstract class EnderEntity implements Entity {
 	private DataWatcher dataWatcher = new DataWatcher();
 	private long latestDamage = 0;
 	private int fireTicks = 0;
-	
+
 	private boolean shouldBeRemoved = false;
 	private boolean broadcastDespawn = true;
-	
+
 	public EnderEntity(Location location) {
 		this.entityId = entityCount++;
-		this.location = location;
+		this.location = location.clone();
 	}
 
 	public int getEntityId() {
@@ -62,15 +65,17 @@ public abstract class EnderEntity implements Entity {
 	public Location getLocation() {
 		return location.clone();
 	}
-	
-	public void setLocation(Location newLoc){
+
+	public void setLocation(Location newLoc) {
 		this.location.cloneFrom(newLoc);
 	}
 
 	public abstract Packet[] getSpawnPackets();
 
+	@Override
 	public abstract void teleport(Location loc);
 
+	@Override
 	public abstract void teleport(EnderEntity entity);
 
 	public abstract void onRightClick(EnderPlayer attacker);
@@ -105,16 +110,15 @@ public abstract class EnderEntity implements Entity {
 	}
 
 	public boolean damage(float damage, Vector knockback) {
-		//damage delay
+		// damage delay
 		if ((Main.getInstance().getCurrentServerTick() - this.latestDamage) < 10) {
 			return false;
 		}
 		this.latestDamage = Main.getInstance().getCurrentServerTick();
-		
+
 		boolean death = this.damage(damage);
-		if (this.getWorld() instanceof EnderWorld) {
-			((EnderWorld) this.getWorld()).broadcastPacket(new PacketOutEntityVelocity(getEntityId(), knockback), this.getLocation());
-		}
+		((EnderWorld) this.getWorld()).broadcastPacket(new PacketOutEntityVelocity(this.getEntityId(), knockback), this.getLocation());
+		this.location.add(knockback.getX(), knockback.getY(), knockback.getZ());
 		return death;
 	}
 
@@ -130,10 +134,11 @@ public abstract class EnderEntity implements Entity {
 
 	public final void heal() {
 		setHealth(this.getMaxHealth());
+		setFireTicks(0);
 	}
 
 	protected void onHealthUpdate(float newHealth, float lastHealth) {
-		
+
 	}
 
 	public float getHealth() {
@@ -167,14 +172,14 @@ public abstract class EnderEntity implements Entity {
 		onHealthUpdate(this.health, lastHealth);
 		return this.health <= 0;
 	}
-	
+
 	@Override
 	public void remove() {
 		this.shouldBeRemoved = true;
 		this.broadcastDespawn = true;
 	}
-	
-	public void removeInternally(boolean broadcastDespawn){
+
+	public void removeInternally(boolean broadcastDespawn) {
 		this.shouldBeRemoved = true;
 		this.broadcastDespawn = broadcastDespawn;
 	}
@@ -182,7 +187,7 @@ public abstract class EnderEntity implements Entity {
 	protected abstract String getDamageSound();
 
 	protected abstract String getDeadSound();
-	
+
 	protected abstract String getRandomSound();
 
 	protected abstract float getBaseHealth();
@@ -200,9 +205,9 @@ public abstract class EnderEntity implements Entity {
 	public abstract void updateDataWatcher();
 
 	public abstract void onSpawn();
-	
+
 	public abstract float getWidth();
-	
+
 	public abstract float getHeight();
 
 	private void initHealth() {
@@ -235,55 +240,61 @@ public abstract class EnderEntity implements Entity {
 			return false;
 		return true;
 	}
-	
+
 	public void serverTick() {
-		if(shouldBeRemoved || this.isDead() || Main.getInstance().doPhysics == false){
+		if (shouldBeRemoved || this.isDead() || Main.getInstance().doPhysics == false) {
 			return;
 		}
-			
+		// if (this instanceof EnderPlayer) {
+		// EnderLogger.debug("FireTicks: " + fireTicks);
+		// }
 		World world = this.getWorld();
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();
 		double z = this.getLocation().getZ();
-		BlockId id1 = world.getBlock((int)x, (int)y, (int)z).getBlock();
-		BlockId id2 = world.getBlock((int)(x + (getWidth() / 2)), (int)y, (int)z).getBlock();
-		BlockId id3 = world.getBlock((int)(x - (getWidth() / 2)), (int)y, (int)z).getBlock();
-		BlockId id4 = world.getBlock((int)x, (int)y, (int)(z - (getWidth() / 2))).getBlock();
-		BlockId id5 = world.getBlock((int)x, (int)y, (int)(z + (getWidth() / 2))).getBlock();
+		BlockId id1 = world.getBlock(floor(x), floor(y), floor(z)).getBlock();
+		BlockId id2 = world.getBlock(floor(x + (getWidth() / 2)), floor(y), floor(z)).getBlock();
+		BlockId id3 = world.getBlock(floor(x - (getWidth() / 2)), floor(y), floor(z)).getBlock();
+		BlockId id4 = world.getBlock(floor(x), floor(y), floor(z - (getWidth() / 2))).getBlock();
+		BlockId id5 = world.getBlock(floor(x), floor(y), floor(z + (getWidth() / 2))).getBlock();
 		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
-		
+
 		boolean isInFire = compare(BlockId.FIRE, array) || compare(BlockId.LAVA, array) || compare(BlockId.LAVA_FLOWING, array);
-		if (isInFire) {
-			if (getFireTicks() == 0) {
-				setFireTicks(101); // 5 seconds burn after leaving lava/fire
-			}
-		}
 		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
-		if(isInWater){
-			if(this.getFireTicks() > 0){
+		if (isInWater) {
+			if (this.getFireTicks() > 0) {
 				this.setFireTicks(0);
+			}
+		} else if (isInFire) {
+			if (getFireTicks() == 0) {
+				setFireTicks(100); // 5 seconds burn after leaving lava/fire
 			}
 		}
 
-		if(fireTicks == 0){
+		if (fireTicks == 0) {
 			return;
 		}
 		this.fireTicks--;
-		if(fireTicks % 20 == 0){
+		if (fireTicks % 10 == 0) {
 			if (damage(1F)) {
 				if ((this instanceof EnderPlayer)) {
 					Main.getInstance().broadcastMessage(new AdvancedMessage(((EnderPlayer) this).getPlayerName() + " burned to death."));
 				}
 			}
 		}
-		if(this.fireTicks == 0){
+		if (this.fireTicks == 0) {
 			this.setFireTicks(0);
 		}
 	}
 
-	private boolean compare(BlockId fire, BlockId[] ids) {
-		for(BlockId id : ids){
-			if(id == fire){
+	public static int floor(double num) {
+		final int floor = (int) num;
+		return floor == num ? floor : floor - (int) (Double.doubleToRawLongBits(num) >>> 63);
+	}
+
+	private static boolean compare(BlockId fire, BlockId[] ids) {
+		for (BlockId id : ids) {
+			if (id == fire) {
 				return true;
 			}
 		}
@@ -295,31 +306,31 @@ public abstract class EnderEntity implements Entity {
 	}
 
 	public void setFireTicks(int fireTicks) {
-		if(this.fireTicks > 0 && fireTicks > 0){
+		if (this.fireTicks > 0 && fireTicks > 0) {
 			this.fireTicks = fireTicks;
 			return;
 		}
-		if(this.getFireTicks() == 0 && fireTicks == 0){
+		if (this.fireTicks == 0 && fireTicks == 0) {
 			return;
 		}
 		this.fireTicks = fireTicks;
 		this.updateDataWatcher();
 		this.getLocation().getWorld().broadcastPacket(new PacketOutEntityMetadata(getEntityId(), dataWatcher), this.getLocation());
 	}
-	
+
 	protected static byte calcYaw(float f) {
 		int i = (int) f;
 		return (byte) (f < i ? i - 1 : i);
 	}
-	
-	public boolean shouldBeRemoved(){
+
+	public boolean shouldBeRemoved() {
 		return this.shouldBeRemoved;
 	}
-	
-	public boolean shouldBroadcastDespawn(){
+
+	public boolean shouldBroadcastDespawn() {
 		return this.broadcastDespawn;
 	}
-	
+
 	@Override
 	public Location getHeadLocation() {
 		return this.getLocation().add(0, this.getHeight(), 0);
