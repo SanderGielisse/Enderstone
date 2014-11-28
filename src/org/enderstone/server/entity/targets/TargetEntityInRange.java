@@ -9,8 +9,8 @@ package org.enderstone.server.entity.targets;
 import java.util.Collection;
 import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.entity.EnderEntity;
-import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.EntityMob;
+import org.enderstone.server.entity.player.EnderPlayer;
 
 /**
  *
@@ -69,7 +69,7 @@ public class TargetEntityInRange implements Target {
 	@Override
 	public void reset() {
 
-		
+		mob.getNavigator().setTarget(null);
 	}
 
 	@Override

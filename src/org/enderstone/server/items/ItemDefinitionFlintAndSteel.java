@@ -7,7 +7,7 @@
 package org.enderstone.server.items;
 
 import org.enderstone.server.api.Block;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.regions.BlockId;
 
 /**
