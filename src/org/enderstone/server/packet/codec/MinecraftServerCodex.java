@@ -18,12 +18,17 @@
 package org.enderstone.server.packet.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.api.messages.Message;
+import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.packet.HandshakeState;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
@@ -41,10 +46,15 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 
 	HandshakeState state = HandshakeState.NEW;
 	NetworkManager manager;
+	private final Map<InetAddress, Long> connectionThrottlingMap;
+	private final long maxConnectionThrottle;
 
-	public MinecraftServerCodex(NetworkManager manager) {
+	public MinecraftServerCodex(NetworkManager manager, 
+		Map<InetAddress, Long> connectionThrottlingMap, long maxConnectionThrottle) {
 		super(Packet.class);
 		this.manager = manager;
+		this.connectionThrottlingMap = connectionThrottlingMap;
+		this.maxConnectionThrottle = maxConnectionThrottle;
 	}
 
 	@Override
@@ -102,6 +112,18 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 								break;
 							case 2:
 								state = HandshakeState.LOGIN;
+								InetAddress address = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress();
+								EnderLogger.info("Incomming connection: " + address.toString());
+								if (this.connectionThrottlingMap.containsKey(address)) {
+									long lastLogin = this.connectionThrottlingMap.get(address);
+									if (System.currentTimeMillis() - lastLogin < maxConnectionThrottle) {
+										ctx.write(new PacketOutLoginPlayerDisconnect(
+											new SimpleMessage("Connection throtled!")))
+											.addListener(ChannelFutureListener.CLOSE);
+										return;
+									}
+								}
+								this.connectionThrottlingMap.put(address, System.currentTimeMillis());
 								break;
 							case 3:
 								state = HandshakeState.PLAY;
