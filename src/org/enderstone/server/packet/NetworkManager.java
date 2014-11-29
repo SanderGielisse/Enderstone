@@ -27,14 +27,17 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -82,6 +85,11 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	private final Queue<Packet> packets = new LinkedList<>();
 	private volatile boolean isConnected = true;
+
+	public NetworkManager(Map<InetAddress, Long> connectionThrottlingMap, long maxConnectionThrottle) {
+		this.connectionThrottlingMap = connectionThrottlingMap;
+		this.maxConnectionThrottle = maxConnectionThrottle;
+	}
 
 	public EncryptionSettings getEncryptionSettings() {
 		return encryptionSettings;
@@ -171,8 +179,11 @@ public class NetworkManager extends ChannelHandlerAdapter {
 
 	private MinecraftServerCodex codex;
 
+	private final Map<InetAddress, Long> connectionThrottlingMap;
+	private final long maxConnectionThrottle;
+
 	public MinecraftServerCodex createCodex() {
-		return codex = new MinecraftServerCodex(this);
+		return codex = new MinecraftServerCodex(this, connectionThrottlingMap, 5000);
 	}
 
 	public MinecraftServerCodex getCodex() {

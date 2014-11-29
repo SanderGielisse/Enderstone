@@ -21,15 +21,26 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import java.net.InetAddress;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.enderstone.server.packet.NetworkManager;
 
 public class ConnectionInitializer extends ChannelInitializer<SocketChannel> {
 
+	private final Map<InetAddress, Long> connectionThrottlingMap = new LinkedHashMap<InetAddress, Long>() {
+
+		@Override
+		protected boolean removeEldestEntry(Map.Entry<InetAddress, Long> eldest) {
+			return this.size() > 200;
+		}
+	};
+	
 	@Override
 	protected void initChannel(SocketChannel channel) throws Exception {
 		ChannelPipeline line = channel.pipeline();
-		NetworkManager manager = new NetworkManager();
+		NetworkManager manager = new NetworkManager(connectionThrottlingMap, 5000); // TODO Add config option for this
 		line.addLast("packet_r_timeout", new ReadTimeoutHandler(30, TimeUnit.SECONDS));
 		line.addLast("packet_rw_converter", manager.createCodex());
 		line.addLast("packet_rw_reader", manager);
