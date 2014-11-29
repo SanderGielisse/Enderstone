@@ -393,7 +393,7 @@ public class Main implements Runnable {
 	private void serverTick(long tick) {
 		int recepies = DefaultCraftingRecipes.serverTick();
 		if (recepies != -1) {
-			EnderLogger.debug(recepies + " crafting recipes listeners loaded!");
+			EnderLogger.info(recepies + " crafting recipes listeners loaded!");
 		}
 		this.playerCount = this.onlinePlayers.size();
 		boolean doKeepAliveUpdate = (latestKeepAlive++ & 0b0011_1111) == 0; // faster than % 64 == 0

@@ -110,9 +110,9 @@ public class PacketInPlayerDigging extends Packet {
 						}
 					}
 				} else if (getStatus() == 3) {
-					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
+					networkManager.player.getInventory().recievePacket(PacketInPlayerDigging.this);
 				} else if (getStatus() == 4) {
-					networkManager.player.getInventoryHandler().recievePacket(PacketInPlayerDigging.this);
+					networkManager.player.getInventory().recievePacket(PacketInPlayerDigging.this);
 				} else if (getStatus() == 5){
 					networkManager.player.clientSettings.isEatingTicks = 0;
 					networkManager.player.updateDataWatcher();
