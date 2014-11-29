@@ -19,7 +19,7 @@ package org.enderstone.server.packet.play;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.packet.NetworkManager;

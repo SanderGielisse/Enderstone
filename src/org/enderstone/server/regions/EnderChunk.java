@@ -19,8 +19,6 @@ package org.enderstone.server.regions;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -32,8 +30,6 @@ import org.enderstone.server.api.Location;
 import org.enderstone.server.api.World;
 import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.packet.play.PacketOutBlockChange;
-import org.enderstone.server.regions.tileblocks.TileBlock;
-import org.enderstone.server.regions.tileblocks.TileBlocks;
 
 /**
  *

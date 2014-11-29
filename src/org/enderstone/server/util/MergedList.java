@@ -31,22 +31,23 @@ import java.util.RandomAccess;
  */
 public class MergedList<E> extends AbstractList<E> implements RandomAccess, java.io.Serializable {
 
-	private final List<Entry<List<E>,Integer>> indexes;
+	private static final long serialVersionUID = -8300412081424839582L;
+	private final List<Entry<List<E>, Integer>> indexes;
 
-	private  MergedList(List<Entry<List<E>,Integer>> indexes) {
+	private MergedList(List<Entry<List<E>, Integer>> indexes) {
 		this.indexes = indexes;
 	}
-	
+
 	@Override
 	public E get(int index) {
-		Entry<List<E>,Integer> entry  = this.indexes.get(index);
+		Entry<List<E>, Integer> entry = this.indexes.get(index);
 		return entry.getKey().get(entry.getValue());
 	}
 
 	@Override
 	public E set(int index, E element) {
-		Entry<List<E>,Integer> entry  = this.indexes.get(index);
-		return entry.getKey().set(entry.getValue(),element);
+		Entry<List<E>, Integer> entry = this.indexes.get(index);
+		return entry.getKey().set(entry.getValue(), element);
 	}
 
 	@Override
@@ -63,38 +64,37 @@ public class MergedList<E> extends AbstractList<E> implements RandomAccess, java
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		final MergedList<?> other = (MergedList<?>) obj;
 		return Objects.equals(this.indexes, other.indexes);
 	}
-	
+
 	public static class Builder<E> {
-		
-		private Entry<List<E>,Integer>[] indexes = new Entry[16];
+
+		@SuppressWarnings("unchecked")
+		private Entry<List<E>, Integer>[] indexes = new Entry[16];
 		private int higestIndex;
-		
-		public Builder<E> addList(int offset, List<E> list)
-		{
-			return this.addList(offset,list,0,list.size());
+
+		public Builder<E> addList(int offset, List<E> list) {
+			return this.addList(offset, list, 0, list.size());
 		}
-		
-		public Builder<E> addList(int offset, final List<E> list, int startIndex, int mergeLength)
-		{
-			if(this.indexes.length < offset+mergeLength)
-			{
-				Entry<List<E>,Integer>[] a = new Entry[offset+mergeLength+16];
+
+		@SuppressWarnings("unchecked")
+		public Builder<E> addList(int offset, final List<E> list, int startIndex, int mergeLength) {
+			if (this.indexes.length < offset + mergeLength) {
+				Entry<List<E>, Integer>[] a = new Entry[offset + mergeLength + 16];
 				System.arraycopy(indexes, 0, a, 0, higestIndex);
 				indexes = a;
 			}
-			if(higestIndex < offset+mergeLength)
-			{
-				higestIndex = offset+mergeLength;
+			if (higestIndex < offset + mergeLength) {
+				higestIndex = offset + mergeLength;
 			}
-			for(int i = 0; i < mergeLength; i++)
-			{
+			for (int i = 0; i < mergeLength; i++) {
 				final int index = i + startIndex;
-				this.indexes[i + offset] = new Entry<List<E>, Integer>(){
+				this.indexes[i + offset] = new Entry<List<E>, Integer>() {
 
 					@Override
 					public List<E> getKey() {
@@ -114,9 +114,10 @@ public class MergedList<E> extends AbstractList<E> implements RandomAccess, java
 			}
 			return this;
 		}
-		public MergedList build()
-		{
-			return new MergedList(new FixedSizeList<>(indexes,0,higestIndex));
+
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		public MergedList build() {
+			return new MergedList(new FixedSizeList<>(indexes, 0, higestIndex));
 		}
 	}
 }

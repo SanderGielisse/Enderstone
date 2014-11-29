@@ -127,4 +127,6 @@ public interface Entity {
 	 * @return the location of the head of the entity
 	 */
 	public Location getHeadLocation();
+	
+	public boolean isOnGround();
 }

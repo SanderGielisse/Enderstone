@@ -117,14 +117,14 @@ public class PathNavigator {
 				currentTile++;
 			}
 			Location nextDestination = path.get(currentTile).getLocation(pathfinder.getStartLocation()).add(0, 1, 0);
-			Vector difference = Vector.substract(mob.getLocation(), nextDestination);
+			Vector difference = Vector.substractAndNormalize(mob.getLocation(), nextDestination);
 			float speed = mob.getMovementSpeed() / 20;// 20 ticks per second
 			difference.setX(difference.getX() > 0 ? Math.min(difference.getX(), speed) : Math.max(difference.getX(), -speed));
 			difference.setY(difference.getY() > 0 ? Math.min(difference.getY(), speed) : Math.max(difference.getY(), -speed));
 			difference.setZ(difference.getZ() > 0 ? Math.min(difference.getZ(), speed) : Math.max(difference.getZ(), -speed));
 			// Change new move method
 			// mob.teleport(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
-			mob.moveInstantly(mob.getLocation().clone().add(difference.getX(), difference.getY(), difference.getZ()));
+			mob.moveInstantly(mob.getLocation().add(difference.getX(), difference.getY(), difference.getZ()));
 			// There is probably a better way to do this
 			if (difference.getX() == 0) {
 				if (difference.getZ() > 0) {

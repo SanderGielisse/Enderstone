@@ -40,7 +40,6 @@ import org.enderstone.server.api.entity.Mob;
 import org.enderstone.server.api.entity.Player;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EntityItem;
-import org.enderstone.server.entity.EntitySpider;
 import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
