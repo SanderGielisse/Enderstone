@@ -19,15 +19,18 @@ package org.enderstone.server.packet.play;
 
 import java.io.IOException;
 import java.util.Iterator;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.event.player.PlayerEatEvent;
 import org.enderstone.server.blocks.BlockDefinition;
 import org.enderstone.server.blocks.BlockDefinitions;
-import org.enderstone.server.entity.EnderPlayer;
-import org.enderstone.server.entity.FoodType;
+import org.enderstone.server.entity.player.EnderPlayer;
+import org.enderstone.server.entity.player.FoodType;
 import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.items.ItemDefinition;
+import org.enderstone.server.items.ItemDefinitions;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
@@ -85,7 +88,7 @@ public class PacketInBlockPlacement extends Packet {
 				if (getHeldItem() == null || getHeldItem().getBlockId() == -1) {
 					return;
 				}
-				
+
 				int x = getLocation().getBlockX();
 				int y = getLocation().getBlockY();
 				int z = getLocation().getBlockZ();
@@ -120,28 +123,27 @@ public class PacketInBlockPlacement extends Packet {
 				loc.setWorld(networkManager.player.getWorld());
 				if (networkManager.player.getLocation().isInRange(6, loc, true)) {
 					EnderPlayer pl = networkManager.player;
-
-					if (getHeldItem() == null || pl.getInventoryHandler().getItemInHand() == null) {
+					if (getHeldItem() == null || pl.getInventory().getItemInHand() == null) {
 						if (Main.getInstance().getWorld(pl).getBlockIdAt(x, y, z).getId() == 0) {
 							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short) 0, (byte) 0); // tell client it failed and set the block back to air
 						}
 						return;
 					}
-					if (pl.getInventoryHandler().getItemInHand().getBlockId() != getHeldItem().getBlockId() && pl.getInventoryHandler().getItemInHand().getAmount() != getHeldItem().getAmount()) {
+					if (pl.getInventory().getItemInHand().getBlockId() != getHeldItem().getBlockId() && pl.getInventory().getItemInHand().getAmount() != getHeldItem().getAmount()) {
 						if (Main.getInstance().getWorld(pl).getBlockIdAt(x, y, z).getId() == 0) {
 							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short) 0, (byte) 0); // tell client it failed and set the block back to air
 						}
 						return;
 					}
-
 					if (BlockId.byId(getHeldItem().getBlockId()).isValidBlock()) {
-
-						Main.getInstance().getWorld(pl).setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
-
+						pl.getWorld().setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
 						BlockDefinition definition = BlockDefinitions.getBlock(networkManager.player.getWorld().getBlockIdAt(x, y, z));
-
-						pl.getInventoryHandler().decreaseItemInHand(1);
-						Main.getInstance().getWorld(networkManager.player).broadcastSound(definition.getPlaceSound(), 1F, (byte) 63, loc, null);
+						pl.getInventory().decreaseItemInHand(1);
+						pl.getWorld().broadcastSound(definition.getPlaceSound(), 1F, (byte) 63, loc, null);
+						return;
+					} else {
+						ItemDefinition definition = ItemDefinitions.getItem(getHeldItem().getId());
+						definition.onRightClick(pl, pl.getWorld().getBlock(x, y, z));
 						return;
 					}
 				}

@@ -15,35 +15,33 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.commands.vanila;
+package org.enderstone.server.items;
 
-import org.enderstone.server.api.messages.SimpleMessage;
-import org.enderstone.server.commands.Command;
-import org.enderstone.server.commands.CommandMap;
-import org.enderstone.server.commands.CommandSender;
-import org.enderstone.server.commands.SimpleCommand;
+import org.enderstone.server.api.Block;
 import org.enderstone.server.entity.player.EnderPlayer;
+import org.enderstone.server.regions.BlockId;
 
 /**
- * Simple /kill command
- * @author ferrybig
+ *
+ * @author gyroninja
  */
-public class KillCommand extends SimpleCommand {
+public class ItemDefinitionFlintAndSteel extends ItemDefinition {
 
-	public KillCommand() {
-		super("command.enderstone.kill", "kill", CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY);
+	public ItemDefinitionFlintAndSteel() {
+
+		super(BlockId.FLINT_AND_STEEL);
 	}
 
 	@Override
-	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
-		if (sender instanceof EnderPlayer) {
-			sender.sendMessage(new SimpleMessage("Killing: "+sender.getName()));
-			((EnderPlayer)sender).kill();
+	public int getMaxStackSize() {
+		return 1;
+	}
+
+	@Override
+	public void onRightClick(EnderPlayer player, Block block) {
+System.out.println(block.getBlock());
+		if (block.getBlock() == BlockId.AIR) {
+			block.setBlock(BlockId.FIRE, (byte) 0);
 		}
-		else
-		{
-			sender.sendMessage(new SimpleMessage("Cannot kill console!"));
-		}
-		return COMMAND_SUCCES;
 	}
 }

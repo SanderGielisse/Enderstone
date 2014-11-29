@@ -15,32 +15,27 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.blocks;
+package org.enderstone.server.items;
 
-import org.enderstone.server.api.Block;
-import org.enderstone.server.entity.player.EnderPlayer;
-import org.enderstone.server.inventory.CraftingInventory;
 import org.enderstone.server.regions.BlockId;
 
-public class BlockDefinitionWorkbench extends BlockDefinition {
+/**
+ *
+ * @author gyroninja
+ */
+public class ItemDefinitionIronShovel extends ItemDefinition {
 
-	public BlockDefinitionWorkbench() {
-		super(BlockId.WORKBENCH);
+	public ItemDefinitionIronShovel() {
+		super(BlockId.IRON_SPADE);
 	}
 
 	@Override
-	public String getPlaceSound() {
-		return "step.wood";
+	public int getMaxStackSize() {
+		return 1;
 	}
 
 	@Override
-	public String getBreakSound() {
-		return "dig.wood";
-	}
-	
-	@Override
-	public boolean onRightClick(EnderPlayer player, Block block) {
-		player.getInventory().openInventory(new CraftingInventory(player.getLocation()));
-		return true;
+	public int getAttackDamage() {
+		return 4;
 	}
 }

@@ -15,7 +15,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server;
+package org.enderstone.server.packet;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.enderstone.server.packet.NetworkManager;
 
-public class MinecraftServerInitializer extends ChannelInitializer<SocketChannel> {
+public class ConnectionInitializer extends ChannelInitializer<SocketChannel> {
 
 	private final Map<InetAddress, Long> connectionThrottlingMap = new LinkedHashMap<InetAddress, Long>() {
 

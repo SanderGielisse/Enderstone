@@ -22,7 +22,7 @@ public class Vector {
 	private double x;
 	private double y;
 	private double z;
-	
+
 	public double motX;
 	public double motY;
 	public double motZ;
@@ -30,9 +30,12 @@ public class Vector {
 	/**
 	 * Creates a new vector with the X, Y, and Z values assigned to both it's location and velocity.
 	 * 
-	 * @param x the location and velocity of the vector along the X axis
-	 * @param y the location and velocity of the vector along the Y axis
-	 * @param z the location and velocity of the vector along the Z axis
+	 * @param x
+	 *            the location and velocity of the vector along the X axis
+	 * @param y
+	 *            the location and velocity of the vector along the Y axis
+	 * @param z
+	 *            the location and velocity of the vector along the Z axis
 	 */
 	public Vector(double x, double y, double z) {
 		this.x = x;
@@ -55,10 +58,12 @@ public class Vector {
 	/**
 	 * Set the X location of the vector.
 	 * 
-	 * @param x the new X location of the vector
+	 * @param x
+	 *            the new X location of the vector
 	 */
-	public void setX(double x) {
+	public Vector setX(double x) {
 		this.x = x;
+		return this;
 	}
 
 	/**
@@ -73,10 +78,12 @@ public class Vector {
 	/**
 	 * Set the Y location of the vector.
 	 * 
-	 * @param y the new Y location of the vector
+	 * @param y
+	 *            the new Y location of the vector
 	 */
-	public void setY(double y) {
+	public Vector setY(double y) {
 		this.y = y;
+		return this;
 	}
 
 	/**
@@ -91,17 +98,21 @@ public class Vector {
 	/**
 	 * Set the Z location of the vector.
 	 * 
-	 * @param z the new Z location of the vector
+	 * @param z
+	 *            the new Z location of the vector
 	 */
-	public void setZ(double z) {
+	public Vector setZ(double z) {
 		this.z = z;
+		return this;
 	}
 
 	/**
 	 * Gets the vector of the difference of two locations.
 	 * 
-	 * @param fromLocation starting location
-	 * @param toLocation ending location
+	 * @param fromLocation
+	 *            starting location
+	 * @param toLocation
+	 *            ending location
 	 * 
 	 * @return The difference of two locations
 	 */
@@ -112,14 +123,34 @@ public class Vector {
 	/**
 	 * Normalize the vector and also returns itself.
 	 * 
-	 * @param distance the distance to normalize
+	 * @param distance
+	 *            the distance to normalize
 	 * 
 	 * @return The normalized vector
 	 */
-	public Vector normalize(double distance){
+	public Vector normalize(double distance) {
 		this.x = x / distance;
 		this.y = y / distance;
 		this.z = z / distance;
 		return this;
+	}
+
+	public Vector multiply(float f) {
+		this.x *= f;
+		this.y *= f;
+		this.z *= f;
+		return this;
+	}
+
+	public Vector add(float x, float y, float z) {
+		this.x += x;
+		this.y += y;
+		this.z += z;
+		return this;
+	}
+
+	@Override
+	public String toString() {
+		return "Vector [x=" + x + ", y=" + y + ", z=" + z + "]";
 	}
 }

@@ -15,8 +15,27 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity;
+package org.enderstone.server.items;
 
-public enum EquipmentUpdateType {
-	HELMET_CHANGE, CHESTPLATE_CHANGE, LEGGINGS_CHANGE, BOOTS_CHANGE, ITEM_IN_HAND_CHANGE, ALL;
+import org.enderstone.server.regions.BlockId;
+
+/**
+ *
+ * @author gyroninja
+ */
+public class ItemDefinitionIronAxe extends ItemDefinition {
+
+	public ItemDefinitionIronAxe() {
+		super(BlockId.IRON_AXE);
+	}
+
+	@Override
+	public int getMaxStackSize() {
+		return 1;
+	}
+
+	@Override
+	public int getAttackDamage() {
+		return 6;
+	}
 }

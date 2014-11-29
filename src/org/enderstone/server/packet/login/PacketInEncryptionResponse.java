@@ -19,16 +19,20 @@ package org.enderstone.server.packet.login;
 
 import java.io.IOException;
 import java.math.BigInteger;
+
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.enderstone.server.EnderLogger;
-import org.enderstone.server.entity.PlayerTextureStore;
+import org.enderstone.server.entity.player.PlayerTextureStore;
 import org.enderstone.server.packet.NetworkEncrypter;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
 import org.enderstone.server.uuid.ServerRequest;
+
 import static org.enderstone.server.uuid.UUIDFactory.parseUUID;
+
 import org.json.JSONObject;
 
 /**

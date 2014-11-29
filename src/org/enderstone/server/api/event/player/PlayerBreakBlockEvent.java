@@ -20,7 +20,7 @@ package org.enderstone.server.api.event.player;
 import org.enderstone.server.api.Block;
 import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 
 public class PlayerBreakBlockEvent extends Event implements Cancellable {
 

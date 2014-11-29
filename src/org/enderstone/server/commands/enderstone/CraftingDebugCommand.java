@@ -23,7 +23,7 @@ import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.CraftingInventory;
 
 /**
@@ -40,7 +40,7 @@ public class CraftingDebugCommand extends SimpleCommand {
 	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
 		try
 		{
-			((EnderPlayer)sender).getInventoryHandler().openInventory(new CraftingInventory(((EnderPlayer)sender).getLocation()));
+			((EnderPlayer)sender).getInventory().openInventory(new CraftingInventory(((EnderPlayer)sender).getLocation()));
 			return COMMAND_SUCCES;
 		}
 		catch(ClassCastException err)

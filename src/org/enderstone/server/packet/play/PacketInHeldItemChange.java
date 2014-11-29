@@ -18,9 +18,10 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.event.player.PlayerHeldItemChangeEvent;
-import org.enderstone.server.entity.EquipmentUpdateType;
+import org.enderstone.server.entity.player.EquipmentUpdateType;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
@@ -59,10 +60,10 @@ public class PacketInHeldItemChange extends Packet {
 
 			@Override
 			public void run() {
-				if(Main.getInstance().callEvent(new PlayerHeldItemChangeEvent(networkManager.player, (short) networkManager.player.getInventoryHandler().getHeldItemSlot(), getSlot()))){
+				if(Main.getInstance().callEvent(new PlayerHeldItemChangeEvent(networkManager.player, (short) networkManager.player.getInventory().getHeldItemSlot(), getSlot()))){
 					return;
 				}
-				networkManager.player.getInventoryHandler().recievePacket(PacketInHeldItemChange.this);
+				networkManager.player.getInventory().recievePacket(PacketInHeldItemChange.this);
 				networkManager.player.broadcastEquipment(EquipmentUpdateType.ITEM_IN_HAND_CHANGE);
 			}
 		});

@@ -15,7 +15,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity;
+package org.enderstone.server.entity.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.ChatPosition;
@@ -48,6 +49,7 @@ import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandSender;
+import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.inventory.Inventory;
 import org.enderstone.server.inventory.InventoryHandler;
 import org.enderstone.server.inventory.InventoryListener;
@@ -119,12 +121,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			}
 
 			@Override
-			public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue) {
-			}
+			public void onPropertyChange(Inventory inv, short property, short oldValue, short newValue) {}
 
 			@Override
-			public void closeInventory(Inventory inv) {
-			}
+			public void closeInventory(Inventory inv) {}
 		});
 	}
 	public final PlayerSettings clientSettings = new PlayerSettings();
@@ -209,9 +209,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + entitySubId;
-		result = prime * result + ((textureSignature == null) ? 0 : textureSignature.hashCode());
-		result = prime * result + ((textureValue == null) ? 0 : textureValue.hashCode());
-		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
 		return result;
 	}
 
@@ -225,21 +222,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			return false;
 		EnderPlayer other = (EnderPlayer) obj;
 		if (entitySubId != other.entitySubId)
-			return false;
-		if (textureSignature == null) {
-			if (other.textureSignature != null)
-				return false;
-		} else if (!textureSignature.equals(other.textureSignature))
-			return false;
-		if (textureValue == null) {
-			if (other.textureValue != null)
-				return false;
-		} else if (!textureValue.equals(other.textureValue))
-			return false;
-		if (uuid == null) {
-			if (other.uuid != null)
-				return false;
-		} else if (!uuid.equals(other.uuid))
 			return false;
 		return true;
 	}
@@ -265,7 +247,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.setLocation(this.getLocation().cloneFrom(toWorld.getSpawn()));
 		this.loadedChunks.clear();
 		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 3);
-		networkManager.player.getInventoryHandler().updateInventory();
+		networkManager.player.getInventory().updateInventory();
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(toWorld.getSpawn().getX(), toWorld.getSpawn().getY(), toWorld.getSpawn().getZ(), 0F, 0F, (byte) 1));
 		this.updateClientSettings();
 		EnderLogger.info("Switched player " + this.getPlayerName() + " from world " + currentWorld.worldName + " to " + toWorld.worldName + ".");
@@ -289,6 +271,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.COOKED_CHICKEN, (byte) 10));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_CHICKEN, (byte) 10));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.RAW_RABBIT, (byte) 10));
+
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.FLINT_AND_STEEL, (byte) 1));
 
 		this.inventoryHandler.getPlayerInventory().setRawItem(5, new ItemStack(BlockId.DIAMOND_HELMET, (byte) 1));
 
@@ -328,10 +312,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public Packet[] getSpawnPackets() {
 		List<Packet> toSend = new ArrayList<>();
-		PlayerInventory handler = this.getInventoryHandler().getPlayerInventory();
+		PlayerInventory handler = this.getInventory().getPlayerInventory();
 		toSend.add(new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, (int) (this.getLocation().getX() * 32.0D), (int) (this.getLocation().getY() * 32.0D), (int) (this.getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (short) 0, this.getDataWatcher()));
-		if (this.getInventoryHandler().getItemInHand() != null) {
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); // helmet
+		if (this.getInventory().getItemInHand() != null) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventory().getItemInHand())); // hand item
 		}
 		if (handler.getArmor().get(0) != null) {
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.getArmor().get(0))); // helmet
@@ -350,10 +334,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public void broadcastEquipment(EquipmentUpdateType type) {
 		List<Packet> toSend = new ArrayList<>();
-		List<ItemStack> handler = this.getInventoryHandler().getPlayerInventory().getArmor();
+		List<ItemStack> handler = this.getInventory().getPlayerInventory().getArmor();
 
 		if ((type == EquipmentUpdateType.ITEM_IN_HAND_CHANGE || type == EquipmentUpdateType.ALL)) {
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); // item in hand
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventory().getItemInHand())); // item in hand
 		}
 		if ((type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)) {
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.get(0))); // helmet
@@ -474,16 +458,18 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public void checkCollision() {
 		if (latestCheck++ % 3 == 0) {
-			// check if item entities nearby
+			// check if item entities are nearby
 			Iterator<EnderEntity> it = Main.getInstance().getWorld(this).entities.iterator();
-			while(it.hasNext()){
+			while (it.hasNext()) {
 				EnderEntity e = it.next();
-				if (e.getLocation().isInRange(2, this.getLocation(), true)) {
-					boolean remove = e.onCollision(this);
-					if (remove) {
-						it.remove();
-						Main.getInstance().getWorld(this).removeEntity(e, true);
-						Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
+				if (!this.isDead()) {
+					if (e.getLocation().isInRange(2, this.getLocation(), true)) {
+						boolean remove = e.onCollide(this);
+						if (remove) {
+							it.remove();
+							Main.getInstance().getWorld(this).removeEntity(e, true);
+							Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
+						}
 					}
 				}
 			}
@@ -497,9 +483,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		if (this.isDead()) {
 			return;
 		}
-		
-		checkCollision();
-
 		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
 		double dy = (newLocation.getY() - this.getLocation().getY()) * 32;
 		double dz = (newLocation.getZ() - this.getLocation().getZ()) * 32;
@@ -604,13 +587,13 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void teleport(Location newLocation) {
-		if(Main.getInstance().callEvent(new PlayerTeleportEvent(this, this.getLocation(), newLocation))){
+		if (Main.getInstance().callEvent(new PlayerTeleportEvent(this, this.getLocation(), newLocation))) {
 			return;
 		}
 		this.teleportInternally(newLocation);
 	}
-	
-	public void teleportInternally(Location newLocation){
+
+	public void teleportInternally(Location newLocation) {
 		this.waitingForValidMoveAfterTeleport = 1;
 		this.setLocation(this.getLocation().cloneFrom(newLocation));
 
@@ -630,9 +613,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public void serverTick() {
 		super.serverTick();
-		if(Main.getInstance().doPhysics == false){
+		if (Main.getInstance().doPhysics == false) {
 			return;
 		}
+		this.checkCollision();
 		if (getFoodLevel() == 20) {
 			this.clientSettings.isEatingTicks = 0;
 			this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(this.getHealth(), this.getFoodLevel(), this.clientSettings.foodSaturation));
@@ -641,9 +625,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				this.clientSettings.isEatingTicks++;
 				if (this.clientSettings.isEatingTicks % 30 == 0) {
 					this.clientSettings.isEatingTicks = 0;
-					if (this.getInventoryHandler().getItemInHand() != null) {
-						FoodType type = FoodType.fromBlockId(this.getInventoryHandler().getItemInHand().getBlockId());
-						this.getInventoryHandler().decreaseItemInHand(1);
+					if (this.getInventory().getItemInHand() != null) {
+						FoodType type = FoodType.fromBlockId(this.getInventory().getItemInHand().getBlockId());
+						this.getInventory().decreaseItemInHand(1);
 
 						if (this.clientSettings.foodSaturation + type.getSaturation() > 5) {
 							this.clientSettings.foodSaturation = 5;
@@ -723,8 +707,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 		if (this.clientSettings.godMode)
 			return false;
-		
-		for (ItemStack stack : this.getInventoryHandler().getPlayerInventory().getArmor()) {
+
+		for (ItemStack stack : this.getInventory().getPlayerInventory().getArmor()) {
 			if (stack != null) {
 				Armor armor = Armor.fromId(stack.getId());
 				if (armor != null) {
@@ -752,13 +736,13 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			}
 		}
 		this.canSeeEntity.clear();
-		for (ItemStack inv : this.getInventoryHandler().getPlayerInventory().getRawItems()) {
+		for (ItemStack inv : this.getInventory().getPlayerInventory().getRawItems()) {
 			if (inv != null) {
 				EnderWorld world = Main.getInstance().getWorld(this);
 				world.dropItem(getLocation(), inv, 1);
 			}
 		}
-		Collections.fill(this.getInventoryHandler().getPlayerInventory().getRawItems(), null);
+		Collections.fill(this.getInventory().getPlayerInventory().getRawItems(), null);
 	}
 
 	private void broadcastEmptyArmour() {
@@ -814,11 +798,11 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	public void setOnGround(boolean onGround) {
-		if(Main.getInstance().doPhysics == false){
+		if (Main.getInstance().doPhysics == false) {
 			this.isOnGround = onGround;
 			return;
 		}
-		
+
 		World world = this.getWorld();
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();
@@ -830,14 +814,14 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		BlockId id5 = world.getBlock(floor(x), floor(y), floor(z + (getWidth() / 2))).getBlock();
 		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
 		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
-		
-		if(isInWater){
-			//reset fall damage
+
+		if (isInWater) {
+			// reset fall damage
 			this.yLocation = this.getLocation().getY();
 		}
 		if (this.isOnGround == false && onGround == true) {
-			if (this.clientSettings.isFlying){
-				return; // Flying players don't get damage in vanilla
+			if (this.clientSettings.isFlying) {
+				return; // flying players don't get damage in vanilla
 			}
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
@@ -857,10 +841,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 		this.isOnGround = onGround;
 	}
-	
+
 	private boolean compare(BlockId fire, BlockId[] ids) {
-		for(BlockId id : ids){
-			if(id == fire){
+		for (BlockId id : ids) {
+			if (id == fire) {
 				return true;
 			}
 		}
@@ -872,14 +856,12 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	@Override
-	public void onRightClick(EnderPlayer attacker) {
-		// TODO
-	}
+	public void onRightClick(EnderPlayer attacker) {}
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		if (this.damage(1F, Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2))) {
-			Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " was killed by " + attacker.getPlayerName()));
+		if (this.damage(DamageItemType.fromItemStack(attacker.getInventory().getItemInHand()), Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2).add(0, 0.1F, 0).multiply(100F))) {
+			Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " was slain by " + attacker.getPlayerName()));
 		}
 	}
 
@@ -903,21 +885,14 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public void kick(Message reason) {
 		PlayerKickEvent e = new PlayerKickEvent(this, reason);
-		if(e.isCancelled()){
+		if (e.isCancelled()) {
 			return;
 		}
 		if (e.getReason() == null) {
 			this.getNetworkManager().disconnect(reason, false);
-		}else{
+		} else {
 			this.getNetworkManager().disconnect(e.getReason(), false);
 		}
-	}
-
-	/**
-	 * @return the inventoryHandler
-	 */
-	public InventoryHandler getInventoryHandler() {
-		return inventoryHandler;
 	}
 
 	public void updateAbilities() {
@@ -1050,7 +1025,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setSneaking(boolean sneaking) {
-		if(Main.getInstance().callEvent(new PlayerToggleSneakEvent(this, sneaking))){
+		if (Main.getInstance().callEvent(new PlayerToggleSneakEvent(this, sneaking))) {
 			return;
 		}
 		clientSettings.isSneaking = sneaking;
@@ -1109,12 +1084,12 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public InventoryHandler getInventory() {
-		return this.getInventoryHandler();
+		return this.inventoryHandler;
 	}
 
 	@Override
 	public ItemStack getItemInHand() {
-		return this.getInventoryHandler().getItemInHand();
+		return this.getInventory().getItemInHand();
 	}
 
 	@Override
@@ -1188,7 +1163,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void setSprinting(boolean sprinting) {
-		if(Main.getInstance().callEvent(new PlayerToggleSprintEvent(this, sprinting))){
+		if (Main.getInstance().callEvent(new PlayerToggleSprintEvent(this, sprinting))) {
 			return;
 		}
 		this.clientSettings.isSprinting = sprinting;
@@ -1220,15 +1195,15 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		double xDiff = endLocation.getX() - startLocation.getX();
 		double yDiff = endLocation.getY() - startLocation.getY();
 		double zDiff = endLocation.getZ() - startLocation.getZ();
-		
+
 		double xScale = xDiff / (blocksPerLocation * range);
 		double yScale = yDiff / (blocksPerLocation * range);
 		double zScale = zDiff / (blocksPerLocation * range);
-		
+
 		double currentX = 0;
 		double currentY = 0;
 		double currentZ = 0;
-		
+
 		for (int i = 0; i < (blocksPerLocation * range); i++) {
 			currentX += xScale;
 			currentY += yScale;
@@ -1242,74 +1217,74 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public Location getTargetBlock(double range) {
 		double yaw = this.getHeadLocation().getYaw();
 		double pitch = this.getHeadLocation().getPitch();
-		
+
 		boolean watchingUp = false;
 		boolean watchingNorth = false;
 		boolean watchingEast = false;
 		boolean watchingSouth = false;
 		boolean watchingWest = false;
-		
-		if(pitch >= 0){
+
+		if (pitch >= 0) {
 			watchingUp = true;
-		}else if(pitch < 0){
+		} else if (pitch < 0) {
 			pitch *= -1;
 		}
-		
-		while(yaw > 360){
+
+		while (yaw > 360) {
 			yaw -= 360;
 		}
-		while(yaw < -360){
+		while (yaw < -360) {
 			yaw += 360;
 		}
-		
-		if(isInBetween(yaw, -360, -270)){
+
+		if (isInBetween(yaw, -360, -270)) {
 			yaw *= -1;
 			yaw -= 270;
 			yaw = 90 - yaw;
 			watchingNorth = true;
-		} else if(isInBetween(yaw, -270, -180)){
+		} else if (isInBetween(yaw, -270, -180)) {
 			yaw *= -1;
 			yaw -= 180;
 			yaw = 90 - yaw;
 			watchingEast = true;
-		} else if(isInBetween(yaw, -180, -90)){
+		} else if (isInBetween(yaw, -180, -90)) {
 			yaw *= -1;
 			yaw -= 90;
 			yaw = 90 - yaw;
 			watchingSouth = true;
-		} else if(isInBetween(yaw, -90, 0)){
+		} else if (isInBetween(yaw, -90, 0)) {
 			yaw *= -1;
 			yaw = 90 - yaw;
 			watchingWest = true;
-		} else if(isInBetween(yaw, 0, 90)){
+		} else if (isInBetween(yaw, 0, 90)) {
 			watchingNorth = true;
-		} else if(isInBetween(yaw, 90, 180)){
+		} else if (isInBetween(yaw, 90, 180)) {
 			yaw -= 90;
 			watchingEast = true;
-		} else if(isInBetween(yaw, 180, 270)){
+		} else if (isInBetween(yaw, 180, 270)) {
 			yaw -= 180;
 			watchingSouth = true;
-		} else if(isInBetween(yaw, 270, 360)){
+		} else if (isInBetween(yaw, 270, 360)) {
 			yaw -= 270;
 			watchingWest = true;
 		}
-		
+
 		double radianYaw = Math.toRadians(yaw);
 		double radianPitch = Math.toRadians(pitch);
-		
+
 		double yTranslation = Math.sin(radianPitch) * range;
 		double hozTranslation = Math.cos(radianPitch) * range;
 		double xTranslation = Math.cos(radianYaw) * hozTranslation;
 		double zTranslation = Math.sin(radianYaw) * hozTranslation;
-		
+
 		Location old = this.getLocation();
-		if(watchingNorth){
+		if (watchingNorth) {
 			return new Location(old.getWorld(), old.getX() - zTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() + xTranslation, yaw, pitch);
-		}else if(watchingEast){
+		} else if (watchingEast) {
 			return new Location(old.getWorld(), old.getX() - xTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() - zTranslation, yaw, pitch);
-		}else if(watchingSouth){
+		} else if (watchingSouth) {
 			return new Location(old.getWorld(), old.getX() + zTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() - xTranslation, yaw, pitch);
-		}else if(watchingWest){
+		} else if (watchingWest) {
 			return new Location(old.getWorld(), old.getX() + xTranslation, (watchingUp ? (old.getY() - yTranslation) : (old.getY() + yTranslation)), old.getZ() + zTranslation, yaw, pitch);
 		}
 		throw new RuntimeException("This shouldn't happen! PITCH: " + pitch + " YAW: " + yaw + " North: " + watchingNorth + " East: " + watchingEast + " South: " + watchingSouth + " West: " + watchingWest);

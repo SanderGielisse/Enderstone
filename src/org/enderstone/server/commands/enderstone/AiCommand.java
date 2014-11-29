@@ -17,17 +17,17 @@
  */
 package org.enderstone.server.commands.enderstone;
 
-import java.math.BigInteger;
 import java.util.List;
+
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;
-import org.enderstone.server.entity.EnderPlayer;
 import org.enderstone.server.entity.pathfinding.PathFinder;
 import org.enderstone.server.entity.pathfinding.PathTile;
+import org.enderstone.server.entity.player.EnderPlayer;
 
 /**
  *
@@ -49,7 +49,7 @@ public class AiCommand extends SimpleCommand {
 
 			final EnderPlayer player = (EnderPlayer) sender;
 
-			PathFinder pathfinder = new PathFinder(getBlockUnderLocation(new Location(player.getWorld(), 0.5, 64, 0.5, 0, 0)), getBlockUnderLocation(player.getLocation()), 32);
+			PathFinder pathfinder = new PathFinder(null, getBlockUnderLocation(new Location(player.getWorld(), 0.5, 64, 0.5, 0, 0)), getBlockUnderLocation(player.getLocation()), 32);
 
 			long time = System.nanoTime();
 

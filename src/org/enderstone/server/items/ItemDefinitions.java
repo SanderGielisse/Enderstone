@@ -15,32 +15,33 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.blocks;
 
-import org.enderstone.server.api.Block;
-import org.enderstone.server.entity.player.EnderPlayer;
-import org.enderstone.server.inventory.CraftingInventory;
+package org.enderstone.server.items;
+
 import org.enderstone.server.regions.BlockId;
 
-public class BlockDefinitionWorkbench extends BlockDefinition {
+/**
+ *
+ * @author gyroninja
+ */
+public class ItemDefinitions {
 
-	public BlockDefinitionWorkbench() {
-		super(BlockId.WORKBENCH);
-	}
+	private static final ItemDefinition[] items = new ItemDefinition[4096];
 
-	@Override
-	public String getPlaceSound() {
-		return "step.wood";
-	}
+	static {
+			items[BlockId.IRON_SPADE.getId()] = new ItemDefinitionIronShovel();
+			items[BlockId.IRON_PICKAXE.getId()] = new ItemDefinitionIronPickaxe();
+			items[BlockId.IRON_AXE.getId()] = new ItemDefinitionIronAxe();
+			items[BlockId.FLINT_AND_STEEL.getId()] = new ItemDefinitionFlintAndSteel();
+	};
 
-	@Override
-	public String getBreakSound() {
-		return "dig.wood";
-	}
-	
-	@Override
-	public boolean onRightClick(EnderPlayer player, Block block) {
-		player.getInventory().openInventory(new CraftingInventory(player.getLocation()));
-		return true;
+	public static ItemDefinition getItem(BlockId type) {
+		ItemDefinition definition = items[type.getId()];
+		if (definition != null) {
+			return definition;
+		} else {
+			items[type.getId()] =  new ItemDefinition(type);
+			return items[type.getId()];
+		}
 	}
 }

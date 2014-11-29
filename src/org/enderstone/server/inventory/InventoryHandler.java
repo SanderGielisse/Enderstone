@@ -19,12 +19,13 @@ package org.enderstone.server.inventory;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.GameMode;
 import org.enderstone.server.api.event.player.PlayerDropItemEvent;
 import org.enderstone.server.api.messages.SimpleMessage;
-import org.enderstone.server.entity.EnderPlayer;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.packet.play.PacketInClickWindow;
 import org.enderstone.server.packet.play.PacketInCloseWindow;
 import org.enderstone.server.packet.play.PacketInConfirmTransaction;

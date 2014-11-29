@@ -15,32 +15,34 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.blocks;
+package org.enderstone.server.entity;
 
-import org.enderstone.server.api.Block;
-import org.enderstone.server.entity.player.EnderPlayer;
-import org.enderstone.server.inventory.CraftingInventory;
-import org.enderstone.server.regions.BlockId;
+import org.enderstone.server.inventory.ItemStack;
 
-public class BlockDefinitionWorkbench extends BlockDefinition {
+public class EntityDrop {
 
-	public BlockDefinitionWorkbench() {
-		super(BlockId.WORKBENCH);
+	private ItemStack stack;
+	private int dropChance;
+
+	public EntityDrop(ItemStack stack, int dropChance) {
+		this.stack = stack;
+		this.dropChance = dropChance;
 	}
 
-	@Override
-	public String getPlaceSound() {
-		return "step.wood";
+	public ItemStack getStack() {
+		return stack;
 	}
 
-	@Override
-	public String getBreakSound() {
-		return "dig.wood";
+	public void setStack(ItemStack stack) {
+		this.stack = stack;
 	}
-	
-	@Override
-	public boolean onRightClick(EnderPlayer player, Block block) {
-		player.getInventory().openInventory(new CraftingInventory(player.getLocation()));
-		return true;
+
+	public int getDropChance() {
+		return dropChance;
 	}
+
+	public void setDropChance(int dropChance) {
+		this.dropChance = dropChance;
+	}
+
 }

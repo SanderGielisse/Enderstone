@@ -15,34 +15,8 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity.drops;
+package org.enderstone.server.entity.player;
 
-import org.enderstone.server.inventory.ItemStack;
-
-public class EntityDrop {
-
-	private ItemStack stack;
-	private int dropChance;
-
-	public EntityDrop(ItemStack stack, int dropChance) {
-		this.stack = stack;
-		this.dropChance = dropChance;
-	}
-
-	public ItemStack getStack() {
-		return stack;
-	}
-
-	public void setStack(ItemStack stack) {
-		this.stack = stack;
-	}
-
-	public int getDropChance() {
-		return dropChance;
-	}
-
-	public void setDropChance(int dropChance) {
-		this.dropChance = dropChance;
-	}
-
+public enum EquipmentUpdateType {
+	HELMET_CHANGE, CHESTPLATE_CHANGE, LEGGINGS_CHANGE, BOOTS_CHANGE, ITEM_IN_HAND_CHANGE, ALL;
 }

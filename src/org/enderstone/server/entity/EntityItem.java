@@ -18,10 +18,12 @@
 package org.enderstone.server.entity;
 
 import java.util.Set;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Item;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutCollectItem;
@@ -147,10 +149,10 @@ public class EntityItem extends EnderEntity implements Item {
 	}
 
 	@Override
-	public boolean onCollision(EnderPlayer withPlayer) {
+	public boolean onCollide(EnderPlayer withPlayer) {
 		if (pickupDelay <= 0) {
 			if (withPlayer.canSeeEntity.contains(this)) {
-				ItemStack stack = withPlayer.getInventoryHandler().tryPickup(this.itemstack);
+				ItemStack stack = withPlayer.getInventory().tryPickup(this.itemstack);
 				if (stack == null) {
 					withPlayer.canSeeEntity.remove(this);
 					Main.getInstance().getWorld(withPlayer).broadcastPacket(new PacketOutCollectItem(this.getEntityId(), withPlayer.getEntityId()), withPlayer.getLocation());
