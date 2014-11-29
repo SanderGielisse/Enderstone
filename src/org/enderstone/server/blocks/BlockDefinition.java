@@ -55,11 +55,12 @@ public class BlockDefinition {
 		return false;
 	}
 
-	public boolean onRightClick(EnderPlayer player, Block block) {
+	
+	public boolean onLeftClick(EnderPlayer player, Block block) {
 		return false;
 	}
 
-	public boolean onLeftClick(EnderPlayer player, Block block) {
+	public boolean onRightClick(EnderPlayer player, Block block) {
 		return false;
 	}
 

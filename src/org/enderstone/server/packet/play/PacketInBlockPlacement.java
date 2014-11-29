@@ -29,6 +29,8 @@ import org.enderstone.server.blocks.BlockDefinitions;
 import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.entity.player.FoodType;
 import org.enderstone.server.inventory.ItemStack;
+import org.enderstone.server.items.ItemDefinition;
+import org.enderstone.server.items.ItemDefinitions;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;
@@ -123,13 +125,13 @@ public class PacketInBlockPlacement extends Packet {
 					EnderPlayer pl = networkManager.player;
 
 					if (getHeldItem() == null || pl.getInventoryHandler().getItemInHand() == null) {
-						if (Main.getInstance().getWorld(pl).getBlockIdAt(x, y, z).getId() == 0) {
+						if (pl.getWorld().getBlockIdAt(x, y, z).getId() == 0) {
 							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short) 0, (byte) 0); // tell client it failed and set the block back to air
 						}
 						return;
 					}
 					if (pl.getInventoryHandler().getItemInHand().getBlockId() != getHeldItem().getBlockId() && pl.getInventoryHandler().getItemInHand().getAmount() != getHeldItem().getAmount()) {
-						if (Main.getInstance().getWorld(pl).getBlockIdAt(x, y, z).getId() == 0) {
+						if (pl.getWorld().getBlockIdAt(x, y, z).getId() == 0) {
 							pl.sendBlockUpdate(new Location(pl.getWorld(), x, y, z, (byte) 0, (byte) 0), (short) 0, (byte) 0); // tell client it failed and set the block back to air
 						}
 						return;
@@ -137,12 +139,21 @@ public class PacketInBlockPlacement extends Packet {
 
 					if (BlockId.byId(getHeldItem().getBlockId()).isValidBlock()) {
 
-						Main.getInstance().getWorld(pl).setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
+						pl.getWorld().setBlockAt(x, y, z, BlockId.byId(getHeldItem().getBlockId()), (byte) getHeldItem().getDamage());
 
 						BlockDefinition definition = BlockDefinitions.getBlock(networkManager.player.getWorld().getBlockIdAt(x, y, z));
 
 						pl.getInventoryHandler().decreaseItemInHand(1);
-						Main.getInstance().getWorld(networkManager.player).broadcastSound(definition.getPlaceSound(), 1F, (byte) 63, loc, null);
+						pl.getWorld().broadcastSound(definition.getPlaceSound(), 1F, (byte) 63, loc, null);
+						return;
+					}
+
+					else {
+
+						ItemDefinition definition = ItemDefinitions.getItem(getHeldItem().getId());
+
+						definition.onRightClick(pl, pl.getWorld().getBlock(x, y, z));
+
 						return;
 					}
 				}

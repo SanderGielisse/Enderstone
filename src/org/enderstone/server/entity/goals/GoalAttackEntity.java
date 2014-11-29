@@ -17,16 +17,11 @@
  */
 package org.enderstone.server.entity.goals;
 
-import java.util.Collection;
 import java.util.List;
-
 import org.enderstone.server.api.Location;
-import org.enderstone.server.api.entity.Entity;
-import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.EntityMob;
 import org.enderstone.server.entity.pathfinding.PathFinder;
 import org.enderstone.server.entity.pathfinding.PathTile;
-import org.enderstone.server.entity.player.EnderPlayer;
 
 /**
  *
@@ -35,44 +30,32 @@ import org.enderstone.server.entity.player.EnderPlayer;
 public class GoalAttackEntity implements Goal {
 
 	private final EntityMob mob;
-	private final Class<? extends Entity> targetType;
-
-	private EnderEntity target;
 
 	private int lastUpdate;
 
-	public GoalAttackEntity(EntityMob mob, Class<? extends Entity> targetType) {
+	public GoalAttackEntity(EntityMob mob) {
 
 		this.mob = mob;
-		this.targetType = targetType;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean shouldStart() {
-		Collection<EnderEntity> entities = (Collection<EnderEntity>) (targetType == EnderPlayer.class ? mob.getWorld().getPlayers() : mob.getWorld().getEntities());
-		for (Entity e : entities) {
-			if (e.getClass().equals(targetType)) {
-				if (mob.getLocation().distanceSquared(e.getLocation()) < (16 * 16)) { // range of 16 blocks
-					target = (EnderEntity) e;
-					return true;
-				}
-			}
+	public boolean start() {
+
+		if (mob.getNavigator().getTarget() == null) {
+
+			return false;
 		}
-		return false;
+
+		pathfindToTarget(mob.getLocation());
+
+		return mob.getNavigator().getPathfinder() != null && mob.getNavigator().getPathfinder().hasPath();
 	}
 
 	@Override
 	public boolean shouldContinue() {
-		if (target.isDead() || (target instanceof EnderPlayer && !((EnderPlayer) target).isOnline)) {
-			return false;
-		}
-		return mob.getLocation().distanceSquared(target.getLocation()) < 1024;// 32 squared = 1024
-	}
 
-	@Override
-	public void start() {
-		pathfindToTarget(mob.getLocation());
+		return mob.getNavigator().getPath() != null;
 	}
 
 	@Override
@@ -89,22 +72,26 @@ public class GoalAttackEntity implements Goal {
 
 	@Override
 	public void reset() {
-		target = null;
+
 		mob.getNavigator().setPath(null, null);
 	}
 
 	private void pathfindToTarget(Location start) {
-		PathFinder pathfinder = new PathFinder(mob, mob.getLocation(), target.getLocation(), 32);
-		List<PathTile> path = pathfinder.calculatePath();
-		if (pathfinder.hasPath()) {
-			mob.getNavigator().setPath(pathfinder, path);
-		} else {
+
+		if (mob.getNavigator().getTarget() != null) {
+
+			PathFinder pathfinder = new PathFinder(mob, mob.getLocation(), mob.getNavigator().getTarget().getLocation(), 32);
+
+			List<PathTile> path = pathfinder.calculatePath();
+			if (pathfinder.hasPath()) {
+				mob.getNavigator().setPath(pathfinder, path);
+			} else {
+				mob.getNavigator().setPath(null, null);
+			}
+		}
+
+		else {
 			mob.getNavigator().setPath(null, null);
 		}
-	}
-
-	@Override
-	public EnderEntity getCurrentTarget() {
-		return this.target;
 	}
 }
