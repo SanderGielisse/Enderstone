@@ -120,6 +120,12 @@ public class Vector {
 		return new Vector(toLocation.getX() - fromLocation.getX(), toLocation.getY() - fromLocation.getY(), toLocation.getZ() - fromLocation.getZ());
 	}
 
+	public static Vector substractAndNormalize(Location fromLocation, Location toLocation) {
+		Vector vec = substract(fromLocation, toLocation);
+		vec.normalize(fromLocation.distance(toLocation));
+		return vec;
+	}
+
 	/**
 	 * Normalize the vector and also returns itself.
 	 * 
@@ -152,5 +158,12 @@ public class Vector {
 	@Override
 	public String toString() {
 		return "Vector [x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
+
+	public Vector add(double x, double y, double z) {
+		this.x += x;
+		this.y += y;
+		this.z += z;
+		return this;
 	}
 }

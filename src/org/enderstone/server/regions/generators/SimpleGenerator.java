@@ -20,6 +20,7 @@ package org.enderstone.server.regions.generators;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.entity.EntitySpider;
@@ -102,7 +103,7 @@ public class SimpleGenerator implements ChunkGenerator {
 				setBlock(14, 0, source);
 				
 				//TEMPORARILY TESTS
-				if (Main.random.nextInt(5) == 0) {
+				if (Main.random.nextInt(25) == 0) {
 					world.addEntity(new EntitySpider(world, new Location(world, source.getX() * 16, source.getHighestBlockAt(0, 0) + 1, source.getZ() * 16, 0F, 0F)));
 				}
 				source.setBlock(8, source.getHighestBlockAt(8, 0), 0, BlockId.WATER, (byte) 0);

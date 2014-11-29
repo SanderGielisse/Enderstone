@@ -34,27 +34,20 @@ public class GoalAttackEntity implements Goal {
 	private int lastUpdate;
 
 	public GoalAttackEntity(EntityMob mob) {
-
 		this.mob = mob;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean start() {
-
 		if (mob.getNavigator().getTarget() == null) {
-
 			return false;
 		}
-
 		pathfindToTarget(mob.getLocation());
-
 		return mob.getNavigator().getPathfinder() != null && mob.getNavigator().getPathfinder().hasPath();
 	}
 
 	@Override
 	public boolean shouldContinue() {
-
 		return mob.getNavigator().getPath() != null;
 	}
 
@@ -72,25 +65,19 @@ public class GoalAttackEntity implements Goal {
 
 	@Override
 	public void reset() {
-
 		mob.getNavigator().setPath(null, null);
 	}
 
 	private void pathfindToTarget(Location start) {
-
 		if (mob.getNavigator().getTarget() != null) {
-
 			PathFinder pathfinder = new PathFinder(mob, mob.getLocation(), mob.getNavigator().getTarget().getLocation(), 32);
-
 			List<PathTile> path = pathfinder.calculatePath();
 			if (pathfinder.hasPath()) {
 				mob.getNavigator().setPath(pathfinder, path);
 			} else {
 				mob.getNavigator().setPath(null, null);
 			}
-		}
-
-		else {
+		} else {
 			mob.getNavigator().setPath(null, null);
 		}
 	}

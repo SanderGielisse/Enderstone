@@ -98,7 +98,7 @@ public class Main implements Runnable {
 			this.add(47); // 1.8
 		}
 	});
-	public static final String[] AUTHORS = new String[] { "sander2798 [Sander Gielisse]", "ferrybig [Fernando van Loenhout]" };
+	public static final String[] AUTHORS = new String[] { "Sander Gielisse [sander2798]", "Fernando van Loenhout [ferrybig]" };
 	public static final String[] TOP_CONTRIBUTORS = new String[] { "Gyroninja" };
 	public static final Random random = new Random();
 	public volatile Thread mainThread;
@@ -130,7 +130,6 @@ public class Main implements Runnable {
 		commands.registerCommand(new WorldCommand());
 		commands.registerCommand(new CraftingDebugCommand());
 		commands.registerCommand(new LagCommand());
-
 		commands.registerCommand(new AiCommand());
 	}
 
@@ -173,6 +172,7 @@ public class Main implements Runnable {
 		this.loadConfigFromDisk();
 		this.motd = (String) prop.get("motd");
 		// TODO read max players from config
+		// this.maxPlayers = ;
 		EnderLogger.info("Loaded server.properties file!");
 
 		EnderLogger.info("Loading favicon...");
@@ -242,10 +242,10 @@ public class Main implements Runnable {
 					Thread.currentThread().interrupt();
 				} catch (RuntimeException ex) {
 					EnderLogger.error("CRASH REPORT! (this should not happen!)");
-					EnderLogger.error("Main thread has shutdown, this shouldn't happen!");
+					EnderLogger.error("Main thread has shut down, this shouldn't happen!");
 					EnderLogger.exception(ex);
-					EnderLogger.error("Server is inside tick " + tick);
-					EnderLogger.error("Last tick was in " + new Date(lastTick).toString());
+					EnderLogger.error("Server was processing tick " + tick);
+					EnderLogger.error("Last succesfull tick was " + new Date(lastTick).toString());
 				} finally {
 					Main.this.isRunning = false;
 					Main.getInstance().directShutdown();

@@ -81,7 +81,8 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		this.damage(DamageItemType.fromItemStack(attacker.getInventory().getItemInHand()), Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2).setY(-0.2F).multiply(10F));
+		Vector knockback = Vector.substractAndNormalize(attacker.getLocation(), this.getLocation()).multiply(2F).add(0, 0.2F, 0);
+		this.damage(DamageItemType.fromItemStack(attacker.getInventory().getItemInHand()), knockback);
 	}
 
 	@Override
@@ -211,6 +212,9 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 				}
 			}
 		}
+		if (!this.isOnGround()) {
+			this.currentVelocity.add(0, -0.1F, 0);
+		}
 	}
 
 	public void moveInstantly(Location toLocation) {
@@ -236,5 +240,10 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 	@Override
 	public float getMovementSpeed() {
 		return 2;
+	}
+
+	@Override
+	public boolean isOnGround() {
+		return !this.canGoDown();
 	}
 }

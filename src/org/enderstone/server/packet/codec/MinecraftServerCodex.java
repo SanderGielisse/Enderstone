@@ -20,9 +20,10 @@ package org.enderstone.server.packet.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
+
 import java.io.IOException;
 import java.util.List;
-import org.enderstone.server.EnderLogger;
+
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.packet.HandshakeState;
 import org.enderstone.server.packet.NetworkManager;
@@ -110,7 +111,6 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 								throw new IOException("Invalid packet");
 						}
 						in = packet;
-						
 					}
 					break;
 					default: {
@@ -141,13 +141,13 @@ public class MinecraftServerCodex extends ByteToMessageCodec<Packet> {
 	public void setState(HandshakeState state) {
 		this.state = state;
 	}
-	
-	public Packet getDisconnectionPacket(Message m)
-	{
-		switch(this.state)
-		{
-			case LOGIN: return new PacketOutLoginPlayerDisconnect(m);
-			case PLAY: return new PacketOutPlayerDisconnect(m);
+
+	public Packet getDisconnectionPacket(Message m) {
+		switch (this.state) {
+		case LOGIN:
+			return new PacketOutLoginPlayerDisconnect(m);
+		case PLAY:
+			return new PacketOutPlayerDisconnect(m);
 		default:
 			return null;
 		}

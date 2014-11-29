@@ -19,6 +19,7 @@ package org.enderstone.server.entity;
 
 import java.util.Set;
 
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
@@ -48,6 +49,7 @@ public abstract class EnderEntity implements Entity {
 	private DataWatcher dataWatcher = new DataWatcher();
 	private long latestDamage = 0;
 	private int fireTicks = 0;
+	protected Vector currentVelocity = new Vector(0, 0, 0);
 
 	private boolean shouldBeRemoved = false;
 	private boolean broadcastDespawn = true;
@@ -55,18 +57,6 @@ public abstract class EnderEntity implements Entity {
 	public EnderEntity(Location location) {
 		this.entityId = entityCount++;
 		this.location = location.clone();
-	}
-
-	public int getEntityId() {
-		return entityId;
-	}
-
-	public Location getLocation() {
-		return location.clone();
-	}
-
-	public void setLocation(Location newLoc) {
-		this.location.cloneFrom(newLoc);
 	}
 
 	public abstract Packet[] getSpawnPackets();
@@ -83,108 +73,6 @@ public abstract class EnderEntity implements Entity {
 
 	public boolean onCollide(EnderPlayer withPlayer) {
 		return false;
-	}
-
-	public boolean damage(float damage) {
-		EntityDamageEvent e = new EntityDamageEvent(this, damage);
-		if (Main.getInstance().callEvent(e)) {
-			return health != 0;
-		}
-		if (Float.isNaN(this.health))
-			initHealth();
-		if (health == 0)
-			return false;
-		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
-			if (p.getLocation().isInRange(25, getLocation(), true)) {
-				p.getNetworkManager().sendPacket(new PacketOutEntityStatus(getEntityId(), PacketOutEntityStatus.Status.LIVING_ENTITY_HURT));
-				p.getNetworkManager().sendPacket(new PacketOutSoundEffect(isDead() ? getDeadSound() : getDamageSound(), location));
-				p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
-			}
-		}
-		boolean death = this.setHealth(Math.max(health - e.getDamage(), 0));
-		if (death) {
-			Main.getInstance().callEvent(new EntityDeathEvent(this));
-		}
-		return death;
-	}
-
-	public boolean damage(float damage, Vector knockback) {
-		// damage delay
-		if ((Main.getInstance().getCurrentServerTick() - this.latestDamage) < 10) {
-			return false;
-		}
-		this.latestDamage = Main.getInstance().getCurrentServerTick();
-
-		boolean death = this.damage(damage);
-		if (!death) {
-			((EnderWorld) this.getWorld()).broadcastPacket(new PacketOutEntityVelocity(this.getEntityId(), knockback), this.getLocation());
-			this.location.add(knockback.getX(), knockback.getY(), knockback.getZ());
-		}
-		return death;
-	}
-
-	public final boolean isDead() {
-		if (Float.isNaN(this.health))
-			initHealth();
-		return this.health <= 0;
-	}
-
-	public final void kill() {
-		damage(1000);
-	}
-
-	public final void heal() {
-		setHealth(this.getMaxHealth());
-		setFireTicks(0);
-	}
-
-	protected void onHealthUpdate(float newHealth, float lastHealth) {
-
-	}
-
-	public float getHealth() {
-		if (Float.isNaN(this.health)) {
-			initHealth();
-		}
-		return health;
-	}
-
-	public final float getMaxHealth() {
-		if (Float.isNaN(this.health)) {
-			initHealth();
-		}
-		return maxHealth;
-	}
-
-	public final void setMaxHealth(float health) {
-		if (Float.isNaN(this.health))
-			initHealth();
-		setHealth(Math.min(health, this.health));
-		this.maxHealth = health;
-	}
-
-	public final boolean setHealth(float health) {
-		if (Float.isNaN(this.health))
-			initHealth();
-		if (health == this.health)
-			return false;
-		if (health > this.maxHealth)
-			throw new IllegalArgumentException("Health value too large");
-		float lastHealth = this.health;
-		this.health = health;
-		onHealthUpdate(this.health, lastHealth);
-		return this.health <= 0;
-	}
-
-	@Override
-	public void remove() {
-		this.shouldBeRemoved = true;
-		this.broadcastDespawn = true;
-	}
-
-	public void removeInternally(boolean broadcastDespawn) {
-		this.shouldBeRemoved = true;
-		this.broadcastDespawn = broadcastDespawn;
 	}
 
 	protected abstract String getDamageSound();
@@ -212,6 +100,127 @@ public abstract class EnderEntity implements Entity {
 	public abstract float getWidth();
 
 	public abstract float getHeight();
+
+	public int getEntityId() {
+		return entityId;
+	}
+
+	public Location getLocation() {
+		return location.clone();
+	}
+
+	public void setLocation(Location newLoc) {
+		this.location.cloneFrom(newLoc);
+	}
+
+	public boolean damage(float damage) {
+		EntityDamageEvent e = new EntityDamageEvent(this, damage);
+		if (Main.getInstance().callEvent(e)) {
+			return health != 0;
+		}
+		if (Float.isNaN(this.health))
+			initHealth();
+		if (health == 0)
+			return false;
+		for (EnderPlayer p : Main.getInstance().onlinePlayers) {
+			if (p.getLocation().isInRange(25, getLocation(), true)) {
+				p.getNetworkManager().sendPacket(new PacketOutEntityStatus(getEntityId(), PacketOutEntityStatus.Status.LIVING_ENTITY_HURT));
+				p.getNetworkManager().sendPacket(new PacketOutSoundEffect(isDead() ? getDeadSound() : getDamageSound(), location));
+				p.getNetworkManager().sendPacket(new PacketOutAnimation(getEntityId(), (byte) 1));
+			}
+		}
+		boolean death = this.setHealth(Math.max(health - e.getDamage(), 0));
+		if (death) {
+			Main.getInstance().callEvent(new EntityDeathEvent(this));
+		}
+		return death;
+	}
+
+	public void setVelocity(Vector velocity) {
+		if (this instanceof EnderPlayer) {
+			((EnderWorld) this.getWorld()).broadcastPacket(new PacketOutEntityVelocity(this.getEntityId(), velocity), this.getLocation());
+			return;
+		}
+		this.currentVelocity = velocity;
+	}
+
+	public boolean damage(float damage, Vector knockback) {
+		// damage delay
+		if ((Main.getInstance().getCurrentServerTick() - this.latestDamage) < 10) {
+			return false;
+		}
+		this.latestDamage = Main.getInstance().getCurrentServerTick();
+
+		boolean death = this.damage(damage);
+		if (!death) {
+			this.setVelocity(knockback);
+		}
+		return death;
+	}
+
+	public final boolean isDead() {
+		if (Float.isNaN(this.health)) {
+			initHealth();
+		}
+		return this.health <= 0;
+	}
+
+	public final void kill() {
+		damage(1000);
+	}
+
+	public final void heal() {
+		setHealth(this.getMaxHealth());
+		setFireTicks(0);
+	}
+
+	protected void onHealthUpdate(float newHealth, float lastHealth) {}
+
+	public float getHealth() {
+		if (Float.isNaN(this.health)) {
+			initHealth();
+		}
+		return health;
+	}
+
+	public final float getMaxHealth() {
+		if (Float.isNaN(this.health)) {
+			initHealth();
+		}
+		return maxHealth;
+	}
+
+	public final void setMaxHealth(float health) {
+		if (Float.isNaN(this.health)) {
+			initHealth();
+		}
+		setHealth(Math.min(health, this.health));
+		this.maxHealth = health;
+	}
+
+	public final boolean setHealth(float health) {
+		if (Float.isNaN(this.health))
+			initHealth();
+		if (health == this.health)
+			return false;
+		if (health > this.maxHealth)
+			throw new IllegalArgumentException("Health value too large");
+		float lastHealth = this.health;
+		this.health = health;
+		onHealthUpdate(this.health, lastHealth);
+		return this.health <= 0;
+	}
+
+	@Override
+	public void remove() {
+		this.shouldBeRemoved = true;
+		this.broadcastDespawn = true;
+	}
+
+	public void removeInternally(boolean broadcastDespawn) {
+		this.shouldBeRemoved = true;
+		this.broadcastDespawn = broadcastDespawn;
+	}
 
 	private void initHealth() {
 		this.health = getBaseHealth();
@@ -248,9 +257,29 @@ public abstract class EnderEntity implements Entity {
 		if (shouldBeRemoved || this.isDead() || Main.getInstance().doPhysics == false) {
 			return;
 		}
-		// if (this instanceof EnderPlayer) {
-		// EnderLogger.debug("FireTicks: " + fireTicks);
-		// }
+
+		if (this instanceof EntityMob) {
+			// do velocity
+			double veloX = this.currentVelocity.getX();
+			double veloY = this.currentVelocity.getY();
+			double veloZ = this.currentVelocity.getZ();
+
+			double thisTickX = veloX / 2D;
+			double thisTickY = veloY / 2D;
+			double thisTickZ = veloZ / 2D;
+
+			if (!this.canGoDown()) {
+				thisTickY = 0F;
+			}
+
+			if (thisTickX < 0.1D && thisTickY < 0.1D && thisTickZ < 0.1D) {
+				this.currentVelocity = new Vector(0, 0, 0);
+			} else {
+				this.currentVelocity.add(-thisTickX, -thisTickY, -thisTickZ);
+				((EntityMob) this).moveInstantly(this.getLocation().add(thisTickX, thisTickY, thisTickZ));
+			}
+		}
+
 		World world = this.getWorld();
 		double x = this.getLocation().getX();
 		double y = this.getLocation().getY();
@@ -288,6 +317,10 @@ public abstract class EnderEntity implements Entity {
 		if (this.fireTicks == 0) {
 			this.setFireTicks(0);
 		}
+	}
+
+	protected boolean canGoDown() {
+		return this.getWorld().getBlock(this.getLocation().add((this.getWidth() / 2), -1, 0D)).getBlock().doesInstantBreak() && this.getWorld().getBlock(this.getLocation().add(-(this.getWidth() / 2), -1, 0D)).getBlock().doesInstantBreak() && this.getWorld().getBlock(this.getLocation().add(0D, -1, (this.getWidth() / 2))).getBlock().doesInstantBreak() && this.getWorld().getBlock(this.getLocation().add(0D, -1, -(this.getWidth() / 2))).getBlock().doesInstantBreak() && this.getWorld().getBlock(this.getLocation().add(0, -1, 0)).getBlock().doesInstantBreak();
 	}
 
 	public static int floor(double num) {

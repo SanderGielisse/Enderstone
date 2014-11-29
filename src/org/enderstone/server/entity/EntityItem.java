@@ -208,11 +208,11 @@ public class EntityItem extends EnderEntity implements Item {
 	}
 	
 	public boolean canGoDown(){
-		return world.getBlock(this.getLocation().add(0.25D, 0, 0D)).getBlock().doesInstantBreak() &&
-				world.getBlock(this.getLocation().add(-0.25D, 0, 0D)).getBlock().doesInstantBreak() && 
-						world.getBlock(this.getLocation().add(0D, 0, 0.25D)).getBlock().doesInstantBreak() && 
-							world.getBlock(this.getLocation().add(0D, 0, -0.25D)).getBlock().doesInstantBreak() &&
-									world.getBlock(this.getLocation().add(0, -1D, 0)).getBlock().doesInstantBreak();
+		return world.getBlock(this.getLocation().add(0.25D,-1, 0D)).getBlock().doesInstantBreak() &&
+				world.getBlock(this.getLocation().add(-0.25D, -1, 0D)).getBlock().doesInstantBreak() &&
+						world.getBlock(this.getLocation().add(0D, -1, 0.25D)).getBlock().doesInstantBreak() &&
+							world.getBlock(this.getLocation().add(0D, -1, -0.25D)).getBlock().doesInstantBreak() &&
+									world.getBlock(this.getLocation().add(0, -1, 0)).getBlock().doesInstantBreak();
 	}
 
 	@Override
@@ -240,5 +240,10 @@ public class EntityItem extends EnderEntity implements Item {
 	@Override
 	public float getHeight() {
 		return 0.25F;
+	}
+
+	@Override
+	public boolean isOnGround() {
+		return !this.canGoDown();
 	}
 }

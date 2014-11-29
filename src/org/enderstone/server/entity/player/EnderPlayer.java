@@ -463,7 +463,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			while (it.hasNext()) {
 				EnderEntity e = it.next();
 				if (!this.isDead()) {
-					if (e.getLocation().isInRange(2, this.getLocation(), true)) {
+					if (e.getLocation().isInRange(1.5F, this.getLocation(), true)) {
 						boolean remove = e.onCollide(this);
 						if (remove) {
 							it.remove();
@@ -860,7 +860,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		if (this.damage(DamageItemType.fromItemStack(attacker.getInventory().getItemInHand()), Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2).add(0, 0.1F, 0).multiply(100F))) {
+		if (this.damage(DamageItemType.fromItemStack(attacker.getInventory().getItemInHand()), Vector.substractAndNormalize(attacker.getLocation(), this.getLocation()).add(0, 0.2F, 0))) {
 			Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " was slain by " + attacker.getPlayerName()));
 		}
 	}

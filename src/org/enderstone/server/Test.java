@@ -19,6 +19,8 @@ package org.enderstone.server;
 
 import java.io.IOException;
 import java.util.Arrays;
+
+import org.enderstone.server.api.Location;
 import org.enderstone.server.api.messages.AdvancedMessage;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.util.IntegerArrayComparator;
@@ -49,8 +51,9 @@ public class Test {
 		}
 		{
 			System.out.println("Test 4: ");
-			//System.out.println("LN 1: " + RegionSet.calculateRegionPos(-11));
-			//System.out.println("LN 2: " + RegionSet.calculateRegionPos(21));
+			Location loc1 = new Location(null, 0, 0, 0, 0F, 0F);
+			Location loc2 = new Location(null, -1, 0, 1, 0F, 0F);
+			System.out.println("Yaw should be 45 degrees and is " + Location.calcYaw(loc1, loc2));
 		}
 	}
 }

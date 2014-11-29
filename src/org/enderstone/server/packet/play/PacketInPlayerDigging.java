@@ -18,7 +18,7 @@
 package org.enderstone.server.packet.play;
 
 import java.io.IOException;
-import org.enderstone.server.EnderLogger;
+
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
@@ -27,7 +27,6 @@ import org.enderstone.server.api.event.player.PlayerBreakBlockEvent;
 import org.enderstone.server.blocks.BlockDefinition;
 import org.enderstone.server.blocks.BlockDefinitions;
 import org.enderstone.server.entity.EntityItem;
-import org.enderstone.server.inventory.ItemStack;
 import org.enderstone.server.packet.NetworkManager;
 import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.PacketDataWrapper;

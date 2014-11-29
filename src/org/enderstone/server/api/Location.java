@@ -31,12 +31,18 @@ public class Location implements Cloneable {
 	/**
 	 * Location stores a position and rotation of where an object can be located
 	 * 
-	 * @param world the world the location is in
-	 * @param x the x position of the location
-	 * @param y the y position of the location
-	 * @param z the z position of the location
-	 * @param yaw the yaw of the location
-	 * @param pitch the pitch of the location
+	 * @param world
+	 *            the world the location is in
+	 * @param x
+	 *            the x position of the location
+	 * @param y
+	 *            the y position of the location
+	 * @param z
+	 *            the z position of the location
+	 * @param yaw
+	 *            the yaw of the location
+	 * @param pitch
+	 *            the pitch of the location
 	 */
 	public Location(EnderWorld world, double x, double y, double z, float yaw, float pitch) {
 		this.world = world;
@@ -50,12 +56,18 @@ public class Location implements Cloneable {
 	/**
 	 * Location stores a position and rotation of where an object can be located
 	 * 
-	 * @param world the world the location is in
-	 * @param x the x position of the location
-	 * @param y the y position of the location
-	 * @param z the z position of the location
-	 * @param yaw the yaw of the location
-	 * @param pitch the pitch of the location
+	 * @param world
+	 *            the world the location is in
+	 * @param x
+	 *            the x position of the location
+	 * @param y
+	 *            the y position of the location
+	 * @param z
+	 *            the z position of the location
+	 * @param yaw
+	 *            the yaw of the location
+	 * @param pitch
+	 *            the pitch of the location
 	 */
 	public Location(EnderWorld world, double x, double y, double z, double yaw, double pitch) {
 		this(world, (float) x, (float) y, (float) z, (float) yaw, (float) pitch);
@@ -73,7 +85,8 @@ public class Location implements Cloneable {
 	/**
 	 * Set the world the location is in
 	 * 
-	 * @param world The new world the location is in
+	 * @param world
+	 *            The new world the location is in
 	 */
 	public void setWorld(EnderWorld world) {
 		this.world = world;
@@ -91,7 +104,8 @@ public class Location implements Cloneable {
 	/**
 	 * Set the X position of the location
 	 * 
-	 * @param x The new X position of the location
+	 * @param x
+	 *            The new X position of the location
 	 */
 	public void setX(double x) {
 		this.x = x;
@@ -109,7 +123,8 @@ public class Location implements Cloneable {
 	/**
 	 * Set the Y position of the location
 	 * 
-	 * @param y The new Y position of the location
+	 * @param y
+	 *            The new Y position of the location
 	 */
 	public void setY(double y) {
 		this.y = y;
@@ -127,7 +142,8 @@ public class Location implements Cloneable {
 	/**
 	 * Set the Z position of the location
 	 * 
-	 * @param z The new Z position of the location
+	 * @param z
+	 *            The new Z position of the location
 	 */
 	public void setZ(double z) {
 		this.z = z;
@@ -145,7 +161,8 @@ public class Location implements Cloneable {
 	/**
 	 * Set the yaw rotation of the location
 	 * 
-	 * @param yaw The new X yaw rotation of the location
+	 * @param yaw
+	 *            The new X yaw rotation of the location
 	 */
 	public void setYaw(float yaw) {
 		this.yaw = yaw;
@@ -163,7 +180,8 @@ public class Location implements Cloneable {
 	/**
 	 * Set the pitch rotation of the location
 	 * 
-	 * @param pitch The new pitch rotation of the location
+	 * @param pitch
+	 *            The new pitch rotation of the location
 	 */
 	public void setPitch(float pitch) {
 		this.pitch = pitch;
@@ -172,7 +190,8 @@ public class Location implements Cloneable {
 	/**
 	 * Floors a double (rounds down)
 	 * 
-	 * @param num The number to be rounded
+	 * @param num
+	 *            The number to be rounded
 	 * 
 	 * @return Rounded number
 	 */
@@ -211,9 +230,12 @@ public class Location implements Cloneable {
 	/**
 	 * Adds the given values to the current location
 	 * 
-	 * @param x the X value to add
-	 * @param y the Y value to add
-	 * @param z the Z value to add
+	 * @param x
+	 *            the X value to add
+	 * @param y
+	 *            the Y value to add
+	 * @param z
+	 *            the Z value to add
 	 * 
 	 * @return The location after the translation
 	 */
@@ -227,13 +249,16 @@ public class Location implements Cloneable {
 	/**
 	 * Checks if a different location is within range of the current location.
 	 * 
-	 * @param viewDistance The radius of the range
-	 * @param otherLoc The other location to compare with
-	 * @param checkY Whether or not to take the Y value into the calculations
+	 * @param viewDistance
+	 *            The radius of the range
+	 * @param otherLoc
+	 *            The other location to compare with
+	 * @param checkY
+	 *            Whether or not to take the Y value into the calculations
 	 * 
 	 * @return true if the different location is within the range
 	 */
-	public boolean isInRange(int viewDistance, Location otherLoc, boolean checkY) {
+	public boolean isInRange(double viewDistance, Location otherLoc, boolean checkY) {
 		if (this.world != null && otherLoc.world != null) {
 			if (!this.world.worldName.equals(otherLoc.world.worldName)) {
 				return false;
@@ -249,7 +274,8 @@ public class Location implements Cloneable {
 	/**
 	 * Get the distance between a different location and the current location.
 	 * 
-	 * @param otherLocation the other location to compare with
+	 * @param otherLocation
+	 *            the other location to compare with
 	 * 
 	 * @return The distance between the two locations
 	 */
@@ -261,10 +287,10 @@ public class Location implements Cloneable {
 	}
 
 	/**
-	 * Get the distance between a different location and the current location squared.
-	 * This is more efficient than distance.
+	 * Get the distance between a different location and the current location squared. This is more efficient than distance.
 	 * 
-	 * @param otherLocation the other location to compare with
+	 * @param otherLocation
+	 *            the other location to compare with
 	 * 
 	 * @return The distance between the two locations squared
 	 */
@@ -292,7 +318,8 @@ public class Location implements Cloneable {
 	/**
 	 * Transforms the current location into a different location.
 	 * 
-	 * @param spawn location to transform into
+	 * @param spawn
+	 *            location to transform into
 	 */
 	public Location cloneFrom(Location spawn) {
 		this.world = spawn.world;
@@ -323,10 +350,10 @@ public class Location implements Cloneable {
 	}
 
 	/**
-	 * Applies a vector to the current location.
-	 * This method adds the motion of the vector to this location.
+	 * Applies a vector to the current location. This method adds the motion of the vector to this location.
 	 * 
-	 * @param velocity The velocity to apply
+	 * @param velocity
+	 *            The velocity to apply
 	 * @return the location + the vector
 	 */
 	public Location applyVector(Vector vector) {
@@ -334,5 +361,24 @@ public class Location implements Cloneable {
 		this.y += vector.motY;
 		this.z += vector.motZ;
 		return this;
+	}
+
+	public static double calcYaw(Location fromLocation, Location toLocation) {
+		double x0 = fromLocation.getX();
+		double z0 = fromLocation.getZ();
+		double x = toLocation.getX();
+		double z = toLocation.getZ();
+		double l = x - x0;
+		double w = z - z0;
+		double c = Math.sqrt(l * l + w * w);
+		double alpha1 = -Math.asin((l / c)) / Math.PI * 180D;
+		double alpha2 = Math.acos((w / c)) / Math.PI * 180D;
+		double yaw;
+		if (alpha2 > 90) {
+			yaw = 180 - alpha1;
+		} else {
+			yaw = alpha1;
+		}
+		return yaw;
 	}
 }
