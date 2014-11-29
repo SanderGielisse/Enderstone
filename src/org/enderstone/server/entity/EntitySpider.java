@@ -63,7 +63,7 @@ public class EntitySpider extends EntityMob {
 	}
 
 	@Override
-	public boolean onCollision(EnderPlayer withPlayer) {
+	public boolean onCollide(EnderPlayer withPlayer) {
 		for (Goal pathfinder : this.getNavigator().getGoals()) {
 			if (pathfinder instanceof GoalAttackEntity) {
 				if (super.getNavigator().getTarget() != null && super.getNavigator().getTarget() instanceof EnderPlayer) {
@@ -73,6 +73,6 @@ public class EntitySpider extends EntityMob {
 				}
 			}
 		}
-		return super.onCollision(withPlayer);
+		return super.onCollide(withPlayer);
 	}
 }

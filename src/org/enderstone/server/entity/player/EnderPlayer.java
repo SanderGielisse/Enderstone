@@ -458,16 +458,18 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public void checkCollision() {
 		if (latestCheck++ % 3 == 0) {
-			// check if item entities nearby
+			// check if item entities are nearby
 			Iterator<EnderEntity> it = Main.getInstance().getWorld(this).entities.iterator();
 			while (it.hasNext()) {
 				EnderEntity e = it.next();
-				if (e.getLocation().isInRange(2, this.getLocation(), true)) {
-					boolean remove = e.onCollision(this);
-					if (remove) {
-						it.remove();
-						Main.getInstance().getWorld(this).removeEntity(e, true);
-						Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
+				if (!this.isDead()) {
+					if (e.getLocation().isInRange(2, this.getLocation(), true)) {
+						boolean remove = e.onCollide(this);
+						if (remove) {
+							it.remove();
+							Main.getInstance().getWorld(this).removeEntity(e, true);
+							Main.getInstance().getWorld(this).broadcastSound("random.pop", 1F, (byte) 63, this.getLocation(), null);
+						}
 					}
 				}
 			}
@@ -481,9 +483,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		if (this.isDead()) {
 			return;
 		}
-
-		checkCollision();
-
 		double dx = (newLocation.getX() - this.getLocation().getX()) * 32;
 		double dy = (newLocation.getY() - this.getLocation().getY()) * 32;
 		double dz = (newLocation.getZ() - this.getLocation().getZ()) * 32;
@@ -617,6 +616,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		if (Main.getInstance().doPhysics == false) {
 			return;
 		}
+		this.checkCollision();
 		if (getFoodLevel() == 20) {
 			this.clientSettings.isEatingTicks = 0;
 			this.getNetworkManager().sendPacket(new PacketOutUpdateHealth(this.getHealth(), this.getFoodLevel(), this.clientSettings.foodSaturation));
@@ -821,7 +821,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 		if (this.isOnGround == false && onGround == true) {
 			if (this.clientSettings.isFlying) {
-				return; // Flying players don't get damage in vanilla
+				return; // flying players don't get damage in vanilla
 			}
 			// fall damage
 			double change = this.yLocation - this.getLocation().getY() - 3;
@@ -856,9 +856,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	}
 
 	@Override
-	public void onRightClick(EnderPlayer attacker) {
-		// TODO
-	}
+	public void onRightClick(EnderPlayer attacker) {}
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {

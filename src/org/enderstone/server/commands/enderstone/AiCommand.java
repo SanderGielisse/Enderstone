@@ -17,7 +17,6 @@
  */
 package org.enderstone.server.commands.enderstone;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import org.enderstone.server.api.Location;
