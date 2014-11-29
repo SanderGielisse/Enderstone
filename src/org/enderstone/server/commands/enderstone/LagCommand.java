@@ -19,11 +19,9 @@ package org.enderstone.server.commands.enderstone;
 
 import org.enderstone.server.Main;
 import org.enderstone.server.api.messages.AdvancedMessage;
-import org.enderstone.server.api.messages.AdvancedMessage.AdvancedMessagePart.HoverEventType;
 import org.enderstone.server.api.messages.ChatColor;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
-import static org.enderstone.server.commands.Command.COMMAND_SUCCES;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;

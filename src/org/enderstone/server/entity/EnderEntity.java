@@ -81,7 +81,7 @@ public abstract class EnderEntity implements Entity {
 
 	public abstract void onLeftClick(EnderPlayer attacker);
 
-	public boolean onCollision(EnderPlayer withPlayer) {
+	public boolean onCollide(EnderPlayer withPlayer) {
 		return false;
 	}
 
@@ -116,8 +116,10 @@ public abstract class EnderEntity implements Entity {
 		this.latestDamage = Main.getInstance().getCurrentServerTick();
 
 		boolean death = this.damage(damage);
-		((EnderWorld) this.getWorld()).broadcastPacket(new PacketOutEntityVelocity(this.getEntityId(), knockback), this.getLocation());
-		this.location.add(knockback.getX(), knockback.getY(), knockback.getZ());
+		if (!death) {
+			((EnderWorld) this.getWorld()).broadcastPacket(new PacketOutEntityVelocity(this.getEntityId(), knockback), this.getLocation());
+			this.location.add(knockback.getX(), knockback.getY(), knockback.getZ());
+		}
 		return death;
 	}
 
@@ -141,14 +143,16 @@ public abstract class EnderEntity implements Entity {
 	}
 
 	public float getHealth() {
-		if (Float.isNaN(this.health))
+		if (Float.isNaN(this.health)) {
 			initHealth();
+		}
 		return health;
 	}
 
 	public final float getMaxHealth() {
-		if (Float.isNaN(this.health))
+		if (Float.isNaN(this.health)) {
 			initHealth();
+		}
 		return maxHealth;
 	}
 

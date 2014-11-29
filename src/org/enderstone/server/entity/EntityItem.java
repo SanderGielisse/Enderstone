@@ -149,7 +149,7 @@ public class EntityItem extends EnderEntity implements Item {
 	}
 
 	@Override
-	public boolean onCollision(EnderPlayer withPlayer) {
+	public boolean onCollide(EnderPlayer withPlayer) {
 		if (pickupDelay <= 0) {
 			if (withPlayer.canSeeEntity.contains(this)) {
 				ItemStack stack = withPlayer.getInventory().tryPickup(this.itemstack);

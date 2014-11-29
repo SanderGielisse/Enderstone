@@ -17,8 +17,8 @@
  */
 package org.enderstone.server.inventory;
 
-import java.util.Arrays;
 import java.util.List;
+
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.messages.CachedMessage;
 import org.enderstone.server.api.messages.SimpleMessage;
@@ -42,7 +42,7 @@ public class CraftingInventory extends DefaultHalfInventory {
 	protected void close0() {
 		for(ItemStack item : this.items) {
 			if(item != null) {
-				//TODO implement payer drop event
+				//TODO implement player drop item event
 				location.getWorld().dropItem(location, item, 10);
 			}
 		}
