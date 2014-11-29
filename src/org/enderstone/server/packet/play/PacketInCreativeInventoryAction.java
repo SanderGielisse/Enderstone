@@ -64,7 +64,7 @@ public class PacketInCreativeInventoryAction extends Packet {
 
 			@Override
 			public void run() {
-				networkManager.player.getInventoryHandler().recievePacket(PacketInCreativeInventoryAction.this);
+				networkManager.player.getInventory().recievePacket(PacketInCreativeInventoryAction.this);
 			}
 		});
 	}

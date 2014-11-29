@@ -247,7 +247,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		this.setLocation(this.getLocation().cloneFrom(toWorld.getSpawn()));
 		this.loadedChunks.clear();
 		toWorld.doChunkUpdatesForPlayer(this, this.chunkInformer, 3);
-		networkManager.player.getInventoryHandler().updateInventory();
+		networkManager.player.getInventory().updateInventory();
 		this.getNetworkManager().sendPacket(new PacketOutPlayerPositionLook(toWorld.getSpawn().getX(), toWorld.getSpawn().getY(), toWorld.getSpawn().getZ(), 0F, 0F, (byte) 1));
 		this.updateClientSettings();
 		EnderLogger.info("Switched player " + this.getPlayerName() + " from world " + currentWorld.worldName + " to " + toWorld.worldName + ".");
@@ -312,10 +312,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	@Override
 	public Packet[] getSpawnPackets() {
 		List<Packet> toSend = new ArrayList<>();
-		PlayerInventory handler = this.getInventoryHandler().getPlayerInventory();
+		PlayerInventory handler = this.getInventory().getPlayerInventory();
 		toSend.add(new PacketOutSpawnPlayer(this.getEntityId(), this.uuid, (int) (this.getLocation().getX() * 32.0D), (int) (this.getLocation().getY() * 32.0D), (int) (this.getLocation().getZ() * 32.0D), (byte) 0, (byte) 0, (short) 0, this.getDataWatcher()));
-		if (this.getInventoryHandler().getItemInHand() != null) {
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); // helmet
+		if (this.getInventory().getItemInHand() != null) {
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventory().getItemInHand())); // hand item
 		}
 		if (handler.getArmor().get(0) != null) {
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.getArmor().get(0))); // helmet
@@ -334,10 +334,10 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	public void broadcastEquipment(EquipmentUpdateType type) {
 		List<Packet> toSend = new ArrayList<>();
-		List<ItemStack> handler = this.getInventoryHandler().getPlayerInventory().getArmor();
+		List<ItemStack> handler = this.getInventory().getPlayerInventory().getArmor();
 
 		if ((type == EquipmentUpdateType.ITEM_IN_HAND_CHANGE || type == EquipmentUpdateType.ALL)) {
-			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventoryHandler().getItemInHand())); // item in hand
+			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 0, this.getInventory().getItemInHand())); // item in hand
 		}
 		if ((type == EquipmentUpdateType.HELMET_CHANGE || type == EquipmentUpdateType.ALL)) {
 			toSend.add(new PacketOutEntityEquipment(this.getEntityId(), (short) 4, handler.get(0))); // helmet
@@ -625,9 +625,9 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 				this.clientSettings.isEatingTicks++;
 				if (this.clientSettings.isEatingTicks % 30 == 0) {
 					this.clientSettings.isEatingTicks = 0;
-					if (this.getInventoryHandler().getItemInHand() != null) {
-						FoodType type = FoodType.fromBlockId(this.getInventoryHandler().getItemInHand().getBlockId());
-						this.getInventoryHandler().decreaseItemInHand(1);
+					if (this.getInventory().getItemInHand() != null) {
+						FoodType type = FoodType.fromBlockId(this.getInventory().getItemInHand().getBlockId());
+						this.getInventory().decreaseItemInHand(1);
 
 						if (this.clientSettings.foodSaturation + type.getSaturation() > 5) {
 							this.clientSettings.foodSaturation = 5;
@@ -708,7 +708,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		if (this.clientSettings.godMode)
 			return false;
 
-		for (ItemStack stack : this.getInventoryHandler().getPlayerInventory().getArmor()) {
+		for (ItemStack stack : this.getInventory().getPlayerInventory().getArmor()) {
 			if (stack != null) {
 				Armor armor = Armor.fromId(stack.getId());
 				if (armor != null) {
@@ -736,13 +736,13 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 			}
 		}
 		this.canSeeEntity.clear();
-		for (ItemStack inv : this.getInventoryHandler().getPlayerInventory().getRawItems()) {
+		for (ItemStack inv : this.getInventory().getPlayerInventory().getRawItems()) {
 			if (inv != null) {
 				EnderWorld world = Main.getInstance().getWorld(this);
 				world.dropItem(getLocation(), inv, 1);
 			}
 		}
-		Collections.fill(this.getInventoryHandler().getPlayerInventory().getRawItems(), null);
+		Collections.fill(this.getInventory().getPlayerInventory().getRawItems(), null);
 	}
 
 	private void broadcastEmptyArmour() {
@@ -862,8 +862,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		if (this.damage(DamageItemType.fromItemStack(attacker.getInventoryHandler().getItemInHand()), Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2).add(0, 0.2F, 0))) {
-			Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " was killed by " + attacker.getPlayerName()));
+		if (this.damage(DamageItemType.fromItemStack(attacker.getInventory().getItemInHand()), Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2).add(0, 0.1F, 0).multiply(100F))) {
+			Main.getInstance().broadcastMessage(new SimpleMessage(this.getPlayerName() + " was slain by " + attacker.getPlayerName()));
 		}
 	}
 
@@ -895,13 +895,6 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		} else {
 			this.getNetworkManager().disconnect(e.getReason(), false);
 		}
-	}
-
-	/**
-	 * @return the inventoryHandler
-	 */
-	public InventoryHandler getInventoryHandler() {
-		return inventoryHandler;
 	}
 
 	public void updateAbilities() {
@@ -1093,12 +1086,12 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public InventoryHandler getInventory() {
-		return this.getInventoryHandler();
+		return this.inventoryHandler;
 	}
 
 	@Override
 	public ItemStack getItemInHand() {
-		return this.getInventoryHandler().getItemInHand();
+		return this.getInventory().getItemInHand();
 	}
 
 	@Override

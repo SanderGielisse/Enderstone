@@ -64,7 +64,7 @@ public class PacketInClickWindow extends Packet {
 
 			@Override
 			public void run() {
-				networkManager.player.getInventoryHandler().recievePacket(PacketInClickWindow.this);
+				networkManager.player.getInventory().recievePacket(PacketInClickWindow.this);
 			}
 		});
 	}

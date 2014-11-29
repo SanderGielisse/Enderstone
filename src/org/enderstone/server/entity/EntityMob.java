@@ -81,7 +81,7 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 
 	@Override
 	public void onLeftClick(EnderPlayer attacker) {
-		this.damage(DamageItemType.fromItemStack(attacker.getInventoryHandler().getItemInHand()), Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2).setY(-0.2F).multiply(10F));
+		this.damage(DamageItemType.fromItemStack(attacker.getInventory().getItemInHand()), Vector.substract(attacker.getLocation(), this.getLocation()).normalize(this.getLocation().distance(attacker.getLocation()) * 2).setY(-0.2F).multiply(10F));
 	}
 
 	@Override

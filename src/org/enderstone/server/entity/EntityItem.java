@@ -152,7 +152,7 @@ public class EntityItem extends EnderEntity implements Item {
 	public boolean onCollision(EnderPlayer withPlayer) {
 		if (pickupDelay <= 0) {
 			if (withPlayer.canSeeEntity.contains(this)) {
-				ItemStack stack = withPlayer.getInventoryHandler().tryPickup(this.itemstack);
+				ItemStack stack = withPlayer.getInventory().tryPickup(this.itemstack);
 				if (stack == null) {
 					withPlayer.canSeeEntity.remove(this);
 					Main.getInstance().getWorld(withPlayer).broadcastPacket(new PacketOutCollectItem(this.getEntityId(), withPlayer.getEntityId()), withPlayer.getLocation());

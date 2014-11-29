@@ -60,10 +60,10 @@ public class PacketInHeldItemChange extends Packet {
 
 			@Override
 			public void run() {
-				if(Main.getInstance().callEvent(new PlayerHeldItemChangeEvent(networkManager.player, (short) networkManager.player.getInventoryHandler().getHeldItemSlot(), getSlot()))){
+				if(Main.getInstance().callEvent(new PlayerHeldItemChangeEvent(networkManager.player, (short) networkManager.player.getInventory().getHeldItemSlot(), getSlot()))){
 					return;
 				}
-				networkManager.player.getInventoryHandler().recievePacket(PacketInHeldItemChange.this);
+				networkManager.player.getInventory().recievePacket(PacketInHeldItemChange.this);
 				networkManager.player.broadcastEquipment(EquipmentUpdateType.ITEM_IN_HAND_CHANGE);
 			}
 		});
