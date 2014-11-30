@@ -44,12 +44,10 @@ public class ServerRequest {
 		uc.connect();
 		String encoding = uc.getContentEncoding();
 		encoding = encoding == null ? "UTF-8" : encoding;
-		try (Scanner scanner = new Scanner(uc.getInputStream(),encoding)) {
+		try (Scanner scanner = new Scanner(uc.getInputStream(), encoding)) {
 			scanner.useDelimiter("\\A");
 			return new JSONObject(scanner.next());
-		}
-		catch(NoSuchElementException noskin)
-		{
+		} catch (NoSuchElementException noskin) {
 			return new JSONObject();
 		}
 	}

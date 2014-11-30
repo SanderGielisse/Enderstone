@@ -48,7 +48,7 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 	private final EnderWorld world;
 	private final PathNavigator navigator = new PathNavigator(this);
 
-	EntityMob(byte appearanceId, EnderWorld world, Location location) {
+	protected EntityMob(byte appearanceId, EnderWorld world, Location location) {
 		super(location);
 		this.world = world;
 		this.appearanceId = appearanceId;

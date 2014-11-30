@@ -29,9 +29,12 @@ public interface World {
 	/**
 	 * Gets the block at the requested location.
 	 * 
-	 * @param x The X position of the requested block
-	 * @param y The Y position of the requested block
-	 * @param z The Z position of the requested block
+	 * @param x
+	 *            The X position of the requested block
+	 * @param y
+	 *            The Y position of the requested block
+	 * @param z
+	 *            The Z position of the requested block
 	 * 
 	 * @return The requested block
 	 */
@@ -40,7 +43,8 @@ public interface World {
 	/**
 	 * Gets the block at the requested location.
 	 * 
-	 * @param location The location of the requested block.
+	 * @param location
+	 *            The location of the requested block.
 	 * 
 	 * @return The requested block
 	 */
@@ -49,8 +53,10 @@ public interface World {
 	/**
 	 * Gets the chunk at the requested location.
 	 * 
-	 * @param x The X position of the requested chunk
-	 * @param z The Z position of the requested chunk
+	 * @param x
+	 *            The X position of the requested chunk
+	 * @param z
+	 *            The Z position of the requested chunk
 	 * 
 	 * @return The requested chunk
 	 */
@@ -66,9 +72,12 @@ public interface World {
 	/**
 	 * Drops an item in the world.
 	 * 
-	 * @param location the location to drop the item
-	 * @param itemStack the item to drop
-	 * @param pickupDelay the pickup delay of the dropped item
+	 * @param location
+	 *            the location to drop the item
+	 * @param itemStack
+	 *            the item to drop
+	 * @param pickupDelay
+	 *            the pickup delay of the dropped item
 	 * 
 	 * @return The dropped item entity
 	 */
@@ -77,7 +86,8 @@ public interface World {
 	/**
 	 * Strikes lighting at a location.
 	 * 
-	 * @param location The location to strike the lightning
+	 * @param location
+	 *            The location to strike the lightning
 	 */
 	public void strikeLightning(Location location);
 
@@ -119,10 +129,16 @@ public interface World {
 	/**
 	 * Plays a sound in the world.
 	 * 
-	 * @param location The location to play the sound
-	 * @param soundName The sound to be played
-	 * @param volume the volume to play the sound at
-	 * @param pitch the pitch to play the sound at
+	 * @param location
+	 *            The location to play the sound
+	 * @param soundName
+	 *            The sound to be played
+	 * @param volume
+	 *            the volume to play the sound at
+	 * @param pitch
+	 *            the pitch to play the sound at
 	 */
 	public void playSound(Location location, String soundName, float volume, int pitch);
+
+	public Block getHighestBlockAt(int x, int z);
 }

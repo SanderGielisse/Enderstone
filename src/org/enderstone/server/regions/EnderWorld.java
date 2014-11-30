@@ -50,7 +50,7 @@ import org.enderstone.server.regions.tileblocks.TileBlock;
 import org.enderstone.server.regions.tileblocks.TileBlocks;
 import org.enderstone.server.util.IntegerArrayComparator;
 
-public class EnderWorld implements World{
+public class EnderWorld implements World {
 
 	private Long seed = null;
 	private final RegionSet loadedChunks = new RegionSet();
@@ -73,7 +73,7 @@ public class EnderWorld implements World{
 		return getOrCreateChunk(x, z, true);
 	}
 
-	private EnderChunk getOrCreateChunk(int x, int z, boolean checkChunkPopulation) {		
+	private EnderChunk getOrCreateChunk(int x, int z, boolean checkChunkPopulation) {
 		EnderChunk c = this.getOrCreateChunk0(x, z);
 		return checkChunkPopulation ? checkChunkPopulation(c) : c;
 	}
@@ -122,7 +122,6 @@ public class EnderWorld implements World{
 
 	private EnderChunk getChunk0(int x, int z) {
 		return this.loadedChunks.get(x, z);
-
 	}
 
 	public void saveChunk(EnderChunk ender) {
@@ -146,10 +145,10 @@ public class EnderWorld implements World{
 					if (found == null) {
 						return c;
 					}
-					array[(i+1)+(k+1)*3] = found;
+					array[(i + 1) + (k + 1) * 3] = found;
 				}
 			}
-			array[(0+1)+(0+1)*3] = c;
+			array[(0 + 1) + (0 + 1) * 3] = c;
 			didPopulate = true;
 			try {
 				for (MultiChunkBlockPopulator blocks : generator.getDefaultPopulators(this)) {
@@ -167,7 +166,7 @@ public class EnderWorld implements World{
 	public BlockId getBlockIdAt(int x, int y, int z) {
 		return getOrCreateChunk(x >> 4, z >> 4).getBlock(x & 0xF, y & 0xFF, z & 0xF);
 	}
-	
+
 	public BlockId getBlockIdAt(Location loc) {
 		return getOrCreateChunk(loc.getBlockX() >> 4, loc.getBlockZ() >> 4).getBlock(loc.getBlockX() & 0xF, loc.getBlockY() & 0xFF, loc.getBlockZ() & 0xF);
 	}
@@ -215,7 +214,7 @@ public class EnderWorld implements World{
 						for (cz = minz; cz < mz; cz++) {
 							EnderChunk tmp = getOrCreateChunk(cx, cz);
 							if (!copy.contains(tmp)) {
-								chunkLoad[index++] = new int[]{cx, cz};
+								chunkLoad[index++] = new int[] { cx, cz };
 							} else {
 								copy.remove(tmp);
 							}
@@ -229,8 +228,9 @@ public class EnderWorld implements World{
 						informer.removeChunk(i);
 					}
 					Arrays.sort(chunkLoad, 0, index, new IntegerArrayComparator(px, pz));
-					
-					if (maxSize < chunkLoad.length) chunkLoad[maxSize] = null;
+
+					if (maxSize < chunkLoad.length)
+						chunkLoad[maxSize] = null;
 					index = 0;
 					for (int[] load : chunkLoad) {
 						if (load == null) {
@@ -284,15 +284,15 @@ public class EnderWorld implements World{
 			}
 		}
 	}
-	
+
 	private final List<EnderEntity> pendingEntities = new ArrayList<>();
 
 	public void addEntity(EnderEntity e) {
 		this.pendingEntities.add(e);
 	}
-	
-	public void removeEntity(EnderEntity e, boolean broadcastRemove){
-		if(this.entities.contains(e)){
+
+	public void removeEntity(EnderEntity e, boolean broadcastRemove) {
+		if (this.entities.contains(e)) {
 			this.entities.remove(e);
 		}
 		if (broadcastRemove) {
@@ -320,25 +320,25 @@ public class EnderWorld implements World{
 	}
 
 	public Location getSpawn() {
-		if(this.spawnLocation == null){
+		if (this.spawnLocation == null) {
 			this.spawnLocation = new Location(this, 0.5, getChunkAt(0, 0).getHighestBlockAt(0, 0) + 1, 0.5, 0F, 0F);
 		}
 		return this.spawnLocation;
 	}
 
 	public void serverTick() {
-		for(EnderEntity pending : this.pendingEntities){
+		for (EnderEntity pending : this.pendingEntities) {
 			this.entities.add(pending);
 			pending.onSpawn();
 		}
 		this.pendingEntities.clear();
-		
+
 		Iterator<EnderEntity> it = this.entities.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			EnderEntity e = it.next();
 			if (e.shouldBeRemoved()) {
 				it.remove();
-				if(e.shouldBroadcastDespawn()){
+				if (e.shouldBroadcastDespawn()) {
 					if (e.getWorld() instanceof EnderWorld) {
 						((EnderWorld) e.getWorld()).broadcastPacket(new PacketOutEntityDestroy(new Integer[] { e.getEntityId() }), e.getLocation());
 					}
@@ -357,18 +357,18 @@ public class EnderWorld implements World{
 		}
 		this.time += 1;
 	}
-	
+
 	public void doTileBlock(int x, int y, int z) {
 		EnderChunk chunk = this.getChunk(x >> 4, z >> 4, false);
-		if(chunk == null){
+		if (chunk == null) {
 			return;
 		}
 		BlockId blockId = chunk.getBlock(x & 0xF, y & 0xFF, z & 0xF);
 		Class<? extends TileBlock> clazz = TileBlocks.getTileBlock(blockId);
-		if(clazz != null){
-			for(TileBlock tile : this.tickList){
-				if(tile.getX() == x && tile.getY() == y && tile.getZ() == z){
-					//already is a tile block
+		if (clazz != null) {
+			for (TileBlock tile : this.tickList) {
+				if (tile.getX() == x && tile.getY() == y && tile.getZ() == z) {
+					// already is a tile block
 					return;
 				}
 			}
@@ -379,18 +379,18 @@ public class EnderWorld implements World{
 			}
 		}
 	}
-	
-	public void broadcastPacket(Packet packet, Location loc){
-		for(EnderPlayer ep : Main.getInstance().onlinePlayers){
-			if(ep.getLocation().isInRange(35, loc, true)){
+
+	public void broadcastPacket(Packet packet, Location loc) {
+		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
+			if (ep.getLocation().isInRange(35, loc, true)) {
 				ep.getNetworkManager().sendPacket(packet);
 			}
 		}
 	}
-	
-	public void broadcastPacket(Packet packet, Location loc, EnderPlayer skipPlayer){
-		for(EnderPlayer ep : Main.getInstance().onlinePlayers){
-			if(ep.getLocation().isInRange(35, loc, true) && !ep.equals(skipPlayer)){
+
+	public void broadcastPacket(Packet packet, Location loc, EnderPlayer skipPlayer) {
+		for (EnderPlayer ep : Main.getInstance().onlinePlayers) {
+			if (ep.getLocation().isInRange(35, loc, true) && !ep.equals(skipPlayer)) {
 				ep.getNetworkManager().sendPacket(packet);
 			}
 		}
@@ -426,8 +426,8 @@ public class EnderWorld implements World{
 	@Override
 	public Collection<? extends Mob> getMobs() {
 		List<Mob> mobs = new ArrayList<>();
-		for(Entity e : this.getEntities()){
-			if(e instanceof Mob){
+		for (Entity e : this.getEntities()) {
+			if (e instanceof Mob) {
 				mobs.add((Mob) e);
 			}
 		}
@@ -448,9 +448,19 @@ public class EnderWorld implements World{
 	public Chunk getChunkAt(int x, int z) {
 		return getOrCreateChunk(x, z);
 	}
-	
+
 	@Override
 	public void playSound(Location location, String soundName, float volume, int pitch) {
 		this.broadcastPacket(new PacketOutSoundEffect(soundName, location.getBlockX(), location.getBlockY(), location.getBlockZ(), volume, (byte) pitch), location);
+	}
+
+	@Override
+	public Block getHighestBlockAt(int x, int z) {
+		int chunkX = x >> 4;
+		int chunkZ = z >> 4;
+		Chunk chunk = this.getChunkAt(chunkX, chunkZ);
+		// x & 0xF
+		// z & 0xF
+		return this.getBlock(x, chunk.getHighestBlockAt(x & 0xF, z & 0xF), z);
 	}
 }

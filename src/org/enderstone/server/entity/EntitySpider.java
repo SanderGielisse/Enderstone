@@ -28,13 +28,11 @@ import org.enderstone.server.regions.EnderWorld;
 
 public class EntitySpider extends EntityMob {
 
-	private static final byte APPEARANCE_ID = (byte) 52;
+	private static final byte APPEARANCE_ID = 52;
 
 	public EntitySpider(EnderWorld world, Location location) {
 		super(APPEARANCE_ID, world, location);
-
 		this.getNavigator().addGoal(new GoalAttackEntity(this));
-
 		this.getNavigator().addTarget(new TargetEntityInRange(this, EnderPlayer.class));
 	}
 

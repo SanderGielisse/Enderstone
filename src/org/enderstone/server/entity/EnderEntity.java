@@ -19,7 +19,6 @@ package org.enderstone.server.entity;
 
 import java.util.Set;
 
-import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
@@ -54,7 +53,7 @@ public abstract class EnderEntity implements Entity {
 	private boolean shouldBeRemoved = false;
 	private boolean broadcastDespawn = true;
 
-	public EnderEntity(Location location) {
+	protected EnderEntity(Location location) {
 		this.entityId = entityCount++;
 		this.location = location.clone();
 	}

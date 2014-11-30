@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.entity.player.PlayerTextureStore;

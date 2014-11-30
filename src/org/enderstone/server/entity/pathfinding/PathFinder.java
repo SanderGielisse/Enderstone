@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.regions.BlockId;
@@ -101,170 +102,109 @@ public class PathFinder {
 	}
 
 	public boolean hasPath() {
-
 		return hasPath;
 	}
 
+	
 	public List<PathTile> calculatePath() {
-
 		if (Math.abs(startX - endX) > range || Math.abs(startY - endY) > range || Math.abs(startZ - endZ) > range) {
-
 			hasPath = false;
-
 			return null;
 		}
-
 		PathTile currentTile = null;
-
 		while (canContinue()) {
-
 			currentTile = getLowestCostTile();
-
 			processAdjacentTiles(currentTile);
 		}
-
 		if (hasPath) {
-
 			List<PathTile> pathTrace = new LinkedList<>();
-
 			PathTile parentTile;
-
 			pathTrace.add(currentTile);
-
 			while ((parentTile = currentTile.getParent()) != null) {
-
 				pathTrace.add(parentTile);
-
 				currentTile = parentTile;
 			}
-
 			Collections.reverse(pathTrace);
-
 			return new ArrayList<>(pathTrace);
 		}
-
 		return null;
 	}
 
 	private boolean canContinue() {
-
 		if (openTiles.isEmpty()) {
-
 			hasPath = false;
-
 			return false;
 		}
-
 		if (closedTiles.containsKey(endTileId)) {
-
 			hasPath = true;
-
 			return false;
-		}
-
-		else {
-
+		} else {
 			return true;
 		}
 	}
 
 	private PathTile getLowestCostTile() {
-
 		double cost = 0;
-
 		PathTile drop = null;
-
 		for (PathTile t : openTiles.values()) {
-
 			if (cost == 0) {
-
 				cost = t.getGoalCost() + t.getHeuristicCost();
-
 				drop = t;
-			}
-
-			else {
-
+			} else {
 				double tileCost = t.getGoalCost() + t.getHeuristicCost();
-
 				if (tileCost < cost) {
-
 					cost = tileCost;
-
 					drop = t;
 				}
 			}
 		}
-
 		openTiles.remove(drop.hashCode());
 		closedTiles.add(drop);
-
 		return drop;
 	}
 
 	private void processAdjacentTiles(PathTile currentTile) {
-
 		Set<PathTile> possible = new HashSet<>(26);// 3x3x3 region minus start tile;
-
 		for (int x = -1; x <= 1; x++) {
-
 			for (int y = -1; y <= 1; y++) {
-
 				for (int z = -1; z <= 1; z++) {
-
 					if (x == 0 && y == 0 && z == 0) {
-
 						continue;
 					}
-
 					int hash = 7;
 					hash = 89 * hash + (currentTile.getXOffset() + x);
 					hash = 89 * hash + (currentTile.getYOffset() + y);
 					hash = 89 * hash + (currentTile.getZOffset() + z);
 
 					if (closedTiles.containsKey(hash)) {
-
 						continue;
 					}
 
 					if (!(range - Math.abs(currentTile.getXOffset() + x) >= 0 && range - Math.abs(currentTile.getYOffset() + y) >= 0 && range - Math.abs(currentTile.getZOffset() + z) >= 0)) {
-
 						continue;
 					}
 
 					if (!canWalkOn(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset() + z)) {
-
 						continue;
 					}
 
 					if (x != 0 && z != 0 && (y == 0 || y == 1)) {
-
 						if (!((canWalkOn(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset()) || (canWalkOn(currentTile.getXOffset(), currentTile.getYOffset() + y, currentTile.getZOffset() + z))))) {
-
 							continue;
 						}
 					}
-
 					PathTile t = new PathTile(currentTile.getXOffset() + x, currentTile.getYOffset() + y, currentTile.getZOffset() + z, currentTile, startX, startY, startZ, endX, endY, endZ);
-
 					possible.add(t);
 				}
 			}
 		}
 
 		for (PathTile t : possible) {
-
 			PathTile open = openTiles.get(t.hashCode());
-
 			if (open == null) {
-
 				openTiles.add(t, false);
-			}
-
-			else {
-
+			} else {
 				if ((t.getGoalCost() + t.getHeuristicCost()) < (open.getGoalCost() + open.getHeuristicCost())) {
-
 					open.setParent(currentTile);
 				}
 			}
@@ -281,11 +221,7 @@ public class PathFinder {
 			size = this.entity.getWidth();
 			height = this.entity.getHeight();
 		}
-		if (this.isSolid(world.getBlockIdAt(x, y, z)) ||
-				this.isSolid(world.getBlockIdAt((int) (x + size), y, z)) ||
-				this.isSolid(world.getBlockIdAt((int) (x - size), y, z)) ||
-				this.isSolid(world.getBlockIdAt(x, y, (int) (z + size))) ||
-				this.isSolid(world.getBlockIdAt(x, y, (int) (z - size)))) {
+		if (this.isSolid(world.getBlockIdAt(x, y, z)) || this.isSolid(world.getBlockIdAt((int) (x + size), y, z)) || this.isSolid(world.getBlockIdAt((int) (x - size), y, z)) || this.isSolid(world.getBlockIdAt(x, y, (int) (z + size))) || this.isSolid(world.getBlockIdAt(x, y, (int) (z - size)))) {
 			if (!this.isSolid(world.getBlockIdAt(x, y + 1, z))) {
 				if (!this.isSolid(world.getBlockIdAt(x, (int) (y + height), z))) {
 					return true;
@@ -303,16 +239,11 @@ public class PathFinder {
 	}
 
 	private Location getBlockUnderLocation(Location loc) {
-
 		Location check = loc.clone();
-
 		for (int i = 0;; i++) {
-
 			if (!loc.getWorld().getBlock(check).getBlock().doesInstantBreak()) {
-
 				return check;
 			}
-
 			check.add(0, -1, 0);
 		}
 	}
