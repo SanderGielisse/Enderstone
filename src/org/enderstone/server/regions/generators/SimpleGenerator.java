@@ -23,6 +23,7 @@ import java.util.Random;
 
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
+import org.enderstone.server.entity.EntityCow;
 import org.enderstone.server.entity.EntitySpider;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.BlockPopulator;
@@ -101,14 +102,17 @@ public class SimpleGenerator implements ChunkGenerator {
 
 				setBlock(15, 1, source);
 				setBlock(14, 0, source);
-				
-				//TEMPORARILY TESTS
+
+				// TEMPORARILY TESTS
 				if (Main.random.nextInt(25) == 0) {
 					world.addEntity(new EntitySpider(world, new Location(world, source.getX() * 16, source.getHighestBlockAt(0, 0) + 1, source.getZ() * 16, 0F, 0F)));
 				}
+				if (Main.random.nextInt(10) == 0) {
+					world.addEntity(new EntityCow(world, new Location(world, source.getX() * 16, source.getHighestBlockAt(0, 0) + 1, source.getZ() * 16, 0F, 0F)));
+				}
 				source.setBlock(8, source.getHighestBlockAt(8, 0), 0, BlockId.WATER, (byte) 0);
 				source.setBlock(9, source.getHighestBlockAt(9, 0), 0, BlockId.FIRE, (byte) 0);
-				
+
 				int x = random.nextInt(5) + 3, z = random.nextInt(5) + 3;
 				generateTree(source, x, source.getHighestBlockAt(x, z), z);
 			}
@@ -118,14 +122,14 @@ public class SimpleGenerator implements ChunkGenerator {
 
 	private void generateTree(EnderChunk chunk, int x, int y, int z) {
 		int height = Main.random.nextInt(3) + 5;
-		
-		for(int i = 0; i < height; i++){
+
+		for (int i = 0; i < height; i++) {
 			chunk.setBlock(x, -1 + i + y, z, BlockId.LOG, (byte) 0);
 		}
-		
-		for(int leafY = height - 2; leafY < height + 1; leafY++){
-			for(int leafX = -1; leafX < 2; leafX++){
-				for(int leafZ = -1; leafZ < 2; leafZ++){
+
+		for (int leafY = height - 2; leafY < height + 1; leafY++) {
+			for (int leafX = -1; leafX < 2; leafX++) {
+				for (int leafZ = -1; leafZ < 2; leafZ++) {
 					chunk.setBlock(leafX + x, leafY + y, leafZ + z, BlockId.LEAVES, (byte) 0);
 				}
 			}

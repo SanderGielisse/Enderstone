@@ -18,7 +18,9 @@
 package org.enderstone.server.regions;
 
 import java.util.Objects;
+
 import org.enderstone.server.api.Block;
+import org.enderstone.server.api.Location;
 
 /**
  *
@@ -102,13 +104,19 @@ public class EnderBlock implements Block {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		final EnderBlock other = (EnderBlock) obj;
-		if (this.x != other.x) return false;
-		if (this.y != other.y) return false;
-		if (this.z != other.z) return false;
-		if (!Objects.equals(this.world, other.world)) return false;
+		if (this.x != other.x)
+			return false;
+		if (this.y != other.y)
+			return false;
+		if (this.z != other.z)
+			return false;
+		if (!Objects.equals(this.world, other.world))
+			return false;
 		return true;
 	}
 
@@ -175,13 +183,19 @@ public class EnderBlock implements Block {
 
 			@Override
 			public boolean equals(Object obj) {
-				if (obj == null) return false;
-				if (getClass() != obj.getClass()) return false;
+				if (obj == null)
+					return false;
+				if (getClass() != obj.getClass())
+					return false;
 				final EnderBlock other = (EnderBlock) obj;
-				if (this.x != other.x) return false;
-				if (this.y != other.y) return false;
-				if (this.z != other.z) return false;
-				if (!Objects.equals(this.world, other.world)) return false;
+				if (this.x != other.x)
+					return false;
+				if (this.y != other.y)
+					return false;
+				if (this.z != other.z)
+					return false;
+				if (!Objects.equals(this.world, other.world))
+					return false;
 				return true;
 			}
 
@@ -194,6 +208,11 @@ public class EnderBlock implements Block {
 			public boolean isEditable() {
 				return false;
 			}
+
+			@Override
+			public Location getLocation() {
+				return new Location(this.getWorld(), this.getX(), this.getY(), this.getZ(), 0F, 0F);
+			}
 		};
 
 	}
@@ -201,5 +220,10 @@ public class EnderBlock implements Block {
 	@Override
 	public boolean isEditable() {
 		return true;
+	}
+
+	@Override
+	public Location getLocation() {
+		return new Location(this.getWorld(), this.getX(), this.getY(), this.getZ(), 0F, 0F);
 	}
 }

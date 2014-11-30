@@ -54,12 +54,10 @@ public class PathNavigator {
 	}
 
 	public EnderEntity getTarget() {
-
 		return target;
 	}
 
 	public void setTarget(EnderEntity target) {
-
 		this.target = target;
 	}
 
@@ -175,13 +173,9 @@ public class PathNavigator {
 
 	private void updateCurrentTarget() {
 		if (currentTarget == null) {
-
 			for (Target newTarget : targets) {
-
 				if (newTarget.start()) {
-
 					currentTarget = newTarget;
-
 					break;
 				}
 			}

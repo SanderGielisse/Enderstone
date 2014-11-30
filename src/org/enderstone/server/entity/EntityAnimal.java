@@ -15,29 +15,14 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.entity.pathfinding;
+package org.enderstone.server.entity;
 
-import java.util.HashMap;
+import org.enderstone.server.api.Location;
+import org.enderstone.server.regions.EnderWorld;
 
-/**
- *
- * @author gyroninja
- */
-public class PathTileList extends HashMap<Integer, PathTile> {
+public abstract class EntityAnimal extends EntityMob {
 
-	private static final long serialVersionUID = 4368318447403103929L;
-
-	public void add(PathTile tile) {
-		this.put(tile.hashCode(), tile);
-	}
-
-	public void add(PathTile tile, boolean overwrite) {
-		if (containsKey(tile.hashCode())) {
-			if (overwrite) {
-				add(tile);
-			}
-		} else {
-			add(tile);
-		}
+	protected EntityAnimal(byte appearanceId, EnderWorld world, Location location) {
+		super(appearanceId, world, location);
 	}
 }

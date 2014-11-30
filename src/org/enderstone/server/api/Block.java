@@ -93,4 +93,6 @@ public interface Block {
 	 * @return Whether the block is editable
 	 */
 	public boolean isEditable();
+	
+	public Location getLocation();
 }

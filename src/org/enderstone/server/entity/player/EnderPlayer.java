@@ -263,7 +263,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 	public void onSpawn() {
 		EnderLogger.info(this.getPlayerName() + " logged in from " + networkManager.ctx.channel().remoteAddress().toString() + " with uuid " + uuid);
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_PICKAXE.getId(), (byte) 1, (short) 0));
-		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_SPADE.getId(), (byte) 1, (short) 0));
+		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIAMOND_SWORD.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.DIRT.getId(), (byte) 64, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.WORKBENCH.getId(), (byte) 1, (short) 0));
 		this.inventoryHandler.tryPickup(new ItemStack(BlockId.CHEST.getId(), (byte) 1, (short) 0));
