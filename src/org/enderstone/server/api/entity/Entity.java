@@ -34,7 +34,7 @@ public interface Entity {
 	/**
 	 * Teleports the entity to another entity.
 	 * 
-	 * @param loc The other entity to be teleported to
+	 * @param e The other entity to be teleported to
 	 */
 	public void teleport(EnderEntity e);
 
@@ -122,11 +122,16 @@ public interface Entity {
 	public void remove();
 	
 	/**
-	 * returns the location of the head of the entity
+	 * Returns the location of the head of the entity
 	 * 
 	 * @return the location of the head of the entity
 	 */
 	public Location getHeadLocation();
 	
+	/**
+	 * Returns true if the entity is on the ground.
+	 * 
+	 * @return true if entity is on the ground
+	 */
 	public boolean isOnGround();
 }
