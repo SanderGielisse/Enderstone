@@ -124,8 +124,10 @@ public class SimpleGenerator implements ChunkGenerator {
 		int height = Main.random.nextInt(3) + 5;
 
 		for (int i = 0; i < height; i++) {
-			chunk.setBlock(x, -1 + i + y, z, BlockId.LOG, (byte) 0);
+			chunk.setBlock(x, (i + y) + 1, z, BlockId.LOG, (byte) 0);
 		}
+
+		chunk.setBlock(x, y, z, BlockId.DIRT, (byte) 0);
 
 		for (int leafY = height - 2; leafY < height + 1; leafY++) {
 			for (int leafX = -1; leafX < 2; leafX++) {
