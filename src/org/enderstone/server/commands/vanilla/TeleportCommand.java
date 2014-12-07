@@ -15,7 +15,7 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.commands.vanila;
+package org.enderstone.server.commands.vanilla;
 
 import java.util.List;
 
@@ -87,7 +87,7 @@ public class TeleportCommand extends SimpleCommand {
 			sender.sendMessage(new SimpleMessage("Or: /tp <tosomeone>"));
 			return Command.COMMAND_FAILED;
 		}
-		return Command.COMMAND_SUCCES;
+		return Command.COMMAND_SUCCESS;
 	}
 
 	@Override

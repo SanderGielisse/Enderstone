@@ -56,7 +56,7 @@ public class LagCommand extends SimpleCommand {
 			);
 		}
 		sender.sendMessage(new SimpleMessage("min: " + min + " max: " + max + " avg: " + (total / lastLagg.length)));
-		return COMMAND_SUCCES;
+		return COMMAND_SUCCESS;
 	}
 
 }

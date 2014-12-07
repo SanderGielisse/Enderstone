@@ -66,7 +66,7 @@ public class AiCommand extends SimpleCommand {
 			}
 		}
 
-		return COMMAND_SUCCES;
+		return COMMAND_SUCCESS;
 	}
 
 	private Location getBlockUnderLocation(Location loc) {

@@ -52,7 +52,7 @@ public class WorldCommand extends SimpleCommand {
 		}
 		((EnderPlayer) sender).switchWorld(world);
 		sender.sendMessage(new SimpleMessage("You succesfully switched to world " + worldName + "."));
-		return Command.COMMAND_SUCCES;
+		return Command.COMMAND_SUCCESS;
 	}
 
 	private EnderWorld getWorld(String name) {

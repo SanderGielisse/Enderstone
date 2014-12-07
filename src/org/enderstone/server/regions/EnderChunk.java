@@ -240,7 +240,7 @@ public class EnderChunk implements Chunk{
 			}
 		}
 		/**
-		 * Block Light - uses data because its the same size as the lightning array we don't have
+		 * Block Light - uses data because its the same size as the lighting array we don't have
 		 */
 		{
 			for (blockLength = 0; blockLength < data.length; ++blockLength) {

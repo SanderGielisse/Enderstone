@@ -707,6 +707,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		}
 		if (this.clientSettings.godMode)
 			return false;
+		if (this.getGameMode() == GameMode.CREATIVE || this.getGameMode() == GameMode.SPECTATOR)
+			return false;
 
 		for (ItemStack stack : this.getInventory().getPlayerInventory().getArmor()) {
 			if (stack != null) {

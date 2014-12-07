@@ -35,7 +35,7 @@ public class PingCommand extends SimpleCommand{
 	@Override
 	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
 		sender.sendMessage(new SimpleMessage("Ping! Pong!"));
-		return COMMAND_SUCCES;
+		return COMMAND_SUCCESS;
 	}
 	
 }

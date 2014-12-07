@@ -41,7 +41,7 @@ public class DebugCommand extends SimpleCommand {
 		try
 		{
 			((EnderPlayer)sender).debugOutputs.add(PlayerDebugger.valueOf(args[0]));
-			return COMMAND_SUCCES;
+			return COMMAND_SUCCESS;
 		}
 		catch (IllegalArgumentException | ClassCastException | IndexOutOfBoundsException err)
 		// TODO This is the worst code I ever written....
