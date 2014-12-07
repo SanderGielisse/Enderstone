@@ -15,30 +15,35 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.enderstone.server.commands.vanila;
+package org.enderstone.server.commands.vanilla;
 
-import org.enderstone.server.Main;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;
+import org.enderstone.server.entity.player.EnderPlayer;
 
 /**
- *
- * @author Fernando
+ * Simple /kill command
+ * @author ferrybig
  */
-public class StopCommand extends SimpleCommand {
+public class KillCommand extends SimpleCommand {
 
-	public StopCommand() {
-		super("command.enderstone.stop","stop",CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY, "halt");
+	public KillCommand() {
+		super("command.enderstone.kill", "kill", CommandMap.DEFAULT_ENDERSTONE_COMMAND_PRIORITY);
 	}
 
 	@Override
 	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
-		sender.sendMessage(new SimpleMessage("Stopping server..."));
-		Main.getInstance().scheduleShutdown();
+		if (sender instanceof EnderPlayer) {
+			sender.sendMessage(new SimpleMessage("Killing: "+sender.getName()));
+			((EnderPlayer)sender).kill();
+		}
+		else
+		{
+			sender.sendMessage(new SimpleMessage("Cannot kill console!"));
+		}
 		return COMMAND_SUCCES;
 	}
 }
-
