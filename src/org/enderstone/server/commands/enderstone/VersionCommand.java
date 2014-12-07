@@ -38,7 +38,7 @@ public class VersionCommand extends SimpleCommand{
 	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
 		sender.sendMessage(new SimpleMessage(Main.NAME + " " + Main.VERSION + " Created by: "+ Arrays.asList(Main.AUTHORS)));
 		sender.sendMessage(new SimpleMessage("Implementing Minecraft api: "+Main.PROTOCOL_VERSION));
-		return COMMAND_SUCCES;
+		return COMMAND_SUCCESS;
 	}
 	
 }

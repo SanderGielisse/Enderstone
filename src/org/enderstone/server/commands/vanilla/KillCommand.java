@@ -44,6 +44,6 @@ public class KillCommand extends SimpleCommand {
 		{
 			sender.sendMessage(new SimpleMessage("Cannot kill console!"));
 		}
-		return COMMAND_SUCCES;
+		return COMMAND_SUCCESS;
 	}
 }

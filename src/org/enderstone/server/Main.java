@@ -21,7 +21,6 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,10 +41,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
-
 import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
 import org.enderstone.server.api.messages.Message;
@@ -58,10 +55,11 @@ import org.enderstone.server.commands.enderstone.PingCommand;
 import org.enderstone.server.commands.enderstone.QuitCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
 import org.enderstone.server.commands.enderstone.WorldCommand;
-import org.enderstone.server.commands.vanila.KillCommand;
-import org.enderstone.server.commands.vanila.StopCommand;
-import org.enderstone.server.commands.vanila.TeleportCommand;
-import org.enderstone.server.commands.vanila.TellCommand;
+import org.enderstone.server.commands.vanilla.GameModeCommand;
+import org.enderstone.server.commands.vanilla.KillCommand;
+import org.enderstone.server.commands.vanilla.StopCommand;
+import org.enderstone.server.commands.vanilla.TeleportCommand;
+import org.enderstone.server.commands.vanilla.TellCommand;
 import org.enderstone.server.entity.EnderEntity;
 import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.DefaultCraftingRecipes;
@@ -119,18 +117,20 @@ public class Main implements Runnable {
 
 	{
 		commands = new CommandMap();
-		commands.registerCommand(new TellCommand());
-		commands.registerCommand(new PingCommand());
-		commands.registerCommand(new VersionCommand());
-		commands.registerCommand(new TeleportCommand());
-		commands.registerCommand(new StopCommand());
-		commands.registerCommand(new KillCommand());
-		commands.registerCommand(new QuitCommand());
-		commands.registerCommand(new DebugCommand());
-		commands.registerCommand(new WorldCommand());
-		commands.registerCommand(new CraftingDebugCommand());
-		commands.registerCommand(new LagCommand());
+
 		commands.registerCommand(new AiCommand());
+		commands.registerCommand(new CraftingDebugCommand());
+		commands.registerCommand(new DebugCommand());
+		commands.registerCommand(new GameModeCommand());
+		commands.registerCommand(new KillCommand());
+		commands.registerCommand(new LagCommand());
+		commands.registerCommand(new PingCommand());
+		commands.registerCommand(new QuitCommand());
+		commands.registerCommand(new StopCommand());
+		commands.registerCommand(new TeleportCommand());
+		commands.registerCommand(new TellCommand());
+		commands.registerCommand(new VersionCommand());
+		commands.registerCommand(new WorldCommand());
 	}
 
 	private static Main instance;

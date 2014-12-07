@@ -47,7 +47,7 @@ public class TellCommand extends SimpleCommand {
 			EnderPlayer target = Main.getInstance().getPlayer(args[0]);
 			if(target == null)
 			{
-				sender.sendMessage(new SimpleMessage("TargetPlayer cannot be found!"));
+				sender.sendMessage(new SimpleMessage("Target player cannot be found!"));
 				return COMMAND_FAILED;
 			}
 			if(target == sender)
@@ -76,7 +76,7 @@ public class TellCommand extends SimpleCommand {
 					.build();
 			target.sendMessage(m);
 			sender.sendMessage(m);
-			return COMMAND_SUCCES; // 1 person recieved the message
+			return COMMAND_SUCCESS;
 		}
 		sender.sendMessage(new SimpleMessage("Usage: /tell <person> <command>"));
 		return COMMAND_FAILED;

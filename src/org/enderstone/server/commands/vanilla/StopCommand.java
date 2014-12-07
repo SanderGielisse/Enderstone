@@ -38,7 +38,7 @@ public class StopCommand extends SimpleCommand {
 	public int executeCommand(Command cmd, String alias, CommandSender sender, String[] args) {
 		sender.sendMessage(new SimpleMessage("Stopping server..."));
 		Main.getInstance().scheduleShutdown();
-		return COMMAND_SUCCES;
+		return COMMAND_SUCCESS;
 	}
 }
 

@@ -18,6 +18,7 @@
 package org.enderstone.server.entity.targets;
 
 import java.util.Collection;
+import org.enderstone.server.api.GameMode;
 
 import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.entity.EnderEntity;
@@ -45,6 +46,11 @@ public class TargetEntityInRange implements Target {
 		Collection<EnderEntity> entities = (Collection<EnderEntity>) (targetType == EnderPlayer.class ? mob.getWorld().getPlayers() : mob.getWorld().getEntities());
 		for (Entity e : entities) {
 			if (e.getClass().equals(targetType)) {
+				if (e instanceof EnderPlayer) {
+					if (((EnderPlayer) e).getGameMode() == GameMode.CREATIVE || ((EnderPlayer) e).getGameMode() == GameMode.SPECTATOR) {
+						continue;
+					}
+				}
 				if (mob.getLocation().distanceSquared(e.getLocation()) < 1024) { // 32 squared = 1024
 					mob.getNavigator().setTarget((EnderEntity) e);
 					return true;
@@ -57,6 +63,9 @@ public class TargetEntityInRange implements Target {
 	@Override
 	public boolean shouldContinue() {
 		if (mob.getNavigator().getTarget().isDead() || (mob.getNavigator().getTarget() instanceof EnderPlayer && !((EnderPlayer) mob.getNavigator().getTarget()).isOnline)) {
+			return false;
+		}
+		if (mob.getNavigator().getTarget() instanceof EnderPlayer && (((EnderPlayer) mob.getNavigator().getTarget()).getGameMode() == GameMode.CREATIVE || ((EnderPlayer) mob.getNavigator().getTarget()).getGameMode() == GameMode.SPECTATOR)) {
 			return false;
 		}
 		if (mob.getNavigator().getPath() == null) {

@@ -41,7 +41,7 @@ public class CraftingDebugCommand extends SimpleCommand {
 		try
 		{
 			((EnderPlayer)sender).getInventory().openInventory(new CraftingInventory(((EnderPlayer)sender).getLocation()));
-			return COMMAND_SUCCES;
+			return COMMAND_SUCCESS;
 		}
 		catch(ClassCastException err)
 		// TODO Handle exceptions correctly

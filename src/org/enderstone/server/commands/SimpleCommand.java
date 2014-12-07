@@ -29,13 +29,13 @@ public abstract class SimpleCommand extends Command{
 
 	protected final String permissions;
 	protected final String name;
-	protected final List<String> aliasses;
+	protected final List<String> aliases;
 	protected final int priority;
 
-	public SimpleCommand(String permissions, String name, int priority, String ... aliasses) {
+	public SimpleCommand(String permissions, String name, int priority, String ... aliases) {
 		this.permissions = permissions;
 		this.name = name;
-		this.aliasses = Collections.unmodifiableList(Arrays.asList(aliasses));
+		this.aliases = Collections.unmodifiableList(Arrays.asList(aliases));
 		this.priority = priority;
 	}
 	
@@ -59,7 +59,7 @@ public abstract class SimpleCommand extends Command{
 
 	@Override
 	public List<String> getAliasses() {
-		return aliasses;
+		return aliases;
 	}
 
 	@Override

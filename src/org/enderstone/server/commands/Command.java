@@ -30,7 +30,7 @@ import org.enderstone.server.entity.player.EnderPlayer;
  */
 public abstract class Command {
 
-	public static final int COMMAND_SUCCES = 1;
+	public static final int COMMAND_SUCCESS = 1;
 	public static final int COMMAND_FAILED = 0;
 
 	public abstract String getPermision();
@@ -42,7 +42,7 @@ public abstract class Command {
 	public abstract String getName();
 
 	/**
-	 * Get the command aliasses
+	 * Get the command aliases
 	 *
 	 * @return
 	 */

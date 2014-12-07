@@ -87,7 +87,7 @@ public class TeleportCommand extends SimpleCommand {
 			sender.sendMessage(new SimpleMessage("Or: /tp <tosomeone>"));
 			return Command.COMMAND_FAILED;
 		}
-		return Command.COMMAND_SUCCES;
+		return Command.COMMAND_SUCCESS;
 	}
 
 	@Override
