@@ -39,7 +39,7 @@ public class ItemDefinitionFlintAndSteel extends ItemDefinition {
 
 	@Override
 	public void onRightClick(EnderPlayer player, Block block) {
-System.out.println(block.getBlock());
+
 		if (block.getBlock() == BlockId.AIR) {
 			block.setBlock(BlockId.FIRE, (byte) 0);
 		}
