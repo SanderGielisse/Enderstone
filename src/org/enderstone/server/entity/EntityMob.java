@@ -25,7 +25,6 @@ import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.Vector;
 import org.enderstone.server.api.entity.Mob;
-import org.enderstone.server.entity.pathfinding.PathNavigator;
 import org.enderstone.server.entity.player.DamageItemType;
 import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.inventory.ItemStack;
@@ -46,7 +45,6 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 
 	private final byte appearanceId;
 	private final EnderWorld world;
-	private final PathNavigator navigator = new PathNavigator(this);
 
 	protected EntityMob(byte appearanceId, EnderWorld world, Location location) {
 		super(location);
@@ -204,7 +202,6 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 		if (Main.getInstance().doPhysics == false) {
 			return;
 		}
-		navigator.run();
 		if (Main.random.nextBoolean()) {
 			if (Main.random.nextBoolean()) {
 				if (latestSound++ % (20 * 4) == 0) {
@@ -230,11 +227,6 @@ public abstract class EntityMob extends EnderEntity implements Mob {
 	@Override
 	public float getHeight() {
 		return 1.6F;
-	}
-
-	@Override
-	public PathNavigator getNavigator() {
-		return navigator;
 	}
 
 	@Override

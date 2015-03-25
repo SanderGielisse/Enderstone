@@ -152,7 +152,7 @@ public abstract class EnderEntity implements Entity {
 
 		boolean death = this.damage(damage);
 		if (!death) {
-			this.setVelocity(knockback);
+			// this.setVelocity(knockback);
 		}
 		return death;
 	}
@@ -203,7 +203,7 @@ public abstract class EnderEntity implements Entity {
 		if (health == this.health)
 			return false;
 		if (health > this.maxHealth)
-			throw new IllegalArgumentException("Health value too large");
+			throw new IllegalArgumentException("Health value too high");
 		float lastHealth = this.health;
 		this.health = health;
 		onHealthUpdate(this.health, lastHealth);

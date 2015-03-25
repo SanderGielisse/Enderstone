@@ -17,16 +17,7 @@
  */
 package org.enderstone.server.api.entity;
 
-import org.enderstone.server.entity.pathfinding.PathNavigator;
-
 public interface Mob extends Entity {
-
-	/**
-	 * Get the navigator for the mob.
-	 * 
-	 * @return The navigator for the mob
-	 */
-	public abstract PathNavigator getNavigator();
 
 	/**
 	 * Get the movement speed of the mob in meters per second.

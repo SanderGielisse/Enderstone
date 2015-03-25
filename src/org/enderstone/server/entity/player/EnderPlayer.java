@@ -90,7 +90,6 @@ import org.enderstone.server.packet.play.PacketOutTitle;
 import org.enderstone.server.packet.play.PacketOutTitle.ActionDisplayTitle;
 import org.enderstone.server.packet.play.PacketOutTitle.ActionSubtitle;
 import org.enderstone.server.packet.play.PacketOutUpdateHealth;
-import org.enderstone.server.permissions.Operator;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
@@ -791,12 +790,8 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 
 	@Override
 	public boolean hasPermission(String permission) {
-		for (Operator operator : Main.getInstance().operators) {
-			if (operator.getUUID().equals(this.uuid)) {
-				return true;
-			}
-		}
-		return false;
+		// TODO
+		return true;
 	}
 
 	public void setOnGround(boolean onGround) {
@@ -815,7 +810,7 @@ public class EnderPlayer extends EnderEntity implements CommandSender, Player {
 		BlockId id4 = world.getBlock(floor(x), floor(y), floor(z - (getWidth() / 2))).getBlock();
 		BlockId id5 = world.getBlock(floor(x), floor(y), floor(z + (getWidth() / 2))).getBlock();
 		BlockId[] array = new BlockId[] { id1, id2, id3, id4, id5 };
-		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array);
+		boolean isInWater = compare(BlockId.WATER, array) || compare(BlockId.WATER_FLOWING, array) || compare(BlockId.LAVA, array) || compare(BlockId.LAVA_FLOWING, array);
 
 		if (isInWater) {
 			// reset fall damage

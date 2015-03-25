@@ -86,22 +86,17 @@ public class SimpleGenerator implements ChunkGenerator {
 		pops.add(new BlockPopulator() {
 
 			public void setBlock(int x, int z, EnderChunk source) {
-				source.setBlock(x, source.getHighestBlockAt(x, z) + 1, z, BlockId.RED_ROSE, (byte) 0);
+				if (source.getBlock(x, source.getHighestBlockAt(x, z), z) != BlockId.LONG_GRASS) {
+					source.setBlock(x, source.getHighestBlockAt(x, z) + 1, z, BlockId.LONG_GRASS, (byte) 1); // grass
+				}
 			}
 
 			@Override
 			public void populate(EnderWorld world, Random random, EnderChunk source) {
-				setBlock(1, 0, source);
-				setBlock(0, 1, source);
-
-				setBlock(14, 15, source);
-				setBlock(15, 14, source);
-
-				setBlock(1, 15, source);
-				setBlock(0, 14, source);
-
-				setBlock(15, 1, source);
-				setBlock(14, 0, source);
+				
+				for(int i = 0; i < Main.random.nextInt(5) + 10; i++){
+					setBlock(Main.random.nextInt(16), Main.random.nextInt(16), source);
+				}
 
 				// TEMPORARILY TESTS
 				if (Main.random.nextInt(25) == 0) {
@@ -110,8 +105,6 @@ public class SimpleGenerator implements ChunkGenerator {
 				if (Main.random.nextInt(10) == 0) {
 					world.addEntity(new EntityCow(world, new Location(world, source.getX() * 16, source.getHighestBlockAt(0, 0) + 1, source.getZ() * 16, 0F, 0F)));
 				}
-				source.setBlock(8, source.getHighestBlockAt(8, 0), 0, BlockId.WATER, (byte) 0);
-				source.setBlock(9, source.getHighestBlockAt(9, 0), 0, BlockId.FIRE, (byte) 0);
 
 				int x = random.nextInt(5) + 3, z = random.nextInt(5) + 3;
 				generateTree(source, x, source.getHighestBlockAt(x, z), z);

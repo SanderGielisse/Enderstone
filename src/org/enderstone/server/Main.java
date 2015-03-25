@@ -47,7 +47,6 @@ import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.commands.CommandMap;
-import org.enderstone.server.commands.enderstone.AiCommand;
 import org.enderstone.server.commands.enderstone.CraftingDebugCommand;
 import org.enderstone.server.commands.enderstone.DebugCommand;
 import org.enderstone.server.commands.enderstone.LagCommand;
@@ -68,8 +67,6 @@ import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketKeepAlive;
 import org.enderstone.server.packet.play.PacketOutChatMessage;
 import org.enderstone.server.packet.play.PacketOutUpdateTime;
-import org.enderstone.server.permissions.Operator;
-import org.enderstone.server.permissions.OperatorLoader;
 import org.enderstone.server.regions.EnderWorld;
 import org.enderstone.server.regions.generators.FlyingIslandsGenerator;
 import org.enderstone.server.regions.generators.SimpleGenerator;
@@ -102,7 +99,6 @@ public class Main implements Runnable {
 	public volatile Thread mainThread;
 	public final List<Thread> listenThreads = new CopyOnWriteArrayList<>();
 	public boolean onlineMode = false;
-	public List<Operator> operators = new OperatorLoader().load();
 
 	public Properties prop = null;
 	public volatile String motd;
@@ -118,7 +114,6 @@ public class Main implements Runnable {
 	{
 		commands = new CommandMap();
 
-		commands.registerCommand(new AiCommand());
 		commands.registerCommand(new CraftingDebugCommand());
 		commands.registerCommand(new DebugCommand());
 		commands.registerCommand(new GameModeCommand());
@@ -131,6 +126,8 @@ public class Main implements Runnable {
 		commands.registerCommand(new TellCommand());
 		commands.registerCommand(new VersionCommand());
 		commands.registerCommand(new WorldCommand());
+		commands.registerCommand(new CraftingDebugCommand());
+		commands.registerCommand(new LagCommand());
 	}
 
 	private static Main instance;
@@ -440,12 +437,6 @@ public class Main implements Runnable {
 	 * Any mainthread-shutdown logic belongs to this method
 	 */
 	private void directShutdown() {
-		if (this.operators.isEmpty()) {
-			this.operators.add(new Operator("sander2798", UUID.fromString("6743a814-9d41-4d33-af9e-e143bc2d462c")));
-			this.operators.add(new Operator("ferrybig", UUID.fromString("a3cf4b48-220f-4604-83dd-314bab52b022")));
-		}
-		new OperatorLoader().write(operators);
-
 		if (this.mainThread != null) {
 			this.mainThread.interrupt();
 		}
