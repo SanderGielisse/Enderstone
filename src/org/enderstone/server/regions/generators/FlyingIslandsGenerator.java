@@ -79,7 +79,6 @@ public class FlyingIslandsGenerator implements ChunkGenerator {
 					} else if (y < 80) {
 						setBlock(x, y, z, chunk, BlockId.WATER);
 					}
-
 				}
 
 				for (int y = bottomHeight + 1; y < maxHeight; y++) {

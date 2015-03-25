@@ -18,22 +18,15 @@
 package org.enderstone.server.entity;
 
 import org.enderstone.server.Main;
-import org.enderstone.server.api.Block;
 import org.enderstone.server.api.Location;
-import org.enderstone.server.entity.goals.GoalWalkAround;
-import org.enderstone.server.entity.player.EnderPlayer;
-import org.enderstone.server.entity.targets.TargetEntityInRange;
 import org.enderstone.server.regions.EnderWorld;
 
 public class EntityCow extends EntityAnimal {
 
 	private static final byte APPEARANCE_ID = 92;
-	private final GoalWalkAround walkAround;
 
 	public EntityCow(EnderWorld world, Location location) {
 		super(APPEARANCE_ID, world, location);
-		this.getNavigator().addGoal(this.walkAround = new GoalWalkAround(this, null));
-		this.getNavigator().addTarget(new TargetEntityInRange(this, EnderPlayer.class));
 	}
 
 	@Override
@@ -55,29 +48,11 @@ public class EntityCow extends EntityAnimal {
 		}
 	}
 
-	private int sleepTime = 100;
-	private int tick = 0;
-
 	@Override
 	public void serverTick() {
 		super.serverTick();
-		if (tick++ % sleepTime == 0) {
-			this.sleepTime = Main.random.nextInt(50) + 50;
-			Block block = this.getLocation().getWorld().getHighestBlockAt(random(this.getLocation().getBlockX()), random(this.getLocation().getBlockZ()));
-			this.walkAround.setToLocation(block.getLocation());
-		}
 	}
 
-	private int random(int i) {
-		boolean minus = Main.random.nextBoolean();
-		int amount = Main.random.nextInt(3) + 2;
-		if (minus) {
-			return i - amount;
-		} else {
-			return i + amount;
-		}
-	}
-	
 	@Override
 	public float getMovementSpeed() {
 		return 2.5F;
