@@ -95,4 +95,6 @@ public interface Block {
 	public boolean isEditable();
 	
 	public Location getLocation();
+
+	public Block getRelative(int i, int j, int k);
 }

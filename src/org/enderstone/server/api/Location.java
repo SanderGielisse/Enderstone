@@ -17,6 +17,7 @@
  */
 package org.enderstone.server.api;
 
+import org.enderstone.server.api.entity.Entity;
 import org.enderstone.server.regions.EnderWorld;
 
 public class Location implements Cloneable {
@@ -71,6 +72,10 @@ public class Location implements Cloneable {
 	 */
 	public Location(EnderWorld world, double x, double y, double z, double yaw, double pitch) {
 		this(world, (float) x, (float) y, (float) z, (float) yaw, (float) pitch);
+	}
+
+	public Location(EnderWorld world, int x, int y, int z) {
+		this(world, (float) x, (float) y, (float) z, 0F, 0F);
 	}
 
 	/**
@@ -424,5 +429,18 @@ public class Location implements Cloneable {
 		if (Double.doubleToLongBits(z) != Double.doubleToLongBits(other.z))
 			return false;
 		return true;
+	}
+
+	public Block getBlock() {
+		return this.world.getBlock(this.getBlockX(), this.getBlockY(), this.getBlockZ());
+	}
+
+	public Entity getNearestEntity(int range) {
+		for(Entity e : this.world.getEntities()){
+			if(e.getLocation().distanceSquared(this) <= range * range){
+				return e;
+			}
+		}
+		return null;
 	}
 }
