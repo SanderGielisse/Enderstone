@@ -18,6 +18,27 @@
 
 package org.enderstone.server.regions.io;
 
-public class ChunkManager {
+import java.io.File;
+import java.util.List;
+import java.util.Set;
+import org.enderstone.server.regions.ChunkGenerator;
+import org.enderstone.server.regions.EnderChunk;
 
+public class ChunkManager {
+	
+	private ChunkGenerator generator;
+	
+	private File regionDirectory;
+	
+	private List<EnderChunk> unusedChunks;
+	
+	private Set<EnderChunk> loadedChunks;
+	
+	public EnderChunk getChunk(int x, int z) {
+		return null;
+	}
+	
+	public void saveChunks() {
+		
+	}
 }
