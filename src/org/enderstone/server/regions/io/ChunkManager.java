@@ -41,4 +41,8 @@ public class ChunkManager {
 	public void saveChunks() {
 		
 	}
+    
+    public void markChunkUsed(int chunkX, int chunkZ) {
+        
+    }
 }
