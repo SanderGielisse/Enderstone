@@ -213,6 +213,11 @@ public class EnderBlock implements Block {
 			public Location getLocation() {
 				return new Location(this.getWorld(), this.getX(), this.getY(), this.getZ(), 0F, 0F);
 			}
+
+			@Override
+			public Block getRelative(int x, int y, int z) {
+				return this.getLocation().add(x, y, z).getBlock();
+			}
 		};
 
 	}
@@ -225,5 +230,10 @@ public class EnderBlock implements Block {
 	@Override
 	public Location getLocation() {
 		return new Location(this.getWorld(), this.getX(), this.getY(), this.getZ(), 0F, 0F);
+	}
+
+	@Override
+	public Block getRelative(int x, int y, int z) {
+		return this.getLocation().add(x, y, z).getBlock();
 	}
 }

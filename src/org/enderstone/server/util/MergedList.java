@@ -82,9 +82,9 @@ public class MergedList<E> extends AbstractList<E> implements RandomAccess, java
 			return this.addList(offset, list, 0, list.size());
 		}
 
-		@SuppressWarnings("unchecked")
 		public Builder<E> addList(int offset, final List<E> list, int startIndex, int mergeLength) {
 			if (this.indexes.length < offset + mergeLength) {
+				@SuppressWarnings("unchecked")
 				Entry<List<E>, Integer>[] a = new Entry[offset + mergeLength + 16];
 				System.arraycopy(indexes, 0, a, 0, higestIndex);
 				indexes = a;
@@ -115,9 +115,8 @@ public class MergedList<E> extends AbstractList<E> implements RandomAccess, java
 			return this;
 		}
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		public MergedList build() {
-			return new MergedList(new FixedSizeList<>(indexes, 0, higestIndex));
+		public MergedList<E> build() {
+			return new MergedList<>(new FixedSizeList<>(indexes, 0, higestIndex));
 		}
 	}
 }

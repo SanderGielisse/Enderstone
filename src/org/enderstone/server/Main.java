@@ -21,6 +21,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -41,12 +42,15 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
+
 import org.enderstone.server.api.event.Cancellable;
 import org.enderstone.server.api.event.Event;
 import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.commands.CommandMap;
+import org.enderstone.server.commands.enderstone.AiCommand;
 import org.enderstone.server.commands.enderstone.CraftingDebugCommand;
 import org.enderstone.server.commands.enderstone.DebugCommand;
 import org.enderstone.server.commands.enderstone.LagCommand;
@@ -128,6 +132,7 @@ public class Main implements Runnable {
 		commands.registerCommand(new WorldCommand());
 		commands.registerCommand(new CraftingDebugCommand());
 		commands.registerCommand(new LagCommand());
+		commands.registerCommand(new AiCommand());
 	}
 
 	private static Main instance;
@@ -426,7 +431,7 @@ public class Main implements Runnable {
 	}
 
 	/**
-	 * Schedule a server shutdown, calling this methodes says to the main thread that the server need to shutdown
+	 * Schedule a server shutdown, calling this methods tells the main thread that the server needs to shutdown
 	 */
 	public void scheduleShutdown() {
 		this.mainThread.interrupt();
