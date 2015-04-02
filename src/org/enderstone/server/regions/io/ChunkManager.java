@@ -43,6 +43,11 @@ public class ChunkManager {
      * Region files of this world
      */
 	private final File regionDirectory;
+    
+    /**
+     * Cache for open regionFiles
+     */
+    private final List<RegionFile> regionFileCache = new ArrayList<>();
 	
     /**
      * Thrown away chunks that are unloaded, these objects are kept inside this
