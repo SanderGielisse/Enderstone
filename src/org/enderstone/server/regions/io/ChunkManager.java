@@ -18,12 +18,15 @@
 
 package org.enderstone.server.regions.io;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import org.enderstone.server.EnderLogger;
 import org.enderstone.server.regions.BlockData;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.ChunkGenerator;
@@ -31,6 +34,8 @@ import org.enderstone.server.regions.EnderChunk;
 import org.enderstone.server.regions.EnderWorld;
 import static org.enderstone.server.regions.EnderWorld.AMOUNT_OF_CHUNKSECTIONS;
 import org.enderstone.server.regions.RegionSet;
+import org.jnbt.CompoundTag;
+import org.jnbt.NBTInputStream;
 
 public class ChunkManager {
 	
@@ -47,7 +52,7 @@ public class ChunkManager {
     /**
      * Cache for open regionFiles
      */
-    private final List<RegionFile> regionFileCache = new ArrayList<>();
+    private final Map<Long,RegionFile> regionFileCache = new HashMap<>();
 	
     /**
      * Thrown away chunks that are unloaded, these objects are kept inside this
@@ -78,6 +83,30 @@ public class ChunkManager {
         
     }
     
+    private EnderChunk loadChunk(int x, int z) {
+        long key = ((long) calculateRegionPos(x) << 32) ^ calculateRegionPos(z);
+        EnderChunk c;
+        DataInputStream in;
+        synchronized (regionFileCache) {
+            RegionFile region = regionFileCache.get(Long.valueOf(key));
+            if (region == null) {
+                region = new RegionFile(new File(regionDirectory, "r."+calculateRegionPos(x)+"."+calculateRegionPos(z)+".mca"));
+                regionFileCache.put(key, region);
+            }
+            in = region.getChunkDataInputStream(calculateChunkPos(x), calculateChunkPos(z));
+        }
+        try (NBTInputStream indata = new NBTInputStream(in)) {
+            CompoundTag tag = (CompoundTag) indata.readTag();
+            // read tag to chunk, http://minecraft.gamepedia.com/Chunk_format
+            c = null;
+        } catch (IOException ex) {
+            EnderLogger.warn("Error while loading chunk");
+            EnderLogger.exception(ex);
+            return null;
+        }
+        return c;
+    }
+
     private EnderChunk createChunk(int x, int z) {
         EnderChunk r;
         BlockId[][] blocks = generator.generateExtBlockSections(world, new Random((((long)x) << 32) ^ z), x, z);
@@ -107,4 +136,17 @@ public class ChunkManager {
 		r = new EnderChunk(world, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>());
 		return r;
     }
+    
+    private static int calculateChunkPos(int rawChunkLocation) {
+		rawChunkLocation %= 32;
+		if (rawChunkLocation < 0) {
+			rawChunkLocation += 32;
+		}
+		return rawChunkLocation;
+	}
+
+	protected static int calculateRegionPos(int raw) {
+		raw = raw >> 5;
+		return raw;
+	}
 }
