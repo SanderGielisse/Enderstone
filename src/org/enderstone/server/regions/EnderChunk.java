@@ -19,6 +19,7 @@ package org.enderstone.server.regions;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -48,6 +49,8 @@ public class EnderChunk implements Chunk{
 	public boolean hasPopulated = false;
 	private boolean isValid = true;
 	private EnderWorld world;
+    private final List<BlockData> blockData;
+    public final AtomicReference<ChunkState> chunkState = new AtomicReference<>(ChunkState.LOADED);
 
 	public EnderChunk(EnderWorld world, int x, int z, short[][] blockID, byte[][] data, byte[] biome, List<BlockData> blockData) {
 		this.world = world;
@@ -71,14 +74,20 @@ public class EnderChunk implements Chunk{
 		this.blockID = blockID;
 		this.data = data;
 		this.biome = biome;
-		//this.blockData = blockData;
+        this.blockData = blockData;
 		this.x = x;
 	}
+    
+    public EnderChunk(EnderWorld world, int x, int z) {
+        this(world, x, z, new short[MAX_CHUNK_SECTIONS][], new byte[MAX_CHUNK_SECTIONS][], new byte[16*16], new ArrayList<BlockData>());
+    }
 
+    @Override
 	public int getZ() {
 		return z;
 	}
 
+    @Override
 	public int getX() {
 		return x;
 	}
@@ -323,15 +332,6 @@ public class EnderChunk implements Chunk{
 		return this.isValid;
 	}
 
-	public final AtomicReference<ChunkState> chunkState = new AtomicReference<>(ChunkState.LOADED);
-
-	public enum ChunkState {
-
-		LOADED, LOADED_SAVE,
-		UNLOADED, UNLOADED_SAVE,
-		SAVING, GONE
-	}
-
 	@Override
 	public Block getBlockAt(int x, int y, int z) {
 		return new EnderBlock(x + (16 * this.x), y, z + (16 * this.z), this.world); //TODO test this
@@ -345,5 +345,12 @@ public class EnderChunk implements Chunk{
 	@Override
 	public World getWorld() {
 		return this.world;
+	}
+    
+    public enum ChunkState {
+
+		LOADED, LOADED_SAVE,
+		UNLOADED, UNLOADED_SAVE,
+		SAVING, GONE
 	}
 }
