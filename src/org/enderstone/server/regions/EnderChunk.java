@@ -157,11 +157,7 @@ public class EnderChunk implements Chunk{
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			if (player.getWorld().worldName.equals(world.worldName)) {
 				if (player.getLoadedChunks().contains(this)) {
-					try {
-						player.getNetworkManager().sendPacket(new PacketOutBlockChange(new Location(player.getWorld(), (this.getX() * 16) + x, y, (this.getZ() * 16) + z, (float) 0, (float) 0), material.getId(), data));
-					} catch (Exception e) {
-						EnderLogger.exception(e);
-					}
+					player.getNetworkManager().sendPacket(new PacketOutBlockChange(new Location(player.getWorld(), (this.getX() * 16) + x, y, (this.getZ() * 16) + z, (float) 0, (float) 0), material.getId(), data));
 				}
 			}
 		}
