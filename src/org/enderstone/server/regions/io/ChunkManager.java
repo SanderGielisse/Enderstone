@@ -72,7 +72,17 @@ public class ChunkManager {
     }
 	
 	public EnderChunk getChunk(int x, int z) {
-		return null;
+        EnderChunk c;
+        if((c = this.loadedChunks.get(x, z)) == null) {
+            if((c = this.loadChunk(x, z)) == null) {
+                if((c = this.createChunk(x, z)) == null) {
+                    throw new RuntimeException("Unable to create a chunk?!?! This won't happen as createChunk always returns a valid chunk");
+                } 
+            }
+            this.loadedChunks.add(c);
+        }
+        markChunkUsed(x, z);
+		return c;
 	}
 	
 	public void saveChunks() {
