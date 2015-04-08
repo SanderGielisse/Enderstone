@@ -19,6 +19,7 @@
 package org.enderstone.server.regions.io;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -91,6 +92,24 @@ public class ChunkManager {
     
     public void markChunkUsed(int chunkX, int chunkZ) {
         
+    }
+    
+    private void saveChunk(EnderChunk chunk) {
+        int x = chunk.getX(), z = chunk.getZ();
+        long key = ((long) calculateRegionPos(x) << 32) ^ calculateRegionPos(z);
+        synchronized (regionFileCache) {
+            RegionFile region = regionFileCache.get(Long.valueOf(key));
+            if (region == null) {
+                region = new RegionFile(new File(regionDirectory, "r."+calculateRegionPos(x)+"."+calculateRegionPos(z)+".mca"));
+                regionFileCache.put(key, region);
+            }
+            try(DataOutputStream out = region.getChunkDataOutputStream(calculateChunkPos(x), calculateChunkPos(z))) {
+                
+            } catch (IOException ex) {
+                EnderLogger.warn("Error while saving chunk");
+                EnderLogger.exception(ex);
+            }
+        }
     }
     
     private EnderChunk loadChunk(int x, int z) {
