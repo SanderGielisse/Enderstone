@@ -111,7 +111,12 @@ public class ChunkManager {
             }
         }
     }
-    
+
+    private void unlockChunk(EnderChunk chunk) {
+        saveChunk(chunk);
+        this.loadedChunks.remove(chunk);
+    }
+
     private EnderChunk loadChunk(int x, int z) {
         long key = ((long) calculateRegionPos(x) << 32) ^ calculateRegionPos(z);
         EnderChunk c;
