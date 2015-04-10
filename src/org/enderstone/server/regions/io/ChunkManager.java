@@ -91,7 +91,8 @@ public class ChunkManager {
 	}
     
     public void markChunkUsed(int chunkX, int chunkZ) {
-        
+        EnderChunk chunk = this.loadedChunks.get(chunkX, chunkZ);
+        chunk.chunkState.set(EnderChunk.ChunkState.LOADED_SAVE);
     }
     
     private void saveChunk(EnderChunk chunk) {
