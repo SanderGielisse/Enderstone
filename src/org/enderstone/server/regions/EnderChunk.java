@@ -314,6 +314,7 @@ public class EnderChunk implements Chunk{
 		return chunkmap;
 	}
 
+    @Override
 	public int getHighestBlockAt(int x, int z) {
 		for (int i = 255; i > 0; i--) {
 			BlockId bl = this.getBlock(x, i, z);
