@@ -111,10 +111,12 @@ public class ChunkManager {
                 EnderLogger.exception(ex);
             }
         }
+        chunk.chunkState.set(EnderChunk.ChunkState.LOADED);
     }
 
     private void unlockChunk(EnderChunk chunk) {
         saveChunk(chunk);
+        chunk.chunkState.set(EnderChunk.ChunkState.GONE);
         this.loadedChunks.remove(chunk);
     }
 
@@ -134,6 +136,11 @@ public class ChunkManager {
             CompoundTag tag = (CompoundTag) indata.readTag();
             // read tag to chunk, http://minecraft.gamepedia.com/Chunk_format
             c = null;
+            
+            
+            
+            
+            c.chunkState.set(EnderChunk.ChunkState.LOADED);
         } catch (IOException ex) {
             EnderLogger.warn("Error while loading chunk");
             EnderLogger.exception(ex);
@@ -169,6 +176,7 @@ public class ChunkManager {
 			}
 		}
 		r = new EnderChunk(world, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>());
+        r.chunkState.set(EnderChunk.ChunkState.LOADED_SAVE);
 		return r;
     }
     
