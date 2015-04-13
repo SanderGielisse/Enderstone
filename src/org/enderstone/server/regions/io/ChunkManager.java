@@ -87,7 +87,9 @@ public class ChunkManager {
 	}
 	
 	public void saveChunks() {
-		
+		for(EnderChunk chunk : loadedChunks) {
+            this.saveChunk(chunk);
+        }
 	}
     
     public void markChunkUsed(int chunkX, int chunkZ) {
