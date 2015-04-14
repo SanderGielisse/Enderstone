@@ -23,11 +23,13 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.enderstone.server.EnderLogger;
+import org.enderstone.server.api.Chunk;
 import org.enderstone.server.regions.BlockData;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.ChunkGenerator;
@@ -97,7 +99,7 @@ public class ChunkManager {
         chunk.chunkState.set(EnderChunk.ChunkState.LOADED_SAVE);
     }
     
-    private void saveChunk(EnderChunk chunk) {
+    public void saveChunk(EnderChunk chunk) {
         int x = chunk.getX(), z = chunk.getZ();
         long key = ((long) calculateRegionPos(x) << 32) ^ calculateRegionPos(z);
         synchronized (regionFileCache) {
@@ -194,4 +196,8 @@ public class ChunkManager {
 		raw = raw >> 5;
 		return raw;
 	}
+
+    public Collection<? extends Chunk> getChunks() {
+        return this.loadedChunks;
+    }
 }
