@@ -67,10 +67,10 @@ public class EnderWorld implements World {
 	private Location spawnLocation;
 	public final String worldName;
 
-	public EnderWorld(String worldName, ChunkGenerator gen) {
+	public EnderWorld(String worldName, ChunkGenerator gen, File worldDirectory) {
 		this.worldName = worldName;
 		this.generator = gen;
-        this.chunks = new ChunkManager(gen, new File("world/region"), this); // todo: edit this path
+        this.chunks = new ChunkManager(gen, new File(worldDirectory, "region"), this); // todo: edit this path
 	}
 
 	public EnderChunk getOrCreateChunk(int x, int z) {

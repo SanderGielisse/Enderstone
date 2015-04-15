@@ -232,8 +232,8 @@ public class Main implements Runnable {
 				EnderLogger.info("" + NAME + " Server started, " + PROTOCOL_VERSION + " clients can now connect to port " + port + "!");
 
 				// TODO support multiple worlds with a simple and good working system
-				worlds.add(new EnderWorld("world1", new SimpleGenerator()));
-				worlds.add(new EnderWorld("world2", new FlyingIslandsGenerator()));
+				worlds.add(new EnderWorld("world1", new SimpleGenerator(), new File("world1")));
+				worlds.add(new EnderWorld("world2", new FlyingIslandsGenerator(), new File("world2")));
 
 				try {
 					while (Main.this.isRunning) {
