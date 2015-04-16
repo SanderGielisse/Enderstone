@@ -180,7 +180,7 @@ public class ChunkManager {
 			}
 		}
 		r = new EnderChunk(world, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>());
-        r.chunkState.set(EnderChunk.ChunkState.LOADED_SAVE);
+        r.chunkState.set(EnderChunk.ChunkState.LOADED);
 		return r;
     }
     
@@ -199,5 +199,20 @@ public class ChunkManager {
 
     public Collection<? extends Chunk> getChunks() {
         return this.loadedChunks;
+    }
+    
+    public void cleanUpOldChunks() {
+        int chunksSaved = 0;
+        for(EnderChunk c : loadedChunks) {
+            final EnderChunk.ChunkState state = c.chunkState.get();
+            if(state == EnderChunk.ChunkState.LOADED_SAVE && chunksSaved < 50) {
+                this.saveChunk(c);
+            }
+            if (state == EnderChunk.ChunkState.LOADED ) {
+                if (/* TODO Check entity distance */ true) {
+                    this.unlockChunk(c);
+                }
+            }
+        }
     }
 }

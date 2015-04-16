@@ -66,6 +66,7 @@ public class EnderWorld implements World {
 	public final List<TileBlock> tickList = new ArrayList<>();
 	private Location spawnLocation;
 	public final String worldName;
+    private long cleanuptimer = 0;
 
 	public EnderWorld(String worldName, ChunkGenerator gen, File worldDirectory) {
 		this.worldName = worldName;
@@ -308,6 +309,10 @@ public class EnderWorld implements World {
 			pending.onSpawn();
 		}
 		this.pendingEntities.clear();
+        if(cleanuptimer++ > 20) {
+            cleanuptimer = 0;
+            this.chunks.cleanUpOldChunks();
+        }
 
 		Iterator<EnderEntity> it = this.entities.iterator();
 		while (it.hasNext()) {
