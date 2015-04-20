@@ -20,6 +20,7 @@ package org.enderstone.server.regions;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -31,12 +32,15 @@ import org.enderstone.server.api.Location;
 import org.enderstone.server.api.World;
 import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.packet.play.PacketOutBlockChange;
+import org.enderstone.server.regions.io.NBTStorable;
+import org.jnbt.CompoundTag;
+import org.jnbt.Tag;
 
 /**
  *
  * @author Fernando
  */
-public class EnderChunk implements Chunk{
+public class EnderChunk implements Chunk, NBTStorable {
 
 	protected final static int CHUNK_SECTION_SIZE = 16;
 	protected final static int MAX_CHUNK_SECTIONS = 16;
@@ -343,6 +347,17 @@ public class EnderChunk implements Chunk{
 	public World getWorld() {
 		return this.world;
 	}
+
+    @Override
+    public CompoundTag saveToNBT() {
+        //TODO throw new UnsupportedOperationException("Not supported yet.");
+        return new CompoundTag("level", Collections.<String,Tag>emptyMap());
+    }
+
+    @Override
+    public void loadFromNBT(CompoundTag tag) {
+        // TODO throw new UnsupportedOperationException("Not supported yet.");
+    }
     
     public enum ChunkState {
 

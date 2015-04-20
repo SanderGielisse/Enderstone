@@ -39,6 +39,7 @@ import static org.enderstone.server.regions.EnderWorld.AMOUNT_OF_CHUNKSECTIONS;
 import org.enderstone.server.regions.RegionSet;
 import org.jnbt.CompoundTag;
 import org.jnbt.NBTInputStream;
+import org.jnbt.NBTOutputStream;
 
 public class ChunkManager {
 	
@@ -109,7 +110,9 @@ public class ChunkManager {
                 regionFileCache.put(key, region);
             }
             try(DataOutputStream out = region.getChunkDataOutputStream(calculateChunkPos(x), calculateChunkPos(z))) {
-                
+                try(NBTOutputStream out1 = new NBTOutputStream(out)) {
+                    out1.writeTag(chunk.saveToNBT());
+                }
             } catch (IOException ex) {
                 EnderLogger.warn("Error while saving chunk");
                 EnderLogger.exception(ex);
@@ -139,7 +142,8 @@ public class ChunkManager {
         try (NBTInputStream indata = new NBTInputStream(in)) {
             CompoundTag tag = (CompoundTag) indata.readTag();
             // read tag to chunk, http://minecraft.gamepedia.com/Chunk_format
-            c = null;
+            c = new EnderChunk(world, x, z);
+            c.loadFromNBT(tag);
             
             
             
