@@ -101,6 +101,7 @@ public class ChunkManager {
     }
     
     public void saveChunk(EnderChunk chunk) {
+        EnderLogger.debug("Save: "+chunk);
         int x = chunk.getX(), z = chunk.getZ();
         long key = ((long) calculateRegionPos(x) << 32) ^ calculateRegionPos(z);
         synchronized (regionFileCache) {
@@ -123,11 +124,13 @@ public class ChunkManager {
 
     private void unlockChunk(EnderChunk chunk) {
         saveChunk(chunk);
+        EnderLogger.debug("Unload: "+chunk);
         chunk.chunkState.set(EnderChunk.ChunkState.GONE);
         this.loadedChunks.remove(chunk);
     }
 
     private EnderChunk loadChunk(int x, int z) {
+        
         long key = ((long) calculateRegionPos(x) << 32) ^ calculateRegionPos(z);
         EnderChunk c;
         DataInputStream in;
@@ -138,6 +141,10 @@ public class ChunkManager {
                 regionFileCache.put(key, region);
             }
             in = region.getChunkDataInputStream(calculateChunkPos(x), calculateChunkPos(z));
+        }
+        if (in == null)
+        {
+            return createChunk(x, z);
         }
         try (NBTInputStream indata = new NBTInputStream(in)) {
             CompoundTag tag = (CompoundTag) indata.readTag();
@@ -154,6 +161,7 @@ public class ChunkManager {
             EnderLogger.exception(ex);
             return null;
         }
+        EnderLogger.debug("Load: "+c);
         return c;
     }
 
@@ -185,6 +193,7 @@ public class ChunkManager {
 		}
 		r = new EnderChunk(world, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>());
         r.chunkState.set(EnderChunk.ChunkState.LOADED);
+        EnderLogger.debug("Create: "+r);
 		return r;
     }
     

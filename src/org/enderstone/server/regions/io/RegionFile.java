@@ -93,6 +93,8 @@ public class RegionFile {
         try {
             if (path.exists()) {
                 lastModified = path.lastModified();
+            } else {
+                path.createNewFile();
             }
 
             file = new RandomAccessFile(path, "rw");
