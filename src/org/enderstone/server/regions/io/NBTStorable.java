@@ -24,7 +24,8 @@ import org.jnbt.CompoundTag;
  * @author Fernando
  */
 public interface NBTStorable {
+
     public CompoundTag saveToNBT();
-    
+
     public void loadFromNBT(CompoundTag tag);
 }

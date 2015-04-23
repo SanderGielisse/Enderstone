@@ -15,7 +15,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.enderstone.server.regions.io;
 
 import java.io.DataInputStream;
@@ -42,76 +41,77 @@ import org.jnbt.NBTInputStream;
 import org.jnbt.NBTOutputStream;
 
 public class ChunkManager {
-	
+
     /**
      * Stored the chunk generator fo this world
      */
-	private final ChunkGenerator generator;
-	
+    private final ChunkGenerator generator;
+
     /**
      * Region files of this world
      */
-	private final File regionDirectory;
-    
+    private final File regionDirectory;
+
     /**
      * Cache for open regionFiles
      */
-    private final Map<Long,RegionFile> regionFileCache = new HashMap<>();
-	
+    private final Map<Long, RegionFile> regionFileCache = new HashMap<>();
+
     /**
      * Thrown away chunks that are unloaded, these objects are kept inside this
-     * list so we can reuse the memory without the garbage collector
-     * causing lagg
+     * list so we can reuse the memory without the garbage collector causing
+     * lagg
      */
-	private final List<EnderChunk> unusedChunks = new ArrayList<>();
-	
+    private final List<EnderChunk> unusedChunks = new ArrayList<>();
+
     private final RegionSet loadedChunks;
     private final EnderWorld world;
-    
+
     public ChunkManager(ChunkGenerator generator, File regionDirectory, EnderWorld world) {
         this.generator = generator;
         this.regionDirectory = regionDirectory;
         this.loadedChunks = new RegionSet();
         this.world = world;
+        this.regionDirectory.mkdirs();
     }
-	
-	public EnderChunk getChunk(int x, int z) {
+
+    public EnderChunk getChunk(int x, int z) {
         EnderChunk c;
-        if((c = this.loadedChunks.get(x, z)) == null) {
-            if((c = this.loadChunk(x, z)) == null) {
-                if((c = this.createChunk(x, z)) == null) {
+        if ((c = this.loadedChunks.get(x, z)) == null) {
+            if ((c = this.loadChunk(x, z)) == null) {
+                if ((c = this.createChunk(x, z)) == null) {
                     throw new RuntimeException("Unable to create a chunk?!?! This won't happen as createChunk always returns a valid chunk");
-                } 
+                }
             }
             this.loadedChunks.add(c);
         }
         markChunkUsed(x, z);
-		return c;
-	}
-	
-	public void saveChunks() {
-		for(EnderChunk chunk : loadedChunks) {
+        return c;
+    }
+
+    public void saveChunks() {
+        for (EnderChunk chunk : loadedChunks) {
             this.saveChunk(chunk);
         }
-	}
-    
+    }
+
     public void markChunkUsed(int chunkX, int chunkZ) {
         EnderChunk chunk = this.loadedChunks.get(chunkX, chunkZ);
         chunk.chunkState.set(EnderChunk.ChunkState.LOADED_SAVE);
     }
-    
+
     public void saveChunk(EnderChunk chunk) {
-        EnderLogger.debug("Save: "+chunk);
+        EnderLogger.debug("Save: " + chunk);
         int x = chunk.getX(), z = chunk.getZ();
         long key = ((long) calculateRegionPos(x) << 32) ^ calculateRegionPos(z);
         synchronized (regionFileCache) {
             RegionFile region = regionFileCache.get(Long.valueOf(key));
             if (region == null) {
-                region = new RegionFile(new File(regionDirectory, "r."+calculateRegionPos(x)+"."+calculateRegionPos(z)+".mca"));
+                region = new RegionFile(new File(regionDirectory, "r." + calculateRegionPos(x) + "." + calculateRegionPos(z) + ".mca"));
                 regionFileCache.put(key, region);
             }
-            try(DataOutputStream out = region.getChunkDataOutputStream(calculateChunkPos(x), calculateChunkPos(z))) {
-                try(NBTOutputStream out1 = new NBTOutputStream(out)) {
+            try (DataOutputStream out = region.getChunkDataOutputStream(calculateChunkPos(x), calculateChunkPos(z))) {
+                try (NBTOutputStream out1 = new NBTOutputStream(out)) {
                     out1.writeTag(chunk.saveToNBT());
                 }
             } catch (IOException ex) {
@@ -124,26 +124,25 @@ public class ChunkManager {
 
     private void unlockChunk(EnderChunk chunk) {
         saveChunk(chunk);
-        EnderLogger.debug("Unload: "+chunk);
+        EnderLogger.debug("Unload: " + chunk);
         chunk.chunkState.set(EnderChunk.ChunkState.GONE);
         this.loadedChunks.remove(chunk);
     }
 
     private EnderChunk loadChunk(int x, int z) {
-        
+
         long key = ((long) calculateRegionPos(x) << 32) ^ calculateRegionPos(z);
         EnderChunk c;
         DataInputStream in;
         synchronized (regionFileCache) {
             RegionFile region = regionFileCache.get(Long.valueOf(key));
             if (region == null) {
-                region = new RegionFile(new File(regionDirectory, "r."+calculateRegionPos(x)+"."+calculateRegionPos(z)+".mca"));
+                region = new RegionFile(new File(regionDirectory, "r." + calculateRegionPos(x) + "." + calculateRegionPos(z) + ".mca"));
                 regionFileCache.put(key, region);
             }
             in = region.getChunkDataInputStream(calculateChunkPos(x), calculateChunkPos(z));
         }
-        if (in == null)
-        {
+        if (in == null) {
             return createChunk(x, z);
         }
         try (NBTInputStream indata = new NBTInputStream(in)) {
@@ -151,78 +150,75 @@ public class ChunkManager {
             // read tag to chunk, http://minecraft.gamepedia.com/Chunk_format
             c = new EnderChunk(world, x, z);
             c.loadFromNBT(tag);
-            
-            
-            
-            
+
             c.chunkState.set(EnderChunk.ChunkState.LOADED);
         } catch (IOException ex) {
             EnderLogger.warn("Error while loading chunk");
             EnderLogger.exception(ex);
             return null;
         }
-        EnderLogger.debug("Load: "+c);
+        EnderLogger.debug("Load: " + c);
         return c;
     }
 
     private EnderChunk createChunk(int x, int z) {
         EnderChunk r;
-        BlockId[][] blocks = generator.generateExtBlockSections(world, new Random((((long)x) << 32) ^ z), x, z);
-		if (blocks == null) {
-			blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
-		}
-		if (blocks.length != AMOUNT_OF_CHUNKSECTIONS) {
-			blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
-		}
-		short[][] id = new short[16][];
-		byte[][] data = new byte[16][];
-		for (int i = 0; i < blocks.length; i++) {
+        BlockId[][] blocks = generator.generateExtBlockSections(world, new Random((((long) x) << 32) ^ z), x, z);
+        if (blocks == null) {
+            blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
+        }
+        if (blocks.length != AMOUNT_OF_CHUNKSECTIONS) {
+            blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
+        }
+        short[][] id = new short[16][];
+        byte[][] data = new byte[16][];
+        for (int i = 0; i < blocks.length; i++) {
 
-			if (blocks[i] != null) {
-				id[i] = new short[4096];
-				data[i] = new byte[4096];
-				for (int j = 0; j < 4096; j++) {
+            if (blocks[i] != null) {
+                id[i] = new short[4096];
+                data[i] = new byte[4096];
+                for (int j = 0; j < 4096; j++) {
 
-					if (blocks[i][j] == null) {
-						id[i][j] = BlockId.AIR.getId();
-					} else {
-						id[i][j] = blocks[i][j].getId();
-					}
-				}
-			}
-		}
-		r = new EnderChunk(world, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>());
+                    if (blocks[i][j] == null) {
+                        id[i][j] = BlockId.AIR.getId();
+                    } else {
+                        id[i][j] = blocks[i][j].getId();
+                    }
+                }
+            }
+        }
+        r = new EnderChunk(world, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>());
         r.chunkState.set(EnderChunk.ChunkState.LOADED);
-        EnderLogger.debug("Create: "+r);
-		return r;
+        EnderLogger.debug("Create: " + r);
+        return r;
     }
-    
-    private static int calculateChunkPos(int rawChunkLocation) {
-		rawChunkLocation %= 32;
-		if (rawChunkLocation < 0) {
-			rawChunkLocation += 32;
-		}
-		return rawChunkLocation;
-	}
 
-	protected static int calculateRegionPos(int raw) {
-		raw = raw >> 5;
-		return raw;
-	}
+    private static int calculateChunkPos(int rawChunkLocation) {
+        rawChunkLocation %= 32;
+        if (rawChunkLocation < 0) {
+            rawChunkLocation += 32;
+        }
+        return rawChunkLocation;
+    }
+
+    protected static int calculateRegionPos(int raw) {
+        raw = raw >> 5;
+        return raw;
+    }
 
     public Collection<? extends Chunk> getChunks() {
         return this.loadedChunks;
     }
-    
+
     public void cleanUpOldChunks() {
         int chunksSaved = 0;
-        for(EnderChunk c : loadedChunks) {
+        for (EnderChunk c : loadedChunks) {
             final EnderChunk.ChunkState state = c.chunkState.get();
-            if(state == EnderChunk.ChunkState.LOADED_SAVE && chunksSaved < 50) {
+            if (state == EnderChunk.ChunkState.LOADED_SAVE && chunksSaved < 50) {
                 this.saveChunk(c);
             }
-            if (state == EnderChunk.ChunkState.LOADED ) {
-                if (/* TODO Check entity distance */ true) {
+            if (state == EnderChunk.ChunkState.LOADED) {
+                if (/* TODO Check entity distance */true) {
                     this.unlockChunk(c);
                 }
             }

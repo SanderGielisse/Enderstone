@@ -20,7 +20,6 @@ package org.enderstone.server.regions.io;
  * formatter template).
  * 
  */
-
 // Interfaces with region files on the disk
 
 /*
@@ -57,7 +56,6 @@ package org.enderstone.server.regions.io;
  data is the chunk length - 1.
 
  */
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.zip.*;
@@ -121,7 +119,7 @@ public class RegionFile {
 
             /* set up the available sector map */
             int nSectors = (int) file.length() / SECTOR_BYTES;
-            sectorFree = new ArrayList<Boolean>(nSectors);
+            sectorFree = new ArrayList<>(nSectors);
 
             for (int i = 0; i < nSectors; ++i) {
                 sectorFree.add(true);
@@ -239,7 +237,9 @@ public class RegionFile {
     }
 
     public DataOutputStream getChunkDataOutputStream(int x, int z) {
-        if (outOfBounds(x, z)) return null;
+        if (outOfBounds(x, z)) {
+            return null;
+        }
 
         return new DataOutputStream(new DeflaterOutputStream(new ChunkBuffer(x, z)));
     }
@@ -249,6 +249,7 @@ public class RegionFile {
      * chunk is serializing -- only writes when serialization is over
      */
     class ChunkBuffer extends ByteArrayOutputStream {
+
         private int x, z;
 
         public ChunkBuffer(int x, int z) {
@@ -293,8 +294,11 @@ public class RegionFile {
                 if (runStart != -1) {
                     for (int i = runStart; i < sectorFree.size(); ++i) {
                         if (runLength != 0) {
-                            if (sectorFree.get(i)) runLength++;
-                            else runLength = 0;
+                            if (sectorFree.get(i)) {
+                                runLength++;
+                            } else {
+                                runLength = 0;
+                            }
                         } else if (sectorFree.get(i)) {
                             runStart = i;
                             runLength = 1;
