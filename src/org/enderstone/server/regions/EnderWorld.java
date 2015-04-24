@@ -17,6 +17,7 @@
  */
 package org.enderstone.server.regions;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +47,7 @@ import org.enderstone.server.packet.Packet;
 import org.enderstone.server.packet.play.PacketOutEntityDestroy;
 import org.enderstone.server.packet.play.PacketOutSoundEffect;
 import org.enderstone.server.regions.generators.MultiChunkBlockPopulator;
+import org.enderstone.server.regions.io.ChunkManager;
 import org.enderstone.server.regions.tileblocks.TileBlock;
 import org.enderstone.server.regions.tileblocks.TileBlocks;
 import org.enderstone.server.util.IntegerArrayComparator;
@@ -53,8 +55,9 @@ import org.enderstone.server.util.IntegerArrayComparator;
 public class EnderWorld implements World {
 
 	private Long seed = null;
-	private final RegionSet loadedChunks = new RegionSet();
+	//private final RegionSet loadedChunks = new RegionSet();
 	private final ChunkGenerator generator;
+    private final ChunkManager chunks;
 	private final Random random = new Random();
 	private long time = random.nextInt();
 	public static final int AMOUNT_OF_CHUNKSECTIONS = 16;
@@ -63,10 +66,12 @@ public class EnderWorld implements World {
 	public final List<TileBlock> tickList = new ArrayList<>();
 	private Location spawnLocation;
 	public final String worldName;
+    private long cleanuptimer = 0;
 
-	public EnderWorld(String worldName, ChunkGenerator gen) {
+	public EnderWorld(String worldName, ChunkGenerator gen, File worldDirectory) {
 		this.worldName = worldName;
 		this.generator = gen;
+        this.chunks = new ChunkManager(gen, new File(worldDirectory, "region"), this); // todo: edit this path
 	}
 
 	public EnderChunk getOrCreateChunk(int x, int z) {
@@ -80,34 +85,6 @@ public class EnderWorld implements World {
 
 	private EnderChunk getOrCreateChunk0(int x, int z) {
 		EnderChunk r = getChunk(x, z, false);
-		if (r != null) {
-			return r;
-		}
-		BlockId[][] blocks = generator.generateExtBlockSections(this, new Random(), x, z);
-		if (blocks == null) {
-			blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
-		}
-		if (blocks.length != AMOUNT_OF_CHUNKSECTIONS) {
-			blocks = new BlockId[AMOUNT_OF_CHUNKSECTIONS][];
-		}
-		short[][] id = new short[16][];
-		byte[][] data = new byte[16][];
-		for (int i = 0; i < blocks.length; i++) {
-
-			if (blocks[i] != null) {
-				id[i] = new short[4096];
-				data[i] = new byte[4096];
-				for (int j = 0; j < 4096; j++) {
-
-					if (blocks[i][j] == null) {
-						id[i][j] = BlockId.AIR.getId();
-					} else {
-						id[i][j] = blocks[i][j].getId();
-					}
-				}
-			}
-		}
-		loadedChunks.add(r = new EnderChunk(this, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>()));
 		return r;
 	}
 
@@ -121,11 +98,11 @@ public class EnderWorld implements World {
 	}
 
 	private EnderChunk getChunk0(int x, int z) {
-		return this.loadedChunks.get(x, z);
+		return this.chunks.getChunk(x, z);
 	}
 
 	public void saveChunk(EnderChunk ender) {
-
+        this.chunks.saveChunk(ender);
 	}
 
 	private EnderChunk checkChunkPopulation(EnderChunk c) {
@@ -200,6 +177,7 @@ public class EnderWorld implements World {
 					while (cx++ < mx) {
 						for (cz = minz; cz < mz; cz++) {
 							EnderChunk c = getOrCreateChunk(cx, cz);
+                            c.resetChunkUnloadTimer(20);
 							playerChunks.add(c);
 							informer.sendChunk(c);
 						}
@@ -213,6 +191,7 @@ public class EnderWorld implements World {
 					for (; cx < mx; cx++) {
 						for (cz = minz; cz < mz; cz++) {
 							EnderChunk tmp = getOrCreateChunk(cx, cz);
+                            tmp.resetChunkUnloadTimer(20);
 							if (!copy.contains(tmp)) {
 								chunkLoad[index++] = new int[] { cx, cz };
 							} else {
@@ -332,6 +311,10 @@ public class EnderWorld implements World {
 			pending.onSpawn();
 		}
 		this.pendingEntities.clear();
+        if(cleanuptimer++ > 20) {
+            cleanuptimer = 0;
+            this.chunks.cleanUpOldChunks();
+        }
 
 		Iterator<EnderEntity> it = this.entities.iterator();
 		while (it.hasNext()) {
@@ -398,7 +381,7 @@ public class EnderWorld implements World {
 
 	@Override
 	public Collection<? extends Chunk> getLoadedChunks() {
-		return this.loadedChunks;
+		return this.chunks.getChunks();
 	}
 
 	@Override

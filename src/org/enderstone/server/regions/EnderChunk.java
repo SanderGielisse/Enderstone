@@ -19,6 +19,8 @@ package org.enderstone.server.regions;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -30,12 +32,15 @@ import org.enderstone.server.api.Location;
 import org.enderstone.server.api.World;
 import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.packet.play.PacketOutBlockChange;
+import org.enderstone.server.regions.io.NBTStorable;
+import org.jnbt.CompoundTag;
+import org.jnbt.Tag;
 
 /**
  *
  * @author Fernando
  */
-public class EnderChunk implements Chunk{
+public class EnderChunk implements Chunk, NBTStorable {
 
 	protected final static int CHUNK_SECTION_SIZE = 16;
 	protected final static int MAX_CHUNK_SECTIONS = 16;
@@ -48,6 +53,9 @@ public class EnderChunk implements Chunk{
 	public boolean hasPopulated = false;
 	private boolean isValid = true;
 	private EnderWorld world;
+    private final List<BlockData> blockData;
+    public final AtomicReference<ChunkState> chunkState = new AtomicReference<>(ChunkState.LOADED);
+    private int unloadTimer = 20;
 
 	public EnderChunk(EnderWorld world, int x, int z, short[][] blockID, byte[][] data, byte[] biome, List<BlockData> blockData) {
 		this.world = world;
@@ -71,14 +79,20 @@ public class EnderChunk implements Chunk{
 		this.blockID = blockID;
 		this.data = data;
 		this.biome = biome;
-		//this.blockData = blockData;
+        this.blockData = blockData;
 		this.x = x;
 	}
+    
+    public EnderChunk(EnderWorld world, int x, int z) {
+        this(world, x, z, new short[MAX_CHUNK_SECTIONS][], new byte[MAX_CHUNK_SECTIONS][], new byte[16*16], new ArrayList<BlockData>());
+    }
 
+    @Override
 	public int getZ() {
 		return z;
 	}
 
+    @Override
 	public int getX() {
 		return x;
 	}
@@ -102,6 +116,11 @@ public class EnderChunk implements Chunk{
 		}
 		return this.x == other.x;
 	}
+    
+    public void resetChunkUnloadTimer(int newAmount) {
+        if(this.unloadTimer < newAmount)
+            this.unloadTimer = newAmount;
+    }
 
 	/**
 	 * MUST BE CALLED FROM MAIN THREAD
@@ -113,8 +132,9 @@ public class EnderChunk implements Chunk{
 	 * @param data
 	 */
 	public void setBlock(int x, int y, int z, BlockId material, byte data) {
-		// if the Block section the block is in hasn't been used yet, allocate
-		// it
+        if (this.chunkState.get() == ChunkState.GONE) 
+            throw new IllegalStateException("Chunk unloaded");
+		// if the Block section the block is in hasn't been used yet, allocate it
 		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {
 			throw new ArrayIndexOutOfBoundsException("x must be: 0 <= x < 16 (" + x + ") &&" + " y must be: 0 <= y < 256 (" + y + ") &&" + " z must be: 0 <= z < 16 (" + z + ")");
 		}
@@ -148,14 +168,11 @@ public class EnderChunk implements Chunk{
 		for (EnderPlayer player : Main.getInstance().onlinePlayers) {
 			if (player.getWorld().worldName.equals(world.worldName)) {
 				if (player.getLoadedChunks().contains(this)) {
-					try {
-						player.getNetworkManager().sendPacket(new PacketOutBlockChange(new Location(player.getWorld(), (this.getX() * 16) + x, y, (this.getZ() * 16) + z, (float) 0, (float) 0), material.getId(), data));
-					} catch (Exception e) {
-						EnderLogger.exception(e);
-					}
+					player.getNetworkManager().sendPacket(new PacketOutBlockChange(new Location(player.getWorld(), (this.getX() * 16) + x, y, (this.getZ() * 16) + z, (float) 0, (float) 0), material.getId(), data));
 				}
 			}
 		}
+        this.chunkState.set(ChunkState.LOADED_SAVE);
 		compressed = NULL_REFERENCE;
 	}
 
@@ -309,6 +326,7 @@ public class EnderChunk implements Chunk{
 		return chunkmap;
 	}
 
+    @Override
 	public int getHighestBlockAt(int x, int z) {
 		for (int i = 255; i > 0; i--) {
 			BlockId bl = this.getBlock(x, i, z);
@@ -321,15 +339,6 @@ public class EnderChunk implements Chunk{
 
 	public boolean isValid() {
 		return this.isValid;
-	}
-
-	public final AtomicReference<ChunkState> chunkState = new AtomicReference<>(ChunkState.LOADED);
-
-	public enum ChunkState {
-
-		LOADED, LOADED_SAVE,
-		UNLOADED, UNLOADED_SAVE,
-		SAVING, GONE
 	}
 
 	@Override
@@ -346,4 +355,45 @@ public class EnderChunk implements Chunk{
 	public World getWorld() {
 		return this.world;
 	}
+
+    @Override
+    public CompoundTag saveToNBT() {
+        //TODO throw new UnsupportedOperationException("Not supported yet.");
+        return new CompoundTag("level", Collections.<String, Tag>emptyMap());
+    }
+
+    @Override
+    public void loadFromNBT(CompoundTag tag) {
+        // TODO throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void serverTick() {
+        // do tile blocks like furnaces and hoppers here
+    }
+    
+    public boolean tickUnload() {
+        if (this.unloadTimer != Integer.MAX_VALUE && this.unloadTimer != Integer.MIN_VALUE) {
+            this.unloadTimer--;
+        }
+        return this.unloadTimer < 0;
+    }
+
+    public int getUnloadTimer() {
+        return this.unloadTimer;
+    }
+
+    @Override
+    public String toString() {
+        return "EnderChunk{" + "x=" + x + ", z=" + z + ", isValid=" + isValid + ", chunkState=" + chunkState + ", unloadTimer=" + unloadTimer + '}';
+    }
+    
+    
+
+    public enum ChunkState {
+
+        LOADED, LOADED_SAVE,
+        UNLOADED, UNLOADED_SAVE,
+        SAVING, GONE
+    }
+
 }
