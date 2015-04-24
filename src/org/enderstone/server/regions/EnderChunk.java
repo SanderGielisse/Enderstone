@@ -55,6 +55,7 @@ public class EnderChunk implements Chunk, NBTStorable {
 	private EnderWorld world;
     private final List<BlockData> blockData;
     public final AtomicReference<ChunkState> chunkState = new AtomicReference<>(ChunkState.LOADED);
+    private int unloadTimer = 20;
 
 	public EnderChunk(EnderWorld world, int x, int z, short[][] blockID, byte[][] data, byte[] biome, List<BlockData> blockData) {
 		this.world = world;
@@ -115,6 +116,11 @@ public class EnderChunk implements Chunk, NBTStorable {
 		}
 		return this.x == other.x;
 	}
+    
+    public void resetChunkUnloadTimer(int newAmount) {
+        if(this.unloadTimer < newAmount)
+            this.unloadTimer = newAmount;
+    }
 
 	/**
 	 * MUST BE CALLED FROM MAIN THREAD
@@ -126,8 +132,9 @@ public class EnderChunk implements Chunk, NBTStorable {
 	 * @param data
 	 */
 	public void setBlock(int x, int y, int z, BlockId material, byte data) {
-		// if the Block section the block is in hasn't been used yet, allocate
-		// it
+        if (this.chunkState.get() == ChunkState.GONE) 
+            throw new IllegalStateException("Chunk unloaded");
+		// if the Block section the block is in hasn't been used yet, allocate it
 		if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0)) {
 			throw new ArrayIndexOutOfBoundsException("x must be: 0 <= x < 16 (" + x + ") &&" + " y must be: 0 <= y < 256 (" + y + ") &&" + " z must be: 0 <= z < 16 (" + z + ")");
 		}
@@ -165,6 +172,7 @@ public class EnderChunk implements Chunk, NBTStorable {
 				}
 			}
 		}
+        this.chunkState.set(ChunkState.LOADED_SAVE);
 		compressed = NULL_REFERENCE;
 	}
 
@@ -351,18 +359,41 @@ public class EnderChunk implements Chunk, NBTStorable {
     @Override
     public CompoundTag saveToNBT() {
         //TODO throw new UnsupportedOperationException("Not supported yet.");
-        return new CompoundTag("level", Collections.<String,Tag>emptyMap());
+        return new CompoundTag("level", Collections.<String, Tag>emptyMap());
     }
 
     @Override
     public void loadFromNBT(CompoundTag tag) {
         // TODO throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public void serverTick() {
+        // do tile blocks like furnaces and hoppers here
+    }
     
+    public boolean tickUnload() {
+        if (this.unloadTimer != Integer.MAX_VALUE && this.unloadTimer != Integer.MIN_VALUE) {
+            this.unloadTimer--;
+        }
+        return this.unloadTimer < 0;
+    }
+
+    public int getUnloadTimer() {
+        return this.unloadTimer;
+    }
+
+    @Override
+    public String toString() {
+        return "EnderChunk{" + "x=" + x + ", z=" + z + ", isValid=" + isValid + ", chunkState=" + chunkState + ", unloadTimer=" + unloadTimer + '}';
+    }
+    
+    
+
     public enum ChunkState {
 
-		LOADED, LOADED_SAVE,
-		UNLOADED, UNLOADED_SAVE,
-		SAVING, GONE
-	}
+        LOADED, LOADED_SAVE,
+        UNLOADED, UNLOADED_SAVE,
+        SAVING, GONE
+    }
+
 }

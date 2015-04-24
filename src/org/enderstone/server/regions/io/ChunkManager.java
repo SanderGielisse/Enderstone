@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Random;
 import org.enderstone.server.EnderLogger;
 import org.enderstone.server.api.Chunk;
+import org.enderstone.server.entity.EnderEntity;
+import org.enderstone.server.entity.player.EnderPlayer;
 import org.enderstone.server.regions.BlockData;
 import org.enderstone.server.regions.BlockId;
 import org.enderstone.server.regions.ChunkGenerator;
@@ -82,10 +84,10 @@ public class ChunkManager {
                 if ((c = this.createChunk(x, z)) == null) {
                     throw new RuntimeException("Unable to create a chunk?!?! This won't happen as createChunk always returns a valid chunk");
                 }
+                markChunkUsed(x, z);
             }
             this.loadedChunks.add(c);
         }
-        markChunkUsed(x, z);
         return c;
     }
 
@@ -125,6 +127,9 @@ public class ChunkManager {
     private void unlockChunk(EnderChunk chunk) {
         saveChunk(chunk);
         EnderLogger.debug("Unload: " + chunk);
+        for(EnderEntity ent : world.entities) {
+            ent.removeInternally(true);
+        }
         chunk.chunkState.set(EnderChunk.ChunkState.GONE);
         this.loadedChunks.remove(chunk);
     }
@@ -142,7 +147,7 @@ public class ChunkManager {
             }
             in = region.getChunkDataInputStream(calculateChunkPos(x), calculateChunkPos(z));
         }
-        if (in == null) {
+        if (true || in == null) { // todo: remove true when the chunk loading finaly works
             return createChunk(x, z);
         }
         try (NBTInputStream indata = new NBTInputStream(in)) {
@@ -188,7 +193,7 @@ public class ChunkManager {
             }
         }
         r = new EnderChunk(world, x, z, id, data, new byte[16 * 16], new ArrayList<BlockData>());
-        r.chunkState.set(EnderChunk.ChunkState.LOADED);
+        r.chunkState.set(EnderChunk.ChunkState.LOADED_SAVE);
         EnderLogger.debug("Create: " + r);
         return r;
     }
@@ -218,7 +223,7 @@ public class ChunkManager {
                 this.saveChunk(c);
             }
             if (state == EnderChunk.ChunkState.LOADED) {
-                if (/* TODO Check entity distance */true) {
+                if (c.tickUnload()) {
                     this.unlockChunk(c);
                 }
             }

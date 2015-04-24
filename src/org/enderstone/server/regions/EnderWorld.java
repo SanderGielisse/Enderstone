@@ -177,6 +177,7 @@ public class EnderWorld implements World {
 					while (cx++ < mx) {
 						for (cz = minz; cz < mz; cz++) {
 							EnderChunk c = getOrCreateChunk(cx, cz);
+                            c.resetChunkUnloadTimer(20);
 							playerChunks.add(c);
 							informer.sendChunk(c);
 						}
@@ -190,6 +191,7 @@ public class EnderWorld implements World {
 					for (; cx < mx; cx++) {
 						for (cz = minz; cz < mz; cz++) {
 							EnderChunk tmp = getOrCreateChunk(cx, cz);
+                            tmp.resetChunkUnloadTimer(20);
 							if (!copy.contains(tmp)) {
 								chunkLoad[index++] = new int[] { cx, cz };
 							} else {
