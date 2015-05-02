@@ -82,8 +82,14 @@ public class Main implements Runnable {
 	public static final String NAME = "Enderstone";
 	public static final String VERSION = "1.0.0";
 	public static final String PROTOCOL_VERSION = "1.8";
-	public static final int EXCEPTED_TICK_RATE = 20;
-	public static final int EXCEPTED_SLEEP_TIME = 1000 / EXCEPTED_TICK_RATE;
+        /**
+         * Amount of server ticks in 1 second
+         */
+	private int tickSpeed = 20;
+        /**
+         * time between ticks in ms
+         */
+	private int tickTime = 1000 / tickSpeed;
 	public static final int CANT_KEEP_UP_TIMEOUT = -10000;
 	public static final int MAX_VIEW_DISTANCE = 10;
 	public static final int MAX_NETTY_BOSS_THREADS = 4;
@@ -277,13 +283,13 @@ public class Main implements Runnable {
 					EnderLogger.error("Problem while running ServerTick()");
 					EnderLogger.exception(e);
 				}
-				this.lastTick += Main.EXCEPTED_SLEEP_TIME;
+				this.lastTick += getTickTime();
 				long sleepTime = (lastTick) - System.currentTimeMillis();
 				Main.this.lastTickSlices[Main.this.lastTickPointer] = sleepTime;
 				if (++Main.this.lastTickPointer >= Main.this.lastTickSlices.length)
 					Main.this.lastTickPointer = 0;
 				if (sleepTime < Main.CANT_KEEP_UP_TIMEOUT) {
-					this.warn("Can't keep up! " + -(sleepTime / Main.EXCEPTED_SLEEP_TIME) + " ticks behind!");
+					this.warn("Can't keep up! " + -(sleepTime / tickTime) + " ticks behind!");
 					this.lastTick = System.currentTimeMillis();
 				} else if (sleepTime > Main.MAX_SLEEP) {
 					this.warn("Did the system time change?");
@@ -520,4 +526,28 @@ public class Main implements Runnable {
 		}
 		return last;
 	}
+
+    /**
+     * @return the tickSpeed
+     */
+    public int getTickSpeed() {
+        return tickSpeed;
+    }
+
+    /**
+     * @param tickSpeed the tickSpeed to set
+     */
+    public void setTickSpeed(int tickSpeed) {
+        if(tickSpeed <= 0) 
+            throw new IllegalArgumentException("tickSpeed <= 0: "+tickSpeed);
+        this.tickSpeed = tickSpeed;
+        this.tickTime = 1000 / tickSpeed;
+    }
+
+    /**
+     * @return the tickTime
+     */
+    public int getTickTime() {
+        return tickTime;
+    }
 }
