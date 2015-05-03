@@ -46,15 +46,28 @@ public class LagCommand extends SimpleCommand {
 			if(max < sleepTime) max = sleepTime;
 			total += sleepTime;
 			long tick = currentTick + i;
+                        double tps = sleepTime;
+                        tps -= Main.getInstance().getTickTime();
+                        if(tps >= 0);
+                            tps = 0;
+                        tps *= -1;
+                        if(tps == 0) {
+                            tps = -1;
+                        } else {
+                            tps = 1000 / tps;
+                        }
+                        
 			sender.sendMessage(
 					new AdvancedMessage()
 						.getBase()
 							.setColor(sleepTime < -50 ? ChatColor.RED : sleepTime < 0 ? ChatColor.YELLOW : ChatColor.GREEN)
 						.addPart("Tick: " + tick + " ")
+                                                .addPart("TPS: " + tps + " ")
 						.addPart("Sleeptime: " + sleepTime)
 					.build()
 			);
 		}
+                assert min <= max;
 		sender.sendMessage(new SimpleMessage("min: " + min + " max: " + max + " avg: " + (total / lastLagg.length)));
 		return COMMAND_SUCCESS;
 	}
