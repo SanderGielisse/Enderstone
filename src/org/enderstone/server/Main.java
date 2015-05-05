@@ -56,6 +56,7 @@ import org.enderstone.server.commands.enderstone.DebugCommand;
 import org.enderstone.server.commands.enderstone.LagCommand;
 import org.enderstone.server.commands.enderstone.PingCommand;
 import org.enderstone.server.commands.enderstone.QuitCommand;
+import org.enderstone.server.commands.enderstone.TickRateCommand;
 import org.enderstone.server.commands.enderstone.VersionCommand;
 import org.enderstone.server.commands.enderstone.WorldCommand;
 import org.enderstone.server.commands.vanilla.GameModeCommand;
@@ -139,6 +140,7 @@ public class Main implements Runnable {
 		commands.registerCommand(new CraftingDebugCommand());
 		commands.registerCommand(new LagCommand());
 		commands.registerCommand(new AiCommand());
+		commands.registerCommand(new TickRateCommand());
 	}
 
 	private static Main instance;
@@ -262,9 +264,7 @@ public class Main implements Runnable {
 			}
 
 			private void mainServerTick() throws InterruptedException {
-				if (Thread.interrupted()) {
-					throw new InterruptedException();
-				}
+				
 				synchronized (sendToMainThread) {
 					for (Runnable run : sendToMainThread) {
 						try {
@@ -296,7 +296,11 @@ public class Main implements Runnable {
 					this.lastTick = System.currentTimeMillis();
 				} else if (sleepTime > 0) {
 					Thread.sleep(sleepTime);
-				}
+				} else {
+                                    if (Thread.interrupted()) {
+					throw new InterruptedException();
+                                    }
+                                }
 				tick++;
 			}
 

@@ -21,16 +21,10 @@ package org.enderstone.server.commands.enderstone;
 import org.enderstone.server.Main;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.commands.Command;
-import static org.enderstone.server.commands.Command.COMMAND_SUCCESS;
 import org.enderstone.server.commands.CommandMap;
 import org.enderstone.server.commands.CommandSender;
 import org.enderstone.server.commands.SimpleCommand;
-import org.enderstone.server.regions.EnderWorld;
 
-/**
- *
- * @author Fernando
- */
 
 
 public class TickRateCommand extends SimpleCommand {
