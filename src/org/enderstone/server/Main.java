@@ -515,7 +515,7 @@ public class Main implements Runnable {
 	public boolean callEvent(Event e) {
 		// TODO call events
 		if (e instanceof Cancellable) {
-			((Cancellable) e).isCancelled();
+			return ((Cancellable) e).isCancelled();
 		}
 		return false;
 	}
