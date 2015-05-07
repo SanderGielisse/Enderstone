@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.RandomAccess;
 
 /**
- *
+ * A fixed size list. This list can be changed, but not increaded or decreased in size
  * @author Fernando
  * @param <E>
  */

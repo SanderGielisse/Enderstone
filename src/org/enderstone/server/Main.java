@@ -297,10 +297,10 @@ public class Main implements Runnable {
 				} else if (sleepTime > 0) {
 					Thread.sleep(sleepTime);
 				} else {
-                                    if (Thread.interrupted()) {
-					throw new InterruptedException();
-                                    }
-                                }
+					if (Thread.interrupted()) {
+						throw new InterruptedException();
+					}
+				}
 				tick++;
 			}
 
@@ -348,6 +348,11 @@ public class Main implements Runnable {
 		}
 	}
 
+	/**
+	 * Gets the current servertick. may overflow to below zero
+	 * if the server is running longer than the length of the universe
+	 * @return 
+	 */
 	public long getCurrentServerTick() {
 		return this.tick;
 	}
@@ -381,6 +386,11 @@ public class Main implements Runnable {
 		return prop;
 	}
 
+	/**
+	 * Get a player by its username
+	 * @param name
+	 * @return 
+	 */
 	public EnderPlayer getPlayer(String name) {
 		for (EnderPlayer ep : this.onlinePlayers) {
 			if (ep.getPlayerName().equals(name)) {
@@ -389,7 +399,9 @@ public class Main implements Runnable {
 		}
 		return null;
 	}
-
+	/**
+	 * Gets a player by its UUID
+	 */
 	public EnderPlayer getPlayer(UUID uuid) {
 		for (EnderPlayer ep : this.onlinePlayers) {
 			if (ep.uuid.equals(uuid)) {

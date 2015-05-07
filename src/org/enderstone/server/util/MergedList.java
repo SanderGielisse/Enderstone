@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.RandomAccess;
 
 /**
- *
+ * A merged list combines 2 fixed size lists into 1 bigger sized list that contains al elements in a specific order
  * @author ferrybig
  * @param <E>
  */
@@ -72,8 +72,15 @@ public class MergedList<E> extends AbstractList<E> implements RandomAccess, java
 		return Objects.equals(this.indexes, other.indexes);
 	}
 
+	/**
+	 * Public builder class used to construct the MergedLists
+	 * @param <E> 
+	 */
 	public static class Builder<E> {
 
+		/**
+		 * Internal array for the references to the orginal list
+		 */
 		@SuppressWarnings("unchecked")
 		private Entry<List<E>, Integer>[] indexes = new Entry[16];
 		private int higestIndex;
