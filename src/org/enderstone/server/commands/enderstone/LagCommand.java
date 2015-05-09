@@ -46,29 +46,46 @@ public class LagCommand extends SimpleCommand {
 			if(max < sleepTime) max = sleepTime;
 			total += sleepTime;
 			long tick = currentTick + i;
-                        double tps = sleepTime;
-                        tps -= Main.getInstance().getTickTime();
-                        if(tps >= 0);
-                            tps = 0;
-                        tps *= -1;
-                        if(tps == 0) {
-                            tps = -1;
-                        } else {
-                            tps = 1000 / tps;
-                        }
+			double tps = sleepTime;
+			tps -= Main.getInstance().getTickTime();
+			if(tps > 0)
+				tps = 0;
+			tps *= -1;
+			if(tps == 0) {
+				tps = Main.getInstance().getTickSpeed();
+			} else {
+				tps = 1000 / tps;
+			}
+			if(tps > Main.getInstance().getTickSpeed())
+				tps = Main.getInstance().getTickSpeed();
                         
 			sender.sendMessage(
 					new AdvancedMessage()
 						.getBase()
 							.setColor(sleepTime < -50 ? ChatColor.RED : sleepTime < 0 ? ChatColor.YELLOW : ChatColor.GREEN)
 						.addPart("Tick: " + tick + " ")
-                                                .addPart("TPS: " + tps + " ")
+						.addPart("TPS: " + String.format("%2.3f",tps) + " ")
 						.addPart("Sleeptime: " + sleepTime)
 					.build()
 			);
 		}
                 assert min <= max;
-		sender.sendMessage(new SimpleMessage("min: " + min + " max: " + max + " avg: " + (total / lastLagg.length)));
+				
+				double avg = (total / (double)lastLagg.length);
+		sender.sendMessage(new SimpleMessage("min: " + min + " max: " + max + " avg: " + String.format("%.3f", avg)));
+		double tps = avg;
+		tps -= Main.getInstance().getTickTime();
+		if(tps > 0)
+			tps = 0;
+		tps *= -1;
+		if(tps == 0) {
+			tps = Main.getInstance().getTickSpeed();
+		} else {
+			tps = 1000 / tps;
+		}
+		if(tps > Main.getInstance().getTickSpeed())
+			tps = Main.getInstance().getTickSpeed();
+		sender.sendMessage(new SimpleMessage("Average TPS: " + String.format("%.3f", tps)));
 		return COMMAND_SUCCESS;
 	}
 
