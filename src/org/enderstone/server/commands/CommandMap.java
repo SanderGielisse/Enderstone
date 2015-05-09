@@ -37,6 +37,13 @@ public class CommandMap extends Command {
 	private final static Command COMMAND_CONFLICT = null;
 	public final static Integer DEFAULT_ENDERSTONE_COMMAND_PRIORITY = -100;
 
+	/**
+	 * Registers a command to this CommandMap.
+	 * Conflicted commands will win by the priority of the commands,
+	 * if multiple commands have the same priority, then the command won't work
+	 * @param cmd The command to register
+	 * @return this, you can chain multiple calls to a CommandMap
+	 */
 	public CommandMap registerCommand(Command... cmd) {
 		for (Command c : cmd) {
 			int priority = c.getPriority();
@@ -73,6 +80,10 @@ public class CommandMap extends Command {
 		return true;
 	}
 
+	/**
+	 * Returns the permission used by this Command, a CommandMap returns always null
+	 * @return always null
+	 */
 	@Override
 	public String getPermision() {
 		return null;
