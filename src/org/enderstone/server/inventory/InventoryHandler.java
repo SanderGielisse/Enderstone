@@ -191,6 +191,7 @@ public class InventoryHandler {
 		int button = packet.getButton();
 		int mode = packet.getMode();
 		if (windowId != this.nextWindowId && windowId != 0) {
+			// TODO: Count how many times this happens when the server is playable, if it happens to mutch times because of the lagg, remove the message
 			player.sendMessage(new SimpleMessage("Invalid inventory interaction!"));
 			return false;
 		}
@@ -356,6 +357,7 @@ public class InventoryHandler {
 			this.activeInventory = this.equimentInventory;
 		} else {
 			assert this.activeInventory == this.equimentInventory;
+			// These slots are the crafting table slots
 			drop(this.equimentInventory.getRawItems(), true, 1);
 			drop(this.equimentInventory.getRawItems(), true, 2);
 			drop(this.equimentInventory.getRawItems(), true, 3);
