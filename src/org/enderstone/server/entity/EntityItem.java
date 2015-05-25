@@ -18,6 +18,7 @@
 package org.enderstone.server.entity;
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.enderstone.server.Main;
 import org.enderstone.server.api.Location;
@@ -40,13 +41,19 @@ public class EntityItem extends EnderEntity implements Item {
 	private final ItemStack itemstack;
 	private int pickupDelay;
 	private Vector vector;
+	private UUID dropper;
 	
 	public EntityItem(EnderWorld world, Location location, ItemStack stack, int pickupDelay, Vector vector) {
+		this(world, location, stack, pickupDelay, vector, null);
+	}
+
+	public EntityItem(EnderWorld world, Location location, ItemStack stack, int pickupDelay, Vector vector, UUID dropper) {
 		super(location);
 		this.itemstack = stack;
 		this.pickupDelay = pickupDelay;
 		this.world = world;
 		this.vector = vector;
+		this.dropper = dropper;
 	}
 
 	@Override
@@ -245,5 +252,12 @@ public class EntityItem extends EnderEntity implements Item {
 	@Override
 	public boolean isOnGround() {
 		return !this.canGoDown();
+	}
+
+	/**
+	 * @return the dropper
+	 */
+	public UUID getDropper() {
+		return dropper;
 	}
 }
