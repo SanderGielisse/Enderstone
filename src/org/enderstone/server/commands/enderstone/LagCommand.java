@@ -74,6 +74,7 @@ public class LagCommand extends SimpleCommand {
 				double avg = (total / (double)lastLagg.length);
 		sender.sendMessage(new SimpleMessage("min: " + min + " max: " + max + " avg: " + String.format("%.3f", avg)));
 		double tps = avg;
+		tps /= lastLagg.length;
 		tps -= Main.getInstance().getTickTime();
 		if(tps > 0)
 			tps = 0;
@@ -85,7 +86,11 @@ public class LagCommand extends SimpleCommand {
 		}
 		if(tps > Main.getInstance().getTickSpeed())
 			tps = Main.getInstance().getTickSpeed();
-		sender.sendMessage(new SimpleMessage("Average TPS: " + String.format("%.3f", tps)));
+		sender.sendMessage(new AdvancedMessage().getBase().
+				setColor(tps < Main.getInstance().getTickSpeed() / 2 ? ChatColor.RED : 
+						tps < Main.getInstance().getTickSpeed() ? ChatColor.YELLOW : 
+								ChatColor.GREEN).
+				addPart("Average TPS: " + String.format("%.3f", tps)).build());
 		return COMMAND_SUCCESS;
 	}
 

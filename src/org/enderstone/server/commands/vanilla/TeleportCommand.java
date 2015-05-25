@@ -85,6 +85,7 @@ public class TeleportCommand extends SimpleCommand {
 		} else {
 			sender.sendMessage(new SimpleMessage("Correct usage: /tp <someone> <tosomeone>"));
 			sender.sendMessage(new SimpleMessage("Or: /tp <tosomeone>"));
+			sender.sendMessage(new SimpleMessage("Or: /tp <x> <y> <z>"));
 			return Command.COMMAND_FAILED;
 		}
 		return Command.COMMAND_SUCCESS;

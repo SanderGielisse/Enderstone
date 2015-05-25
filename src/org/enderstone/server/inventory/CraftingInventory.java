@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.enderstone.server.api.Location;
 import org.enderstone.server.api.messages.CachedMessage;
+import org.enderstone.server.api.messages.Message;
 import org.enderstone.server.api.messages.SimpleMessage;
 import org.enderstone.server.util.MergedList;
 
@@ -34,7 +35,11 @@ public class CraftingInventory extends DefaultHalfInventory {
 	private static final CachedMessage TITLE = CachedMessage.wrap(new SimpleMessage("Crafting Table"));
 
 	public CraftingInventory(Location location) {
-		super(InventoryType.CRAFTING_TABLE, 10, TITLE, new CraftingInventoryListener(3, 3, 0, 1, DefaultCraftingRecipes.getRecipes()));
+		this(location, TITLE);
+	}
+
+	public CraftingInventory(Location location, Message title) {
+		super(InventoryType.CRAFTING_TABLE, 10, title, new CraftingInventoryListener(3, 3, 0, 1, DefaultCraftingRecipes.getRecipes()));
 		this.location = location;
 	}
 
