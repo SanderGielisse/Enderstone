@@ -1,11 +1,11 @@
+Note; This server software was written during pre-university college, at age 16 / 17. It demonstrates good use of protocols and networking in Java, but note that lots of improvements are possible. This software will not be updated. The project is currently using Minecraft protocol version 47, which means that only Minecraft 1.8 clients will be able to connect.
+
 Enderstone Server Software
 
 GLOBAL INFORMATION
 =========
 Enderstone is a project started by BigTeddy98 (Sander) and Ferrybig (Fernando).
 We are making an open-source Minecraft server with a custom API, without using any Mojang Minecraft Server code.
-
-The project is currently using protocol version 47, which means that only Minecraft 1.8 clients will be able to connect.
 
 LICENSE
 =========
